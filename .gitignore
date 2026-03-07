@@ -17,7 +17,7 @@ __pycache__/
 .DS_Store
 
 # ======================
-# Jupyter (si tu en utilises)
+# Jupyter
 # ======================
 .ipynb_checkpoints/
 
@@ -26,3 +26,18 @@ __pycache__/
 # ======================
 *.log
 *.tmp
+
+# ======================
+# DATA
+# ======================
+data/
+
+# ======================
+# Notebooks
+# ======================
+notebooks/
+
+# ======================
+# Script temporaire
+# ======================
+script/compare.py
