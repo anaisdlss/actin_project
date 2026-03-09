@@ -1,4 +1,4 @@
-# Projet interaction entre actin et actin binding protein
+# Projet interaction actin-ABP
 
 ## Installation du projet et environnement
 
