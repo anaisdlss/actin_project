@@ -35,10 +35,19 @@ actin_project/
 │   └── get_pdb_entries.py
 │
 ├── data/
+│   ├── ppi3d_actin_summary.csv
+│   ├── pdb_entry_results.csv
+│   │
 │   ├── details/
-│   ├── clusters/
-│   └── ppi3d_actin_summary.csv
-│   └── pdb_entry_results.csv
+│   │   └── structures_files/
+│   │
+│   └── clusters/
+│       ├── clusters_summary.csv
+│       └── pdb_entry_results.csv
+│
+├── pixi.toml
+├── pixi.lock
+└── README.md
 
 ### 1. Retrieve summary results
 
