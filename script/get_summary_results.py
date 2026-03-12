@@ -62,12 +62,13 @@ def load_metadata():
 # sauvegarder metadata
 # -----------------------------
 
-def save_metadata(update_date, job_id):
+def save_metadata(update_date, job_id, results_url):
 
     metadata = {
         "uniprot": UNIPROT_ID,
         "ppi3d_last_update": update_date,
-        "job_id": job_id
+        "job_id": job_id,
+        "results_url": results_url
     }
 
     with open(META_PATH, "w") as f:
@@ -131,11 +132,14 @@ if metadata is None:
 
     print("New Job ID:", job_id)
 
-    save_metadata(current_update, job_id)
+    results_url = f"{BASE_URL}/site/results/{job_id}"
+    save_metadata(current_update, job_id, results_url)
 
 else:
 
     print("Using frozen job:", job_id)
+    results_url = f"{BASE_URL}/site/results/{job_id}"
+    save_metadata(current_update, job_id, results_url)
 
 
 # -----------------------------
@@ -172,46 +176,67 @@ html = session.get(detailed_url).text
 
 print("Detailed page downloaded")
 
+soup = BeautifulSoup(html, "html.parser")
+
 
 # -----------------------------
 # table interactions
 # -----------------------------
 
-tables = pd.read_html(StringIO(html))
+tables = pd.read_html(StringIO(html), flavor="bs4")
 summary_df = tables[0]
 
 print("Number of interactions:", len(summary_df))
 
 
 # -----------------------------
-# extraire liens DETAILS
+# extraire liens DETAILS et CLUSTERS
 # -----------------------------
 
-soup = BeautifulSoup(html, "html.parser")
+rows = soup.select("#detailed_table tbody tr")
 
 detail_links = []
+cluster_links = []
 
-for a in soup.find_all("a", href=True):
+for i, row in enumerate(rows):
 
-    if "interaction_details" in a["href"]:
+    # ------------------
+    # detail link
+    # ------------------
 
-        link = a["href"]
+    detail = row.find("a", href=lambda x: x and "interaction_details" in x)
 
+    if detail:
+        link = detail["href"]
         if not link.startswith("http"):
             link = BASE_URL + link
-
         detail_links.append(link)
+    else:
+        detail_links.append(None)
 
-print("Number of detail pages:", len(detail_links))
+    # ------------------
+    # cluster link
+    # ------------------
+
+    cluster = row.find("a", href=lambda x: x and "detailed_cluster" in x)
+
+    if cluster:
+        link = cluster["href"]
+        if not link.startswith("http"):
+            link = BASE_URL + link
+        cluster_links.append(link)
+    else:
+        cluster_links.append(None)
 
 
 # -----------------------------
-# ajouter les liens dans summary
+# ajouter les colonnes
 # -----------------------------
 
 if len(detail_links) == len(summary_df):
 
     summary_df["detail_url"] = detail_links
+    summary_df["cluster_url"] = cluster_links
 
 else:
 
@@ -227,8 +252,7 @@ summary_path = os.path.join(
     f"ppi3d_{NAME_PROT}_summary.csv"
 )
 
-summary_df.to_csv(summary_path, index=False)
+summary_df.to_csv(summary_path, index=False, sep=";")
 
 print("Summary saved:", summary_path)
-
 print("\nSummary extraction finished.")

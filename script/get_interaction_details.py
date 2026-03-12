@@ -64,30 +64,51 @@ def save_dataframe(data, filename):
 DATA_DIR = "data"
 DETAIL_DIR = os.path.join(DATA_DIR, "details")
 
-PAIRWISE_DIR = os.path.join(DETAIL_DIR, "structures_files/pairwise")
-ASSEMBLY_DIR = os.path.join(DETAIL_DIR, "structures_files/assembly")
-PYMOL_DIR = os.path.join(DETAIL_DIR, "structures_files/pymol")
-
-SUMMARY_PATH = os.path.join(DATA_DIR, "ppi3d_actin_summary.csv")
-
 REQUEST_TIMEOUT = 30
-PAUSE = 0.5
-
-create_directories()
+PAUSE = 0.05
 
 session = requests.Session()
 session.headers.update({
     "User-Agent": "ppi3d-actin-scraper/1.0"
 })
+adapter = requests.adapters.HTTPAdapter(pool_connections=50, pool_maxsize=50)
+session.mount("https://", adapter)
 
 
 def main():
 
     # -----------------------------
+    # CHOOSE INPUT
+    # -----------------------------
+
+    global DETAIL_DIR, PAIRWISE_DIR, ASSEMBLY_DIR, PYMOL_DIR
+
+    mode = input(
+        "Use clusters summary instead of default summary? (y/[n]): "
+    ).strip().lower()
+
+    if mode == "y":
+        SUMMARY_PATH = os.path.join(
+            DATA_DIR, "clusters", "clusters_summary.csv")
+        DETAIL_DIR = os.path.join(DATA_DIR, "clusters", "details")
+        is_cluster = True
+    else:
+        SUMMARY_PATH = os.path.join(DATA_DIR, "ppi3d_actin_summary.csv")
+        DETAIL_DIR = os.path.join(DATA_DIR, "details")
+        is_cluster = False
+
+    PAIRWISE_DIR = os.path.join(DETAIL_DIR, "structures_files/pairwise")
+    ASSEMBLY_DIR = os.path.join(DETAIL_DIR, "structures_files/assembly")
+    PYMOL_DIR = os.path.join(DETAIL_DIR, "structures_files/pymol")
+
+    create_directories()
+
+    # -----------------------------
     # LOAD SUMMARY
     # -----------------------------
 
-    summary = pd.read_csv(SUMMARY_PATH)
+    summary = pd.read_csv(SUMMARY_PATH, sep=";")
+    print("Using summary file:", SUMMARY_PATH)
 
     detail_urls = summary["detail_url"].tolist()
 
@@ -114,17 +135,27 @@ def main():
             r.raise_for_status()
             html = r.text
 
-            soup = BeautifulSoup(html, "html.parser")
+            soup = BeautifulSoup(html, "lxml")
             tables = pd.read_html(StringIO(html))
 
             # récupérer le texte de la page
             text = soup.get_text(separator="\n", strip=True)
             lines = text.split("\n")
 
-            interaction = {"interaction_id": i+1}
+            if is_cluster:
+                interaction_id = summary.iloc[i]["Link to details"].split(" ")[
+                    0].strip()
+                cluster_id = summary.iloc[i]["cluster_id"]
+                interaction = {
+                    "interaction_id": f"{cluster_id}.{interaction_id}"
+                }
+            else:
+                interaction = {"interaction_id": i+1}
+
+            current_id = interaction["interaction_id"]
+            safe_id = str(current_id).replace(".", "_")
 
             for idx, line in enumerate(lines):
-
                 line = line.strip()
 
             # -----------------------------
@@ -172,7 +203,7 @@ def main():
 
                     protein = {}
 
-                    protein["interaction_id"] = i+1
+                    protein["interaction_id"] = current_id
                     protein["chain_id"] = line.split(":")[-1].strip()
 
                     protein["protein_name"] = lines[idx +
@@ -181,7 +212,13 @@ def main():
                                                 2].replace("Source organism:", "").strip()
 
                     residues = lines[idx + 3].split(":")[-1].strip()
-                    protein["num_residues"] = int(residues.split()[0])
+
+                    match = re.search(r"\d+", residues)
+
+                    if match:
+                        protein["num_residues"] = int(match.group())
+                    else:
+                        protein["num_residues"] = None
 
                     proteins.append(protein)
 
@@ -209,7 +246,7 @@ def main():
 
                     residue = {}
 
-                    residue["interaction_id"] = i+1
+                    residue["interaction_id"] = current_id
                     residue["chain"] = chain
 
                     residue["residue_number_structure"] = row["Residue no. in structure"]
@@ -235,7 +272,7 @@ def main():
 
                         contact = {}
 
-                        contact["interaction_id"] = i + 1
+                        contact["interaction_id"] = current_id
 
                         contact["chain_A_id"] = interaction["chain_A_id"]
                         contact["residue_A_structure"] = row["Residue no. in chain A structure"]
@@ -268,7 +305,7 @@ def main():
 
                         ligand = {}
 
-                        ligand["interaction_id"] = i + 1
+                        ligand["interaction_id"] = current_id
                         ligand["chain"] = row["Chain"]
                         ligand["protein"] = row["Protein"]
                         ligand["residue_number"] = row["Residue no."]
@@ -283,7 +320,7 @@ def main():
             # table 6 sequence alignment metadata
             # -----------------------------
 
-            metadata = {"interaction_id": i + 1}
+            metadata = {"interaction_id": current_id}
 
             in_interface_block = False
 
@@ -343,7 +380,7 @@ def main():
             # table 7 alignment
             # -----------------------------
 
-            alignment_seq = {"interaction_id": i + 1}
+            alignment_seq = {"interaction_id": current_id}
 
             # ---- récupérer FASTA ----
 
@@ -415,7 +452,7 @@ def main():
             # table 8 structures
             # -----------------------------
 
-            structure = {"interaction_id": i + 1}
+            structure = {"interaction_id": current_id}
 
             for a in soup.find_all("a", href=True):
 
@@ -435,7 +472,9 @@ def main():
                             chainA = interaction["chain_A_id"].split("_")[-1]
                             chainB = interaction["chain_B_id"].split("_")[-1]
 
-                            filename = f"{i+1}_{pdb_id}_{chainA}_{chainB}.pdb"
+                            filename = (
+                                f"{safe_id}_{pdb_id}_{chainA}_{chainB}.pdb"
+                            )
 
                             file_path = save_file(
                                 pdb_text,
@@ -458,7 +497,8 @@ def main():
                             chainA = interaction["chain_A_id"].split("_")[-1]
                             chainB = interaction["chain_B_id"].split("_")[-1]
 
-                            filename = f"{i+1}_{pdb_id}_{chainA}_{chainB}.py"
+                            filename = (
+                                f"{safe_id}_{pdb_id}_{chainA}_{chainB}.py")
 
                             script_path = save_file(
                                 pymol_script,
@@ -484,7 +524,7 @@ def main():
                             if "mmCIF" in href or content.startswith("data_"):
 
                                 pdb_id = interaction["pdb_id"]
-                                filename = f"{i+1}_{pdb_id}.cif"
+                                filename = f"{safe_id}_{pdb_id}.cif"
 
                                 cif_path = save_file(
                                     content,
@@ -499,7 +539,7 @@ def main():
 
                                 pdb_id = interaction["pdb_id"]
 
-                                filename = f"{i+1}_{pdb_id}.pdb"
+                                filename = f"{safe_id}_{pdb_id}.pdb"
 
                                 pdb_path = save_file(
                                     content,
