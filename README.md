@@ -1,6 +1,6 @@
 # Projet interaction actin-ABP
 
-## Installation du projet et environnement
+## 1. Installation du projet et environnement
 
 Assurez vous que pixi et python >3.11 (anaconda) soient installés.
 
@@ -12,7 +12,7 @@ cd actin_project
 pixi install
 pixi shell
 ```
-## Generate data
+## 2. Generate data
 
 Using the provided scripts, it is possible to retrieve data from the PPI3D database using the UniProt identifier P60709.
 This generates the summary results as well as the detailed information for each interaction.
