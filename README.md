@@ -26,31 +26,30 @@ The scripts in the script/ directory allow retrieval of interaction data from th
 
 The pipeline is composed of four main steps.
 
-### Project structure
+### Data structure
 
 ```
-actin_project/
-│
-├── script/
-│   ├── get_summary_results.py
-│   ├── get_interaction_details.py
-│   ├── get_cluster.py
-│   └── get_pdb_entries.py
-│
-├── data/
-│   ├── ppi3d_actin_summary.csv
-│   ├── pdb_entry_results.csv
-│   │
-│   ├── details/
-│   │   └── structures_files/
-│   │
-│   └── clusters/
-│       ├── clusters_summary.csv
-│       └── pdb_entry_results.csv
-│
-├── pixi.toml
-├── pixi.lock
-└── README.md
+data/
+├── ppi3d_actin_summary.csv
+├── pdb_entry_results.csv
+├── details/
+│   ├── 1.interactions.csv
+│   ├── 2.proteins.csv
+│   ├── 3.interface_residues.csv
+│   ├── 4.inter-residue_contacts.csv
+│   ├── 6.meta_alignement.csv
+│   ├── 7.alignment_sequences.csv
+│   ├── 8.structures.csv
+│   ├── structures_files/
+│       ├── pairwise/
+│       ├── assembly/
+│       ├── pymol/
+├── clusters/
+│   ├── clusters_summary.csv
+│   ├── pdb_entry_cluster.csv
+│   └── details/
+│       ├── ...
+
 ```
 
 ### 1. Retrieve summary results
