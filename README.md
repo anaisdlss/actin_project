@@ -25,7 +25,10 @@ When the database is updated, it is recommended to rerun the scripts in order to
 The scripts in the script/ directory allow retrieval of interaction data from the PPI3D database using the UniProt identifier P60709 (Actin).
 
 The pipeline is composed of four main steps.
+
 ### Project structure
+
+```
 actin_project/
 │
 ├── script/
@@ -48,6 +51,7 @@ actin_project/
 ├── pixi.toml
 ├── pixi.lock
 └── README.md
+```
 
 ### 1. Retrieve summary results
 
