@@ -1,10 +1,10 @@
-# Projet interaction actin-ABP
+# Projet interaction actine-ABP
 
-## 1. Installation du projet et environnement
+Récupération et analyse des interactions actine–protéines de liaison à l'actine (ABP) depuis la base de données [PPI3D](https://bioinformatics.lt/ppi3d), à partir de l'identifiant UniProt **P60709** (Actin, cytoplasmic 1).
 
-Assurez vous que pixi et python >3.11 (anaconda) soient installés.
+## 1. Installation
 
-Clonez le repertoire, allez au dossier du projet, et activez l'environnement pixi:
+Assurez-vous que [pixi](https://pixi.sh) et Python ≥ 3.11 sont installés.
 
 ```bash
 git clone https://github.com/anaisdlss/actin_project.git
@@ -12,104 +12,81 @@ cd actin_project
 pixi install
 pixi shell
 ```
-## 2. Generate data
 
-Using the provided scripts, it is possible to retrieve data from the PPI3D database using the UniProt identifier P60709.
-This generates the summary results as well as the detailed information for each interaction.
-The clustered results and their corresponding details are also retrieved.
-Finally, additional information about the PDB entries associated with these results is extracted.
+## 2. Générer les données
 
-For reproducibility purposes, the generated identifiers (e.g. job IDs) are stored and reused until a new update of the PPI3D database occurs.
-When the database is updated, it is recommended to rerun the scripts in order to regenerate the results and obtain the most up-to-date data.
+### Option A — Pipeline complet (recommandé)
 
-The scripts in the script/ directory allow retrieval of interaction data from the PPI3D database using the UniProt identifier P60709 (Actin).
+Le pipeline enchaîne les 6 étapes automatiquement :
 
-The pipeline is composed of four main steps.
+```bash
+python script/data_extract/pipeline_data.py
+```
 
-### Data structure
+> Sur macOS, pour éviter la mise en veille pendant l'exécution :
+> ```bash
+> caffeinate -i python script/data_extract/pipeline_data.py
+> ```
+
+Les étapes sont :
+
+| Étape | Description |
+|-------|-------------|
+| 1/6 | Récupération du summary des interactions (BLAST PPI3D) |
+| 2/6 | Récupération des entrées PDB associées |
+| 3/6 | Récupération de la table globale des clusters PPI3D |
+| 4/6 | Filtrage des structures (≥ 5 actines) via notebook |
+| 5/6 | Téléchargement des détails d'interface (résidus de contact) |
+| 6/6 | Filtrage de la table all_data selon les PDB retenus |
+
+Les étapes déjà à jour sont automatiquement ignorées (vérification par date de modification).
+
+### Option B — Étapes individuelles
+
+```bash
+python -m script.data_extract.get_summary_results
+python -m script.data_extract.get_pdb_entries
+python -m script.data_extract.get_cluster_table
+python -m script.data_extract.get_interaction_details
+```
+
+### Structure des données générées
 
 ```
 data/
-├── ppi3d_actin_summary.csv
-├── pdb_entry_results.csv
-├── details/
-│   ├── 1.interactions.csv
-│   ├── 2.proteins.csv
-│   ├── 3.interface_residues.csv
-│   ├── 4.inter-residue_contacts.csv
-│   ├── 6.meta_alignement.csv
-│   ├── 7.alignment_sequences.csv
-│   ├── 8.structures.csv
-│   ├── structures_files/
-│       ├── pairwise/
-│       ├── assembly/
-│       ├── pymol/
-├── clusters/
-│   ├── clusters_summary.csv
-│   ├── pdb_entry_cluster.csv
-│   └── details/
-│       ├── ...
-
+├── raw/
+│   ├── ppi3d_actin_summary.csv
+│   ├── pdb_entry_results.csv
+│   ├── all_data.csv
+│   └── metadata.json
+└── filtered/
+    ├── filtered_pdb_entry.csv
+    ├── filtered_summary.csv
+    ├── filtered_all_data.csv
+    └── details/
+        ├── 1.interactions.csv
+        ├── 2.proteins.csv
+        ├── 3.interface_residues.csv
+        ├── 4.inter-residue_contacts.csv
+        ├── 5.ligands.csv
+        ├── 6.meta_alignement.csv
+        ├── 7.alignment_sequences.csv
+        └── 8.structures.csv
 ```
 
-### 1. Retrieve summary results
+> Le fichier `metadata.json` stocke les identifiants de jobs PPI3D pour assurer la reproductibilité. Quand la base PPI3D est mise à jour, relancer le pipeline pour obtenir les données les plus récentes.
+
+## 3. Interface Streamlit
+
+L'application Streamlit permet de lancer le pipeline, visualiser les données filtrées et explorer les clusters d'interactions depuis un navigateur.
 
 ```bash
-python script/get_summary_results.py
-```
-This script queries the PPI3D database and generates the summary of all interactions involving actin.
-Output:
-```code
-data/ppi3d_actin_summary.csv
-data/metadata.json
-```
-The metadata.json file stores the job identifier returned by PPI3D to ensure reproducibility.
-
-### 2. Retrieve interaction details
-```bash
-python script/get_interaction_details.py
-```
-This script downloads the detailed information for each interaction found in the summary.
-Outputs are stored in:
-
-```code
-data/details/
-```
-Structure files (PDB / CIF) are stored in:
-```code
-data/details/structures_files/
+streamlit run script/streamlit.py
 ```
 
-### 3. Retrieve clusters
-```bash
-python script/get_cluster.py
-```
+## 4. Notebooks d'analyse
 
-This script extracts the clustered interaction results from PPI3D.
-Outputs:
-```code
-data/clusters/clusters_summary.csv
-data/clusters/details/
-```
+Les notebooks sont dans le dossier `notebooks/` :
 
-### 4. Retrieve PDB entry interactions
-```bash
-python script/get_pdb_entries.py
-```
-This script retrieves all interactions present in each PDB entry identified in the summary results.
-The script will ask whether to use:
-```code
-cluster summary or default summary
-```
-Outputs:
-```code
-data/pdb_entry_results.csv
-```
-or
-```code
-data/clusters/pdb_entry_results.csv
-```
-depending on the selected mode.
-
-
-
+- `graphe_filter.ipynb` — filtrage des structures PDB (étape 4 du pipeline)
+- `cluster_interaction_analysis.ipynb` — analyse des clusters d'interactions actine
