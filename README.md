@@ -4,89 +4,116 @@ Récupération et analyse des interactions actine–protéines de liaison à l'a
 
 ---
 
-## 1. Installation
+## Étape 1 — Installer les outils nécessaires
 
-Assurez-vous que [pixi](https://pixi.sh) est installé.
+### 1.1 Installer pixi
+
+Pixi est le gestionnaire d'environnement utilisé par ce projet. Il installe automatiquement Python et toutes les dépendances.
+
+**Sur macOS :**
+Ouvre le terminal (cherche "Terminal" dans Spotlight avec `Cmd + Espace`), puis colle cette commande et appuie sur Entrée :
 
 ```bash
-git clone https://github.com/anaisdlss/actin_project.git
-cd actin_project
-pixi install
-pixi shell
+curl -fsSL https://pixi.sh/install.sh | bash
 ```
+
+Ferme le terminal et rouvre-le pour que pixi soit pris en compte.
 
 ---
 
-## 2. Pipeline complet — générer toutes les données
+## Étape 2 — Récupérer le projet
 
-Le pipeline se déroule en **deux phases** à exécuter dans l'ordre.
-
-### Phase 1 — Téléchargement et filtrage des données PPI3D
+Choisis un dossier où tu veux mettre le projet (par exemple ton Bureau ou tes Documents), puis dans le terminal :
 
 ```bash
-python -m script.data_extract.pipeline_data
+# Exemple : aller dans le dossier Documents
+cd ~/Documents
+
+# Cloner le projet depuis GitHub
+git clone https://github.com/anaisdlss/actin_project.git
+
+# Entrer dans le dossier du projet
+cd actin_project
 ```
 
-> Sur macOS, pour éviter la mise en veille :
+> Si `git` n'est pas installé, macOS te proposera de l'installer automatiquement au premier usage — clique OK.
+
+---
+
+## Étape 3 — Installer l'environnement
+
+Toujours dans le terminal, dans le dossier `actin_project` :
+
+```bash
+pixi install
+```
+
+Cette commande télécharge et installe Python, Jupyter, et toutes les librairies nécessaires. Cela peut prendre quelques minutes la première fois.
+
+---
+
+## Étape 4 — Lancer le pipeline complet
+
+Le pipeline télécharge toutes les données depuis PPI3D et génère l'ensemble des analyses automatiquement.
+
+```bash
+pixi run python -m script.data_extract.pipeline_data
+```
+
+> **Important :** ne mets pas ton ordinateur en veille pendant l'exécution. Sur Mac, tu peux éviter la mise en veille automatique avec :
 > ```bash
-> caffeinate -i python -m script.data_extract.pipeline_data
+> caffeinate -i pixi run python -m script.data_extract.pipeline_data
 > ```
 
-Cette commande enchaîne automatiquement les étapes suivantes :
+Le pipeline enchaîne les étapes suivantes (peut durer 30–60 minutes selon la connexion) :
 
 | Étape | Description |
 |-------|-------------|
-| 1/11 | Récupération du summary des interactions (BLAST PPI3D) |
-| 2/11 | Récupération des entrées PDB associées |
-| 3/11 | Récupération de la table globale des clusters PPI3D |
-| 4/11 | Filtrage des structures (≥ 5 actines) via notebook |
-| 5/11 | Téléchargement des détails d'interface (résidus de contact) |
+| 1/11 | Téléchargement du summary des interactions (PPI3D) |
+| 2/11 | Téléchargement des entrées PDB |
+| 3/11 | Téléchargement de la table des clusters |
+| 4/11 | Filtrage des structures (≥ 4 actines connectées) |
+| 5/11 | Téléchargement des détails d'interface |
 | 6/11 | Alignements MAFFT des séquences |
-| 7/11 | Calcul des patches S1 binding site |
-| 8/11 | Calcul des B-factors C70 interface |
-| 9/11 | Calcul des B-factors cluster |
-| 10/11 | Génération du heatmap S1 |
-| 11/11 | Calcul des B-factors cluster (finalisation) |
+| 7/11 | Analyse des clusters d'interaction C70 |
+| 8/11 | Calcul des B-factors interface C70 |
+| 9/11 | Analyse détaillée interface par cluster C70 |
+| 10/11 | Heatmap S1 binding site |
+| 11/11 | Calcul des B-factors S1 par cluster |
 
-Les étapes déjà à jour sont automatiquement ignorées.
-
-### Phase 2 — Analyse des interfaces (notebooks)
-
-```bash
-jupyter nbconvert --to notebook --execute --inplace notebooks/interface_analysis_s1.ipynb
-jupyter nbconvert --to notebook --execute --inplace notebooks/interface_analysis_c70.ipynb
-```
-
-Ces notebooks génèrent les visualisations dans `visualisations/`.
+Les étapes déjà réalisées sont automatiquement ignorées si les données sont à jour.
 
 ---
 
-## 3. Lancer l'interface Streamlit
+## Étape 5 — Lancer l'interface web
+
+Une fois le pipeline terminé, lance l'interface Streamlit :
 
 ```bash
-streamlit run script/streamlit.py
+pixi run streamlit run script/streamlit.py
 ```
 
-L'application permet de visualiser les données filtrées et d'explorer les clusters d'interactions actine–ABP.
+Une page s'ouvre automatiquement dans ton navigateur. Si ce n'est pas le cas, ouvre manuellement l'adresse affichée dans le terminal (généralement `http://localhost:8501`).
 
 ---
 
 ## Structure des données générées
 
+Après le pipeline, le dossier `data/` contiendra :
+
 ```
 data/
-├── raw/
+├── raw/                        ← données brutes téléchargées depuis PPI3D
 │   ├── ppi3d_actin_summary.csv
 │   ├── pdb_entry_results.csv
 │   ├── all_data.csv
 │   └── metadata.json
-└── filtered/
+└── filtered/                   ← données filtrées et analysées
     ├── filtered_pdb_entry.csv
     ├── filtered_summary.csv
     ├── filtered_all_data.csv
     ├── patches_infos_s1_binding_site.csv
     ├── patches_infos_cluster_data_70.csv
-    ├── actin_s1_canon_area_by_cluster.csv
     └── details/
         ├── 1.interactions.csv
         ├── 2.proteins.csv
@@ -97,11 +124,5 @@ data/
         ├── 7.alignment_sequences.csv
         └── 8.structures.csv
 
-visualisations/
-├── actin_s1_all_equitable_heatmap.png
-├── actin_c70_heatmap_surface_area.png
-├── actin_c70_contacts/
-└── actin_c70_contacts_surface_area/
+visualisations/                 ← graphiques générés par le pipeline
 ```
-
-> `metadata.json` stocke les identifiants de jobs PPI3D pour la reproductibilité. Relancer le pipeline si la base PPI3D est mise à jour.
