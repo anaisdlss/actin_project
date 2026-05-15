@@ -1,14 +1,14 @@
 """
 Génère un script PyMOL par cluster de site de liaison actine (Binding Site Cluster Data 70).
 
-Chaque script correspond à un nœud rouge du réseau "Binding Site Cluster Data 70"
-et montre :
-  - L'actine de référence (8iah_L, surface grise semi-transparente)
-  - Tous les partenaires C70 associés à ce site actine (surface chain B colorée par B-factor)
+Logique identique au réseau Streamlit "Binding Site Cluster Data 70" :
+  - Un script par nœud rouge (S1 binding site cluster, ou S2 actin pour homo)
+  - À l'intérieur : un objet PyMOL par S2 binding site connecté (arête dans le réseau)
+    → représenté par le C70 patch avec le plus d'interactions pour cette paire (S1, S2)
 
-Logique de groupement (identique au réseau Streamlit) :
-  - Pour chaque interaction de df_all : s1_binding_site_cluster_data_70 → cluster_data_70
-  - Pour les interactions homo (s2_actine=True) : s2_binding_site_cluster_data_70 aussi actine
+Chaque script montre :
+  - L'actine de référence (8iah_L, surface grise semi-transparente)
+  - Un objet par S2 binding site (surface chain B, colorée par B-factor)
 
 Usage :
   cd /path/to/actin_project
@@ -46,35 +46,50 @@ if not ref_pdb_path.exists():
     ref_pdb_path = candidates[0]
 ref_pdb_abs = ref_pdb_path.resolve()
 
-# ── Groupement actin_site → set de C70 patches (même logique que le réseau) ───
-actin_to_patches: dict[str, set] = defaultdict(set)
+# ── Groupement : actin_site → { s2_binding_site → meilleur C70 patch } ────────
+# Identique au réseau : une arête par (S1 binding site, S2 binding site)
+# Si plusieurs C70 patches pour la même paire → on garde celui avec le plus
+# d'interactions (représentant le plus statistiquement solide).
+#
+# Structure : actin_to_s2 [actin_site][s2_site] = best_c70_patch
+actin_to_s2: dict[str, dict[str, str]] = defaultdict(dict)
 
-for _, row in df_all.iterrows():
-    s1_bs = row.get("s1_binding_site_cluster_data_70")
-    c70   = row.get("cluster_data_70")
-    if pd.isna(s1_bs) or pd.isna(c70):
+df_valid = df_all[df_all["cluster_data_70"].notna()].copy()
+df_valid["s1_bs"] = df_valid["s1_binding_site_cluster_data_70"].astype(str)
+df_valid["s2_bs"] = df_valid["s2_binding_site_cluster_data_70"].astype(str)
+df_valid["c70"]   = df_valid["cluster_data_70"].astype(str)
+
+for _, row in df_valid.iterrows():
+    s1_bs = row["s1_bs"]
+    s2_bs = row["s2_bs"]
+    c70   = row["c70"]
+    if s1_bs == "nan" or s2_bs == "nan" or c70 == "nan":
         continue
-    s1_bs = str(s1_bs)
-    c70   = str(c70)
-    actin_to_patches[s1_bs].add(c70)
 
-    # Pour les homos, S2 est aussi actine → même groupement
+    # Mettre à jour si ce C70 patch a plus d'interactions que le précédent
+    current = actin_to_s2[s1_bs].get(s2_bs)
+    if current is None or patch_n.get(c70, 0) > patch_n.get(current, 0):
+        actin_to_s2[s1_bs][s2_bs] = c70
+
+    # Pour les homos, S2 est aussi actine → même logique depuis le côté S2
     if row["s2_actine"]:
-        s2_bs = row.get("s2_binding_site_cluster_data_70")
-        if pd.notna(s2_bs):
-            actin_to_patches[str(s2_bs)].add(c70)
+        current2 = actin_to_s2[s2_bs].get(s1_bs)
+        if current2 is None or patch_n.get(c70, 0) > patch_n.get(current2, 0):
+            actin_to_s2[s2_bs][s1_bs] = c70
 
-print(f"Clusters actine uniques : {len(actin_to_patches)}")
+print(f"Clusters actine uniques : {len(actin_to_s2)}")
 
 # ── Génération des scripts PyMOL ───────────────────────────────────────────────
 n_written = 0
-for actin_site, patches_set in sorted(actin_to_patches.items()):
-    patches_sorted = sorted(patches_set, key=lambda p: patch_n.get(p, 0), reverse=True)
+for actin_site, s2_to_c70 in sorted(actin_to_s2.items()):
+    # Trier les S2 binding sites par n_interactions du représentant (décroissant)
+    s2_sorted = sorted(s2_to_c70.items(), key=lambda x: patch_n.get(x[1], 0), reverse=True)
 
     lines = [
         f"# PyMOL — cluster actine : {actin_site}",
-        f"# {len(patches_sorted)} partenaires C70",
+        f"# {len(s2_sorted)} S2 binding sites (un objet par arête du réseau Binding Site Cluster Data 70)",
         "# Vert = ABP (hétéro) | Rose = actine (homo) | Intensité = B-factor (% ASA interface)",
+        "# Représentant par S2 binding site = C70 patch avec le plus d'interactions",
         "",
         "# ── Actine de référence ──────────────────────────────────────────────────",
         f"load {ref_pdb_abs}, _ref_complex",
@@ -85,18 +100,19 @@ for actin_site, patches_set in sorted(actin_to_patches.items()):
         "color grey70, base_actin",
         "set transparency, 0.55, base_actin",
         "",
-        "# ── Partenaires ──────────────────────────────────────────────────────────",
+        "# ── S2 binding sites ─────────────────────────────────────────────────────",
     ]
 
     n_loaded = 0
-    for patch in patches_sorted:
-        pdb_path = (BFAC_DIR / f"{patch}.pdb").resolve()
+    for s2_site, c70_patch in s2_sorted:
+        pdb_path = (BFAC_DIR / f"{c70_patch}.pdb").resolve()
         if not pdb_path.exists():
             continue
 
-        itype = patch_type.get(patch, "hetero")
-        obj_tmp     = "tmp_" + re.sub(r"[^A-Za-z0-9_]", "_", patch)
-        obj_partner = "p_"   + re.sub(r"[^A-Za-z0-9_]", "_", patch)
+        itype = patch_type.get(c70_patch, "hetero")
+        # Nom d'objet PyMOL basé sur le S2 binding site (pas le C70 patch)
+        obj_tmp     = "tmp_" + re.sub(r"[^A-Za-z0-9_]", "_", s2_site)
+        obj_partner = "s2_"  + re.sub(r"[^A-Za-z0-9_]", "_", s2_site)
 
         bmax = 1.0
         for line in open(pdb_path):
@@ -115,7 +131,7 @@ for actin_site, patches_set in sorted(actin_to_patches.items()):
             color_cmd = f"spectrum b, white_green,   {obj_partner}, minimum=0, maximum={bmax}"
 
         lines += [
-            f"# {patch} ({itype}, {patch_n.get(patch, '?')} interactions)",
+            f"# S2 site : {s2_site} ({itype}) — représentant C70 : {c70_patch} ({patch_n.get(c70_patch, '?')} interactions)",
             f"load {pdb_path}, {obj_tmp}",
             f"align {obj_tmp} and chain A, base_actin",
             f"create {obj_partner}, {obj_tmp} and chain B",
