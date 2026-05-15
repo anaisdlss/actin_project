@@ -1417,7 +1417,7 @@ STEP_OUTPUT_FILES = {
     "7/11":  "data/filtered/patches_infos_cluster_data_70.csv",
     "8/11":  "data/filtered/details/structures_files/bfactor_c70_interface",
     "9/11":  "visualisations/actin_c70_contacts",
-    "10/11": "visualisations/actin_s1_heatmap_equitable.png",
+    "10/11": "visualisations/actin_s1_all_equitable_heatmap.png",
     "11/11": "data/filtered/details/structures_files/bfactor_cluster",
 }
 
