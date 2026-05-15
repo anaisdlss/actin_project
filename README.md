@@ -2,9 +2,11 @@
 
 Récupération et analyse des interactions actine–protéines de liaison à l'actine (ABP) depuis la base de données [PPI3D](https://bioinformatics.lt/ppi3d), à partir de l'identifiant UniProt **P60709** (Actin, cytoplasmic 1).
 
+---
+
 ## 1. Installation
 
-Assurez-vous que [pixi](https://pixi.sh) et Python ≥ 3.11 sont installés.
+Assurez-vous que [pixi](https://pixi.sh) est installé.
 
 ```bash
 git clone https://github.com/anaisdlss/actin_project.git
@@ -13,44 +15,63 @@ pixi install
 pixi shell
 ```
 
-## 2. Générer les données
+---
 
-### Option A — Pipeline complet (recommandé)
+## 2. Pipeline complet — générer toutes les données
 
-Le pipeline enchaîne les 6 étapes automatiquement :
+Le pipeline se déroule en **deux phases** à exécuter dans l'ordre.
+
+### Phase 1 — Téléchargement et filtrage des données PPI3D
 
 ```bash
-python script/data_extract/pipeline_data.py
+python -m script.data_extract.pipeline_data
 ```
 
-> Sur macOS, pour éviter la mise en veille pendant l'exécution :
+> Sur macOS, pour éviter la mise en veille :
 > ```bash
-> caffeinate -i python script/data_extract/pipeline_data.py
+> caffeinate -i python -m script.data_extract.pipeline_data
 > ```
 
-Les étapes sont :
+Cette commande enchaîne automatiquement les étapes suivantes :
 
 | Étape | Description |
 |-------|-------------|
-| 1/6 | Récupération du summary des interactions (BLAST PPI3D) |
-| 2/6 | Récupération des entrées PDB associées |
-| 3/6 | Récupération de la table globale des clusters PPI3D |
-| 4/6 | Filtrage des structures (≥ 5 actines) via notebook |
-| 5/6 | Téléchargement des détails d'interface (résidus de contact) |
-| 6/6 | Filtrage de la table all_data selon les PDB retenus |
+| 1/11 | Récupération du summary des interactions (BLAST PPI3D) |
+| 2/11 | Récupération des entrées PDB associées |
+| 3/11 | Récupération de la table globale des clusters PPI3D |
+| 4/11 | Filtrage des structures (≥ 5 actines) via notebook |
+| 5/11 | Téléchargement des détails d'interface (résidus de contact) |
+| 6/11 | Alignements MAFFT des séquences |
+| 7/11 | Calcul des patches S1 binding site |
+| 8/11 | Calcul des B-factors C70 interface |
+| 9/11 | Calcul des B-factors cluster |
+| 10/11 | Génération du heatmap S1 |
+| 11/11 | Calcul des B-factors cluster (finalisation) |
 
-Les étapes déjà à jour sont automatiquement ignorées (vérification par date de modification).
+Les étapes déjà à jour sont automatiquement ignorées.
 
-### Option B — Étapes individuelles
+### Phase 2 — Analyse des interfaces (notebooks)
 
 ```bash
-python -m script.data_extract.get_summary_results
-python -m script.data_extract.get_pdb_entries
-python -m script.data_extract.get_cluster_table
-python -m script.data_extract.get_interaction_details
+jupyter nbconvert --to notebook --execute --inplace notebooks/interface_analysis_s1.ipynb
+jupyter nbconvert --to notebook --execute --inplace notebooks/interface_analysis_c70.ipynb
 ```
 
-### Structure des données générées
+Ces notebooks génèrent les visualisations dans `visualisations/`.
+
+---
+
+## 3. Lancer l'interface Streamlit
+
+```bash
+streamlit run script/streamlit.py
+```
+
+L'application permet de visualiser les données filtrées et d'explorer les clusters d'interactions actine–ABP.
+
+---
+
+## Structure des données générées
 
 ```
 data/
@@ -63,6 +84,9 @@ data/
     ├── filtered_pdb_entry.csv
     ├── filtered_summary.csv
     ├── filtered_all_data.csv
+    ├── patches_infos_s1_binding_site.csv
+    ├── patches_infos_cluster_data_70.csv
+    ├── actin_s1_canon_area_by_cluster.csv
     └── details/
         ├── 1.interactions.csv
         ├── 2.proteins.csv
@@ -72,21 +96,12 @@ data/
         ├── 6.meta_alignement.csv
         ├── 7.alignment_sequences.csv
         └── 8.structures.csv
+
+visualisations/
+├── actin_s1_all_equitable_heatmap.png
+├── actin_c70_heatmap_surface_area.png
+├── actin_c70_contacts/
+└── actin_c70_contacts_surface_area/
 ```
 
-> Le fichier `metadata.json` stocke les identifiants de jobs PPI3D pour assurer la reproductibilité. Quand la base PPI3D est mise à jour, relancer le pipeline pour obtenir les données les plus récentes.
-
-## 3. Interface Streamlit
-
-L'application Streamlit permet de lancer le pipeline, visualiser les données filtrées et explorer les clusters d'interactions depuis un navigateur.
-
-```bash
-streamlit run script/streamlit.py
-```
-
-## 4. Notebooks d'analyse
-
-Les notebooks sont dans le dossier `notebooks/` :
-
-- `graphe_filter.ipynb` — filtrage des structures PDB (étape 4 du pipeline)
-- `cluster_interaction_analysis.ipynb` — analyse des clusters d'interactions actine
+> `metadata.json` stocke les identifiants de jobs PPI3D pour la reproductibilité. Relancer le pipeline si la base PPI3D est mise à jour.
