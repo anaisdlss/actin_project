@@ -135,37 +135,52 @@ def main():
             DETAILS / "4.inter-residue_contacts.csv",
             DETAILS / "8.structures.csv",
         ):
-            skip_step("8/11 — Calcul B-factors interface C70 par cluster")
+            skip_step("8/12 — Calcul B-factors interface C70 par cluster")
         else:
             run_step(
-                "8/11 — Calcul B-factors interface C70 par cluster (bfactor_c70_interface.py)",
+                "8/12 — Calcul B-factors interface C70 par cluster (bfactor_c70_interface.py)",
                 [python_exec, "-m", "script.bfactor_c70_interface"],
                 cwd=PROJECT_ROOT,
             )
 
-        # 9 — Analyse interface C70 détaillée + génération script PyMOL (notebook)
+        # 9 — Génération script PyMOL surface complète (dépend des PDB bfactor C70)
+        _pml_out = FILTERED / "details" / "structures_files" / "bfactor_c70_interface" / "view_full_surface.pml"
+        if is_up_to_date(
+            _pml_out,
+            FILTERED / "patches_infos_cluster_data_70.csv",
+            FILTERED / "details" / "structures_files" / "bfactor_c70_interface",
+        ):
+            skip_step("9/12 — Génération script PyMOL surface complète C70")
+        else:
+            run_step(
+                "9/12 — Génération script PyMOL surface complète C70 (bfactor_c70_pymol_full_surface.py)",
+                [python_exec, "-m", "script.bfactor_c70_pymol_full_surface"],
+                cwd=PROJECT_ROOT,
+            )
+
+        # 10 — Analyse interface C70 détaillée (notebook)
         run_notebook(
-            "9/11 — Analyse interface par cluster C70 + script PyMOL",
+            "10/12 — Analyse interface par cluster C70",
             C70_NOTEBOOK,
         )
 
-        # 10 — Heatmap S1 binding site + mise à jour références (notebook)
+        # 11 — Heatmap S1 binding site + mise à jour références (notebook)
         run_notebook(
-            "10/11 — Heatmap S1 binding site et références clusters",
+            "11/12 — Heatmap S1 binding site et références clusters",
             S1_NOTEBOOK,
         )
 
-        # 11 — Calcul B-factors S1 par cluster (pour PyMOL / Streamlit)
+        # 12 — Calcul B-factors S1 par cluster (pour PyMOL / Streamlit)
         if is_up_to_date(
             FILTERED / "details" / "structures_files" / "bfactor_cluster",
             FILTERED / "s1_cluster_reference.csv",
             FILTERED / "patches_infos_cluster_data_70.csv",
             DETAILS / "3.interface_residues.csv",
         ):
-            skip_step("11/11 — Calcul B-factors S1 par cluster")
+            skip_step("12/12 — Calcul B-factors S1 par cluster")
         else:
             run_step(
-                "11/11 — Calcul B-factors S1 par cluster (bfactor.py)",
+                "12/12 — Calcul B-factors S1 par cluster (bfactor.py)",
                 [python_exec, "-m", "script.bfactor"],
                 cwd=PROJECT_ROOT,
             )

@@ -1393,32 +1393,34 @@ with st.sidebar:
 st.header("Téléchargement des données")
 
 STEPS = {
-    "1/11":  "Téléchargement du summary PPI3D (BLAST)",
-    "2/11":  "Téléchargement des entrées PDB",
-    "3/11":  "Téléchargement de toutes les données (cluster table)",
-    "4/11":  "Filtrage des structures (≥ 4 actines connectées) - notebook",
-    "5/11":  "Téléchargement des interactions d'interface",
-    "6/11":  "Alignement MAFFT par cluster de séquences",
-    "7/11":  "Analyse des clusters d'interaction C70 - notebook",
-    "8/11":  "Calcul B-factors interface C70 par cluster",
-    "9/11":  "Analyse interface par cluster C70 + script PyMOL - notebook",
-    "10/11": "Heatmap S1 binding site et références clusters - notebook",
-    "11/11": "Calcul B-factors S1 par cluster",
+    "1/12":  "Téléchargement du summary PPI3D (BLAST)",
+    "2/12":  "Téléchargement des entrées PDB",
+    "3/12":  "Téléchargement de toutes les données (cluster table)",
+    "4/12":  "Filtrage des structures (≥ 4 actines connectées) - notebook",
+    "5/12":  "Téléchargement des interactions d'interface",
+    "6/12":  "Alignement MAFFT par cluster de séquences",
+    "7/12":  "Analyse des clusters d'interaction C70 - notebook",
+    "8/12":  "Calcul B-factors interface C70 par cluster",
+    "9/12":  "Génération script PyMOL surface complète C70",
+    "10/12": "Analyse interface par cluster C70 - notebook",
+    "11/12": "Heatmap S1 binding site et références clusters - notebook",
+    "12/12": "Calcul B-factors S1 par cluster",
 }
 
 # Fichier de sortie attendu pour chaque étape
 STEP_OUTPUT_FILES = {
-    "1/11":  "data/raw/ppi3d_actin_summary.csv",
-    "2/11":  "data/raw/pdb_entry_results.csv",
-    "3/11":  "data/raw/all_data.csv",
-    "4/11":  "data/filtered/filtered_pdb_entry.csv",
-    "5/11":  "data/filtered/details/1.interactions.csv",
-    "6/11":  "data/alignments/.done",
-    "7/11":  "data/filtered/patches_infos_cluster_data_70.csv",
-    "8/11":  "data/filtered/details/structures_files/bfactor_c70_interface",
-    "9/11":  "visualisations/actin_c70_contacts",
-    "10/11": "visualisations/actin_s1_all_equitable_heatmap.png",
-    "11/11": "data/filtered/details/structures_files/bfactor_cluster",
+    "1/12":  "data/raw/ppi3d_actin_summary.csv",
+    "2/12":  "data/raw/pdb_entry_results.csv",
+    "3/12":  "data/raw/all_data.csv",
+    "4/12":  "data/filtered/filtered_pdb_entry.csv",
+    "5/12":  "data/filtered/details/1.interactions.csv",
+    "6/12":  "data/alignments/.done",
+    "7/12":  "data/filtered/patches_infos_cluster_data_70.csv",
+    "8/12":  "data/filtered/details/structures_files/bfactor_c70_interface",
+    "9/12":  "data/filtered/details/structures_files/bfactor_c70_interface/view_full_surface.pml",
+    "10/12": "visualisations/actin_c70_contacts",
+    "11/12": "visualisations/actin_s1_all_equitable_heatmap.png",
+    "12/12": "data/filtered/details/structures_files/bfactor_cluster",
 }
 
 STEP_KEYS = list(STEPS.keys())
@@ -2140,7 +2142,8 @@ def _build_tripartite_graph_html(all_data_path: str) -> str:
         "s2_binding_site_cluster_data_70",
     )
     df = df_all[[col_s1, col_c70, col_s2,
-                 "subunit_2_title", "s2_actine"]].copy()
+                 "subunit_2_title", "s2_actine",
+                 "s2_sequence_cluster_70"]].copy()
     df = df.dropna(subset=[col_s1, col_c70, col_s2])
     df[col_s1] = df[col_s1].astype(str)
     df[col_c70] = df[col_c70].astype(str)
@@ -2155,6 +2158,7 @@ def _build_tripartite_graph_html(all_data_path: str) -> str:
     c70_counts: dict = {}
     s2_counts: dict = {}
     s2_proteins: dict = {}  # s2_cluster → set of protein names (hétéro)
+    s2_seq_cluster: dict = {}  # s2_binding_site_cluster → s2_sequence_cluster_70
     s1_c70: dict = {}        # (s1_cluster, c70) → weight
     c70_s2_hetero: dict = {}  # (c70, s2_cluster) → weight  (hétéro uniquement)
     # (c70, s2_actin_cluster) → weight (homo : S2 = actine)
@@ -2186,6 +2190,9 @@ def _build_tripartite_graph_html(all_data_path: str) -> str:
                 row["subunit_2_title"]) else ""
             if prot:
                 s2_proteins.setdefault(s2, set()).add(prot)
+            seq_cl = row["s2_sequence_cluster_70"]
+            if pd.notna(seq_cl):
+                s2_seq_cluster[s2] = str(int(seq_cl))
             c70_s2_hetero[(c70, s2)] = c70_s2_hetero.get((c70, s2), 0) + 1
 
     all_counts = (list(s1_counts.values()) + list(c70_counts.values())
@@ -2321,17 +2328,16 @@ def _build_tripartite_graph_html(all_data_path: str) -> str:
                              dashes=True, color=direct_color, width=1.5,
                              title=direct_tip)
 
-    # ── Arêtes pointillées vertes : nœuds S2 avec exactement le même nom ─────
+    # ── Arêtes pointillées vertes : nœuds S2 du même cluster de séquence ────
     from collections import defaultdict as _dd2
 
-    # nom exact de protéine → ensemble de nœuds s2_*
-    _name_to_s2: dict = _dd2(set)
-    for _s2nd, _prots in s2_proteins.items():
-        for _prot in _prots:
-            _name_to_s2[_prot].add(f"s2_{_s2nd}")
+    # s2_sequence_cluster_70 → ensemble de nœuds s2_*
+    _seqcl_to_s2: dict = _dd2(set)
+    for _s2nd, _seqcl in s2_seq_cluster.items():
+        _seqcl_to_s2[_seqcl].add(f"s2_{_s2nd}")
 
     _s2_done: set = set()
-    for _prot_name, _s2nodes in _name_to_s2.items():
+    for _seqcl, _s2nodes in _seqcl_to_s2.items():
         if len(_s2nodes) < 2:
             continue
         _s2nodes = sorted(_s2nodes)
@@ -2342,7 +2348,7 @@ def _build_tripartite_graph_html(all_data_path: str) -> str:
                 if _k2 not in _s2_done:
                     _s2_done.add(_k2)
                     net.add_edge(_u2, _v2, color="#00aa44", width=2,
-                                 dashes=True, title=f"Même protéine : {_prot_name}")
+                                 dashes=True, title=f"Même cluster de séquence S2 : {_seqcl}")
 
     html = net.generate_html()
 

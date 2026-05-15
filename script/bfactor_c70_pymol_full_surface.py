@@ -77,11 +77,23 @@ for _, row in df_c70.sort_values("n_interactions", ascending=False).iterrows():
     obj_tmp = "tmp_" + re.sub(r"[^A-Za-z0-9_]", "_", patch)
     obj_partner = "p_" + re.sub(r"[^A-Za-z0-9_]", "_", patch)
 
+    # Max B-factor réel de chain B (même logique que le viewer Streamlit)
+    bmax = 1.0
+    for line in open(pdb_path):
+        if line.startswith("ATOM") and len(line) > 66 and line[21] == "B":
+            try:
+                v = float(line[60:66].strip())
+                if v > bmax:
+                    bmax = v
+            except ValueError:
+                pass
+    bmax = round(bmax, 2)
+
     # Couleur selon homo/hétéro
     if itype == "homo":
-        color_cmd = f"spectrum b, white_hotpink, {obj_partner}, minimum=0, maximum=100"
+        color_cmd = f"spectrum b, white_hotpink, {obj_partner}, minimum=0, maximum={bmax}"
     else:
-        color_cmd = f"spectrum b, white_green,   {obj_partner}, minimum=0, maximum=100"
+        color_cmd = f"spectrum b, white_green,   {obj_partner}, minimum=0, maximum={bmax}"
 
     lines += [
         f"# {patch} ({itype}, {row['n_interactions']} interactions)",
