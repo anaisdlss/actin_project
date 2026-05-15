@@ -242,7 +242,9 @@ for patch, iids in patch_to_iids.items():
                     if not _row.empty:
                         _s1 = str(_row.iloc[0]["s1_binding_site_cluster_data_70"])
                         _s2 = str(_row.iloc[0]["s2_binding_site_cluster_data_70"])
-                        if _patch_role.get(_s1) == "S1":
+                        if iid not in _homo_iids:
+                            is_sw_rep = False   # Hétéro : chain A = actine = S1 par convention PPI3D
+                        elif _patch_role.get(_s1) == "S1":
                             is_sw_rep = False   # subunit_1 = S1 → chain A physique = S1
                         elif _patch_role.get(_s2) == "S1":
                             is_sw_rep = True    # subunit_2 = S1 → chain B physique = S1 → swap
