@@ -41,30 +41,41 @@ if not ref_pdb_path.exists():
     ref_pdb_path = candidates[0]
 ref_pdb_abs = ref_pdb_path.resolve()
 
-# Construire le mapping s1_site → liste de patches C70
-s1_to_patches: dict[str, list[str]] = {}
+# Construire le mapping actin_site → liste de patches C70
+# On inclut :
+#   - s1_binding_sites pour tous les patches
+#   - s2_binding_sites pour les patches homo (S2 = actine aussi)
+actin_to_patches: dict[str, list[str]] = {}
+
+def _add(site: str, patch: str):
+    site = site.strip()
+    if not site:
+        return
+    actin_to_patches.setdefault(site, [])
+    if patch not in actin_to_patches[site]:
+        actin_to_patches[site].append(patch)
+
 for _, row in df_roles.iterrows():
     patch = str(row["patch"])
-    s1_sites_raw = str(row["s1_binding_sites"])
-    if not s1_sites_raw or s1_sites_raw == "nan":
-        continue
-    for s1 in s1_sites_raw.split(";"):
-        s1 = s1.strip()
-        if not s1:
-            continue
-        s1_to_patches.setdefault(s1, [])
-        if patch not in s1_to_patches[s1]:
-            s1_to_patches[s1].append(patch)
+    itype = patch_type.get(patch, "hetero")
 
-print(f"Clusters S1 uniques : {len(s1_to_patches)}")
+    for s1 in str(row["s1_binding_sites"]).split(";"):
+        _add(s1, patch)
+
+    # Pour les homos, S2 est aussi actine → même groupement
+    if itype == "homo":
+        for s2 in str(row["s2_binding_sites"]).split(";"):
+            _add(s2, patch)
+
+print(f"Clusters actine uniques : {len(actin_to_patches)}")
 
 n_written = 0
-for s1, patches in sorted(s1_to_patches.items()):
+for s1, patches in sorted(actin_to_patches.items()):
     # Trier les patches par n_interactions décroissant
     patches_sorted = sorted(patches, key=lambda p: patch_n.get(p, 0), reverse=True)
 
     lines = [
-        f"# PyMOL — cluster S1 : {s1}",
+        f"# PyMOL — cluster actine : {s1}",
         f"# {len(patches_sorted)} partenaires C70",
         "# Vert = ABP (hétéro) | Rose = actine (homo) | Intensité = B-factor (% ASA interface)",
         "",
