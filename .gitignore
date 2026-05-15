@@ -45,6 +45,7 @@ data/filtered/details/*
 !data/filtered/details/3.interface_residues.csv
 !data/filtered/details/4.inter-residue_contacts.csv
 *.html
+!script/graph_component/index.html
 *.tsv
 
 # ======================
