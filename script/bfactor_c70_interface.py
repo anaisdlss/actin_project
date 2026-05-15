@@ -261,29 +261,30 @@ for patch, iids in patch_to_iids.items():
         continue
 
     # Mapping canon → résidu structure dans le PDB représentatif (données BRUTES)
+    # Si le représentant est dans _t4_swapped_ppi3d, les colonnes A/B de df4_raw
+    # sont inversées par rapport à ce qu'utilise asa_s1/asa_s2 (calculé sur df4
+    # après swap). On doit donc croiser is_sw_rep avec rep_in_t4 pour choisir
+    # les bonnes colonnes.
     df_rep = df4_raw[df4_raw["interaction_id"] == rep_iid]
-    if is_sw_rep:
-        # Chaîne physique B = S1
-        s1_c2s = (df_rep[["residue_B_canon_mafft", "residue_B_structure"]]
-                  .dropna().drop_duplicates("residue_B_canon_mafft")
-                  .set_index("residue_B_canon_mafft")["residue_B_structure"]
-                  .astype(int).to_dict())
-        s2_c2s = (df_rep[["residue_A_canon_mafft", "residue_A_structure"]]
-                  .dropna().drop_duplicates("residue_A_canon_mafft")
-                  .set_index("residue_A_canon_mafft")["residue_A_structure"]
-                  .astype(int).to_dict())
-        ch_s1, ch_s2 = "B", "A"
+    rep_in_t4 = rep_iid in _t4_swapped_ppi3d
+    # use_A_for_s2 = True  → S2 utilise colonnes A de df_rep, S1 utilise colonnes B
+    # use_A_for_s2 = False → S2 utilise colonnes B de df_rep, S1 utilise colonnes A
+    use_A_for_s2 = (is_sw_rep != rep_in_t4)
+
+    def _c2s(df, canon_col, struct_col):
+        return (df[[canon_col, struct_col]]
+                .dropna().drop_duplicates(canon_col)
+                .set_index(canon_col)[struct_col].astype(int).to_dict())
+
+    if use_A_for_s2:
+        s1_c2s = _c2s(df_rep, "residue_B_canon_mafft", "residue_B_structure")
+        s2_c2s = _c2s(df_rep, "residue_A_canon_mafft", "residue_A_structure")
     else:
-        # Chaîne physique A = S1
-        s1_c2s = (df_rep[["residue_A_canon_mafft", "residue_A_structure"]]
-                  .dropna().drop_duplicates("residue_A_canon_mafft")
-                  .set_index("residue_A_canon_mafft")["residue_A_structure"]
-                  .astype(int).to_dict())
-        s2_c2s = (df_rep[["residue_B_canon_mafft", "residue_B_structure"]]
-                  .dropna().drop_duplicates("residue_B_canon_mafft")
-                  .set_index("residue_B_canon_mafft")["residue_B_structure"]
-                  .astype(int).to_dict())
-        ch_s1, ch_s2 = "A", "B"
+        s1_c2s = _c2s(df_rep, "residue_A_canon_mafft", "residue_A_structure")
+        s2_c2s = _c2s(df_rep, "residue_B_canon_mafft", "residue_B_structure")
+
+    # ch_s1/ch_s2 = lettres de chaîne PHYSIQUES dans le PDB (inchangé)
+    ch_s1, ch_s2 = ("B", "A") if is_sw_rep else ("A", "B")
 
     bfac_s1 = {s1_c2s[c]: v for c, v in asa_s1.items() if c in s1_c2s}
     bfac_s2 = {s2_c2s[c]: v for c, v in asa_s2.items() if c in s2_c2s}
