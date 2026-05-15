@@ -51,6 +51,7 @@ data/filtered/details/*
 !data/filtered/details/6.meta_alignement.csv
 !data/filtered/details/7.alignment_sequences.csv
 !data/filtered/details/8.structures.csv
+!data/filtered/actin_s1_canon_area_by_cluster.csv
 *.html
 !script/graph_component/index.html
 *.tsv
@@ -58,7 +59,7 @@ data/filtered/details/*
 # ======================
 # Visualisations
 # ======================
-visualisations/
+# visualisations/ — inclus dans git
 
 # ======================
 # Claude Code
