@@ -12,6 +12,17 @@ import sys
 session = requests.Session()
 
 BASE_URL = "https://bioinformatics.lt/ppi3d"
+
+
+def get_with_retry(url, retries=5, delay=15):
+    for attempt in range(retries):
+        response = session.get(url)
+        if response.status_code == 504:
+            print(f"504 Gateway Timeout on {url}, retry {attempt + 1}/{retries} in {delay}s...")
+            time.sleep(delay)
+            continue
+        return response
+    raise RuntimeError(f"Failed to fetch {url} after {retries} retries (504 Gateway Timeout)")
 SUBMIT_URL = f"{BASE_URL}/site/submit_data"
 
 NAME_PROT = "actin"
@@ -288,7 +299,7 @@ clustered_summary_url = (
     f"{job_id}/1/null/1/0/0/0"
 )
 
-html = session.get(clustered_summary_url).text
+html = get_with_retry(clustered_summary_url).text
 
 soup = BeautifulSoup(html, "html.parser")
 
@@ -345,7 +356,7 @@ if settings_form:
     else:
         target_url = response.url
 
-    html = session.get(target_url).text
+    html = get_with_retry(target_url).text
 
     print("Summary page switched to no clustering")
     print("No clustering URL:", target_url)

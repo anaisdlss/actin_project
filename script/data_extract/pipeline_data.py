@@ -2,110 +2,180 @@ import sys
 import os
 import subprocess
 from pathlib import Path
+import pandas as pd
 
-# execution : caffeinate -i python script/data_extract/pipeline_data.py
+# execution : caffeinate -i python -m script.data_extract.pipeline_data
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-FILTER_NOTEBOOK = PROJECT_ROOT / "notebooks" / "graphe_filter.ipynb"
+FILTER_NOTEBOOK   = PROJECT_ROOT / "notebooks" / "graphe_filter.ipynb"
+CLUSTER_NOTEBOOK  = PROJECT_ROOT / "notebooks" / "cluster_interaction_analysis.ipynb"
+C70_NOTEBOOK      = PROJECT_ROOT / "notebooks" / "interface_analysis_c70.ipynb"
+S1_NOTEBOOK       = PROJECT_ROOT / "notebooks" / "interface_analysis_s1.ipynb"
+
+DATA      = PROJECT_ROOT / "data"
+RAW       = DATA / "raw"
+FILTERED  = DATA / "filtered"
+DETAILS   = FILTERED / "details"
+ALIGNMENTS = DATA / "alignments"
+
+
+def is_up_to_date(output: Path, *inputs: Path) -> bool:
+    """True si output existe et est plus récent que tous les inputs."""
+    if not output.exists():
+        return False
+    out_mtime = output.stat().st_mtime
+    return all(inp.exists() and out_mtime >= inp.stat().st_mtime for inp in inputs)
 
 
 def run_step(label, command, input_text=None, cwd=None):
     print("\n" + "=" * 60)
     print(f"ETAPE : {label}")
     print("=" * 60)
+    subprocess.run(command, input=input_text, text=True, check=True, cwd=cwd)
 
-    result = subprocess.run(
-        command,
-        input=input_text,
-        text=True,
-        check=True,
-        cwd=cwd
-    )
-    return result
+
+def skip_step(label):
+    print("\n" + "=" * 60)
+    print(f"ETAPE : {label}")
+    print("=" * 60)
+    print("Already up to date — Nothing to do")
+
+
+def cleanup_orphan_chains(filtered_dir: Path, details_dir: Path):
+    """Supprime de 3.interface_residues.csv les chaînes absentes de filtered_all_data
+    (pas de séquence connue → impossible d'aligner avec MAFFT)."""
+    df_all = pd.read_csv(filtered_dir / "filtered_all_data.csv")
+    valid_chains = set(df_all["subunit_1"]) | set(df_all["subunit_2"])
+
+    df3_path = details_dir / "3.interface_residues.csv"
+    df3 = pd.read_csv(df3_path)
+    before = len(df3)
+    df3_clean = df3[df3["chain"].isin(valid_chains)]
+    removed = before - len(df3_clean)
+    if removed > 0:
+        df3_clean.to_csv(df3_path, index=False)
+        print(f"  Chaînes orphelines supprimées : {removed} résidus retirés de df3")
+    else:
+        print("  Aucune chaîne orpheline détectée dans df3")
+
+
+def run_notebook(label, notebook_path):
+    run_step(label, [
+        sys.executable, "-m", "jupyter", "nbconvert",
+        "--to", "notebook", "--execute", "--inplace",
+        str(notebook_path),
+    ], cwd=PROJECT_ROOT)
 
 
 def main():
     python_exec = sys.executable
     os.environ["MPLBACKEND"] = "Agg"
 
+    for d in [RAW, FILTERED, DETAILS, ALIGNMENTS]:
+        d.mkdir(parents=True, exist_ok=True)
+
     try:
-        # 1. summary principal
+        # 1 — Toujours exécuté : le script détecte lui-même si PPI3D a été mis à jour
         run_step(
-            "1/6 — Téléchargement du summary des interactions actine (PPI3D BLAST)",
-            [python_exec, "-m", "script.data_extract.get_summary_results"]
+            "1/10 — Téléchargement du summary des interactions actine (PPI3D BLAST)",
+            [python_exec, "-m", "script.data_extract.get_summary_results"],
         )
 
-        # 2. pdb entries
-        run_step(
-            "2/6 — Téléchargement des entrées PDB pour chaque structure",
-            [python_exec, "-m", "script.data_extract.get_pdb_entries"]
-        )
-
-        # 3. table clusters globale PPI3D
-        run_step(
-            "3/6 — Téléchargement de la table globale des clusters PPI3D",
-            [python_exec, "-m", "script.data_extract.get_cluster_table"]
-        )
-
-        # 4. notebook de filtrage
-        summary_path = PROJECT_ROOT / "data" / "raw" / "ppi3d_actin_summary.csv"
-        filtered_path = PROJECT_ROOT / "data" / "filtered" / "filtered_pdb_entry.csv"
-
-        if (
-            filtered_path.exists()
-            and summary_path.exists()
-            and filtered_path.stat().st_mtime >= summary_path.stat().st_mtime
-        ):
-            print("\n" + "=" * 60)
-            print("ETAPE : 4/6 — Filtrage des structures (garder celles avec >= 5 actines)")
-            print("=" * 60)
-            print("Filtered data already up to date — Nothing to do")
+        # 2 — Re-télécharge les entrées PDB si le summary a changé
+        if is_up_to_date(RAW / "pdb_entry_results.csv", RAW / "ppi3d_actin_summary.csv"):
+            skip_step("2/10 — Téléchargement des entrées PDB pour chaque structure")
         else:
             run_step(
-                "4/6 — Filtrage des structures (garder celles avec >= 5 actines)",
-                [
-                    python_exec, "-m", "jupyter", "nbconvert",
-                    "--to", "notebook", "--execute", "--inplace",
-                    str(FILTER_NOTEBOOK),
-                ],
-                cwd=PROJECT_ROOT
+                "2/10 — Téléchargement des entrées PDB pour chaque structure",
+                [python_exec, "-m", "script.data_extract.get_pdb_entries"],
             )
 
-        # 5. details depuis le summary filtré
+        # 3 — Toujours exécuté : le script détecte lui-même si PPI3D a été mis à jour
         run_step(
-            "5/6 — Téléchargement des détails d'interface (résidus de contact)",
+            "3/10 — Téléchargement de toutes les données (cluster table PPI3D)",
+            [python_exec, "-m", "script.data_extract.get_cluster_table"],
+        )
+
+        # 4 — Filtrage des structures (notebook)
+        run_notebook(
+            "4/10 — Filtrage des structures (≥ 4 actines connectées)",
+            FILTER_NOTEBOOK,
+        )
+
+        # 5 — get_interaction_details gère lui-même le cache (hash du summary + progress.csv)
+        run_step(
+            "5/10 — Téléchargement des interactions d'interface",
             [python_exec, "-m", "script.data_extract.get_interaction_details"],
-            input_text="f\n"
+            input_text="f\n",
         )
 
-        # 6. filtrer all_data
-        all_data_path = PROJECT_ROOT / "data" / "raw" / "all_data.csv"
-        filtered_all_data_path = PROJECT_ROOT / "data" / "filtered" / "filtered_all_data.csv"
+        # 5.5 — Nettoyage des chaînes orphelines (absentes de filtered_all_data)
+        print("\n" + "=" * 60)
+        print("ETAPE : 5.5/10 — Nettoyage des chaînes orphelines")
+        print("=" * 60)
+        cleanup_orphan_chains(FILTERED, DETAILS)
 
-        if (
-            filtered_all_data_path.exists()
-            and all_data_path.exists()
-            and filtered_path.exists()
-            and filtered_all_data_path.stat().st_mtime >= all_data_path.stat().st_mtime
-            and filtered_all_data_path.stat().st_mtime >= filtered_path.stat().st_mtime
+        # 6 — Alignement MAFFT
+        run_step(
+            "6/10 — Alignement MAFFT par cluster de séquences",
+            [python_exec, "-m", "script.mafft_pipeline"],
+            cwd=PROJECT_ROOT,
+        )
+
+        # 7 — Analyse clusters d'interaction C70 (notebook)
+        run_notebook(
+            "7/10 — Analyse des clusters d'interaction C70",
+            CLUSTER_NOTEBOOK,
+        )
+
+        # 8 — Calcul B-factors interface C70 (doit précéder le notebook C70)
+        if is_up_to_date(
+            FILTERED / "details" / "structures_files" / "bfactor_c70_interface",
+            FILTERED / "patches_infos_cluster_data_70.csv",
+            DETAILS / "4.inter-residue_contacts.csv",
+            DETAILS / "8.structures.csv",
         ):
-            print("\n" + "=" * 60)
-            print("ETAPE : 6/6 — Filtrage de la table all_data selon les PDB retenus")
-            print("=" * 60)
-            print("Filtered all_data already up to date — Nothing to do")
+            skip_step("8/11 — Calcul B-factors interface C70 par cluster")
         else:
             run_step(
-                "6/6 — Filtrage de la table all_data selon les PDB retenus",
-                [python_exec, "-m", "script.filter.filter_all_data_by_filtered_pdb"]
+                "8/11 — Calcul B-factors interface C70 par cluster (bfactor_c70_interface.py)",
+                [python_exec, "-m", "script.bfactor_c70_interface"],
+                cwd=PROJECT_ROOT,
             )
 
-        print("\nPipeline finished successfully.")
+        # 9 — Analyse interface C70 détaillée + génération script PyMOL (notebook)
+        run_notebook(
+            "9/11 — Analyse interface par cluster C70 + script PyMOL",
+            C70_NOTEBOOK,
+        )
+
+        # 10 — Heatmap S1 binding site + mise à jour références (notebook)
+        run_notebook(
+            "10/11 — Heatmap S1 binding site et références clusters",
+            S1_NOTEBOOK,
+        )
+
+        # 11 — Calcul B-factors S1 par cluster (pour PyMOL / Streamlit)
+        if is_up_to_date(
+            FILTERED / "details" / "structures_files" / "bfactor_cluster",
+            FILTERED / "s1_cluster_reference.csv",
+            FILTERED / "patches_infos_cluster_data_70.csv",
+            DETAILS / "3.interface_residues.csv",
+        ):
+            skip_step("11/11 — Calcul B-factors S1 par cluster")
+        else:
+            run_step(
+                "11/11 — Calcul B-factors S1 par cluster (bfactor.py)",
+                [python_exec, "-m", "script.bfactor"],
+                cwd=PROJECT_ROOT,
+            )
+
+        print("\nPipeline terminé avec succès.")
 
     except subprocess.CalledProcessError as e:
-        print("\nPipeline stopped because one step failed.")
-        print("Failed command:", e.cmd)
-        print("Return code:", e.returncode)
-
+        print("\nPipeline interrompu : une étape a échoué.")
+        print("Commande :", e.cmd)
+        print("Code retour :", e.returncode)
         sys.exit(e.returncode)
 
 

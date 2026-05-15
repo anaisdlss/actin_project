@@ -3,6 +3,7 @@ import json
 import os
 import re
 import sys
+import time
 
 from script.utils.utils import create_session
 
@@ -217,27 +218,52 @@ def main():
 
     print("Request page:", result_url)
 
-    result_response = session.get(result_url, timeout=60)
-    result_response.raise_for_status()
+    data_link = None
+    max_wait = 600
+    poll_interval = 15
+    elapsed = 0
 
-    try:
-        data_link = extract_data_link(result_response.text)
-    except ValueError:
-        debug_path = os.path.join(
-            OUTPUT_DIR, "cluster_table_result_debug.html")
+    while elapsed < max_wait:
+        result_response = session.get(result_url, timeout=60)
+        result_response.raise_for_status()
+        try:
+            data_link = extract_data_link(result_response.text)
+            break
+        except ValueError:
+            if "queued" in result_response.text or "Preparing" in result_response.text or "loading.gif" in result_response.text:
+                print(f"Data still being prepared, waiting {poll_interval}s... ({elapsed}s elapsed)")
+                time.sleep(poll_interval)
+                elapsed += poll_interval
+            else:
+                debug_path = os.path.join(OUTPUT_DIR, "cluster_table_result_debug.html")
+                os.makedirs(OUTPUT_DIR, exist_ok=True)
+                save_text(debug_path, result_response.text)
+                raise ValueError(
+                    "Data table link not found in the result page. "
+                    f"Debug HTML saved to {debug_path}"
+                )
+
+    if data_link is None:
+        debug_path = os.path.join(OUTPUT_DIR, "cluster_table_result_debug.html")
         os.makedirs(OUTPUT_DIR, exist_ok=True)
         save_text(debug_path, result_response.text)
-        raise ValueError(
-            "Data table link not found in the result page. "
-            f"Debug HTML saved to {debug_path}"
+        raise TimeoutError(
+            f"Data table not ready after {max_wait}s. Debug HTML saved to {debug_path}"
         )
 
     print("Downloading:", data_link)
 
-    download_response = session.get(data_link, timeout=120)
-    download_response.raise_for_status()
-
-    csv_content = gzip.decompress(download_response.content).decode("utf-8")
+    for attempt in range(5):
+        download_response = session.get(data_link, timeout=180)
+        download_response.raise_for_status()
+        try:
+            csv_content = gzip.decompress(download_response.content).decode("utf-8")
+            break
+        except (EOFError, gzip.BadGzipFile, OSError) as e:
+            print(f"Download incomplete ({e}), retry {attempt + 1}/5 in 10s...")
+            time.sleep(10)
+    else:
+        raise RuntimeError("Failed to download a complete gzip file after 5 attempts")
 
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     csv_path = os.path.join(OUTPUT_DIR, "all_data.csv")

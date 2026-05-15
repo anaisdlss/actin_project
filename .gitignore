@@ -30,7 +30,20 @@ __pycache__/
 # ======================
 # DATA
 # ======================
-data/
+# Ignorer tout data/ sauf les CSV nécessaires au Streamlit
+data/*
+!data/filtered/
+data/filtered/*
+!data/filtered/filtered_all_data.csv
+!data/filtered/binding_site_roles.csv
+!data/filtered/proteins_per_pdb.csv
+!data/filtered/patches_infos_s1_binding_site.csv
+!data/filtered/patches_infos_cluster_data_70.csv
+!data/filtered/details/
+data/filtered/details/*
+!data/filtered/details/1.interactions.csv
+!data/filtered/details/3.interface_residues.csv
+!data/filtered/details/4.inter-residue_contacts.csv
 *.html
 *.tsv
 
@@ -43,6 +56,12 @@ visualisations/
 # Claude Code
 # ======================
 .claude/
+
+# ======================
+# Divers
+# ======================
+.vscode/
+pymol_session/
 
 # ======================
 # Script temporaire

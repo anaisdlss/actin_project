@@ -183,6 +183,25 @@ def details_dataset_is_valid(
     if len(current_hash) != len(files):
         return False
 
+    # Vérifier que toutes les URLs du summary sont bien dans 1.interactions.csv
+    interactions_path = os.path.join(directory, "1.interactions.csv")
+    if os.path.exists(interactions_path):
+        try:
+            sep = "," if mode == "filtered" else ";"
+            df_sum = pd.read_csv(summary_path, sep=sep)
+            df_int = pd.read_csv(interactions_path, dtype={"interaction_id": str})
+            if "detail_url" in df_sum.columns and "source_url" in df_int.columns:
+                summary_urls = set(df_sum["detail_url"].dropna().astype(str))
+                downloaded_urls = set(df_int["source_url"].dropna().astype(str))
+                missing = summary_urls - downloaded_urls
+                stale = downloaded_urls - summary_urls
+                if missing or stale:
+                    print(f"Sync check: {len(missing)} interactions manquantes, "
+                          f"{len(stale)} obsolètes → re-synchronisation")
+                    return False
+        except Exception:
+            return False
+
     return True
 
 
@@ -736,10 +755,16 @@ def process_interaction(task):
             if "Residue no. in structure" in headers and "Buried ASA, %" in headers:
                 interface_tables.append((headers, table))
 
+        # PPI3D affiche les résidus de TOUTES les structures PDB homologues sur la même
+        # page. On ne garde que les chaînes appartenant au PDB représentatif de
+        # l'interaction (pdb_id), pour éviter le double-comptage avec d'autres iids.
+        rep_pdb = interaction.get("pdb_id", "")
         chains = []
         for tag in h4_tags:
             if "Interface residues in" in tag.text:
-                chains.append(tag.text.split("in")[-1].strip())
+                chain_name = tag.text.split("in")[-1].strip()
+                if not rep_pdb or chain_name.startswith(rep_pdb):
+                    chains.append(chain_name)
 
         for chain, (headers, table) in zip(chains, interface_tables):
             rows = table.find_all("tr")
@@ -1185,19 +1210,36 @@ def main():
         and existing_meta.get("mode") == mode_name
         and details_outputs_exist(detail_dir, OUTPUT_FILES)
     ):
-        print("Details files already present")
-        print("Refreshing metadata hashes without re-downloading")
-        save_details_metadata(
-            detail_meta_path,
-            current_job_id,
-            summary_path,
-            mode_name,
-            detail_dir,
-            OUTPUT_FILES
-        )
-        print("Details metadata refreshed")
-        print("Nothing to do")
-        return
+        # Vérifier la cohérence URL avant de conclure que rien n'est à faire
+        interactions_path_quick = os.path.join(detail_dir, "1.interactions.csv")
+        synced = True
+        if os.path.exists(interactions_path_quick):
+            try:
+                sep = "," if mode_name == "filtered" else ";"
+                df_sum_q = pd.read_csv(summary_path, sep=sep)
+                df_int_q = pd.read_csv(interactions_path_quick, dtype={"interaction_id": str})
+                if "detail_url" in df_sum_q.columns and "source_url" in df_int_q.columns:
+                    missing_q = set(df_sum_q["detail_url"].dropna().astype(str)) - set(df_int_q["source_url"].dropna().astype(str))
+                    stale_q   = set(df_int_q["source_url"].dropna().astype(str)) - set(df_sum_q["detail_url"].dropna().astype(str))
+                    if missing_q or stale_q:
+                        print(f"Sync check : {len(missing_q)} manquantes, {len(stale_q)} obsolètes → re-synchronisation")
+                        synced = False
+            except Exception:
+                pass
+        if synced:
+            print("Details files already present")
+            print("Refreshing metadata hashes without re-downloading")
+            save_details_metadata(
+                detail_meta_path,
+                current_job_id,
+                summary_path,
+                mode_name,
+                detail_dir,
+                OUTPUT_FILES
+            )
+            print("Details metadata refreshed")
+            print("Nothing to do")
+            return
 
     if is_cluster:
         requeue_legacy_cluster_interaction_ids(
@@ -1214,6 +1256,24 @@ def main():
 
     if "detail_url" not in summary.columns:
         raise ValueError("detail_url column missing in summary file")
+
+    # Purge anticipée : supprimer les interactions obsolètes (hors summary courant)
+    # avant le download pour éviter toute désynchronisation
+    interactions_path_pre = os.path.join(detail_dir, "1.interactions.csv")
+    if os.path.exists(interactions_path_pre):
+        df_pre = pd.read_csv(interactions_path_pre, dtype={"interaction_id": str})
+        if "source_url" in df_pre.columns:
+            summary_urls = set(summary["detail_url"].dropna().astype(str))
+            stale_ids = set(
+                df_pre[~df_pre["source_url"].astype(str).isin(summary_urls)]["interaction_id"].dropna()
+            )
+            if stale_ids:
+                print(f"Purge anticipée : {len(stale_ids)} interactions obsolètes supprimées")
+                for filename in OUTPUT_FILES:
+                    purge_interaction_ids_from_csv(
+                        os.path.join(detail_dir, filename), stale_ids)
+                # Retirer aussi du progress pour forcer le re-téléchargement des remplaçants
+                purge_interaction_ids_from_csv(progress_path, stale_ids)
 
     total = len(summary)
     records = summary.to_dict("records")
@@ -1232,7 +1292,10 @@ def main():
                     0].strip()
                 interaction_id = raw_interaction_id
             else:
-                interaction_id = str(i + 1)
+                if "interaction_id" in row and row.get("interaction_id") is not None:
+                    interaction_id = str(int(float(row["interaction_id"])))
+                else:
+                    interaction_id = str(i + 1)
 
             if interaction_id in done_ids:
                 continue
@@ -1333,6 +1396,18 @@ def main():
         current_pass += 1
 
     normalize_outputs(detail_dir)
+
+    # Purger les IDs qui ne sont plus dans le summary courant
+    summary_ids = set(summary["interaction_id"].dropna().astype(int).astype(str))
+    interactions_path_check = os.path.join(detail_dir, "1.interactions.csv")
+    if os.path.exists(interactions_path_check):
+        df_check = pd.read_csv(interactions_path_check, dtype={"interaction_id": str})
+        stale_ids = set(df_check["interaction_id"].dropna()) - summary_ids
+        if stale_ids:
+            print(f"Purge de {len(stale_ids)} interactions obsolètes (hors summary)")
+            for filename in OUTPUT_FILES:
+                purge_interaction_ids_from_csv(
+                    os.path.join(detail_dir, filename), stale_ids)
 
     save_details_metadata(
         detail_meta_path,
