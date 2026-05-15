@@ -35,6 +35,8 @@ data/*
 !data/filtered/
 data/filtered/*
 !data/filtered/filtered_all_data.csv
+!data/filtered/filtered_summary.csv
+!data/filtered/filtered_pdb_entry.csv
 !data/filtered/binding_site_roles.csv
 !data/filtered/proteins_per_pdb.csv
 !data/filtered/patches_infos_s1_binding_site.csv
@@ -42,8 +44,13 @@ data/filtered/*
 !data/filtered/details/
 data/filtered/details/*
 !data/filtered/details/1.interactions.csv
+!data/filtered/details/2.proteins.csv
 !data/filtered/details/3.interface_residues.csv
 !data/filtered/details/4.inter-residue_contacts.csv
+!data/filtered/details/5.ligands.csv
+!data/filtered/details/6.meta_alignement.csv
+!data/filtered/details/7.alignment_sequences.csv
+!data/filtered/details/8.structures.csv
 *.html
 !script/graph_component/index.html
 *.tsv
