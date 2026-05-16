@@ -125,24 +125,31 @@ for actin_site, s2_to_c70 in sorted(actin_to_s2.items()):
                     pass
         bmax = round(bmax, 2)
 
+        label = f"# S2 site : {s2_site} ({itype}) — représentant C70 : {c70_patch} ({patch_n.get(c70_patch, '?')} interactions)"
         if itype == "homo":
-            color_cmd = f"spectrum b, white_hotpink, {obj_partner}, minimum=0, maximum={bmax}"
-            show_cmd  = f"show surface, {obj_partner} and b > 0.001"
+            # Homo : on charge directement sous obj_partner (pas de create) pour
+            # conserver la transformation d'alignement sur les coordonnées affichées.
+            lines += [
+                label,
+                f"load {pdb_path}, {obj_partner}",
+                f"align {obj_partner} and chain A, base_actin",
+                f"hide everything, {obj_partner}",
+                f"show surface, {obj_partner} and chain B and b > 0.001",
+                f"spectrum b, white_hotpink, {obj_partner} and chain B, minimum=0, maximum={bmax}",
+                "",
+            ]
         else:
-            color_cmd = f"spectrum b, white_green,   {obj_partner}, minimum=0, maximum={bmax}"
-            show_cmd  = f"show surface, {obj_partner}"
-
-        lines += [
-            f"# S2 site : {s2_site} ({itype}) — représentant C70 : {c70_patch} ({patch_n.get(c70_patch, '?')} interactions)",
-            f"load {pdb_path}, {obj_tmp}",
-            f"align {obj_tmp} and chain A, base_actin",
-            f"create {obj_partner}, {obj_tmp} and chain B",
-            f"delete {obj_tmp}",
-            f"hide everything, {obj_partner}",
-            show_cmd,
-            color_cmd,
-            "",
-        ]
+            lines += [
+                label,
+                f"load {pdb_path}, {obj_tmp}",
+                f"align {obj_tmp} and chain A, base_actin",
+                f"create {obj_partner}, {obj_tmp} and chain B",
+                f"delete {obj_tmp}",
+                f"hide everything, {obj_partner}",
+                f"show surface, {obj_partner}",
+                f"spectrum b, white_green,   {obj_partner}, minimum=0, maximum={bmax}",
+                "",
+            ]
         n_loaded += 1
 
     if n_loaded == 0:

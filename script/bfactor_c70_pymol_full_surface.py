@@ -90,26 +90,32 @@ for _, row in df_c70.sort_values("n_interactions", ascending=False).iterrows():
     bmax = round(bmax, 2)
 
     # Couleur et surface selon homo/hétéro
-    # Pour homo : surface uniquement sur les résidus d'interface (b > 0)
-    # Pour hétéro : surface complète du partenaire ABP
+    # Homo : on charge directement sous obj_partner (pas de create) pour conserver
+    # la transformation d'alignement ; on ne montre que chain B et b > 0 (résidus
+    # d'interface). Sans create, PyMOL utilise les coordonnées post-alignement.
+    # Hétéro : create isole chain B (ABP) puis surface complète.
     if itype == "homo":
-        color_cmd = f"spectrum b, white_hotpink, {obj_partner}, minimum=0, maximum={bmax}"
-        show_cmd  = f"show surface, {obj_partner} and b > 0.001"
+        lines += [
+            f"# {patch} ({itype}, {row['n_interactions']} interactions)",
+            f"load {pdb_path}, {obj_partner}",
+            f"align {obj_partner} and chain A, base_actin",
+            f"hide everything, {obj_partner}",
+            f"show surface, {obj_partner} and chain B and b > 0.001",
+            f"spectrum b, white_hotpink, {obj_partner} and chain B, minimum=0, maximum={bmax}",
+            "",
+        ]
     else:
-        color_cmd = f"spectrum b, white_green,   {obj_partner}, minimum=0, maximum={bmax}"
-        show_cmd  = f"show surface, {obj_partner}"
-
-    lines += [
-        f"# {patch} ({itype}, {row['n_interactions']} interactions)",
-        f"load {pdb_path}, {obj_tmp}",
-        f"align {obj_tmp} and chain A, base_actin",
-        f"create {obj_partner}, {obj_tmp} and chain B",
-        f"delete {obj_tmp}",
-        f"hide everything, {obj_partner}",
-        show_cmd,
-        color_cmd,
-        "",
-    ]
+        lines += [
+            f"# {patch} ({itype}, {row['n_interactions']} interactions)",
+            f"load {pdb_path}, {obj_tmp}",
+            f"align {obj_tmp} and chain A, base_actin",
+            f"create {obj_partner}, {obj_tmp} and chain B",
+            f"delete {obj_tmp}",
+            f"hide everything, {obj_partner}",
+            f"show surface, {obj_partner}",
+            f"spectrum b, white_green,   {obj_partner}, minimum=0, maximum={bmax}",
+            "",
+        ]
     n_loaded += 1
 
 lines += [
