@@ -89,11 +89,15 @@ for _, row in df_c70.sort_values("n_interactions", ascending=False).iterrows():
                 pass
     bmax = round(bmax, 2)
 
-    # Couleur selon homo/hétéro
+    # Couleur et surface selon homo/hétéro
+    # Pour homo : surface uniquement sur les résidus d'interface (b > 0)
+    # Pour hétéro : surface complète du partenaire ABP
     if itype == "homo":
         color_cmd = f"spectrum b, white_hotpink, {obj_partner}, minimum=0, maximum={bmax}"
+        show_cmd  = f"show surface, {obj_partner} and b > 0.001"
     else:
         color_cmd = f"spectrum b, white_green,   {obj_partner}, minimum=0, maximum={bmax}"
+        show_cmd  = f"show surface, {obj_partner}"
 
     lines += [
         f"# {patch} ({itype}, {row['n_interactions']} interactions)",
@@ -102,7 +106,7 @@ for _, row in df_c70.sort_values("n_interactions", ascending=False).iterrows():
         f"create {obj_partner}, {obj_tmp} and chain B",
         f"delete {obj_tmp}",
         f"hide everything, {obj_partner}",
-        f"show surface, {obj_partner}",
+        show_cmd,
         color_cmd,
         "",
     ]
