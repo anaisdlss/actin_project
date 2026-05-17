@@ -206,6 +206,9 @@ df8_valid = df8[
     (df8["pairwise_pdb_file"].astype(str).str.lower() != "nan")
 ].copy()
 
+_D_LOOP_CANON = set(range(38, 75))
+patch_to_type = dict(zip(df_c70["patch"].astype(str), df_c70["interaction_type"]))
+
 ok, skip = 0, 0
 pymol_lines: list[str] = ["# PyMOL : clusters C70 interface — b-factors = % ASA interface équitable"]
 ref_obj: str | None = None
@@ -261,6 +264,21 @@ for patch, iids in patch_to_iids.items():
     if pdb_file is None:
         skip += 1
         continue
+
+    # Détection et correction du swap ASA pour les clusters homo.
+    # Invariant biologique : S1 fournit le plug hydrophobe (~169-295),
+    # S2 fournit le D-loop (~38-74). Quand ~70 % des interactions d'un cluster
+    # sont dans _t4_swapped_ppi3d, residue_A après correction représente les
+    # résidus de la chaîne S2 (D-loop) dans df4 — asa_s1 se retrouve avec les
+    # positions du D-loop et asa_s2 avec le plug hydrophobe, exactement à
+    # l'envers. On détecte et corrige en échangeant les deux dictionnaires.
+    # Important : is_sw_rep N'EST PAS modifié — l'assignation physique des
+    # chaînes est correcte ; seule l'étiquette S1/S2 des moyennes ASA l'est pas.
+    if patch_to_type.get(patch, "hetero") == "homo" and (asa_s1 or asa_s2):
+        n_s1_dl = sum(1 for c in asa_s1 if c in _D_LOOP_CANON)
+        n_s2_dl = sum(1 for c in asa_s2 if c in _D_LOOP_CANON)
+        if n_s1_dl > n_s2_dl:
+            asa_s1, asa_s2 = asa_s2, asa_s1
 
     # Mapping canon → résidu structure dans le PDB représentatif (données BRUTES)
     # Si le représentant est dans _t4_swapped_ppi3d, les colonnes A/B de df4_raw
