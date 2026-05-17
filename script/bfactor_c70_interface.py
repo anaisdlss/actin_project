@@ -265,20 +265,19 @@ for patch, iids in patch_to_iids.items():
         skip += 1
         continue
 
-    # Détection et correction du swap ASA pour les clusters homo.
-    # Invariant biologique : S1 fournit le plug hydrophobe (~169-295),
-    # S2 fournit le D-loop (~38-74). Quand ~70 % des interactions d'un cluster
-    # sont dans _t4_swapped_ppi3d, residue_A après correction représente les
-    # résidus de la chaîne S2 (D-loop) dans df4 — asa_s1 se retrouve avec les
-    # positions du D-loop et asa_s2 avec le plug hydrophobe, exactement à
-    # l'envers. On détecte et corrige en échangeant les deux dictionnaires.
-    # Important : is_sw_rep N'EST PAS modifié — l'assignation physique des
-    # chaînes est correcte ; seule l'étiquette S1/S2 des moyennes ASA l'est pas.
+    # Détection et correction du swap S1/S2 pour les clusters homo.
+    # Invariant biologique : S2 fournit le D-loop (~38-74), S1 fournit le plug
+    # (~133-177). Quand la propagation _patch_role a inversé les rôles pour ce
+    # cluster, asa_s1 contient les positions D-loop (S2) et asa_s2 le plug (S1).
+    # On corrige : échange des moyennes ASA ET flip de is_sw_rep pour que la
+    # chaîne physique S1 soit bien renommée A (référence alignée) et S2 renommée
+    # B (patch affiché en PyMOL).
     if patch_to_type.get(patch, "hetero") == "homo" and (asa_s1 or asa_s2):
         n_s1_dl = sum(1 for c in asa_s1 if c in _D_LOOP_CANON)
         n_s2_dl = sum(1 for c in asa_s2 if c in _D_LOOP_CANON)
         if n_s1_dl > n_s2_dl:
             asa_s1, asa_s2 = asa_s2, asa_s1
+            is_sw_rep = not is_sw_rep
 
     # Mapping canon → résidu structure dans le PDB représentatif (données BRUTES)
     # Si le représentant est dans _t4_swapped_ppi3d, les colonnes A/B de df4_raw

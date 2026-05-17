@@ -127,17 +127,18 @@ for actin_site, s2_to_c70 in sorted(actin_to_s2.items()):
 
         label = f"# S2 site : {s2_site} ({itype}) — représentant C70 : {c70_patch} ({patch_n.get(c70_patch, '?')} interactions)"
         if itype == "homo":
-            color_cmd = (
-                f"spectrum b, white_hotpink, {obj_partner} and chain B, minimum=0, maximum={bmax}"
-                if bmax > 1.0 else
-                f"color hotpink, {obj_partner} and chain B"
-            )
+            if bmax > 1.0:
+                show_cmd  = f"show surface, {obj_partner} and chain B and b > 0.001"
+                color_cmd = f"spectrum b, white_hotpink, {obj_partner} and chain B, minimum=0, maximum={bmax}"
+            else:
+                show_cmd  = f"show surface, {obj_partner} and chain B"
+                color_cmd = f"color hotpink, {obj_partner} and chain B"
             lines += [
                 label,
                 f"load {pdb_path}, {obj_partner}",
                 f"align {obj_partner} and chain A, base_actin",
                 f"hide everything, {obj_partner}",
-                f"show surface, {obj_partner} and chain B",
+                show_cmd,
                 color_cmd,
                 "",
             ]
