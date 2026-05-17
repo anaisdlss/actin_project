@@ -207,7 +207,68 @@ df8_valid = df8[
 ].copy()
 
 _D_LOOP_CANON = set(range(38, 75))
+_PLUG_CANON   = set(range(133, 178))
+_HOMO_GEO_THR = 35.0   # Å : distance centroïde D-loop S2 ↔ plug S1 max pour un bon représentant
 patch_to_type = dict(zip(df_c70["patch"].astype(str), df_c70["interaction_type"]))
+
+
+def _homo_rep_info(iid: int, pdb_path: str):
+    """Détermine les rôles S1/S2 depuis table3 et vérifie la géométrie D-loop/plug.
+    Retourne (is_sw_rep, dist) ou None si indéterminé.
+    is_sw_rep=True : chaîne physique A = S2 (D-loop inserter).
+    """
+    sub3 = df3_raw[df3_raw["interaction_id"] == iid]
+    if sub3.empty:
+        return None
+    int_row = df_int[df_int["interaction_id"] == iid]
+    if int_row.empty:
+        return None
+    ch_A_id = str(int_row.iloc[0]["chain_A_id"])
+    ch_B_id = str(int_row.iloc[0]["chain_B_id"])
+
+    def dl_count(chain_id):
+        canon = sub3[sub3["chain"] == chain_id]["residue_number_canon_mafft"].dropna()
+        return int(canon.isin(_D_LOOP_CANON).sum())
+
+    dl_A, dl_B = dl_count(ch_A_id), dl_count(ch_B_id)
+    if dl_A == dl_B:
+        return None
+    A_is_S2   = dl_A > dl_B
+    s2_id     = ch_A_id if A_is_S2 else ch_B_id
+    s1_id     = ch_B_id if A_is_S2 else ch_A_id
+    s2_pdb_ch = "A" if A_is_S2 else "B"
+    s1_pdb_ch = "B" if A_is_S2 else "A"
+
+    def get_pdb_rns(chain_id, canon_set):
+        return set(
+            sub3[(sub3["chain"] == chain_id) &
+                 (sub3["residue_number_canon_mafft"].isin(canon_set))]
+            ["residue_number_structure"].dropna().astype(int)
+        )
+
+    s2_rns = get_pdb_rns(s2_id, _D_LOOP_CANON)
+    s1_rns = get_pdb_rns(s1_id, _PLUG_CANON)
+    if not s2_rns or not s1_rns:
+        return (A_is_S2, float("inf"))
+
+    s2_xyz, s1_xyz = [], []
+    for line in open(pdb_path):
+        if not line.startswith("ATOM") or line[12:16].strip() != "CA":
+            continue
+        ch = line[21]; rn = int(line[22:26])
+        xyz = [float(line[30:38]), float(line[38:46]), float(line[46:54])]
+        if ch == s2_pdb_ch and rn in s2_rns:
+            s2_xyz.append(xyz)
+        elif ch == s1_pdb_ch and rn in s1_rns:
+            s1_xyz.append(xyz)
+
+    if not s2_xyz or not s1_xyz:
+        return (A_is_S2, float("inf"))
+
+    dist = float(np.linalg.norm(
+        np.mean(s2_xyz, axis=0) - np.mean(s1_xyz, axis=0)
+    ))
+    return (A_is_S2, dist)
 
 ok, skip = 0, 0
 pymol_lines: list[str] = ["# PyMOL : clusters C70 interface — b-factors = % ASA interface équitable"]
@@ -225,15 +286,34 @@ for patch, iids in patch_to_iids.items():
         skip += 1
         continue
 
-    # Représentatif : premier interaction_id avec un pairwise PDB valide
+    # Représentatif : pour les clusters homo, on cherche le premier iid dont le PDB
+    # montre le contact D-loop/plug canonique (centroïde < _HOMO_GEO_THR Å).
+    # Pour les hétéro, on prend le premier PDB valide (convention PPI3D).
     rep_iid, pdb_file, is_sw_rep = None, None, False
+    _is_homo_patch = patch_to_type.get(patch, "hetero") == "homo"
+    _fallback_homo = None   # (iid, pp, is_sw_rep) si aucun contact canonique trouvé
+
     for iid in sorted(iids):
         rows = df8_valid[df8_valid["interaction_id"] == iid]
         for _, r in rows.iterrows():
             pp = str(r["pairwise_pdb_file"])
-            if os.path.exists(pp):
+            if not os.path.exists(pp):
+                continue
+
+            if _is_homo_patch and iid in _homo_iids:
+                geo = _homo_rep_info(iid, pp)
+                if geo is not None:
+                    _sw, _dist = geo
+                    if _dist <= _HOMO_GEO_THR:
+                        rep_iid, pdb_file, is_sw_rep = iid, pp, _sw
+                        break
+                    elif _fallback_homo is None:
+                        _fallback_homo = (iid, pp, _sw)
+                elif _fallback_homo is None:
+                    _fallback_homo = (iid, pp, iid in swap_iids)
+            else:
+                # Hétéro : premier PDB valide (chain A = actine S1 par convention PPI3D)
                 rep_iid, pdb_file = iid, pp
-                # Lookup direct binding site (même logique que le réseau)
                 _int_row = df_int[df_int["interaction_id"] == iid]
                 if not _int_row.empty:
                     _ch_A = _int_row.iloc[0]["chain_A_id"]
@@ -246,38 +326,40 @@ for patch, iids in patch_to_iids.items():
                         _s1 = str(_row.iloc[0]["s1_binding_site_cluster_data_70"])
                         _s2 = str(_row.iloc[0]["s2_binding_site_cluster_data_70"])
                         if iid not in _homo_iids:
-                            is_sw_rep = False   # Hétéro : chain A = actine = S1 par convention PPI3D
+                            is_sw_rep = False
                         elif _patch_role.get(_s1) == "S1":
-                            is_sw_rep = False   # subunit_1 = S1 → chain A physique = S1
+                            is_sw_rep = False
                         elif _patch_role.get(_s2) == "S1":
-                            is_sw_rep = True    # subunit_2 = S1 → chain B physique = S1 → swap
+                            is_sw_rep = True
                         else:
-                            is_sw_rep = iid in swap_iids  # fallback propagation
+                            is_sw_rep = iid in swap_iids
                     else:
                         is_sw_rep = iid in swap_iids
                 else:
                     is_sw_rep = iid in swap_iids
                 break
+            break  # un seul PDB par iid suffit
         if pdb_file:
             break
+
+    # Fallback homo si aucun représentant canonique trouvé
+    if pdb_file is None and _fallback_homo is not None:
+        rep_iid, pdb_file, is_sw_rep = _fallback_homo
 
     if pdb_file is None:
         skip += 1
         continue
 
-    # Détection et correction du swap S1/S2 pour les clusters homo.
-    # Invariant biologique : S2 fournit le D-loop (~38-74), S1 fournit le plug
-    # (~133-177). Quand la propagation _patch_role a inversé les rôles pour ce
-    # cluster, asa_s1 contient les positions D-loop (S2) et asa_s2 le plug (S1).
-    # On corrige : échange des moyennes ASA ET flip de is_sw_rep pour que la
-    # chaîne physique S1 soit bien renommée A (référence alignée) et S2 renommée
-    # B (patch affiché en PyMOL).
+    # Correction du swap ASA pour les clusters homo.
+    # is_sw_rep est déterminé géométriquement (ci-dessus depuis table3 + 3D).
+    # On corrige seulement les étiquettes S1/S2 des moyennes ASA si nécessaire
+    # (quand asa_s1 contient le D-loop plutôt que le plug).
     if patch_to_type.get(patch, "hetero") == "homo" and (asa_s1 or asa_s2):
         n_s1_dl = sum(1 for c in asa_s1 if c in _D_LOOP_CANON)
         n_s2_dl = sum(1 for c in asa_s2 if c in _D_LOOP_CANON)
         if n_s1_dl > n_s2_dl:
             asa_s1, asa_s2 = asa_s2, asa_s1
-            is_sw_rep = not is_sw_rep
+            # is_sw_rep déterminé géométriquement — ne pas modifier ici
 
     # Mapping canon → résidu structure dans le PDB représentatif (données BRUTES)
     # Si le représentant est dans _t4_swapped_ppi3d, les colonnes A/B de df4_raw
@@ -301,6 +383,28 @@ for patch, iids in patch_to_iids.items():
     else:
         s1_c2s = _c2s(df_rep, "residue_A_canon_mafft", "residue_A_structure")
         s2_c2s = _c2s(df_rep, "residue_B_canon_mafft", "residue_B_structure")
+
+    # Pour les clusters homo : remplacer s2_c2s par table3 (plus fiable que df4_raw
+    # dont les numéros de structure sont parfois incorrects pour les contacts actin-actin).
+    if patch_to_type.get(patch, "hetero") == "homo":
+        int_row_rep = df_int[df_int["interaction_id"] == rep_iid]
+        if not int_row_rep.empty:
+            ch_A_rep = str(int_row_rep.iloc[0]["chain_A_id"])
+            ch_B_rep = str(int_row_rep.iloc[0]["chain_B_id"])
+            s2_chain_id = ch_A_rep if is_sw_rep else ch_B_rep
+            _t3 = (
+                df3_raw[
+                    (df3_raw["interaction_id"] == rep_iid) &
+                    (df3_raw["chain"] == s2_chain_id)
+                ][["residue_number_canon_mafft", "residue_number_structure"]]
+                .dropna().drop_duplicates("residue_number_canon_mafft")
+            )
+            t3_s2_c2s = (
+                _t3.set_index("residue_number_canon_mafft")
+                ["residue_number_structure"].astype(int).to_dict()
+            )
+            if t3_s2_c2s:
+                s2_c2s = t3_s2_c2s
 
     # ch_s1/ch_s2 = lettres de chaîne PHYSIQUES dans le PDB (inchangé)
     ch_s1, ch_s2 = ("B", "A") if is_sw_rep else ("A", "B")
