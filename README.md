@@ -8,10 +8,10 @@ Le pipeline télécharge les données, filtre les structures, aligne les séquen
 
 ## Prérequis
 
-- Un Mac avec accès à Internet
+- Accès à Internet
 - [PyMOL](https://pymol.org) installé (pour les visualisations 3D)
 
-Tout le reste (Python, dépendances) s'installe automatiquement.
+Tout le reste (Python, dépendances) s'installe automatiquement via **pixi**.
 
 ---
 
@@ -19,13 +19,19 @@ Tout le reste (Python, dépendances) s'installe automatiquement.
 
 ### 1. Installer pixi
 
-Ouvre le **Terminal** (`Cmd + Espace` → "Terminal") et colle :
+**macOS / Linux** — ouvre un terminal et colle :
 
 ```bash
 curl -fsSL https://pixi.sh/install.sh | bash
 ```
 
-**Ferme et rouvre le terminal.**
+**Windows** — ouvre **PowerShell** et colle :
+
+```powershell
+iwr -useb https://pixi.sh/install.ps1 | iex
+```
+
+**Ferme et rouvre le terminal** avant de continuer.
 
 ### 2. Récupérer le projet
 
@@ -35,7 +41,8 @@ git clone https://github.com/anaisdlss/actin_project.git
 cd actin_project
 ```
 
-> Si macOS propose d'installer les outils de développement, accepte.
+> macOS : si on te propose d'installer les outils de développement, accepte.  
+> Windows : utilise Git Bash ou PowerShell avec [Git for Windows](https://git-scm.com/download/win).
 
 ### 3. Installer l'environnement
 
@@ -49,13 +56,20 @@ Quelques minutes la première fois.
 
 ## Générer les données
 
+**macOS** :
 ```bash
 caffeinate -i pixi run python -m script.data_extract.pipeline_data
 ```
 
-> `caffeinate` empêche la mise en veille. Durée : **30 à 60 minutes** selon la connexion.
+**Linux / Windows** :
+```bash
+pixi run python -m script.data_extract.pipeline_data
+```
 
-Le pipeline s'arrête automatiquement aux étapes déjà à jour si tu le relances.
+> Sur macOS, `caffeinate` empêche la mise en veille pendant le calcul.  
+> Durée : **30 à 60 minutes** selon la connexion.
+
+Le pipeline reprend automatiquement là où il s'est arrêté si tu le relances.
 
 | Étape | Description |
 |-------|-------------|
