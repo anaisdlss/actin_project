@@ -65,7 +65,7 @@ for s2_bs, grp in df_valid.groupby("s2_bs"):
 
 # ── Lecture du bmax d'un PDB sur une chaîne donnée ────────────────────────────
 def _bmax_chain(pdb_path: Path, ch: str) -> float:
-    bmax = 1.0
+    bmax = 0.0
     with open(pdb_path) as f:
         for line in f:
             if line.startswith("ATOM") and len(line) > 66 and line[21] == ch:
@@ -109,10 +109,8 @@ for actin_site, s2_to_c70 in sorted(actin_to_s2.items()):
     s1_bfac_pdb = (BFAC_S1_DIR / f"{actin_site}.pdb").resolve()
     if s1_bfac_pdb.exists():
         bmax_s1 = _bmax_chain(s1_bfac_pdb, "A")
-        if bmax_s1 > 1.0:
-            s1_color_cmd = f"spectrum b, white yellow orange red, base_actin, minimum=0, maximum={bmax_s1}"
-        else:
-            s1_color_cmd = "color yellow, base_actin"
+        effective_max_s1 = max(bmax_s1, 1.0)
+        s1_color_cmd = f"spectrum b, white yellow orange red, base_actin, minimum=0, maximum={effective_max_s1}"
         ref_section = [
             "# ── Actine S1 — B-factor du cluster ─────────────────────────────────────",
             f"load {s1_bfac_pdb}, base_actin",
