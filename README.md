@@ -8,28 +8,21 @@ Le pipeline récupère l'ensemble des co-structures 3D disponibles, filtre les a
 
 ## Installation
 
+> **Systèmes supportés :** macOS (Intel et Apple Silicon) et Linux. Windows n'est pas supporté en raison d'une dépendance (MAFFT) non disponible sur cette plateforme.
+
 ### 0 — Ouvrir un terminal
 
 Toutes les commandes ci-dessous s'exécutent dans un terminal :
 
 - **macOS** : `Cmd + Espace` → taper `Terminal` → Entrée
 - **Linux** : `Ctrl + Alt + T`
-- **Windows** : `Windows + R` → taper `powershell` → Entrée
 
 ### 1 — Installer pixi
 
-Copier-coller la commande correspondante dans le terminal, puis appuyer sur Entrée.
-
-**macOS / Linux**
+Copier-coller la commande dans le terminal, puis appuyer sur Entrée.
 
 ```bash
 curl -fsSL https://pixi.sh/install.sh | bash
-```
-
-**Windows** (PowerShell)
-
-```powershell
-iwr -useb https://pixi.sh/install.ps1 | iex
 ```
 
 **Fermer et rouvrir le terminal** avant de continuer.
@@ -40,8 +33,6 @@ iwr -useb https://pixi.sh/install.ps1 | iex
 git clone https://github.com/anaisdlss/actin_project.git
 cd actin_project
 ```
-
-> Windows : utiliser Git Bash ou PowerShell avec [Git for Windows](https://git-scm.com/download/win).
 
 ### 3 — Installer l'environnement
 
@@ -103,12 +94,3 @@ Pour exécuter un script, utiliser `File > Run Script…` dans PyMOL, ou taper d
 
 PyMOL est nécessaire uniquement pour les visualisations 3D. Le télécharger sur [pymol.org](https://pymol.org) et suivre les instructions d'installation selon le système d'exploitation.
 
----
-
-## Note Windows — MAFFT
-
-L'étape d'alignement de séquences (étape 6/13) utilise MAFFT, qui n'est pas disponible automatiquement sur Windows. Pour l'installer manuellement :
-
-1. Télécharger l'installateur sur [mafft.cbrc.jp](https://mafft.cbrc.jp/alignment/software/windows_without_cygwin.html)
-2. Lancer l'installateur et cocher **"Add to PATH"**
-3. Redémarrer le terminal avant de lancer le pipeline

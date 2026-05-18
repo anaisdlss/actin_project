@@ -5,8 +5,7 @@ platforms = [
   "osx-arm64",
   "osx-64",
   "linux-64",
-  "linux-aarch64",
-  "win-64"
+  "linux-aarch64"
 ]
 version = "0.1.0"
 
@@ -29,18 +28,6 @@ numpy = ">=1.26,<3"
 pymol-open-source = "*"
 py3dmol = "*"
 seaborn = ">=0.13.2,<0.14"
-
-# mafft n'est pas disponible sur Windows via conda-forge
-[target.osx-arm64.dependencies]
-mafft = "*"
-
-[target.osx-64.dependencies]
-mafft = "*"
-
-[target.linux-64.dependencies]
-mafft = "*"
-
-[target.linux-aarch64.dependencies]
 mafft = "*"
 
 [pypi-dependencies]
