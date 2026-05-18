@@ -1,17 +1,12 @@
 """
 Génère un script PyMOL par cluster de site de liaison actine (Binding Site Cluster Data 70).
 
-Logique identique au réseau Streamlit "Binding Site Cluster Data 70" :
-  - Un script par nœud rouge (S1 binding site cluster, ou S2 actin pour homo)
-  - À l'intérieur : un objet PyMOL par S2 binding site connecté (arête dans le réseau)
-    → représenté par le C70 patch avec le plus d'interactions pour cette paire (S1, S2)
-
 Chaque script montre :
-  - L'actine de référence (8iah_L, surface grise semi-transparente)
-  - Un objet par S2 binding site (surface chain B, colorée par B-factor)
+  - L'actine S1 de référence colorée par B-factor du cluster (cyan = résidus d'interface)
+  - Un objet par S2 binding site connecté, nommé {s2_cluster}_{nom_proteine}
+    Vert = ABP (hétéro) | Rose = actine (homo) | Intensité = % ASA enfouie
 
 Usage :
-  cd /path/to/actin_project
   python -m script.bfactor_c70_pymol_by_s1
 
 Sortie :
@@ -23,11 +18,12 @@ import pandas as pd
 from pathlib import Path
 from collections import defaultdict
 
-C70_CSV  = "data/filtered/patches_infos_cluster_data_70.csv"
-ALL_CSV  = "data/filtered/filtered_all_data.csv"
-BFAC_DIR = Path("data/filtered/details/structures_files/bfactor_c70_interface")
+C70_CSV      = "data/filtered/patches_infos_cluster_data_70.csv"
+ALL_CSV      = "data/filtered/filtered_all_data.csv"
+BFAC_DIR     = Path("data/filtered/details/structures_files/bfactor_c70_interface")
+BFAC_S1_DIR  = Path("data/filtered/details/structures_files/bfactor_cluster")
 PAIRWISE_DIR = Path("data/filtered/details/structures_files/pairwise")
-OUT_DIR  = BFAC_DIR / "by_s1_cluster"
+OUT_DIR      = BFAC_DIR / "by_s1_cluster"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 df_c70 = pd.read_csv(C70_CSV)
@@ -37,7 +33,7 @@ df_all["s2_actine"] = df_all["s2_actine"].fillna(False)
 patch_type = dict(zip(df_c70["patch"].astype(str), df_c70["interaction_type"]))
 patch_n    = dict(zip(df_c70["patch"].astype(str), df_c70["n_interactions"]))
 
-# Actine de référence : 8iah_L
+# ── Actine de référence pour l'alignement (8iah_L) ────────────────────────────
 ref_pdb_path = PAIRWISE_DIR / "182_8iah_L_0.pdb"
 if not ref_pdb_path.exists():
     candidates = sorted(PAIRWISE_DIR.glob("*_8iah_L_*.pdb"))
@@ -46,21 +42,43 @@ if not ref_pdb_path.exists():
     ref_pdb_path = candidates[0]
 ref_pdb_abs = ref_pdb_path.resolve()
 
-# ── Groupement : actin_site → { s2_binding_site → meilleur C70 patch } ────────
-# Identique au réseau : une arête par (S1 binding site, S2 binding site)
-# Si plusieurs C70 patches pour la même paire → on garde celui avec le plus
-# d'interactions (représentant le plus statistiquement solide).
-#
-# Structure : actin_to_s2 [actin_site][s2_site] = best_c70_patch
-# {actin_site: {s2_site: (c70_patch, is_swapped)}}
-# is_swapped=True : le PDB a chain A = S1 original, mais ici actin_site est S2 →
-# il faut aligner chain B (actin_site) et montrer la surface de chain A (partenaire).
-actin_to_s2: dict[str, dict[str, tuple[str, bool]]] = defaultdict(dict)
+# ── Mapping s2_binding_site → nom de protéine nettoyé ─────────────────────────
+def _clean_name(title: str) -> str:
+    if not title or str(title).lower() in ("nan", ""):
+        return ""
+    part = str(title).split(",")[0].strip()
+    part = re.sub(r"[^A-Za-z0-9]", "_", part)
+    part = re.sub(r"_+", "_", part).strip("_").lower()
+    return part[:35]
 
 df_valid = df_all[df_all["cluster_data_70"].notna()].copy()
 df_valid["s1_bs"] = df_valid["s1_binding_site_cluster_data_70"].astype(str)
 df_valid["s2_bs"] = df_valid["s2_binding_site_cluster_data_70"].astype(str)
 df_valid["c70"]   = df_valid["cluster_data_70"].astype(str)
+
+# Titre le plus fréquent par s2_binding_site
+_s2bs_name: dict[str, str] = {}
+for s2_bs, grp in df_valid.groupby("s2_bs"):
+    titles = grp["subunit_2_title"].dropna()
+    if len(titles):
+        _s2bs_name[s2_bs] = _clean_name(titles.value_counts().index[0])
+
+# ── Lecture du bmax d'un PDB sur une chaîne donnée ────────────────────────────
+def _bmax_chain(pdb_path: Path, ch: str) -> float:
+    bmax = 1.0
+    with open(pdb_path) as f:
+        for line in f:
+            if line.startswith("ATOM") and len(line) > 66 and line[21] == ch:
+                try:
+                    v = float(line[60:66].strip())
+                    if v > bmax:
+                        bmax = v
+                except ValueError:
+                    pass
+    return round(bmax, 2)
+
+# ── Groupement actin_site → { s2_site → (c70_patch, is_swapped) } ─────────────
+actin_to_s2: dict[str, dict[str, tuple[str, bool]]] = defaultdict(dict)
 
 for _, row in df_valid.iterrows():
     s1_bs = row["s1_bs"]
@@ -69,12 +87,10 @@ for _, row in df_valid.iterrows():
     if s1_bs == "nan" or s2_bs == "nan" or c70 == "nan":
         continue
 
-    # Vue normale (actin_site = S1) : aligner chain A, montrer chain B
     current = actin_to_s2[s1_bs].get(s2_bs)
     if current is None or patch_n.get(c70, 0) > patch_n.get(current[0], 0):
         actin_to_s2[s1_bs][s2_bs] = (c70, False)
 
-    # Vue swappée homo (actin_site = S2) : aligner chain B, montrer chain A
     if row["s2_actine"]:
         current2 = actin_to_s2[s2_bs].get(s1_bs)
         if current2 is None or patch_n.get(c70, 0) > patch_n.get(current2[0], 0):
@@ -85,26 +101,44 @@ print(f"Clusters actine uniques : {len(actin_to_s2)}")
 # ── Génération des scripts PyMOL ───────────────────────────────────────────────
 n_written = 0
 for actin_site, s2_to_c70 in sorted(actin_to_s2.items()):
-    # Trier les S2 binding sites par n_interactions du représentant (décroissant)
     s2_sorted = sorted(s2_to_c70.items(), key=lambda x: patch_n.get(x[1][0], 0), reverse=True)
 
+    # ── Actine S1 : B-factor du cluster si disponible, sinon gris ─────────────
+    # Le PDB bfactor_cluster contient déjà chain A avec les B-factors calculés.
+    # On le charge directement comme base_actin — les S2 s'alignent dessus.
+    s1_bfac_pdb = (BFAC_S1_DIR / f"{actin_site}.pdb").resolve()
+    if s1_bfac_pdb.exists():
+        bmax_s1 = _bmax_chain(s1_bfac_pdb, "A")
+        if bmax_s1 > 1.0:
+            s1_color_cmd = f"spectrum b, white_cyan, base_actin, minimum=0, maximum={bmax_s1}"
+        else:
+            s1_color_cmd = "color cyan, base_actin"
+        ref_section = [
+            "# ── Actine S1 — B-factor du cluster (cyan = résidus d'interface) ─────────",
+            f"load {s1_bfac_pdb}, base_actin",
+            "hide everything, base_actin",
+            "show surface, base_actin",
+            s1_color_cmd,
+            "set transparency, 0.3, base_actin",
+        ]
+    else:
+        ref_section = [
+            "# ── Actine S1 — référence grise (pas de B-factor pour ce cluster) ────────",
+            f"load {ref_pdb_abs}, _ref_complex",
+            "create base_actin, _ref_complex and chain A",
+            "delete _ref_complex",
+            "hide everything, base_actin",
+            "show surface, base_actin",
+            "color grey70, base_actin",
+            "set transparency, 0.55, base_actin",
+        ]
+
     lines = [
-        f"# PyMOL — cluster actine : {actin_site}",
-        f"# {len(s2_sorted)} S2 binding sites (un objet par arête du réseau Binding Site Cluster Data 70)",
-        "# Vert = ABP (hétéro) | Rose = actine (homo) | Intensité = B-factor (% ASA interface)",
-        "# Représentant par S2 binding site = C70 patch avec le plus d'interactions",
+        f"# PyMOL — cluster actine S1 : {actin_site}",
+        f"# {len(s2_sorted)} partenaires (un objet par arête du réseau Binding Site Cluster Data 70)",
+        "# Cyan = site S1 (actine, B-factor cluster) | Vert = ABP | Rose = actine partenaire",
         "",
-        "# ── Actine de référence ──────────────────────────────────────────────────",
-        f"load {ref_pdb_abs}, _ref_complex",
-        "create base_actin, _ref_complex and chain A",
-        "delete _ref_complex",
-        "hide everything, base_actin",
-        "show surface, base_actin",
-        "color grey70, base_actin",
-        "set transparency, 0.55, base_actin",
-        "",
-        "# ── S2 binding sites ─────────────────────────────────────────────────────",
-    ]
+    ] + ref_section + ["", "# ── Partenaires S2 ───────────────────────────────────────────────────────"]
 
     n_loaded = 0
     for s2_site, (c70_patch, is_swapped) in s2_sorted:
@@ -113,56 +147,39 @@ for actin_site, s2_to_c70 in sorted(actin_to_s2.items()):
             continue
 
         itype = patch_type.get(c70_patch, "hetero")
-        # Nom d'objet PyMOL basé sur le S2 binding site (pas le C70 patch)
-        obj_tmp     = "tmp_" + re.sub(r"[^A-Za-z0-9_]", "_", s2_site)
-        obj_partner = "s2_"  + re.sub(r"[^A-Za-z0-9_]", "_", s2_site)
 
-        # Vue swappée homo : actin_site est le S2 original → chain B dans le PDB.
-        # Il faut aligner chain B avec la référence et montrer chain A (le partenaire).
+        # Nom d'objet : {s2_site}_{nom_proteine}
+        prot_name = _s2bs_name.get(s2_site, "")
+        safe_s2   = re.sub(r"[^A-Za-z0-9_]", "_", s2_site)
+        obj_base  = safe_s2 + ("_" + prot_name if prot_name else "")
+        obj_tmp     = "tmp_" + safe_s2
+        obj_partner = obj_base
+
         align_ch   = "B" if is_swapped else "A"
         partner_ch = "A" if is_swapped else "B"
 
-        bmax = 1.0
-        for line in open(pdb_path):
-            if line.startswith("ATOM") and len(line) > 66 and line[21] == partner_ch:
-                try:
-                    v = float(line[60:66].strip())
-                    if v > bmax:
-                        bmax = v
-                except ValueError:
-                    pass
-        bmax = round(bmax, 2)
+        bmax = _bmax_chain(pdb_path, partner_ch)
 
         swap_note = " [vue swappée]" if is_swapped else ""
-        label = f"# S2 site : {s2_site} ({itype}{swap_note}) — représentant C70 : {c70_patch} ({patch_n.get(c70_patch, '?')} interactions)"
+        label = f"# {s2_site} ({itype}{swap_note}) — C70 : {c70_patch} ({patch_n.get(c70_patch, '?')} interactions)"
+
         if itype == "homo":
-            if bmax > 1.0:
-                color_cmd = f"spectrum b, white_hotpink, {obj_partner}, minimum=0, maximum={bmax}"
-            else:
-                color_cmd = f"color hotpink, {obj_partner}"
-            lines += [
-                label,
-                f"load {pdb_path}, {obj_tmp}",
-                f"align {obj_tmp} and chain {align_ch}, base_actin",
-                f"create {obj_partner}, {obj_tmp} and chain {partner_ch}",
-                f"delete {obj_tmp}",
-                f"hide everything, {obj_partner}",
-                f"show surface, {obj_partner}",
-                color_cmd,
-                "",
-            ]
+            color_cmd = (f"spectrum b, white_hotpink, {obj_partner}, minimum=0, maximum={bmax}"
+                         if bmax > 1.0 else f"color hotpink, {obj_partner}")
         else:
-            lines += [
-                label,
-                f"load {pdb_path}, {obj_tmp}",
-                f"align {obj_tmp} and chain A, base_actin",
-                f"create {obj_partner}, {obj_tmp} and chain B",
-                f"delete {obj_tmp}",
-                f"hide everything, {obj_partner}",
-                f"show surface, {obj_partner}",
-                f"spectrum b, white_green,   {obj_partner}, minimum=0, maximum={bmax}",
-                "",
-            ]
+            color_cmd = f"spectrum b, white_green, {obj_partner}, minimum=0, maximum={bmax}"
+
+        lines += [
+            label,
+            f"load {pdb_path}, {obj_tmp}",
+            f"align {obj_tmp} and chain {align_ch}, base_actin",
+            f"create {obj_partner}, {obj_tmp} and chain {partner_ch}",
+            f"delete {obj_tmp}",
+            f"hide everything, {obj_partner}",
+            f"show surface, {obj_partner}",
+            color_cmd,
+            "",
+        ]
         n_loaded += 1
 
     if n_loaded == 0:
