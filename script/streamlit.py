@@ -2968,33 +2968,6 @@ if os.path.exists(proteins_path):
         "Cluster C70": st.column_config.TextColumn(width="medium"),
     })
 
-    # ── Détail par ABP ─────────────────────────────────────────────────────────
-    if len(abp_global) > 0 and "Binding site S1" in abp_global.columns:
-        st.subheader("Détail par ABP")
-
-        def _parse_ids(cell):
-            return sorted(
-                s.strip() for s in str(cell).split(",")
-                if s.strip() and s.strip().lower() != "nan"
-            )
-
-        abp_names = abp_global["Protéine"].tolist()
-        sel_abp = st.selectbox("Sélectionner un ABP", abp_names, key="sel_abp_detail")
-        abp_row = abp_global[abp_global["Protéine"] == sel_abp].iloc[0]
-
-        s1_sites  = _parse_ids(abp_row["Binding site S1"])
-        c70_sites = _parse_ids(abp_row["Cluster C70"])
-
-        col_d1, col_d2 = st.columns(2)
-        with col_d1:
-            st.markdown(f"**Binding sites S1 ({len(s1_sites)})**")
-            for s in s1_sites:
-                st.markdown(f"- `{s}`")
-        with col_d2:
-            st.markdown(f"**Clusters C70 ({len(c70_sites)})**")
-            for c in c70_sites:
-                st.markdown(f"- `{c}`")
-
 # ── Heatmap ABP × résidus actin ──────────────────────────────────────────────
 st.subheader("Heatmap — résidus actin contactés par les ABP")
 st.caption(
@@ -3140,3 +3113,31 @@ if all(os.path.exists(f) for f in _ABP_HM_FILES):
         plt.tight_layout()
         st.pyplot(_fig_hm)
         plt.close(_fig_hm)
+
+# ── Détail par ABP ─────────────────────────────────────────────────────────────
+if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
+        and len(abp_global) > 0 and "Binding site S1" in abp_global.columns):
+    st.subheader("Détail par ABP")
+
+    def _parse_ids(cell):
+        return sorted(
+            s.strip() for s in str(cell).split(",")
+            if s.strip() and s.strip().lower() != "nan"
+        )
+
+    abp_names = abp_global["Protéine"].tolist()
+    sel_abp = st.selectbox("Sélectionner un ABP", abp_names, key="sel_abp_detail")
+    abp_row = abp_global[abp_global["Protéine"] == sel_abp].iloc[0]
+
+    s1_sites  = _parse_ids(abp_row["Binding site S1"])
+    c70_sites = _parse_ids(abp_row["Cluster C70"])
+
+    col_d1, col_d2 = st.columns(2)
+    with col_d1:
+        st.markdown(f"**Binding sites S1 ({len(s1_sites)})**")
+        for s in s1_sites:
+            st.markdown(f"- `{s}`")
+    with col_d2:
+        st.markdown(f"**Clusters C70 ({len(c70_sites)})**")
+        for c in c70_sites:
+            st.markdown(f"- `{c}`")
