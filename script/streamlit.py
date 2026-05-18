@@ -3119,25 +3119,41 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
         and len(abp_global) > 0 and "Binding site S1" in abp_global.columns):
     st.subheader("Détail par ABP")
 
-    def _parse_ids(cell):
-        return sorted(
-            s.strip() for s in str(cell).split(",")
-            if s.strip() and s.strip().lower() != "nan"
-        )
-
     abp_names = abp_global["Protéine"].tolist()
     sel_abp = st.selectbox("Sélectionner un ABP", abp_names, key="sel_abp_detail")
-    abp_row = abp_global[abp_global["Protéine"] == sel_abp].iloc[0]
 
-    s1_sites  = _parse_ids(abp_row["Binding site S1"])
-    c70_sites = _parse_ids(abp_row["Cluster C70"])
+    # PDB IDs contenant cet ABP
+    abp_pdbs = set(merged[merged["protein"] == sel_abp]["pdb_id"])
 
-    col_d1, col_d2 = st.columns(2)
-    with col_d1:
-        st.markdown(f"**Binding sites S1 ({len(s1_sites)})**")
-        for s in s1_sites:
-            st.markdown(f"- `{s}`")
-    with col_d2:
-        st.markdown(f"**Clusters C70 ({len(c70_sites)})**")
-        for c in c70_sites:
-            st.markdown(f"- `{c}`")
+    # Interactions homo actine-actine dans ces mêmes PDB
+    _df_homo = df_all_g.copy()
+    _df_homo["_pdb"] = _df_homo["subunit_1"].str.split("_").str[0]
+    homo_cooc = _df_homo[
+        _df_homo["s1_actine"].fillna(False).astype(bool) &
+        _df_homo["s2_actine"].fillna(False).astype(bool) &
+        _df_homo["_pdb"].isin(abp_pdbs) &
+        _df_homo["cluster_data_70"].notna()
+    ][["_pdb", "cluster_data_70", "s1_binding_site_cluster_data_70"]]
+
+    st.caption(
+        f"{len(abp_pdbs)} PDB contenant cet ABP · "
+        f"interactions homo actine-actine co-présentes"
+    )
+    if homo_cooc.empty:
+        st.info("Aucune interaction homo actine-actine dans les PDB contenant cet ABP.")
+    else:
+        homo_summary = (
+            homo_cooc.groupby(
+                ["cluster_data_70", "s1_binding_site_cluster_data_70"],
+                dropna=False
+            )
+            .agg(nb_pdb=("_pdb", "nunique"))
+            .reset_index()
+            .sort_values("nb_pdb", ascending=False)
+            .rename(columns={
+                "cluster_data_70": "Cluster C70",
+                "s1_binding_site_cluster_data_70": "Binding site S1",
+                "nb_pdb": "Nb PDB",
+            })
+        )
+        st.dataframe(homo_summary, hide_index=True, use_container_width=True)
