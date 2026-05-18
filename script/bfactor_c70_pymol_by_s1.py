@@ -52,7 +52,10 @@ ref_pdb_abs = ref_pdb_path.resolve()
 # d'interactions (représentant le plus statistiquement solide).
 #
 # Structure : actin_to_s2 [actin_site][s2_site] = best_c70_patch
-actin_to_s2: dict[str, dict[str, str]] = defaultdict(dict)
+# {actin_site: {s2_site: (c70_patch, is_swapped)}}
+# is_swapped=True : le PDB a chain A = S1 original, mais ici actin_site est S2 →
+# il faut aligner chain B (actin_site) et montrer la surface de chain A (partenaire).
+actin_to_s2: dict[str, dict[str, tuple[str, bool]]] = defaultdict(dict)
 
 df_valid = df_all[df_all["cluster_data_70"].notna()].copy()
 df_valid["s1_bs"] = df_valid["s1_binding_site_cluster_data_70"].astype(str)
@@ -66,16 +69,16 @@ for _, row in df_valid.iterrows():
     if s1_bs == "nan" or s2_bs == "nan" or c70 == "nan":
         continue
 
-    # Mettre à jour si ce C70 patch a plus d'interactions que le précédent
+    # Vue normale (actin_site = S1) : aligner chain A, montrer chain B
     current = actin_to_s2[s1_bs].get(s2_bs)
-    if current is None or patch_n.get(c70, 0) > patch_n.get(current, 0):
-        actin_to_s2[s1_bs][s2_bs] = c70
+    if current is None or patch_n.get(c70, 0) > patch_n.get(current[0], 0):
+        actin_to_s2[s1_bs][s2_bs] = (c70, False)
 
-    # Pour les homos, S2 est aussi actine → même logique depuis le côté S2
+    # Vue swappée homo (actin_site = S2) : aligner chain B, montrer chain A
     if row["s2_actine"]:
         current2 = actin_to_s2[s2_bs].get(s1_bs)
-        if current2 is None or patch_n.get(c70, 0) > patch_n.get(current2, 0):
-            actin_to_s2[s2_bs][s1_bs] = c70
+        if current2 is None or patch_n.get(c70, 0) > patch_n.get(current2[0], 0):
+            actin_to_s2[s2_bs][s1_bs] = (c70, True)
 
 print(f"Clusters actine uniques : {len(actin_to_s2)}")
 
@@ -83,7 +86,7 @@ print(f"Clusters actine uniques : {len(actin_to_s2)}")
 n_written = 0
 for actin_site, s2_to_c70 in sorted(actin_to_s2.items()):
     # Trier les S2 binding sites par n_interactions du représentant (décroissant)
-    s2_sorted = sorted(s2_to_c70.items(), key=lambda x: patch_n.get(x[1], 0), reverse=True)
+    s2_sorted = sorted(s2_to_c70.items(), key=lambda x: patch_n.get(x[1][0], 0), reverse=True)
 
     lines = [
         f"# PyMOL — cluster actine : {actin_site}",
@@ -104,7 +107,7 @@ for actin_site, s2_to_c70 in sorted(actin_to_s2.items()):
     ]
 
     n_loaded = 0
-    for s2_site, c70_patch in s2_sorted:
+    for s2_site, (c70_patch, is_swapped) in s2_sorted:
         pdb_path = (BFAC_DIR / f"{c70_patch}.pdb").resolve()
         if not pdb_path.exists():
             continue
@@ -114,9 +117,14 @@ for actin_site, s2_to_c70 in sorted(actin_to_s2.items()):
         obj_tmp     = "tmp_" + re.sub(r"[^A-Za-z0-9_]", "_", s2_site)
         obj_partner = "s2_"  + re.sub(r"[^A-Za-z0-9_]", "_", s2_site)
 
+        # Vue swappée homo : actin_site est le S2 original → chain B dans le PDB.
+        # Il faut aligner chain B avec la référence et montrer chain A (le partenaire).
+        align_ch   = "B" if is_swapped else "A"
+        partner_ch = "A" if is_swapped else "B"
+
         bmax = 1.0
         for line in open(pdb_path):
-            if line.startswith("ATOM") and len(line) > 66 and line[21] == "B":
+            if line.startswith("ATOM") and len(line) > 66 and line[21] == partner_ch:
                 try:
                     v = float(line[60:66].strip())
                     if v > bmax:
@@ -125,20 +133,21 @@ for actin_site, s2_to_c70 in sorted(actin_to_s2.items()):
                     pass
         bmax = round(bmax, 2)
 
-        label = f"# S2 site : {s2_site} ({itype}) — représentant C70 : {c70_patch} ({patch_n.get(c70_patch, '?')} interactions)"
+        swap_note = " [vue swappée]" if is_swapped else ""
+        label = f"# S2 site : {s2_site} ({itype}{swap_note}) — représentant C70 : {c70_patch} ({patch_n.get(c70_patch, '?')} interactions)"
         if itype == "homo":
             if bmax > 1.0:
-                show_cmd  = f"show surface, {obj_partner} and chain B and b > 0.001"
-                color_cmd = f"spectrum b, white_hotpink, {obj_partner} and chain B, minimum=0, maximum={bmax}"
+                color_cmd = f"spectrum b, white_hotpink, {obj_partner}, minimum=0, maximum={bmax}"
             else:
-                show_cmd  = f"show surface, {obj_partner} and chain B"
-                color_cmd = f"color hotpink, {obj_partner} and chain B"
+                color_cmd = f"color hotpink, {obj_partner}"
             lines += [
                 label,
-                f"load {pdb_path}, {obj_partner}",
-                f"align {obj_partner} and chain A, base_actin",
+                f"load {pdb_path}, {obj_tmp}",
+                f"align {obj_tmp} and chain {align_ch}, base_actin",
+                f"create {obj_partner}, {obj_tmp} and chain {partner_ch}",
+                f"delete {obj_tmp}",
                 f"hide everything, {obj_partner}",
-                show_cmd,
+                f"show surface, {obj_partner}",
                 color_cmd,
                 "",
             ]

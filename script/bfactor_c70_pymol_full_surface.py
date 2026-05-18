@@ -96,17 +96,17 @@ for _, row in df_c70.sort_values("n_interactions", ascending=False).iterrows():
     # Hétéro : create isole chain B (ABP) puis surface complète.
     if itype == "homo":
         if bmax > 1.0:
-            show_cmd  = f"show surface, {obj_partner} and chain B and b > 0.001"
-            color_cmd = f"spectrum b, white_hotpink, {obj_partner} and chain B, minimum=0, maximum={bmax}"
+            color_cmd = f"spectrum b, white_hotpink, {obj_partner}, minimum=0, maximum={bmax}"
         else:
-            show_cmd  = f"show surface, {obj_partner} and chain B"
-            color_cmd = f"color hotpink, {obj_partner} and chain B"
+            color_cmd = f"color hotpink, {obj_partner}"
         lines += [
             f"# {patch} ({itype}, {row['n_interactions']} interactions)",
-            f"load {pdb_path}, {obj_partner}",
-            f"align {obj_partner} and chain A, base_actin",
+            f"load {pdb_path}, {obj_tmp}",
+            f"align {obj_tmp} and chain A, base_actin",
+            f"create {obj_partner}, {obj_tmp} and chain B",
+            f"delete {obj_tmp}",
             f"hide everything, {obj_partner}",
-            show_cmd,
+            f"show surface, {obj_partner}",
             color_cmd,
             "",
         ]
