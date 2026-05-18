@@ -1026,8 +1026,7 @@ def _build_bipartite_c70_html(patch_c70, bipartite, _v, *_mtimes):
             width=6.0 if (nc == n_couples_total and n_couples_total > 1) else 0.5,
             color={"color": ecol, "highlight": "#FF4400", "hover": "#FF4400"},
             title=f"{nc}/{n_couples_total} couples · {row['contact_type']}",
-            smooth={"enabled": True, "type": "curvedCW" if bipartite else "dynamic",
-                    "roundness": 0.15},
+            smooth={"enabled": False} if bipartite else {"enabled": True, "type": "dynamic"},
         )
 
     if bipartite:
@@ -1036,8 +1035,7 @@ def _build_bipartite_c70_html(patch_c70, bipartite, _v, *_mtimes):
           "physics": {"enabled": false},
           "interaction": {"hover": true, "tooltipDelay": 80,
                           "zoomView": true, "dragView": true, "dragNodes": true},
-          "edges": {"smooth": {"enabled": true, "type": "curvedCW", "roundness": 0.15},
-                    "selectionWidth": 2},
+          "edges": {"smooth": {"enabled": false}, "selectionWidth": 2},
           "nodes": {"font": {"face": "monospace", "size": 25, "multi": "html"},
                     "shadow": {"enabled": true, "color": "rgba(0,0,0,0.10)",
                                "size": 6, "x": 2, "y": 2}}
