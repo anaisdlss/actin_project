@@ -3133,27 +3133,43 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
         _df_homo["s2_actine"].fillna(False).astype(bool) &
         _df_homo["_pdb"].isin(abp_pdbs) &
         _df_homo["cluster_data_70"].notna()
-    ][["_pdb", "cluster_data_70", "s1_binding_site_cluster_data_70"]]
+    ][["_pdb", "cluster_data_70",
+       "s1_binding_site_cluster_data_70", "s2_binding_site_cluster_data_70"]]
 
+    total_homo = len(homo_cooc)
     st.caption(
         f"{len(abp_pdbs)} PDB contenant cet ABP · "
-        f"interactions homo actine-actine co-présentes"
+        f"{total_homo} interactions homo actine-actine co-présentes"
     )
     if homo_cooc.empty:
         st.info("Aucune interaction homo actine-actine dans les PDB contenant cet ABP.")
     else:
         homo_summary = (
             homo_cooc.groupby(
-                ["cluster_data_70", "s1_binding_site_cluster_data_70"],
+                ["cluster_data_70",
+                 "s1_binding_site_cluster_data_70",
+                 "s2_binding_site_cluster_data_70"],
                 dropna=False
             )
-            .agg(nb_pdb=("_pdb", "nunique"))
+            .agg(
+                nb_pdb=("_pdb", "nunique"),
+                nb_inter=("_pdb", "count"),
+            )
             .reset_index()
             .sort_values("nb_pdb", ascending=False)
-            .rename(columns={
-                "cluster_data_70": "Cluster C70",
-                "s1_binding_site_cluster_data_70": "Binding site S1",
-                "nb_pdb": "Nb PDB",
-            })
         )
+        homo_summary["% PDB"] = (
+            homo_summary["nb_pdb"] / len(abp_pdbs) * 100
+        ).round(1)
+        homo_summary["% interactions homo"] = (
+            homo_summary["nb_inter"] / total_homo * 100
+        ).round(1)
+        homo_summary = homo_summary.rename(columns={
+            "cluster_data_70": "Cluster C70",
+            "s1_binding_site_cluster_data_70": "Binding site S1",
+            "s2_binding_site_cluster_data_70": "Binding site S2",
+            "nb_pdb": "Nb PDB",
+            "nb_inter": "Nb interactions homo",
+        })[["Cluster C70", "Binding site S1", "Binding site S2",
+            "Nb PDB", "% PDB", "Nb interactions homo", "% interactions homo"]]
         st.dataframe(homo_summary, hide_index=True, use_container_width=True)
