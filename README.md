@@ -6,18 +6,6 @@ Le pipeline récupère l'ensemble des co-structures 3D disponibles, filtre les a
 
 ---
 
-## Prérequis
-
-| Outil | Rôle |
-|-------|------|
-| [pixi](https://pixi.sh) | Gestion de l'environnement et des dépendances (installé ci-dessous) |
-| [PyMOL](https://pymol.org) | Visualisation des structures 3D |
-| Accès Internet | Récupération des données PPI3D et RCSB PDB |
-
-Python et toutes les librairies Python sont gérés automatiquement par pixi — aucune installation manuelle n'est requise.
-
----
-
 ## Installation
 
 ### 0 — Ouvrir un terminal
@@ -108,3 +96,9 @@ Pour exécuter un script, utiliser `File > Run Script…` dans PyMOL, ou taper d
 ```
 
 **Code couleur :** dégradé vert = partenaire ABP (interaction hétérologue) · dégradé rose = partenaire actine (interaction homologue) · l'intensité encode le pourcentage de surface accessible enfouie à l'interface.
+
+---
+
+## Installer PyMOL
+
+PyMOL est nécessaire uniquement pour les visualisations 3D. Le télécharger sur [pymol.org](https://pymol.org) et suivre les instructions d'installation selon le système d'exploitation.
