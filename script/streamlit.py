@@ -548,8 +548,21 @@ def _load_res4(_v, *_mtimes):
     return df
 
 
+_AA_RESTYPE_HEX = {
+    "A": "#C0C0C0", "G": "#C0C0C0", "I": "#C0C0C0", "L": "#C0C0C0",
+    "M": "#C0C0C0", "V": "#C0C0C0",          # hydrophobe → gris
+    "F": "#FFB6C1", "W": "#FFB6C1", "Y": "#FFB6C1",  # aromatique → rose
+    "H": "#87CEEB", "N": "#87CEEB", "Q": "#87CEEB",
+    "S": "#87CEEB", "T": "#87CEEB",          # polaire → bleu ciel
+    "K": "#4169E1", "R": "#4169E1",          # positif → bleu roi
+    "D": "#DC143C", "E": "#DC143C",          # négatif → rouge
+    "C": "#FFD700",                           # cystéine → doré
+    "P": "#90EE90",                           # proline → vert clair
+    "?": "#AAAAAA",
+}
+
 @st.cache_data(show_spinner="Génération réseau C70…")
-def _build_bipartite_c70_html(patch_c70, bipartite, _v, *_mtimes):
+def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
     """Réseau bipartite interactif pour un patch C70 : résidus actine (S1) ↔ résidus ABP (S2)."""
     import matplotlib.colors as _mc
     import matplotlib as _mpl_c70
@@ -956,8 +969,13 @@ def _build_bipartite_c70_html(patch_c70, bipartite, _v, *_mtimes):
     # Nœuds S1
     for i, pos in enumerate(all_s1):
         asa_v = float(asa_s1[pos]) if pos in asa_s1.index else 0.0
-        bg = _hex_s1(asa_v)
-        tc = "#222" if asa_v < 55 else "#fff"
+        if color_mode == "restype":
+            _aa_key = _aa1(s1_aa_majority.get(pos, "?")) if pos in s1_aa_majority else "?"
+            bg = _AA_RESTYPE_HEX.get(_aa_key, "#AAAAAA")
+            tc = "#fff" if _aa_key in ("K", "R", "D", "E") else "#222"
+        else:
+            bg = _hex_s1(asa_v)
+            tc = "#222" if asa_v < 55 else "#fff"
         _s1_freq = freq_s1.get(pos, 0.0)
         diam = _node_radius(_s1_freq) * 2
         _s1_aa = _aa1(s1_aa_majority.get(pos, "?"))
@@ -990,13 +1008,19 @@ def _build_bipartite_c70_html(patch_c70, bipartite, _v, *_mtimes):
         ca_val = float(avg_asa_s2.get(nid, 0.0))
         aa_dist = str(nd_to_aa_dist.get(nid, ""))
         sz = _node_radius(_s2_freq)
-        if partner == "Actine":
+        _s2_aa_key = str(nd_to_majority.get(nid, "?"))[:1] if nid in nd_to_majority.index else "?"
+        if color_mode == "restype":
+            col = _AA_RESTYPE_HEX.get(_s2_aa_key, "#AAAAAA")
+            _bord_h = "#555555"
+            tc_s2 = "#fff" if _s2_aa_key in ("K", "R", "D", "E") else "#222"
+        elif partner == "Actine":
             col = _hex_s2_homo(ca_val)
             _bord_h = "#880044"
+            tc_s2 = "#222"
         else:
             col = _hex_s2(ca_val)
             _bord_h = "#007700"
-        tc_s2 = "#222"
+            tc_s2 = "#222"
         _variants = f"AA : {aa_dist}" if aa_dist else ""
         _n_iids_s2 = int(s2_n_iids.get(nid, 0))
         _n_c_s2 = int(s2_n_couples.get(nid, 0))
@@ -2888,8 +2912,12 @@ else:
                 "**Réseau interactif — résidus actine ↔ résidus ABP**")
             _bip_ok = all(os.path.exists(f) for f in _BIPARTITE_FILES)
             if _bip_ok:
+                _color_mode = "restype" if st.toggle(
+                    "Coloration physicochimique (hydrophobe/polaire/chargé…)",
+                    value=False, key=f"restype_toggle_{sel_c70}"
+                ) else "bfactor"
                 _html_c70, _n_s1, _n_s2, _n_tot, _html_3d_c70 = _build_bipartite_c70_html(
-                    sel_c70, True, _BIP_CACHE_VERSION, *_bip_mtimes())
+                    sel_c70, True, _color_mode, _BIP_CACHE_VERSION, *_bip_mtimes())
                 if _html_c70:
                     st.caption(
                         f"{_n_s1} résidus actine (S1) · {_n_s2} résidus partenaire (S2)"
