@@ -63,25 +63,6 @@ for s2_bs, grp in df_valid.groupby("s2_bs"):
     if len(titles):
         _s2bs_name[s2_bs] = _clean_name(titles.value_counts().index[0])
 
-# ── Sticks physicochimiques sur les résidus d'interface (b > seuil) ──────────
-_BTHRESH = 10   # % ASA buried minimum pour afficher les sticks
-
-def _restype_cmds(obj: str, bthresh: float = _BTHRESH) -> list[str]:
-    """Commandes PyMOL : sticks fins colorés par type physicochimique, résidus d'interface."""
-    sel = f"{obj} and b > {bthresh}"
-    return [
-        f"# Sticks physicochimiques — résidus d'interface (b > {bthresh} %)",
-        f"show sticks, {sel}",
-        f"set stick_radius, 0.12, {obj}",
-        f"color grey80,    {sel} and (resn ALA+GLY+ILE+LEU+MET+VAL)",   # hydrophobe
-        f"color lightpink, {sel} and (resn PHE+TRP+TYR)",                # aromatique
-        f"color palecyan,  {sel} and (resn HIS+ASN+GLN+SER+THR)",        # polaire
-        f"color blue,      {sel} and (resn LYS+ARG)",                    # positif
-        f"color red,       {sel} and (resn ASP+GLU)",                    # négatif
-        f"color paleyellow,{sel} and resn CYS",                          # cystéine
-        f"color palegreen, {sel} and resn PRO",                          # proline
-    ]
-
 # ── Lecture du bmax d'un PDB sur une chaîne donnée ────────────────────────────
 def _bmax_chain(pdb_path: Path, ch: str) -> float:
     bmax = 1.0
@@ -138,8 +119,8 @@ for actin_site, s2_to_c70 in sorted(actin_to_s2.items()):
             "hide everything, base_actin",
             "show surface, base_actin",
             s1_color_cmd,
-            "set transparency, 0.4, base_actin",
-        ] + _restype_cmds("base_actin")
+            "set transparency, 0.3, base_actin",
+        ]
     else:
         ref_section = [
             "# ── Actine S1 — référence grise (pas de B-factor pour ce cluster) ────────",
@@ -155,9 +136,8 @@ for actin_site, s2_to_c70 in sorted(actin_to_s2.items()):
     lines = [
         f"# PyMOL — cluster actine S1 : {actin_site}",
         f"# {len(s2_sorted)} partenaires (un objet par arête du réseau Binding Site Cluster Data 70)",
-        "# Surface : gradient blanc→rouge = % ASA buried | Transparence 40 %",
-        "# Sticks (b > 10 %) : gris=hydrophobe · rose=aromatique · cyan=polaire",
-        "#                     bleu=positif · rouge=négatif · jaune=Cys · vert=Pro",
+        "# Surface : gradient blanc→rouge = % ASA buried",
+        "# Vert = ABP (hétéro) | Rose = actine partenaire (homo)",
         "",
     ] + ref_section + ["", "# ── Partenaires S2 ───────────────────────────────────────────────────────"]
 
@@ -199,8 +179,8 @@ for actin_site, s2_to_c70 in sorted(actin_to_s2.items()):
             f"hide everything, {obj_partner}",
             f"show surface, {obj_partner}",
             color_cmd,
-            f"set transparency, 0.4, {obj_partner}",
-        ] + _restype_cmds(obj_partner) + [""]
+            "",
+        ]
         n_loaded += 1
 
     if n_loaded == 0:
