@@ -110,9 +110,9 @@ for actin_site, s2_to_c70 in sorted(actin_to_s2.items()):
     if s1_bfac_pdb.exists():
         bmax_s1 = _bmax_chain(s1_bfac_pdb, "A")
         if bmax_s1 > 1.0:
-            s1_color_cmd = f"spectrum b, white_cyan, base_actin, minimum=0, maximum={bmax_s1}"
+            s1_color_cmd = f"spectrum b, white yellow orange red, base_actin, minimum=0, maximum={bmax_s1}"
         else:
-            s1_color_cmd = "color cyan, base_actin"
+            s1_color_cmd = "color yellow, base_actin"
         ref_section = [
             "# ── Actine S1 — B-factor du cluster (cyan = résidus d'interface) ─────────",
             f"load {s1_bfac_pdb}, base_actin",
