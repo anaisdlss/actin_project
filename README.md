@@ -102,3 +102,13 @@ Pour exécuter un script, utiliser `File > Run Script…` dans PyMOL, ou taper d
 ## Installer PyMOL
 
 PyMOL est nécessaire uniquement pour les visualisations 3D. Le télécharger sur [pymol.org](https://pymol.org) et suivre les instructions d'installation selon le système d'exploitation.
+
+---
+
+## Note Windows — MAFFT
+
+L'étape d'alignement de séquences (étape 6/13) utilise MAFFT, qui n'est pas disponible automatiquement sur Windows. Pour l'installer manuellement :
+
+1. Télécharger l'installateur sur [mafft.cbrc.jp](https://mafft.cbrc.jp/alignment/software/windows_without_cygwin.html)
+2. Lancer l'installateur et cocher **"Add to PATH"**
+3. Redémarrer le terminal avant de lancer le pipeline
