@@ -119,7 +119,6 @@ for actin_site, s2_to_c70 in sorted(actin_to_s2.items()):
             "hide everything, base_actin",
             "show surface, base_actin",
             s1_color_cmd,
-            "set transparency, 0.3, base_actin",
         ]
     else:
         ref_section = [
@@ -130,7 +129,6 @@ for actin_site, s2_to_c70 in sorted(actin_to_s2.items()):
             "hide everything, base_actin",
             "show surface, base_actin",
             "color grey70, base_actin",
-            "set transparency, 0.55, base_actin",
         ]
 
     lines = [
