@@ -928,7 +928,7 @@ def _build_bipartite_c70_html(patch_c70, bipartite, _v, *_mtimes):
             for nid in top_s2
         }
         top_s2_ordered = sorted(top_s2, key=lambda nid: s2_mean_s1.get(nid, 0))
-        h_net = max(700, max(n_s1, n_s2) * 55)
+        h_net = max(500, max(n_s1, n_s2) * 30)
     else:
         top_s2_ordered = top_s2
         h_net = 600
@@ -941,6 +941,8 @@ def _build_bipartite_c70_html(patch_c70, bipartite, _v, *_mtimes):
     _freq_max = max(s1_max, freq_s2_max)
 
     def _node_radius(freq):
+        if bipartite:
+            return 12 + int(10 * freq / _freq_max)
         return 40 + int(30 * freq / _freq_max)
 
     # Nœuds S1
@@ -1036,9 +1038,9 @@ def _build_bipartite_c70_html(patch_c70, bipartite, _v, *_mtimes):
           "interaction": {"hover": true, "tooltipDelay": 80,
                           "zoomView": true, "dragView": true, "dragNodes": true},
           "edges": {"smooth": {"enabled": false}, "selectionWidth": 2},
-          "nodes": {"font": {"face": "monospace", "size": 25, "multi": "html"},
+          "nodes": {"font": {"face": "monospace", "size": 13, "multi": "html"},
                     "shadow": {"enabled": true, "color": "rgba(0,0,0,0.10)",
-                               "size": 6, "x": 2, "y": 2}}
+                               "size": 4, "x": 1, "y": 1}}
         }""")
     else:
         net.set_options("""{
@@ -2862,7 +2864,7 @@ else:
                     st.caption(
                         f"{_n_s1} résidus actine (S1) · {_n_s2} résidus partenaire (S2)"
                         f" · n={_n_tot} interactions")
-                    _net_height = max(700, max(_n_s1, _n_s2) * 55 + 20) if _use_bipartite else 620
+                    _net_height = max(500, max(_n_s1, _n_s2) * 30 + 20) if _use_bipartite else 620
                     st.components.v1.html(
                         _html_c70, height=_net_height, scrolling=False)
                     if _html_3d_c70:
