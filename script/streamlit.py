@@ -1079,72 +1079,77 @@ def _build_bipartite_c70_html(patch_c70, bipartite, _v, *_mtimes):
     s2_partner_names = [p for p in all_partners if p != "Actine"]
     _has_homo = "Actine" in all_partners
     _has_hetero = bool(s2_partner_names)
+    _leg_pos = "top:6px;right:6px;" if bipartite else "top:10px;left:10px;"
+    _fs_h = "10px" if bipartite else "12px"
+    _fs_b = "8px"  if bipartite else "10px"
+    _fs_root = "9px" if bipartite else "11px"
+    _pad = "6px 8px" if bipartite else "12px 14px"
+    _mw = "150px" if bipartite else "230px"
+    _bar_h = "7px" if bipartite else "10px"
     _leg = (
-        '<div style="position:fixed;top:10px;left:10px;'
-        'background:rgba(255,255,255,0.96);border:1px solid #dde;border-radius:10px;'
-        'padding:12px 14px;font-family:\'Segoe UI\',sans-serif;font-size:11px;color:#333;'
-        'z-index:999;max-width:230px;max-height:80vh;overflow-y:auto;'
-        'box-shadow:0 2px 12px rgba(0,0,0,0.10);">'
-        '<div style="font-weight:700;color:#555;margin-bottom:6px;font-size:12px">'
-        'Résidus S1 (actine) — % ASA buried moy</div>'
-        '<div style="background:linear-gradient(to right,#FFFFCC,#FD8D3C,#800026);'
-        'height:10px;border-radius:4px;margin:4px 0 2px"></div>'
-        f'<div style="display:flex;justify-content:space-between;font-size:9px;color:#999;'
-        f'margin-bottom:10px"><span>0</span><span>max ({s1_ca_max:.1f} %)</span></div>'
+        f'<div style="position:fixed;{_leg_pos}'
+        f'background:rgba(255,255,255,0.93);border:1px solid #dde;border-radius:8px;'
+        f'padding:{_pad};font-family:\'Segoe UI\',sans-serif;font-size:{_fs_root};color:#333;'
+        f'z-index:999;max-width:{_mw};max-height:80vh;overflow-y:auto;'
+        f'box-shadow:0 2px 8px rgba(0,0,0,0.08);">'
+        f'<div style="font-weight:700;color:#555;margin-bottom:4px;font-size:{_fs_h}">'
+        'S1 (actine) — % ASA buried</div>'
+        f'<div style="background:linear-gradient(to right,#FFFFCC,#FD8D3C,#800026);'
+        f'height:{_bar_h};border-radius:3px;margin:3px 0 2px"></div>'
+        f'<div style="display:flex;justify-content:space-between;font-size:8px;color:#999;'
+        f'margin-bottom:6px"><span>0</span><span>max ({s1_ca_max:.1f} %)</span></div>'
     )
     if _has_homo:
         _leg += (
-            '<div style="font-weight:700;color:#555;margin-bottom:6px;font-size:12px">'
-            'Résidus S2 (actine homo) — % ASA buried moy</div>'
-            '<div style="background:linear-gradient(to right,#FFF0F5,#FF69B4,#C71585);'
-            'height:10px;border-radius:4px;margin:4px 0 2px"></div>'
-            f'<div style="display:flex;justify-content:space-between;font-size:9px;color:#999;'
-            f'margin-bottom:10px"><span>0</span><span>max ({s2_ca_max:.1f} %)</span></div>'
+            f'<div style="font-weight:700;color:#555;margin-bottom:4px;font-size:{_fs_h}">'
+            'S2 (actine homo) — % ASA buried</div>'
+            f'<div style="background:linear-gradient(to right,#FFF0F5,#FF69B4,#C71585);'
+            f'height:{_bar_h};border-radius:3px;margin:3px 0 2px"></div>'
+            f'<div style="display:flex;justify-content:space-between;font-size:8px;color:#999;'
+            f'margin-bottom:6px"><span>0</span><span>max ({s2_ca_max:.1f} %)</span></div>'
         )
     if _has_hetero:
         _leg += (
-            '<div style="font-weight:700;color:#555;margin-bottom:6px;font-size:12px">'
-            'Résidus S2 (ABP) — % ASA buried moy</div>'
-            '<div style="background:linear-gradient(to right,#FFFFCC,#78C679,#006837);'
-            'height:10px;border-radius:4px;margin:4px 0 2px"></div>'
-            f'<div style="display:flex;justify-content:space-between;font-size:9px;color:#999;'
-            f'margin-bottom:10px"><span>0</span><span>max ({s2_ca_max:.1f} %)</span></div>'
-            + '<div style="font-weight:700;color:#555;margin-bottom:6px;font-size:11px">'
+            f'<div style="font-weight:700;color:#555;margin-bottom:4px;font-size:{_fs_h}">'
+            'S2 (ABP) — % ASA buried</div>'
+            f'<div style="background:linear-gradient(to right,#FFFFCC,#78C679,#006837);'
+            f'height:{_bar_h};border-radius:3px;margin:3px 0 2px"></div>'
+            f'<div style="display:flex;justify-content:space-between;font-size:8px;color:#999;'
+            f'margin-bottom:6px"><span>0</span><span>max ({s2_ca_max:.1f} %)</span></div>'
+            + f'<div style="font-weight:700;color:#555;margin-bottom:3px;font-size:{_fs_h}">'
             'Partenaires</div>'
             + "".join(
-                f'<div style="margin:3px 0;font-size:10px;color:#444">• {p[:35]}</div>'
+                f'<div style="margin:2px 0;font-size:{_fs_b};color:#444">• {p[:30]}</div>'
                 for p in s2_partner_names
             )
         )
-    # Couples (s1_patch × s2_patch) présents dans ce cluster
     _couple_counts_leg = (
         iid_to_couple[iid_to_couple.index.isin(all_iids)]
         .value_counts()
         .sort_values(ascending=False)
     )
     _leg += (
-        '<div style="border-top:1px solid #eee;margin:8px 0 6px"></div>'
-        '<div style="font-weight:700;color:#555;margin-bottom:4px;font-size:12px">'
+        f'<div style="border-top:1px solid #eee;margin:5px 0 4px"></div>'
+        f'<div style="font-weight:700;color:#555;margin-bottom:3px;font-size:{_fs_h}">'
         'Combinaisons S1×S2</div>'
         + "".join(
-            f'<div style="margin:2px 0;font-size:10px;color:#444">'
+            f'<div style="margin:1px 0;font-size:{_fs_b};color:#444">'
             f'{c} <span style="color:#999">({n})</span></div>'
             for c, n in _couple_counts_leg.items()
         )
     )
-    # Binding sites S1 / S2
     _leg += (
-        '<div style="border-top:1px solid #eee;margin:8px 0 6px"></div>'
-        '<div style="font-weight:700;color:#555;margin-bottom:4px;font-size:12px">'
+        f'<div style="border-top:1px solid #eee;margin:5px 0 4px"></div>'
+        f'<div style="font-weight:700;color:#555;margin-bottom:3px;font-size:{_fs_h}">'
         'Binding sites S1</div>'
         + "".join(
-            f'<div style="margin:2px 0;font-size:10px;color:#444">{p}</div>'
+            f'<div style="margin:1px 0;font-size:{_fs_b};color:#444">{p}</div>'
             for p in _cluster_s1_patches
         )
-        + '<div style="font-weight:700;color:#555;margin:6px 0 4px;font-size:12px">'
+        + f'<div style="font-weight:700;color:#555;margin:4px 0 3px;font-size:{_fs_h}">'
         'Binding sites S2</div>'
         + "".join(
-            f'<div style="margin:2px 0;font-size:10px;color:#444">{p}</div>'
+            f'<div style="margin:1px 0;font-size:{_fs_b};color:#444">{p}</div>'
             for p in _cluster_s2_patches
         )
     )
