@@ -2813,6 +2813,20 @@ else:
                     "Profil par sous-cluster d'interaction C70 (chaque ligne = 1 cluster d'interface)")
                 st.image(s1_by_c70_img, width='content')
 
+            # Téléchargement du script PyMOL pour ce cluster S1
+            _pml_path = os.path.join(
+                "data/filtered/details/structures_files/bfactor_c70_interface/by_s1_cluster",
+                f"{sel_s1}.pml")
+            if os.path.exists(_pml_path):
+                with open(_pml_path, "rb") as _pml_f:
+                    st.download_button(
+                        label="⬇ Télécharger le script PyMOL de ce cluster S1",
+                        data=_pml_f,
+                        file_name=f"{sel_s1}.pml",
+                        mime="text/plain",
+                        help="Ouvrir dans PyMOL : File > Run Script…  ou  @/chemin/vers/le/fichier.pml",
+                    )
+
     # --- Cluster Data 70 ---
     with tab_c70:
         if os.path.exists(_all_data_path):
