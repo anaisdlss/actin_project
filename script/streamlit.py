@@ -2860,16 +2860,13 @@ else:
                 "**Réseau interactif — résidus actine ↔ résidus ABP**")
             _bip_ok = all(os.path.exists(f) for f in _BIPARTITE_FILES)
             if _bip_ok:
-                _use_bipartite = st.toggle(
-                    "Vue bipartite  (actine S1 à gauche | partenaire S2 à droite)",
-                    value=False, key=f"bip_toggle_{sel_c70}")
                 _html_c70, _n_s1, _n_s2, _n_tot, _html_3d_c70 = _build_bipartite_c70_html(
-                    sel_c70, _use_bipartite, _BIP_CACHE_VERSION, *_bip_mtimes())
+                    sel_c70, True, _BIP_CACHE_VERSION, *_bip_mtimes())
                 if _html_c70:
                     st.caption(
                         f"{_n_s1} résidus actine (S1) · {_n_s2} résidus partenaire (S2)"
                         f" · n={_n_tot} interactions")
-                    _net_height = max(500, max(_n_s1, _n_s2) * 30 + 20) if _use_bipartite else 620
+                    _net_height = max(500, max(_n_s1, _n_s2) * 30 + 20)
                     st.components.v1.html(
                         _html_c70, height=_net_height, scrolling=False)
                     if _html_3d_c70:
