@@ -928,7 +928,8 @@ def _build_bipartite_c70_html(patch_c70, bipartite, _v, *_mtimes):
             for nid in top_s2
         }
         top_s2_ordered = sorted(top_s2, key=lambda nid: s2_mean_s1.get(nid, 0))
-        h_net = max(500, max(n_s1, n_s2) * 30)
+        h_net = 650          # canvas fixe ; network.fit() gère le zoom
+        _Y_SPAN = 1200       # plage de coordonnées Y (indépendante du canvas)
     else:
         top_s2_ordered = top_s2
         h_net = 600
@@ -959,7 +960,7 @@ def _build_bipartite_c70_html(patch_c70, bipartite, _v, *_mtimes):
         _n_c_s1 = int(s1_n_couples.get(pos, 0))
         kwargs = {}
         if bipartite:
-            y_pos = int((i - (n_s1 - 1) / 2) * (h_net / max(n_s1, 1)))
+            y_pos = int((i - (n_s1 - 1) / 2) * (_Y_SPAN / max(n_s1, 1)))
             kwargs = {"x": -450, "y": y_pos, "fixed": True, "physics": False}
         net.add_node(
             f"s1_{pos}", label=f"<b>{_s1_aa}{pos}</b>",
@@ -995,7 +996,7 @@ def _build_bipartite_c70_html(patch_c70, bipartite, _v, *_mtimes):
         diam_s2 = sz * 2
         kwargs = {}
         if bipartite:
-            y_pos = int((i - (n_s2 - 1) / 2) * (h_net / max(n_s2, 1)))
+            y_pos = int((i - (n_s2 - 1) / 2) * (_Y_SPAN / max(n_s2, 1)))
             kwargs = {"x": 450, "y": y_pos, "fixed": True, "physics": False}
         net.add_node(
             f"s2_{nid}", label=f"<b>{label}</b>",
@@ -2866,7 +2867,7 @@ else:
                     st.caption(
                         f"{_n_s1} résidus actine (S1) · {_n_s2} résidus partenaire (S2)"
                         f" · n={_n_tot} interactions")
-                    _net_height = max(500, max(_n_s1, _n_s2) * 30 + 20)
+                    _net_height = 650
                     st.components.v1.html(
                         _html_c70, height=_net_height, scrolling=False)
                     if _html_3d_c70:
