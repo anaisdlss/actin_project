@@ -20,7 +20,17 @@ Python et toutes les librairies Python sont gérés automatiquement par pixi —
 
 ## Installation
 
+### 0 — Ouvrir un terminal
+
+Toutes les commandes ci-dessous s'exécutent dans un terminal. Voici comment l'ouvrir selon le système :
+
+- **macOS** : appuyer sur `Cmd + Espace`, taper `Terminal`, appuyer sur Entrée
+- **Linux** : appuyer sur `Ctrl + Alt + T`
+- **Windows** : appuyer sur `Windows + R`, taper `powershell`, appuyer sur Entrée
+
 ### 1 — Installer pixi
+
+Copier-coller la commande correspondante dans le terminal, puis appuyer sur Entrée.
 
 **macOS / Linux**
 
@@ -34,7 +44,7 @@ curl -fsSL https://pixi.sh/install.sh | bash
 iwr -useb https://pixi.sh/install.ps1 | iex
 ```
 
-Fermer et rouvrir le terminal avant de continuer.
+**Fermer et rouvrir le terminal** avant de continuer.
 
 ### 2 — Cloner le dépôt
 
