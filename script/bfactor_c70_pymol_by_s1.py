@@ -63,6 +63,23 @@ for s2_bs, grp in df_valid.groupby("s2_bs"):
     if len(titles):
         _s2bs_name[s2_bs] = _clean_name(titles.value_counts().index[0])
 
+# ── Coloration physicochimique sur résidus d'interface (b > seuil) ───────────
+_BTHRESH = 10  # % ASA buried minimum
+
+def _restype_surf_cmds(obj: str, bthresh: float = _BTHRESH) -> list[str]:
+    """Surface blanche + couleur physicochimique sur les résidus d'interface."""
+    sel = f"{obj} and b > {bthresh}"
+    return [
+        f"color white, {obj}",
+        f"color grey80,    {sel} and (resn ALA+GLY+ILE+LEU+MET+VAL)",
+        f"color lightpink, {sel} and (resn PHE+TRP+TYR)",
+        f"color palecyan,  {sel} and (resn HIS+ASN+GLN+SER+THR)",
+        f"color blue,      {sel} and (resn LYS+ARG)",
+        f"color red,       {sel} and (resn ASP+GLU)",
+        f"color paleyellow,{sel} and resn CYS",
+        f"color palegreen, {sel} and resn PRO",
+    ]
+
 # ── Lecture du bmax d'un PDB sur une chaîne donnée ────────────────────────────
 def _bmax_chain(pdb_path: Path, ch: str) -> float:
     bmax = 0.0
@@ -108,16 +125,12 @@ for actin_site, s2_to_c70 in sorted(actin_to_s2.items()):
     # On le charge directement comme base_actin — les S2 s'alignent dessus.
     s1_bfac_pdb = (BFAC_S1_DIR / f"{actin_site}.pdb").resolve()
     if s1_bfac_pdb.exists():
-        bmax_s1 = _bmax_chain(s1_bfac_pdb, "A")
-        effective_max_s1 = max(bmax_s1, 1.0)
-        s1_color_cmd = f"spectrum b, white yellow orange red, base_actin, minimum=0, maximum={effective_max_s1}"
         ref_section = [
-            "# ── Actine S1 — B-factor du cluster ─────────────────────────────────────",
+            "# ── Actine S1 — couleurs physicochimiques sur résidus d'interface ───────",
             f"load {s1_bfac_pdb}, base_actin",
             "hide everything, base_actin",
             "show surface, base_actin",
-            s1_color_cmd,
-        ]
+        ] + _restype_surf_cmds("base_actin")
     else:
         ref_section = [
             "# ── Actine S1 — référence grise (pas de B-factor pour ce cluster) ────────",
@@ -132,8 +145,9 @@ for actin_site, s2_to_c70 in sorted(actin_to_s2.items()):
     lines = [
         f"# PyMOL — cluster actine S1 : {actin_site}",
         f"# {len(s2_sorted)} partenaires (un objet par arête du réseau Binding Site Cluster Data 70)",
-        "# Surface : gradient blanc→rouge = % ASA buried",
-        "# Vert = ABP (hétéro) | Rose = actine partenaire (homo)",
+        "# Interface (b > 10%) : gris=hydrophobe · rose=aromatique · cyan=polaire",
+        "#                       bleu=positif · rouge=négatif · jaune=Cys · vert=Pro",
+        "# Vert (partenaire) = ABP hétéro | Rose (partenaire) = actine homo",
         "",
     ] + ref_section + ["", "# ── Partenaires S2 ───────────────────────────────────────────────────────"]
 
@@ -174,9 +188,7 @@ for actin_site, s2_to_c70 in sorted(actin_to_s2.items()):
             f"delete {obj_tmp}",
             f"hide everything, {obj_partner}",
             f"show surface, {obj_partner}",
-            color_cmd,
-            "",
-        ]
+        ] + _restype_surf_cmds(obj_partner) + [""]
         n_loaded += 1
 
     if n_loaded == 0:
