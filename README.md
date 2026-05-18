@@ -22,11 +22,11 @@ Python et toutes les librairies Python sont gérés automatiquement par pixi —
 
 ### 0 — Ouvrir un terminal
 
-Toutes les commandes ci-dessous s'exécutent dans un terminal. Voici comment l'ouvrir selon le système :
+Toutes les commandes ci-dessous s'exécutent dans un terminal :
 
-- **macOS** : appuyer sur `Cmd + Espace`, taper `Terminal`, appuyer sur Entrée
-- **Linux** : appuyer sur `Ctrl + Alt + T`
-- **Windows** : appuyer sur `Windows + R`, taper `powershell`, appuyer sur Entrée
+- **macOS** : `Cmd + Espace` → taper `Terminal` → Entrée
+- **Linux** : `Ctrl + Alt + T`
+- **Windows** : `Windows + R` → taper `powershell` → Entrée
 
 ### 1 — Installer pixi
 
@@ -63,58 +63,27 @@ pixi install
 
 Quelques minutes sont nécessaires lors de la première exécution.
 
----
-
-## Exécution du pipeline
-
-**macOS**
-
-```bash
-caffeinate -i pixi run python -m script.data_extract.pipeline_data
-```
-
-**Linux / Windows**
-
-```bash
-pixi run python -m script.data_extract.pipeline_data
-```
-
-> `caffeinate` (macOS uniquement) empêche la mise en veille du système pendant l'exécution.  
-> Durée estimée : **30 à 60 minutes** selon la vitesse de connexion.
-
-Le pipeline est incrémental : les étapes dont les résultats sont déjà à jour sont automatiquement ignorées lors des exécutions suivantes.
-
-| Étape | Description |
-|-------|-------------|
-| 1/13 | Téléchargement du résumé PPI3D |
-| 2/13 | Téléchargement des métadonnées PDB |
-| 3/13 | Téléchargement de la table des clusters |
-| 4/13 | Filtrage des structures (≥ 4 sous-unités d'actine connectées) |
-| 5/13 | Téléchargement des détails d'interface résidu par résidu |
-| 6/13 | Alignement de séquences MAFFT par cluster |
-| 7/13 | Analyse des clusters d'interaction C70 |
-| 8/13 | Calcul des B-factors d'interface C70 |
-| 9/13 | Génération du script PyMOL vue globale |
-| 10/13 | Génération des scripts PyMOL par site de liaison |
-| 11/13 | Analyse détaillée de l'interface C70 |
-| 12/13 | Heatmap du site de liaison S1 |
-| 13/13 | Calcul des B-factors par cluster S1 |
-
----
-
-## Interface web
+### 4 — Lancer l'interface web
 
 ```bash
 pixi run streamlit run script/streamlit.py
 ```
 
-L'interface est accessible à l'adresse `http://localhost:8501`. Elle propose des réseaux bipartites interactifs, des statistiques par cluster, des alignements de séquences et des visualisations 3D des B-factors.
+Une page s'ouvre automatiquement dans le navigateur (sinon, aller sur `http://localhost:8501`).
+
+---
+
+## Générer les données
+
+Une fois l'interface ouverte, se rendre dans la section **Téléchargement des données** et cliquer sur **Lancer le téléchargement**.
+
+Le pipeline s'exécute entièrement depuis l'interface — aucune commande supplémentaire n'est nécessaire. La durée est de **30 à 60 minutes** selon la vitesse de connexion. Les étapes déjà réalisées sont automatiquement ignorées lors des exécutions suivantes.
 
 ---
 
 ## Visualisations PyMOL
 
-Les scripts sont générés dans :
+Les scripts sont générés automatiquement par le pipeline dans :
 
 ```
 data/filtered/details/structures_files/bfactor_c70_interface/

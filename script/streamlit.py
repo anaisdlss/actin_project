@@ -1514,9 +1514,11 @@ if clicked:
     log_lines = []
     step_log_lines = []
 
+    cmd = [sys.executable, "-u", "-m", "script.data_extract.pipeline_data"]
+    if sys.platform == "darwin":
+        cmd = ["caffeinate", "-i"] + cmd
     proc = subprocess.Popen(
-        ["caffeinate", "-i", sys.executable, "-u",
-            "-m", "script.data_extract.pipeline_data"],
+        cmd,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,
