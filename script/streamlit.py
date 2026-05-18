@@ -103,8 +103,10 @@ def _load_bipartite_base(_v, *_mtimes):
     _s2p_b = mc["s2_binding_site_cluster_data_70"].astype(str)
 
     _homo_df2 = df_all_b[df_all_b["s2_actine"].fillna(False) == True]
-    _gs1b = _homo_df2["s1_binding_site_cluster_data_70"].astype(str).value_counts()
-    _gs2b = _homo_df2["s2_binding_site_cluster_data_70"].astype(str).value_counts()
+    _gs1b = _homo_df2["s1_binding_site_cluster_data_70"].astype(
+        str).value_counts()
+    _gs2b = _homo_df2["s2_binding_site_cluster_data_70"].astype(
+        str).value_counts()
     _can_s1b = {p: int(_gs1b.get(p, 0)) >= int(_gs2b.get(p, 0))
                 for p in set(_gs1b.index) | set(_gs2b.index)}
 
@@ -753,7 +755,8 @@ def _build_bipartite_c70_html(patch_c70, bipartite, _v, *_mtimes):
         _df3_t4fix["residue_number_canon_mafft"], errors="coerce")
     _df3_t4fix = _df3_t4fix[_df3_t4fix["interaction_id"].isin(all_iids)].copy()
     _df3_t4fix["chain_lower"] = _df3_t4fix["chain"].str.lower()
-    _int_ch = df_int[df_int["interaction_id"].isin(all_iids)].set_index("interaction_id")
+    _int_ch = df_int[df_int["interaction_id"].isin(
+        all_iids)].set_index("interaction_id")
     _t4_swapped_ppi3d: set = set()
     for _iid in all_iids:
         if _iid not in _int_ch.index:
@@ -761,11 +764,14 @@ def _build_bipartite_c70_html(patch_c70, bipartite, _v, *_mtimes):
         _cA = str(_int_ch.at[_iid, "chain_A_id"]).lower()
         _cB = str(_int_ch.at[_iid, "chain_B_id"]).lower()
         _sub3 = _df3_t4fix[_df3_t4fix["interaction_id"] == _iid]
-        _t3A = set(_sub3[_sub3["chain_lower"] == _cA]["residue_number_canon_mafft"].dropna().astype(int))
-        _t3B = set(_sub3[_sub3["chain_lower"] == _cB]["residue_number_canon_mafft"].dropna().astype(int))
+        _t3A = set(_sub3[_sub3["chain_lower"] == _cA]
+                   ["residue_number_canon_mafft"].dropna().astype(int))
+        _t3B = set(_sub3[_sub3["chain_lower"] == _cB]
+                   ["residue_number_canon_mafft"].dropna().astype(int))
         if not _t3A and not _t3B:
             continue
-        _t4A = set(df_res4[df_res4["interaction_id"] == _iid]["residue_A_canon_mafft"].dropna().astype(int))
+        _t4A = set(df_res4[df_res4["interaction_id"] == _iid]
+                   ["residue_A_canon_mafft"].dropna().astype(int))
         if not _t4A:
             continue
         _ov_A = len(_t4A & _t3A) / max(len(_t4A | _t3A), 1)
@@ -775,7 +781,8 @@ def _build_bipartite_c70_html(patch_c70, bipartite, _v, *_mtimes):
     if _t4_swapped_ppi3d:
         _sw_ppi3d = t4["interaction_id"].isin(_t4_swapped_ppi3d)
         t4.loc[_sw_ppi3d, ["residue_A_canon_mafft", "residue_B_canon_mafft"]] = \
-            t4.loc[_sw_ppi3d, ["residue_B_canon_mafft", "residue_A_canon_mafft"]].values
+            t4.loc[_sw_ppi3d, ["residue_B_canon_mafft",
+                               "residue_A_canon_mafft"]].values
         t4.loc[_sw_ppi3d, ["asa_pct_A", "asa_pct_B"]] = \
             t4.loc[_sw_ppi3d, ["asa_pct_B", "asa_pct_A"]].values
         t4.loc[_sw_ppi3d, ["residue_A_name", "residue_B_name"]] = \
@@ -1026,10 +1033,12 @@ def _build_bipartite_c70_html(patch_c70, bipartite, _v, *_mtimes):
         ecol = _edge_col(row["contact_type"])
         net.add_edge(
             f"s1_{int(row['s1_canon'])}", f"s2_{row['s2_node']}",
-            width=6.0 if (nc == n_couples_total and n_couples_total > 1) else 0.5,
+            width=6.0 if (
+                nc == n_couples_total and n_couples_total > 1) else 0.5,
             color={"color": ecol, "highlight": "#FF4400", "hover": "#FF4400"},
             title=f"{nc}/{n_couples_total} couples · {row['contact_type']}",
-            smooth={"enabled": False} if bipartite else {"enabled": True, "type": "dynamic"},
+            smooth={"enabled": False} if bipartite else {
+                "enabled": True, "type": "dynamic"},
         )
 
     if bipartite:
@@ -1082,7 +1091,7 @@ def _build_bipartite_c70_html(patch_c70, bipartite, _v, *_mtimes):
     _has_hetero = bool(s2_partner_names)
     _leg_pos = "top:6px;right:6px;" if bipartite else "top:10px;left:10px;"
     _fs_h = "10px" if bipartite else "12px"
-    _fs_b = "8px"  if bipartite else "10px"
+    _fs_b = "8px" if bipartite else "10px"
     _fs_root = "9px" if bipartite else "11px"
     _pad = "6px 8px" if bipartite else "12px 14px"
     _mw = "150px" if bipartite else "230px"
@@ -1229,7 +1238,8 @@ def _build_bipartite_c70_html(patch_c70, bipartite, _v, *_mtimes):
             _pdb_id_3d = _df8_3d.loc[_df8_3d["interaction_id"] == _rep_iid3d,
                                      "pdb_id"].iat[0]
             _same_pdb_iids = (
-                set(_df8_3d.loc[_df8_3d["pdb_id"] == _pdb_id_3d, "interaction_id"])
+                set(_df8_3d.loc[_df8_3d["pdb_id"] ==
+                    _pdb_id_3d, "interaction_id"])
                 & all_iids
             )
             # Utiliser df_res4 (données brutes, non-swappées) pour mapper les
@@ -1279,8 +1289,10 @@ def _build_bipartite_c70_html(patch_c70, bipartite, _v, *_mtimes):
             _pdb_mod = "".join(_pdb_lines)
 
             # Normalisation locale : max observé dans ce PDB (relatif à la structure)
-            _s1_bfac_max = max(max(_s1_bfac.values()) if _s1_bfac else 0.0, 1.0)
-            _s2_bfac_max = max(max(_s2_bfac.values()) if _s2_bfac else 0.0, 1.0)
+            _s1_bfac_max = max(max(_s1_bfac.values())
+                               if _s1_bfac else 0.0, 1.0)
+            _s2_bfac_max = max(max(_s2_bfac.values())
+                               if _s2_bfac else 0.0, 1.0)
 
             _ylord = ["#FFFFCC", "#FFF0A9", "#FEE186", "#FECA65", "#FDAA48",
                       "#FC8C3B", "#FC5A2D", "#EC2D21", "#D30F20", "#AF0026", "#800026"]
@@ -2778,7 +2790,8 @@ else:
             with col_3d_s1:
                 st.markdown("**Interface 3D — couple représentatif**")
                 if _bip_ok:
-                    _s1_3d = _build_s1_3d_html(sel_s1, _BIP_CACHE_VERSION, *_bip_mtimes())
+                    _s1_3d = _build_s1_3d_html(
+                        sel_s1, _BIP_CACHE_VERSION, *_bip_mtimes())
                     if _s1_3d:
                         _html_3d_s1, _s1_max, _s2_max, _s1_is_homo = _s1_3d
                         st.components.v1.html(
@@ -2820,7 +2833,7 @@ else:
             if os.path.exists(_pml_path):
                 with open(_pml_path, "rb") as _pml_f:
                     st.download_button(
-                        label="⬇ Télécharger le script PyMOL de ce cluster S1",
+                        label="⬇ Télécharger le script PyMOL de ce cluster",
                         data=_pml_f,
                         file_name=f"{sel_s1}.pml",
                         mime="text/plain",
@@ -2955,6 +2968,33 @@ if os.path.exists(proteins_path):
         "Cluster C70": st.column_config.TextColumn(width="medium"),
     })
 
+    # ── Détail par ABP ─────────────────────────────────────────────────────────
+    if len(abp_global) > 0 and "Binding site S1" in abp_global.columns:
+        st.subheader("Détail par ABP")
+
+        def _parse_ids(cell):
+            return sorted(
+                s.strip() for s in str(cell).split(",")
+                if s.strip() and s.strip().lower() != "nan"
+            )
+
+        abp_names = abp_global["Protéine"].tolist()
+        sel_abp = st.selectbox("Sélectionner un ABP", abp_names, key="sel_abp_detail")
+        abp_row = abp_global[abp_global["Protéine"] == sel_abp].iloc[0]
+
+        s1_sites  = _parse_ids(abp_row["Binding site S1"])
+        c70_sites = _parse_ids(abp_row["Cluster C70"])
+
+        col_d1, col_d2 = st.columns(2)
+        with col_d1:
+            st.markdown(f"**Binding sites S1 ({len(s1_sites)})**")
+            for s in s1_sites:
+                st.markdown(f"- `{s}`")
+        with col_d2:
+            st.markdown(f"**Clusters C70 ({len(c70_sites)})**")
+            for c in c70_sites:
+                st.markdown(f"- `{c}`")
+
 # ── Heatmap ABP × résidus actin ──────────────────────────────────────────────
 st.subheader("Heatmap — résidus actin contactés par les ABP")
 st.caption(
@@ -2980,7 +3020,8 @@ def _build_abp_heatmap_data(*_):
     df_pp_h = pd.read_csv(_ABP_HM_FILES[3])
 
     df3["buried_ASA_percent"] = pd.to_numeric(
-        df3["buried_ASA_percent"].astype(str).str.replace("%", "", regex=False),
+        df3["buried_ASA_percent"].astype(
+            str).str.replace("%", "", regex=False),
         errors="coerce",
     )
     df3["residue_number_canon_mafft"] = pd.to_numeric(
@@ -2991,12 +3032,14 @@ def _build_abp_heatmap_data(*_):
 
     _actin_ch = set(df_pp_h[df_pp_h["is_actin"]]["chain"].str.lower())
     homo_iids = set(
-        df_int_h[df_int_h["chain_B_id"].str.lower().isin(_actin_ch)]["interaction_id"]
+        df_int_h[df_int_h["chain_B_id"].str.lower().isin(_actin_ch)
+                 ]["interaction_id"]
     )
     het_int = (
         df_int_h[~df_int_h["interaction_id"].isin(homo_iids)]
         .merge(
-            df_all_h[["subunit_1", "subunit_2", "subunit_2_title", "s2_actine"]],
+            df_all_h[["subunit_1", "subunit_2",
+                      "subunit_2_title", "s2_actine"]],
             left_on=["chain_A_id", "chain_B_id"],
             right_on=["subunit_1", "subunit_2"], how="left",
         )
@@ -3033,7 +3076,8 @@ def _build_abp_heatmap_data(*_):
     n_abp = max(abp_freq.shape[0], 1)
     res_freq = agg.groupby("canon")["abp"].nunique() / n_abp
 
-    pivot = agg.pivot(index="abp", columns="canon", values="buried_ASA_percent")
+    pivot = agg.pivot(index="abp", columns="canon",
+                      values="buried_ASA_percent")
     pivot = pivot.loc[abp_freq.index.intersection(pivot.index)]
     return pivot, abp_freq, res_freq
 
@@ -3060,7 +3104,8 @@ if all(os.path.exists(f) for f in _ABP_HM_FILES):
 
         # Clustering hiérarchique sur les lignes (ABP) uniquement
         _mat = _pivot_hm.fillna(0).values.astype(float)
-        _row_order = leaves_list(linkage(pdist(_mat, metric="cosine"), method="average"))
+        _row_order = leaves_list(
+            linkage(pdist(_mat, metric="cosine"), method="average"))
         _pivot_clustered = _pivot_hm.iloc[_row_order].fillna(0)
 
         # Labels Y avec n interactions (après réordonnancement)
@@ -3078,12 +3123,16 @@ if all(os.path.exists(f) for f in _ABP_HM_FILES):
             xticklabels=True,
             yticklabels=_ylabels,
             linewidths=0,
-            cbar_kws={"label": "% ASA buried moy (0 si absent)", "shrink": 0.6},
+            cbar_kws={
+                "label": "% ASA buried moy (0 si absent)", "shrink": 0.6},
         )
-        _ax_hm.set_xlabel("Position canonique (MAFFT)", fontsize=11, labelpad=6)
+        _ax_hm.set_xlabel("Position canonique (MAFFT)",
+                          fontsize=11, labelpad=6)
         _ax_hm.set_ylabel("")
-        _ax_hm.set_xticklabels(_ax_hm.get_xticklabels(), rotation=90, fontsize=8)
-        _ax_hm.set_yticklabels(_ax_hm.get_yticklabels(), rotation=0, fontsize=22)
+        _ax_hm.set_xticklabels(_ax_hm.get_xticklabels(),
+                               rotation=90, fontsize=8)
+        _ax_hm.set_yticklabels(_ax_hm.get_yticklabels(),
+                               rotation=0, fontsize=22)
         _ax_hm.set_title(
             f"% ASA buried moyen — résidus actin × ABP  ({_n_rows} ABP, {_n_cols} résidus)",
             fontsize=11, pad=8,
