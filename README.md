@@ -1,26 +1,26 @@
-# Actin–ABP Interaction Analysis Pipeline
+# Pipeline d'analyse des interactions actine–ABP
 
-Automated structural analysis of actin–actin binding protein (ABP) interactions extracted from the [PPI3D](https://bioinformatics.lt/ppi3d) database (UniProt entry **P60709**, Actin cytoplasmic 1).
+Analyse structurale automatisée des interactions entre l'actine et ses protéines de liaison (ABP) extraites de la base de données [PPI3D](https://bioinformatics.lt/ppi3d) (entrée UniProt **P60709**, Actin cytoplasmic 1).
 
-The pipeline retrieves all available 3D co-structures, filters assemblies containing at least four connected actin subunits, clusters interface residues at 70 % similarity (C70), computes buried surface area (B-factor encoding), and produces interactive visualizations via a Streamlit web interface and PyMOL session scripts.
+Le pipeline récupère l'ensemble des co-structures 3D disponibles, filtre les assemblages contenant au moins quatre sous-unités d'actine connectées, regroupe les résidus d'interface à 70 % de similarité (C70), calcule la surface enfouie à l'interface (encodée en B-factor), et produit des visualisations interactives via une interface web Streamlit et des scripts de session PyMOL.
 
 ---
 
-## Requirements
+## Prérequis
 
-| Tool | Purpose |
-|------|---------|
-| [pixi](https://pixi.sh) | Environment and dependency management (installed below) |
-| [PyMOL](https://pymol.org) | 3D structure visualization |
-| Internet access | Data retrieval from PPI3D and RCSB PDB |
+| Outil | Rôle |
+|-------|------|
+| [pixi](https://pixi.sh) | Gestion de l'environnement et des dépendances (installé ci-dessous) |
+| [PyMOL](https://pymol.org) | Visualisation des structures 3D |
+| Accès Internet | Récupération des données PPI3D et RCSB PDB |
 
-Python and all Python dependencies are managed automatically by pixi — no manual installation required.
+Python et toutes les librairies Python sont gérés automatiquement par pixi — aucune installation manuelle n'est requise.
 
 ---
 
 ## Installation
 
-### 1 — Install pixi
+### 1 — Installer pixi
 
 **macOS / Linux**
 
@@ -34,28 +34,28 @@ curl -fsSL https://pixi.sh/install.sh | bash
 iwr -useb https://pixi.sh/install.ps1 | iex
 ```
 
-Close and reopen the terminal before proceeding.
+Fermer et rouvrir le terminal avant de continuer.
 
-### 2 — Clone the repository
+### 2 — Cloner le dépôt
 
 ```bash
 git clone https://github.com/anaisdlss/actin_project.git
 cd actin_project
 ```
 
-> Windows: use Git Bash or PowerShell with [Git for Windows](https://git-scm.com/download/win).
+> Windows : utiliser Git Bash ou PowerShell avec [Git for Windows](https://git-scm.com/download/win).
 
-### 3 — Install the environment
+### 3 — Installer l'environnement
 
 ```bash
 pixi install
 ```
 
-This downloads Python and all required libraries. Allow a few minutes on first run.
+Quelques minutes sont nécessaires lors de la première exécution.
 
 ---
 
-## Running the Pipeline
+## Exécution du pipeline
 
 **macOS**
 
@@ -69,63 +69,63 @@ caffeinate -i pixi run python -m script.data_extract.pipeline_data
 pixi run python -m script.data_extract.pipeline_data
 ```
 
-> `caffeinate` (macOS only) prevents the system from sleeping during execution.  
-> Estimated duration: **30–60 minutes** depending on network speed.
+> `caffeinate` (macOS uniquement) empêche la mise en veille du système pendant l'exécution.  
+> Durée estimée : **30 à 60 minutes** selon la vitesse de connexion.
 
-The pipeline is incremental: steps whose outputs are already up to date are skipped automatically on subsequent runs.
+Le pipeline est incrémental : les étapes dont les résultats sont déjà à jour sont automatiquement ignorées lors des exécutions suivantes.
 
-| Step | Description |
-|------|-------------|
-| 1/13 | Download PPI3D interaction summary |
-| 2/13 | Download PDB entry metadata |
-| 3/13 | Download full cluster table |
-| 4/13 | Filter structures (≥ 4 connected actin subunits) |
-| 5/13 | Download per-residue interface details |
-| 6/13 | MAFFT sequence alignment by cluster |
-| 7/13 | C70 interaction cluster analysis |
-| 8/13 | Compute C70 interface B-factors |
-| 9/13 | Generate global PyMOL script (all clusters) |
-| 10/13 | Generate per-binding-site PyMOL scripts |
-| 11/13 | Detailed C70 interface analysis |
-| 12/13 | S1 binding site heatmap |
-| 13/13 | Compute S1 cluster B-factors |
+| Étape | Description |
+|-------|-------------|
+| 1/13 | Téléchargement du résumé PPI3D |
+| 2/13 | Téléchargement des métadonnées PDB |
+| 3/13 | Téléchargement de la table des clusters |
+| 4/13 | Filtrage des structures (≥ 4 sous-unités d'actine connectées) |
+| 5/13 | Téléchargement des détails d'interface résidu par résidu |
+| 6/13 | Alignement de séquences MAFFT par cluster |
+| 7/13 | Analyse des clusters d'interaction C70 |
+| 8/13 | Calcul des B-factors d'interface C70 |
+| 9/13 | Génération du script PyMOL vue globale |
+| 10/13 | Génération des scripts PyMOL par site de liaison |
+| 11/13 | Analyse détaillée de l'interface C70 |
+| 12/13 | Heatmap du site de liaison S1 |
+| 13/13 | Calcul des B-factors par cluster S1 |
 
 ---
 
-## Web Interface
+## Interface web
 
 ```bash
 pixi run streamlit run script/streamlit.py
 ```
 
-Opens at `http://localhost:8501`. The interface provides interactive bipartite networks, cluster statistics, sequence alignments, and 3D B-factor viewers.
+L'interface est accessible à l'adresse `http://localhost:8501`. Elle propose des réseaux bipartites interactifs, des statistiques par cluster, des alignements de séquences et des visualisations 3D des B-factors.
 
 ---
 
-## PyMOL Visualizations
+## Visualisations PyMOL
 
-Scripts are generated under:
+Les scripts sont générés dans :
 
 ```
 data/filtered/details/structures_files/bfactor_c70_interface/
 ```
 
-**Global view** — all C70 cluster representatives superimposed on the reference actin (8iah chain L):
+**Vue globale** — tous les représentants de clusters C70 superposés sur l'actine de référence (8iah chaîne L) :
 
 ```
 view_full_surface.pml
 ```
 
-**Per-binding-site view** — one script per S1 actin binding site cluster (red nodes in the Streamlit network):
+**Vue par site de liaison** — un script par cluster de site de liaison S1 (nœuds rouges dans le réseau Streamlit) :
 
 ```
-by_s1_cluster/<cluster_name>.pml
+by_s1_cluster/<nom_du_cluster>.pml
 ```
 
-To execute a script, use `File > Run Script…` in PyMOL, or type in the PyMOL console:
+Pour exécuter un script, utiliser `File > Run Script…` dans PyMOL, ou taper dans la console PyMOL :
 
 ```
-@/path/to/script.pml
+@/chemin/vers/le/script.pml
 ```
 
-**Color scheme:** green gradient = ABP partner (heterologous interaction) · pink gradient = actin partner (homologous interaction) · color intensity encodes the percentage of buried accessible surface area at the interface.
+**Code couleur :** dégradé vert = partenaire ABP (interaction hétérologue) · dégradé rose = partenaire actine (interaction homologue) · l'intensité encode le pourcentage de surface accessible enfouie à l'interface.
