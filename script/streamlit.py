@@ -568,6 +568,18 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
     import matplotlib as _mpl_c70
     import re as _re_c70
 
+    def _blend_white(hex_col: str, t: float) -> str:
+        """Mélange hex_col avec blanc : t=0 → blanc, t=1 → couleur pleine."""
+        t = max(0.0, min(1.0, t))
+        r = int(hex_col[1:3], 16)
+        g = int(hex_col[3:5], 16)
+        b = int(hex_col[5:7], 16)
+        return "#{:02x}{:02x}{:02x}".format(
+            int(255 * (1 - t) + r * t),
+            int(255 * (1 - t) + g * t),
+            int(255 * (1 - t) + b * t),
+        )
+
     if not all(os.path.exists(f) for f in _BIPARTITE_FILES):
         return None, 0, 0, 0
 
@@ -971,8 +983,9 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
         asa_v = float(asa_s1[pos]) if pos in asa_s1.index else 0.0
         if color_mode == "restype":
             _aa_key = _aa1(s1_aa_majority.get(pos, "?")) if pos in s1_aa_majority else "?"
-            bg = _AA_RESTYPE_HEX.get(_aa_key, "#AAAAAA")
-            tc = "#fff" if _aa_key in ("K", "R", "D", "E") else "#222"
+            _t_s1 = asa_v / s1_ca_max if s1_ca_max > 0 else 0.0
+            bg = _blend_white(_AA_RESTYPE_HEX.get(_aa_key, "#AAAAAA"), _t_s1)
+            tc = "#fff" if (_aa_key in ("K", "R", "D", "E") and _t_s1 > 0.6) else "#222"
         else:
             bg = _hex_s1(asa_v)
             tc = "#222" if asa_v < 55 else "#fff"
@@ -1010,9 +1023,10 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
         sz = _node_radius(_s2_freq)
         _s2_aa_key = str(nd_to_majority.get(nid, "?"))[:1] if nid in nd_to_majority.index else "?"
         if color_mode == "restype":
-            col = _AA_RESTYPE_HEX.get(_s2_aa_key, "#AAAAAA")
+            _t_s2 = ca_val / s2_ca_max if s2_ca_max > 0 else 0.0
+            col = _blend_white(_AA_RESTYPE_HEX.get(_s2_aa_key, "#AAAAAA"), _t_s2)
             _bord_h = "#555555"
-            tc_s2 = "#fff" if _s2_aa_key in ("K", "R", "D", "E") else "#222"
+            tc_s2 = "#fff" if (_s2_aa_key in ("K", "R", "D", "E") and _t_s2 > 0.6) else "#222"
         elif partner == "Actine":
             col = _hex_s2_homo(ca_val)
             _bord_h = "#880044"
