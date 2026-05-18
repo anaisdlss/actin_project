@@ -547,7 +547,7 @@ def _load_res4(_v, *_mtimes):
 
 
 @st.cache_data(show_spinner="Génération réseau C70…")
-def _build_bipartite_c70_html(patch_c70, _v, *_mtimes):
+def _build_bipartite_c70_html(patch_c70, bipartite, _v, *_mtimes):
     """Réseau bipartite interactif pour un patch C70 : résidus actine (S1) ↔ résidus ABP (S2)."""
     import matplotlib.colors as _mc
     import matplotlib as _mpl_c70
@@ -916,7 +916,24 @@ def _build_bipartite_c70_html(patch_c70, _v, *_mtimes):
         r, g, b, _ = cmap_s2_homo(norm_s2_homo(float(ca_val)))
         return "#{:02x}{:02x}{:02x}".format(int(r * 255), int(g * 255), int(b * 255))
 
-    net = Network(height="600px", width="100%",
+    # ── Positions bipartites (S1 gauche, S2 droite, tri pour min. croisements) ──
+    n_s1 = len(all_s1)
+    n_s2 = len(top_s2)
+
+    if bipartite:
+        # Trier S2 par position S1 moyenne connectée → minimise les croisements
+        s2_mean_s1 = {
+            nid: float(np.mean(edge_df[edge_df["s2_node"] == nid]["s1_canon"]))
+            if not edge_df[edge_df["s2_node"] == nid].empty else 0.0
+            for nid in top_s2
+        }
+        top_s2_ordered = sorted(top_s2, key=lambda nid: s2_mean_s1.get(nid, 0))
+        h_net = max(700, max(n_s1, n_s2) * 55)
+    else:
+        top_s2_ordered = top_s2
+        h_net = 600
+
+    net = Network(height=f"{h_net}px", width="100%",
                   bgcolor="#ffffff", font_color="#222")
 
     # Taille commune S1 et S2 : même échelle de fréquence → même rayon visuel
@@ -924,12 +941,10 @@ def _build_bipartite_c70_html(patch_c70, _v, *_mtimes):
     _freq_max = max(s1_max, freq_s2_max)
 
     def _node_radius(freq):
-        """Rayon en px (40–70). Même formule pour S1 et S2."""
         return 40 + int(30 * freq / _freq_max)
 
-    # Nœuds S1 (cercles, gradient rouge YlOrRd par ASA)
-    # shape="circle" → widthConstraint = diamètre = 2 × rayon
-    for pos in all_s1:
+    # Nœuds S1
+    for i, pos in enumerate(all_s1):
         asa_v = float(asa_s1[pos]) if pos in asa_s1.index else 0.0
         bg = _hex_s1(asa_v)
         tc = "#222" if asa_v < 55 else "#fff"
@@ -940,6 +955,10 @@ def _build_bipartite_c70_html(patch_c70, _v, *_mtimes):
         _s1_dist_str = f"AA : {_s1_dist}" if _s1_dist else ""
         _n_iids_s1 = int(s1_n_iids.get(pos, 0))
         _n_c_s1 = int(s1_n_couples.get(pos, 0))
+        kwargs = {}
+        if bipartite:
+            y_pos = int((i - (n_s1 - 1) / 2) * (h_net / max(n_s1, 1)))
+            kwargs = {"x": -450, "y": y_pos, "fixed": True, "physics": False}
         net.add_node(
             f"s1_{pos}", label=f"<b>{_s1_aa}{pos}</b>",
             color={"background": bg, "border": "#888",
@@ -950,11 +969,11 @@ def _build_bipartite_c70_html(patch_c70, _v, *_mtimes):
             font={"color": tc},
             title=f"résidu {_s1_aa}{pos} · ASA buried : {asa_v:.1f} % · {_n_iids_s1} interactions · {_n_c_s1}/{n_couples_total} couples{_s1_dist_str}",
             borderWidth=1.5, borderWidthSelected=2.5,
+            **kwargs,
         )
 
-    # Nœuds S2 (points, gradient vert/rose par aire contact moy)
-    # shape="dot" → size = rayon
-    for nid in top_s2:
+    # Nœuds S2
+    for i, nid in enumerate(top_s2_ordered):
         partner = str(nd_to_partner.get(nid, "?"))
         label = str(nd_to_label.get(nid, nid))
         _s2_freq = freq_s2.get(nid, 0.0)
@@ -972,6 +991,10 @@ def _build_bipartite_c70_html(patch_c70, _v, *_mtimes):
         _n_iids_s2 = int(s2_n_iids.get(nid, 0))
         _n_c_s2 = int(s2_n_couples.get(nid, 0))
         diam_s2 = sz * 2
+        kwargs = {}
+        if bipartite:
+            y_pos = int((i - (n_s2 - 1) / 2) * (h_net / max(n_s2, 1)))
+            kwargs = {"x": 450, "y": y_pos, "fixed": True, "physics": False}
         net.add_node(
             f"s2_{nid}", label=f"<b>{label}</b>",
             color={"background": col, "border": "#555",
@@ -982,15 +1005,16 @@ def _build_bipartite_c70_html(patch_c70, _v, *_mtimes):
             font={"color": tc_s2},
             title=f"{partner} — résidu {label} · % ASA moy : {ca_val:.1f} % · {_n_iids_s2} interactions · {_n_c_s2}/{n_couples_total} couples{_variants}",
             borderWidth=1.5,
+            **kwargs,
         )
 
     def _edge_col(ct):
         ct_l = str(ct).lower()
         if "salt" in ct_l:
-            return "rgba(210,175,0,0.55)"    # jaune semi-transparent
+            return "rgba(210,175,0,0.55)"
         if "h-bond" in ct_l or "hydrogen" in ct_l:
-            return "rgba(68,136,238,0.30)"   # bleu semi-transparent
-        return "rgba(50,50,50,0.20)"         # noir semi-transparent
+            return "rgba(68,136,238,0.30)"
+        return "rgba(50,50,50,0.20)"
 
     # Arêtes
     e_max = max(edge_df["n_couples"].max(), 1)
@@ -999,44 +1023,55 @@ def _build_bipartite_c70_html(patch_c70, _v, *_mtimes):
         ecol = _edge_col(row["contact_type"])
         net.add_edge(
             f"s1_{int(row['s1_canon'])}", f"s2_{row['s2_node']}",
-            width=6.0 if (
-                nc == n_couples_total and n_couples_total > 1) else 0.5,
-            color={"color": ecol,
-                   "highlight": "#FF4400",
-                   "hover":     "#FF4400"},
+            width=6.0 if (nc == n_couples_total and n_couples_total > 1) else 0.5,
+            color={"color": ecol, "highlight": "#FF4400", "hover": "#FF4400"},
             title=f"{nc}/{n_couples_total} couples · {row['contact_type']}",
-            smooth={"enabled": True, "type": "dynamic"},
+            smooth={"enabled": True, "type": "curvedCW" if bipartite else "dynamic",
+                    "roundness": 0.15},
         )
 
-    net.set_options("""{
-      "layout": {"randomSeed": 42},
-      "physics": {
-        "solver": "forceAtlas2Based",
-        "forceAtlas2Based": {
-          "gravitationalConstant": -200,
-          "centralGravity": 0.15,
-          "springLength": 30,
-          "springConstant": 0.4,
-          "damping": 0.8,
-          "avoidOverlap": 1.0
-        },
-        "maxVelocity": 100,
-        "timestep": 0.25,
-        "stabilization": {
-          "enabled": true,
-          "iterations": 1500,
-          "updateInterval": 25,
-          "fit": true
-        },
-        "minVelocity": 0.1
-      },
-      "interaction": {"hover": true, "tooltipDelay": 80,
-                      "zoomView": true, "dragView": true, "dragNodes": true},
-      "edges": {"smooth": {"enabled": true, "type": "dynamic"}, "selectionWidth": 2},
-      "nodes": {"font": {"face": "monospace", "size": 25, "multi": "html"},
-                "shadow": {"enabled": true, "color": "rgba(0,0,0,0.10)",
-                           "size": 6, "x": 2, "y": 2}}
-    }""")
+    if bipartite:
+        net.set_options("""{
+          "layout": {"randomSeed": 42},
+          "physics": {"enabled": false},
+          "interaction": {"hover": true, "tooltipDelay": 80,
+                          "zoomView": true, "dragView": true, "dragNodes": true},
+          "edges": {"smooth": {"enabled": true, "type": "curvedCW", "roundness": 0.15},
+                    "selectionWidth": 2},
+          "nodes": {"font": {"face": "monospace", "size": 25, "multi": "html"},
+                    "shadow": {"enabled": true, "color": "rgba(0,0,0,0.10)",
+                               "size": 6, "x": 2, "y": 2}}
+        }""")
+    else:
+        net.set_options("""{
+          "layout": {"randomSeed": 42},
+          "physics": {
+            "solver": "forceAtlas2Based",
+            "forceAtlas2Based": {
+              "gravitationalConstant": -200,
+              "centralGravity": 0.15,
+              "springLength": 30,
+              "springConstant": 0.4,
+              "damping": 0.8,
+              "avoidOverlap": 1.0
+            },
+            "maxVelocity": 100,
+            "timestep": 0.25,
+            "stabilization": {
+              "enabled": true,
+              "iterations": 1500,
+              "updateInterval": 25,
+              "fit": true
+            },
+            "minVelocity": 0.1
+          },
+          "interaction": {"hover": true, "tooltipDelay": 80,
+                          "zoomView": true, "dragView": true, "dragNodes": true},
+          "edges": {"smooth": {"enabled": true, "type": "dynamic"}, "selectionWidth": 2},
+          "nodes": {"font": {"face": "monospace", "size": 25, "multi": "html"},
+                    "shadow": {"enabled": true, "color": "rgba(0,0,0,0.10)",
+                               "size": 6, "x": 2, "y": 2}}
+        }""")
 
     html = net.generate_html()
 
@@ -2820,14 +2855,18 @@ else:
                 "**Réseau interactif — résidus actine ↔ résidus ABP**")
             _bip_ok = all(os.path.exists(f) for f in _BIPARTITE_FILES)
             if _bip_ok:
+                _use_bipartite = st.toggle(
+                    "Vue bipartite  (actine S1 à gauche | partenaire S2 à droite)",
+                    value=False, key=f"bip_toggle_{sel_c70}")
                 _html_c70, _n_s1, _n_s2, _n_tot, _html_3d_c70 = _build_bipartite_c70_html(
-                    sel_c70, _BIP_CACHE_VERSION, *_bip_mtimes())
+                    sel_c70, _use_bipartite, _BIP_CACHE_VERSION, *_bip_mtimes())
                 if _html_c70:
                     st.caption(
                         f"{_n_s1} résidus actine (S1) · {_n_s2} résidus partenaire (S2)"
                         f" · n={_n_tot} interactions")
+                    _net_height = max(700, max(_n_s1, _n_s2) * 55 + 20) if _use_bipartite else 620
                     st.components.v1.html(
-                        _html_c70, height=620, scrolling=False)
+                        _html_c70, height=_net_height, scrolling=False)
                     if _html_3d_c70:
                         st.markdown("**Interface 3D — couple représentatif**")
                         st.components.v1.html(
