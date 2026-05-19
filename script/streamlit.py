@@ -3258,7 +3258,7 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
         _all_n_c = {n for pair in _edge_wts for n in pair}
         for _nc in _all_n_c:
             _deg = _node_deg_c.get(_nc, 1)
-            _sz = 8 + 62 * (_deg / _max_deg_c) ** 0.6
+            _sz = 70 - 62 * (_deg / _max_deg_c) ** 0.6
             _s2c = _prot_s2c.get(_nc)
             _col = _s2c_color.get(_s2c, "#aaaaaa")
             _net_c.add_node(
