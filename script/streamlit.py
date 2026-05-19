@@ -3190,27 +3190,47 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
                       max(_abps_rc[_ii], _abps_rc[_jj]))
                 _edge_wts[_k] = _edge_wts.get(_k, 0) + 1
     if _edge_wts:
-        _net_c = Network(height="600px", width="100%",
-                         bgcolor="white", font_color="#333")
+        # Degré pondéré : nb total de sites S1 partagés par ABP
+        _node_deg_c: dict = {}
+        for (_a_c, _b_c), _w_c in _edge_wts.items():
+            _node_deg_c[_a_c] = _node_deg_c.get(_a_c, 0) + _w_c
+            _node_deg_c[_b_c] = _node_deg_c.get(_b_c, 0) + _w_c
+        _max_deg_c = max(_node_deg_c.values()) if _node_deg_c else 1
+
+        _net_c = Network(height="750px", width="100%",
+                         bgcolor="#ffffff", font_color="#111")
         _net_c.set_options(
-            '{"physics": {"barnesHut": {"springLength": 130},'
-            ' "stabilization": {"iterations": 250}}}'
+            '{"physics": {"barnesHut": {'
+            '  "springLength": 280, "springConstant": 0.03,'
+            '  "damping": 0.1, "avoidOverlap": 1.0,'
+            '  "gravitationalConstant": -15000, "centralGravity": 0.15},'
+            '  "stabilization": {"iterations": 500}},'
+            ' "nodes": {"shape": "dot", "font": {"size": 14, "face": "Arial",'
+            '   "bold": true}},'
+            ' "edges": {"smooth": {"type": "dynamic"}},'
+            ' "interaction": {"hover": true, "tooltipDelay": 150}}'
         )
         _all_n_c = {n for pair in _edge_wts for n in pair}
         for _nc in _all_n_c:
-            _net_c.add_node(_nc, label=_nc, title=_nc, size=18, color="#4a90d9",
-                            font={"size": 11})
+            _deg = _node_deg_c.get(_nc, 1)
+            _sz = 12 + 28 * _deg / _max_deg_c
+            _net_c.add_node(
+                _nc, label=_nc,
+                title=f"<b>{_nc}</b><br/>Sites S1 partagés : {_deg}",
+                size=_sz, color={"background": "#4a90d9", "border": "#1a5fa0"},
+                borderWidth=2,
+            )
         _wmax_c = max(_edge_wts.values())
         for (_a_c, _b_c), _w_c in sorted(_edge_wts.items(),
                                           key=lambda x: x[1], reverse=True):
             _net_c.add_edge(
                 _a_c, _b_c,
                 value=_w_c,
-                width=1 + 5 * _w_c / _wmax_c,
+                width=1.5 + 6 * _w_c / _wmax_c,
                 title=f"{_w_c} site(s) S1 partagé(s)",
-                color={"color": "#e07b54", "opacity": 0.75},
+                color={"color": "#e07b54", "opacity": 0.65},
             )
-        st.components.v1.html(_net_c.generate_html(), height=620, scrolling=False)
+        st.components.v1.html(_net_c.generate_html(), height=770, scrolling=False)
     else:
         st.info("Pas de données de compétition disponibles.")
 
