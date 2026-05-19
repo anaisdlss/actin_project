@@ -3197,6 +3197,30 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
             _node_deg_c[_b_c] = _node_deg_c.get(_b_c, 0) + _w_c
         _max_deg_c = max(_node_deg_c.values()) if _node_deg_c else 1
 
+        # Cluster de séquence S2 (70%) par ABP → couleur
+        _df_s2lnk = df_all_g[
+            df_all_g["s1_actine"].fillna(False).astype(bool) &
+            ~df_all_g["s2_actine"].fillna(False).astype(bool) &
+            df_all_g["s2_sequence_cluster_70"].notna()
+        ][["subunit_2", "s2_sequence_cluster_70"]].copy()
+        _df_s2lnk["_low"] = _df_s2lnk["subunit_2"].str.lower()
+        _df_s2lnk = _df_s2lnk.merge(
+            df_abp[["chain_low", "protein"]],
+            left_on="_low", right_on="chain_low", how="inner"
+        )
+        _prot_s2c = (
+            _df_s2lnk.groupby("protein")["s2_sequence_cluster_70"]
+            .agg(lambda x: x.value_counts().index[0])
+            .to_dict()
+        )
+        _s2c_all = sorted({v for v in _prot_s2c.values() if pd.notna(v)})
+        _pal_c = [
+            "#e6194b", "#3cb44b", "#4363d8", "#f58231", "#911eb4",
+            "#42d4f4", "#f032e6", "#bfef45", "#469990", "#9a6324",
+            "#800000", "#aaffc3", "#808000", "#ffd8b1", "#000075",
+        ]
+        _s2c_color = {c: _pal_c[i % len(_pal_c)] for i, c in enumerate(_s2c_all)}
+
         def _wrap_lbl(name: str, max_ch: int = 18) -> str:
             words, lines, cur = name.split(), [], ""
             for w in words:
@@ -3219,21 +3243,23 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
         _net_c.set_options(
             '{"physics": {"enabled": false},'
             ' "nodes": {"shape": "dot",'
-            '   "font": {"size": 16, "face": "Arial", "bold": true,'
-            '             "multi": true}},'
-            ' "edges": {"smooth": {"type": "continuous"}},'
+            '   "font": {"size": 16, "face": "Arial", "bold": true, "multi": true}},'
+            ' "edges": {"smooth": false},'
             ' "interaction": {"hover": true, "tooltipDelay": 150}}'
         )
         for _nc, (_x_c, _y_c) in _pos_c.items():
             _deg = _node_deg_c.get(_nc, 1)
             _sz = 22 + 38 * _deg / _max_deg_c
+            _s2c = _prot_s2c.get(_nc)
+            _col = _s2c_color.get(_s2c, "#aaaaaa")
             _net_c.add_node(
                 _nc,
                 label=_wrap_lbl(_nc),
-                title=f"<b>{_nc}</b><br/>Sites S1 partagés : {_deg}",
+                title=(f"<b>{_nc}</b><br/>Sites S1 partagés : {_deg}"
+                       f"<br/>Cluster S2 séq. : {_s2c or 'N/A'}"),
                 x=float(_x_c * 900), y=float(_y_c * 900),
                 size=_sz,
-                color={"background": "#4a90d9", "border": "#1a5fa0"},
+                color={"background": _col, "border": "#444444"},
                 borderWidth=2,
                 physics=False,
             )
@@ -3245,8 +3271,19 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
                 value=_w_c,
                 width=1.5 + 6 * _w_c / _wmax_c,
                 title=f"{_w_c} site(s) S1 partagé(s)",
-                color={"color": "#e07b54", "opacity": 0.65},
+                color={"color": "#666666", "opacity": 0.6},
             )
+        # Légende clusters S2
+        _s2c_present = sorted({_prot_s2c.get(n)
+                                for n in _pos_c if _prot_s2c.get(n) is not None})
+        if _s2c_present:
+            _leg_parts = ["**Cluster S2 séquence (70%) :**  "]
+            for _sc in _s2c_present:
+                _ch = _s2c_color.get(_sc, "#aaa")
+                _leg_parts.append(
+                    f'<span style="background:{_ch};padding:2px 10px;border-radius:4px;'
+                    f'margin:2px;color:#fff;font-size:12px;font-weight:bold">{_sc}</span>')
+            st.markdown("  ".join(_leg_parts), unsafe_allow_html=True)
         st.components.v1.html(_net_c.generate_html(), height=840, scrolling=False)
     else:
         st.info("Pas de données de compétition disponibles.")
