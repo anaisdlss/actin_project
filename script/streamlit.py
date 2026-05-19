@@ -3213,13 +3213,21 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
             .agg(lambda x: x.value_counts().index[0])
             .to_dict()
         )
+        # Palette HSV : une couleur distincte par cluster (pas de répétition)
+        import colorsys as _cs
         _s2c_all = sorted({v for v in _prot_s2c.values() if pd.notna(v)})
-        _pal_c = [
-            "#e6194b", "#3cb44b", "#4363d8", "#f58231", "#911eb4",
-            "#42d4f4", "#f032e6", "#bfef45", "#469990", "#9a6324",
-            "#800000", "#aaffc3", "#808000", "#ffd8b1", "#000075",
-        ]
-        _s2c_color = {c: _pal_c[i % len(_pal_c)] for i, c in enumerate(_s2c_all)}
+        _n_cls = max(len(_s2c_all), 1)
+        def _hsv_pal(n: int) -> list:
+            out = []
+            for i in range(n):
+                h = i / n
+                s = 0.72 + 0.18 * (i % 2)
+                v = 0.90 - 0.18 * (i % 3 == 0)
+                r, g, b = _cs.hsv_to_rgb(h, s, v)
+                out.append("#{:02x}{:02x}{:02x}".format(
+                    int(r * 255), int(g * 255), int(b * 255)))
+            return out
+        _s2c_color = dict(zip(_s2c_all, _hsv_pal(_n_cls)))
 
         def _wrap_lbl(name: str, max_ch: int = 18) -> str:
             words, lines, cur = name.split(), [], ""
@@ -3232,22 +3240,22 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
                 lines.append(cur)
             return "\n".join(lines)
 
-        # Positions statiques via networkx spring layout
-        _G_c = nx.Graph()
-        for (_a_c, _b_c), _w_c in _edge_wts.items():
-            _G_c.add_edge(_a_c, _b_c, weight=_w_c)
-        _pos_c = nx.spring_layout(_G_c, k=4.0, seed=42, weight="weight")
-
-        _net_c = Network(height="820px", width="100%", bgcolor="#ffffff",
+        # Physique forceAtlas2 : stabilisation auto → groupes visibles, pas de flottement
+        _net_c = Network(height="860px", width="100%", bgcolor="#ffffff",
                          font_color="#111")
         _net_c.set_options(
-            '{"physics": {"enabled": false},'
+            '{"physics": {"enabled": true, "solver": "forceAtlas2Based",'
+            '  "forceAtlas2Based": {"gravitationalConstant": -80,'
+            '    "centralGravity": 0.005, "springConstant": 0.1,'
+            '    "springLength": 120, "damping": 0.5, "avoidOverlap": 0.6},'
+            '  "stabilization": {"enabled": true, "iterations": 2000, "fit": true}},'
             ' "nodes": {"shape": "dot",'
             '   "font": {"size": 16, "face": "Arial", "bold": true, "multi": true}},'
             ' "edges": {"smooth": false},'
             ' "interaction": {"hover": true, "tooltipDelay": 150}}'
         )
-        for _nc, (_x_c, _y_c) in _pos_c.items():
+        _all_n_c = {n for pair in _edge_wts for n in pair}
+        for _nc in _all_n_c:
             _deg = _node_deg_c.get(_nc, 1)
             _sz = 22 + 38 * _deg / _max_deg_c
             _s2c = _prot_s2c.get(_nc)
@@ -3257,11 +3265,9 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
                 label=_wrap_lbl(_nc),
                 title=(f"<b>{_nc}</b><br/>Sites S1 partagés : {_deg}"
                        f"<br/>Cluster S2 séq. : {_s2c or 'N/A'}"),
-                x=float(_x_c * 900), y=float(_y_c * 900),
                 size=_sz,
                 color={"background": _col, "border": "#444444"},
                 borderWidth=2,
-                physics=False,
             )
         _wmax_c = max(_edge_wts.values())
         for (_a_c, _b_c), _w_c in sorted(_edge_wts.items(),
@@ -3273,18 +3279,7 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
                 title=f"{_w_c} site(s) S1 partagé(s)",
                 color={"color": "#666666", "opacity": 0.6},
             )
-        # Légende clusters S2
-        _s2c_present = sorted({_prot_s2c.get(n)
-                                for n in _pos_c if _prot_s2c.get(n) is not None})
-        if _s2c_present:
-            _leg_parts = ["**Cluster S2 séquence (70%) :**  "]
-            for _sc in _s2c_present:
-                _ch = _s2c_color.get(_sc, "#aaa")
-                _leg_parts.append(
-                    f'<span style="background:{_ch};padding:2px 10px;border-radius:4px;'
-                    f'margin:2px;color:#fff;font-size:12px;font-weight:bold">{_sc}</span>')
-            st.markdown("  ".join(_leg_parts), unsafe_allow_html=True)
-        st.components.v1.html(_net_c.generate_html(), height=840, scrolling=False)
+        st.components.v1.html(_net_c.generate_html(), height=880, scrolling=False)
     else:
         st.info("Pas de données de compétition disponibles.")
 
