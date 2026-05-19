@@ -50,20 +50,18 @@ def _clean_name(title: str) -> str:
     return part[:35]
 
 
-_BTHRESH = 10
-
-def _restype_surf_cmds(obj: str, bthresh: float = _BTHRESH) -> list[str]:
-    sel = f"{obj} and b > {bthresh}"
-    return [
-        f"color white, {obj}",
-        f"color grey80,    {sel} and (resn ALA+GLY+ILE+LEU+MET+VAL)",
-        f"color lightpink, {sel} and (resn PHE+TRP+TYR)",
-        f"color palecyan,  {sel} and (resn HIS+ASN+GLN+SER+THR)",
-        f"color blue,      {sel} and (resn LYS+ARG)",
-        f"color red,       {sel} and (resn ASP+GLU)",
-        f"color paleyellow,{sel} and resn CYS",
-        f"color palegreen, {sel} and resn PRO",
-    ]
+def _bmax_chain(pdb_path: Path, ch: str) -> float:
+    bmax = 0.0
+    with open(pdb_path) as f:
+        for line in f:
+            if line.startswith("ATOM") and len(line) > 66 and line[21] == ch:
+                try:
+                    v = float(line[60:66].strip())
+                    if v > bmax:
+                        bmax = v
+                except ValueError:
+                    pass
+    return round(bmax, 2)
 
 
 df_valid = df_all[df_all["cluster_data_70"].notna()].copy()
@@ -98,31 +96,34 @@ for actin_site, s2_to_c70 in sorted(actin_to_s2.items()):
 
     s1_bfac_pdb = (BFAC_S1_DIR / f"{actin_site}.pdb").resolve()
     if s1_bfac_pdb.exists():
+        bmax_s1 = _bmax_chain(s1_bfac_pdb, "A")
+        s1_color = (f"spectrum b, white_orange, base_actin, minimum=0, maximum={bmax_s1}"
+                    if bmax_s1 > 1.0 else "color white, base_actin")
         ref_section = [
-            "# ── Actine S1 — physicochimique, semi-transparente ──────────────────",
+            "# ── Actine S1 — blanc→orange selon % ASA, semi-transparente ─────────",
             f"load {s1_bfac_pdb}, base_actin",
             "hide everything, base_actin",
             "show surface, base_actin",
+            s1_color,
             "set transparency, 0.4, base_actin",
-        ] + _restype_surf_cmds("base_actin")
+        ]
     else:
         ref_section = [
-            "# ── Actine S1 — grise semi-transparente (pas de B-factor) ───────────",
+            "# ── Actine S1 — blanche semi-transparente (pas de B-factor) ─────────",
             f"load {ref_pdb_abs}, _ref_complex",
             "create base_actin, _ref_complex and chain A",
             "delete _ref_complex",
             "hide everything, base_actin",
             "show surface, base_actin",
-            "color grey70, base_actin",
+            "color white, base_actin",
             "set transparency, 0.4, base_actin",
         ]
 
     lines = [
-        f"# PyMOL — physicochimique — cluster actine S1 : {actin_site}",
+        f"# PyMOL — orange/vert — cluster actine S1 : {actin_site}",
         f"# {len(s2_sorted)} partenaires",
-        "# Interface (b > 10%) : gris=hydrophobe · rose=aromatique · cyan=polaire",
-        "#                       bleu=positif · rouge=négatif · jaune=Cys · vert=Pro",
-        "# Actine de base : même code couleur, transparente à 40 %",
+        "# Blanc→orange = actine S1 (% ASA enfouie) · Blanc→vert = ABP hétéro",
+        "# Blanc→orange = actine homo (même code couleur) · Actine base : 40 % transparent",
         "",
     ] + ref_section + ["", "# ── Partenaires S2 ─────────────────────────────────────────────────────"]
 
@@ -140,6 +141,14 @@ for actin_site, s2_to_c70 in sorted(actin_to_s2.items()):
         align_ch    = "B" if is_swapped else "A"
         partner_ch  = "A" if is_swapped else "B"
 
+        bmax = _bmax_chain(pdb_path, partner_ch)
+        if itype == "homo":
+            color_cmd = (f"spectrum b, white_orange, {obj_partner}, minimum=0, maximum={bmax}"
+                         if bmax > 1.0 else f"color white, {obj_partner}")
+        else:
+            color_cmd = (f"spectrum b, white_green, {obj_partner}, minimum=0, maximum={bmax}"
+                         if bmax > 1.0 else f"color palegreen, {obj_partner}")
+
         swap_note = " [vue swappée]" if is_swapped else ""
         label = (f"# {s2_site} ({itype}{swap_note}) — C70 : {c70_patch} "
                  f"({patch_n.get(c70_patch, '?')} interactions)")
@@ -152,7 +161,9 @@ for actin_site, s2_to_c70 in sorted(actin_to_s2.items()):
             f"delete {obj_tmp}",
             f"hide everything, {obj_partner}",
             f"show surface, {obj_partner}",
-        ] + _restype_surf_cmds(obj_partner) + [""]
+            color_cmd,
+            "",
+        ]
         n_loaded += 1
 
     if n_loaded == 0:
