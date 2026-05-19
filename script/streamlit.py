@@ -2876,7 +2876,7 @@ else:
 
             # Téléchargement du script PyMOL pour ce cluster S1
             _pml_path = os.path.join(
-                "data/filtered/details/structures_files/bfactor_c70_interface/by_s1_cluster",
+                "data/filtered/details/structures_files/bfactor_c70_interface/by_s1_gradient",
                 f"{sel_s1}.pml")
             if os.path.exists(_pml_path):
                 with open(_pml_path, "rb") as _pml_f:
