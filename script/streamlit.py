@@ -898,18 +898,26 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
     nd_to_aa_dist = t4_s2.groupby("node_id4").apply(_aa_dist_eq)
     nd_to_label = nd_to_majority.map(_aa1) + nd_to_pos.astype(str)
 
-    # Arêtes : co-occurrence S1 canon × S2 node, épaisseur = nb couples, couleur = type contact
-    s1_with_type = t4_s1[["interaction_id",
-                          "canon", "contact_type", "couple"]].copy()
-    s2_ids = t4_s2[t4_s2["node_id4"].isin(
-        top_s2)][["interaction_id", "node_id4"]].copy()
-    edges_raw = s1_with_type.merge(s2_ids, on="interaction_id")
-    if edges_raw.empty:
+    # Arêtes : paires de contact DIRECTES (même ligne de table 4 = contact réel)
+    # On n'utilise PAS de merge inter-dataframes sur interaction_id, qui créerait
+    # un produit croisé (tous les résidus S1 × tous les résidus S2 d'une même
+    # interaction), mais les deux résidus de la MÊME ligne.
+    t4_both = t4[
+        t4["residue_A_canon_mafft"].notna() &
+        t4["residue_B_canon_mafft"].notna() &
+        t4["partner"].notna()
+    ].copy()
+    t4_both["s1_canon"] = t4_both["residue_A_canon_mafft"].astype(int)
+    t4_both["_s2_pos4b"] = t4_both["residue_B_canon_mafft"].astype(int)
+    t4_both["s2_node"] = (t4_both["partner"].astype(str).str[:15]
+                          + "_" + t4_both["_s2_pos4b"].astype(str))
+    t4_both = t4_both[t4_both["s2_node"].isin(top_s2)].copy()
+    if t4_both.empty:
         return None, 0, 0, 0
-    edge_counts = (edges_raw.groupby(["canon", "node_id4"])["couple"]
+    edge_counts = (t4_both.groupby(["s1_canon", "s2_node"])["couple"]
                    .nunique().reset_index())
     edge_counts.columns = ["s1_canon", "s2_node", "n_couples"]
-    edge_type = (edges_raw.groupby(["canon", "node_id4"])["contact_type"]
+    edge_type = (t4_both.groupby(["s1_canon", "s2_node"])["contact_type"]
                  .agg(lambda x: x.dropna().value_counts().index[0]
                       if x.dropna().shape[0] > 0 else "").reset_index())
     edge_type.columns = ["s1_canon", "s2_node", "contact_type"]
@@ -1484,36 +1492,38 @@ with st.sidebar:
 st.header("Téléchargement des données")
 
 STEPS = {
-    "1/13":  "Téléchargement du summary PPI3D (BLAST)",
-    "2/13":  "Téléchargement des entrées PDB",
-    "3/13":  "Téléchargement de toutes les données (cluster table)",
-    "4/13":  "Filtrage des structures (≥ 4 actines connectées) - notebook",
-    "5/13":  "Téléchargement des interactions d'interface",
-    "6/13":  "Alignement MAFFT par cluster de séquences",
-    "7/13":  "Analyse des clusters d'interaction C70 - notebook",
-    "8/13":  "Calcul B-factors interface C70 par cluster",
-    "9/13":  "Génération script PyMOL surface complète C70",
-    "10/13": "Génération scripts PyMOL par site S1",
-    "11/13": "Analyse interface par cluster C70 - notebook",
-    "12/13": "Heatmap S1 binding site et références clusters - notebook",
-    "13/13": "Calcul B-factors S1 par cluster",
+    "1/14":  "Téléchargement du summary PPI3D (BLAST)",
+    "2/14":  "Téléchargement des entrées PDB",
+    "3/14":  "Téléchargement de toutes les données (cluster table)",
+    "4/14":  "Filtrage des structures (≥ 4 actines connectées) - notebook",
+    "5/14":  "Téléchargement des interactions d'interface",
+    "6/14":  "Alignement MAFFT par cluster de séquences",
+    "7/14":  "Analyse des clusters d'interaction C70 - notebook",
+    "8/14":  "Calcul B-factors interface C70 par cluster",
+    "9/14":  "Génération script PyMOL surface complète C70",
+    "10/14": "Génération scripts PyMOL par site S1",
+    "11/14": "Analyse interface par cluster C70 - notebook",
+    "12/14": "Heatmap S1 binding site et références clusters - notebook",
+    "13/14": "Calcul B-factors S1 par cluster",
+    "14/14": "Analyse ABP — compétition et interfaces - notebook",
 }
 
 # Fichier de sortie attendu pour chaque étape
 STEP_OUTPUT_FILES = {
-    "1/13":  "data/raw/ppi3d_actin_summary.csv",
-    "2/13":  "data/raw/pdb_entry_results.csv",
-    "3/13":  "data/raw/all_data.csv",
-    "4/13":  "data/filtered/filtered_pdb_entry.csv",
-    "5/13":  "data/filtered/details/1.interactions.csv",
-    "6/13":  "data/alignments/.done",
-    "7/13":  "data/filtered/patches_infos_cluster_data_70.csv",
-    "8/13":  "data/filtered/details/structures_files/bfactor_c70_interface",
-    "9/13":  "data/filtered/details/structures_files/bfactor_c70_interface/view_full_surface.pml",
-    "10/13": "data/filtered/details/structures_files/bfactor_c70_interface/by_s1_cluster",
-    "11/13": "visualisations/actin_c70_contacts",
-    "12/13": "visualisations/actin_s1_all_equitable_heatmap.png",
-    "13/13": "data/filtered/details/structures_files/bfactor_cluster",
+    "1/14":  "data/raw/ppi3d_actin_summary.csv",
+    "2/14":  "data/raw/pdb_entry_results.csv",
+    "3/14":  "data/raw/all_data.csv",
+    "4/14":  "data/filtered/filtered_pdb_entry.csv",
+    "5/14":  "data/filtered/details/1.interactions.csv",
+    "6/14":  "data/alignments/.done",
+    "7/14":  "data/filtered/patches_infos_cluster_data_70.csv",
+    "8/14":  "data/filtered/details/structures_files/bfactor_c70_interface",
+    "9/14":  "data/filtered/details/structures_files/bfactor_c70_interface/view_full_surface.pml",
+    "10/14": "data/filtered/details/structures_files/bfactor_c70_interface/by_s1_cluster",
+    "11/14": "visualisations/actin_c70_contacts",
+    "12/14": "visualisations/actin_s1_all_equitable_heatmap.png",
+    "13/14": "data/filtered/details/structures_files/bfactor_cluster",
+    "14/14": "visualisations/abp_analysis_done.flag",
 }
 
 STEP_KEYS = list(STEPS.keys())
@@ -3161,13 +3171,147 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
         and len(abp_global) > 0 and "Binding site S1" in abp_global.columns):
     st.subheader("Détail par ABP")
 
-    abp_names = abp_global["Protéine"].tolist()
+    _NO_ABP_LABEL = "— PDB sans ABP —"
+    abp_names = [_NO_ABP_LABEL] + abp_global["Protéine"].tolist()
     sel_abp = st.selectbox("Sélectionner un ABP", abp_names, key="sel_abp_detail")
+    _is_no_abp = (sel_abp == _NO_ABP_LABEL)
 
-    # PDB IDs contenant cet ABP
-    abp_pdbs = set(merged[merged["protein"] == sel_abp]["pdb_id"])
+    # PDB IDs selon la sélection
+    if _is_no_abp:
+        _pdbs_with_abp_s = set(df_pp_all[~df_pp_all["is_actin"]]["pdb_id"])
+        _all_pdbs_s = set(df_all_g["subunit_1"].str.split("_").str[0])
+        abp_pdbs = _all_pdbs_s - _pdbs_with_abp_s
+    else:
+        abp_pdbs = set(merged[merged["protein"] == sel_abp]["pdb_id"])
 
-    # Interactions homo actine-actine dans ces mêmes PDB
+    if not _is_no_abp:
+        # ── Clusters actin–ABP (interactions hétéro) ─────────────────────────
+        st.markdown("#### Clusters d'interaction actine–ABP")
+        _abp_subunits = set(merged[merged["protein"] == sel_abp]["subunit_2"])
+        _df_hetero = df_all_g.copy()
+        _df_hetero["_pdb_h"] = _df_hetero["subunit_1"].str.split("_").str[0]
+        abp_int = _df_hetero[
+            _df_hetero["s1_actine"].fillna(False).astype(bool) &
+            ~_df_hetero["s2_actine"].fillna(False).astype(bool) &
+            _df_hetero["subunit_2"].str.lower().isin(_abp_subunits) &
+            _df_hetero["cluster_data_70"].notna()
+        ].copy()
+
+        if abp_int.empty:
+            st.info("Aucune interaction hétéro trouvée pour cet ABP.")
+        else:
+            def _most_freq_pair(grp):
+                """Paire (subunit_1, subunit_2) la plus fréquente dans le groupe."""
+                pairs = grp.groupby(["subunit_1", "subunit_2"]).size()
+                if pairs.empty:
+                    return pd.Series({"rep_actin": "", "rep_abp": ""})
+                best = pairs.idxmax()
+                return pd.Series({"rep_actin": best[0], "rep_abp": best[1]})
+
+            _stats = (
+                abp_int.groupby(
+                    ["cluster_data_70", "s1_binding_site_cluster_data_70"],
+                    dropna=False,
+                )
+                .agg(nb_inter=("subunit_1", "count"), nb_pdb=("_pdb_h", "nunique"))
+                .reset_index()
+            )
+            _pairs = (
+                abp_int.groupby(
+                    ["cluster_data_70", "s1_binding_site_cluster_data_70"],
+                    dropna=False,
+                )
+                .apply(_most_freq_pair)
+                .reset_index()
+            )
+            abp_clust = _stats.merge(
+                _pairs, on=["cluster_data_70", "s1_binding_site_cluster_data_70"]
+            ).sort_values("nb_inter", ascending=False)
+            _total_abp_inter = max(len(abp_int), 1)
+            abp_clust["% PDB"] = (
+                abp_clust["nb_pdb"] / max(len(abp_pdbs), 1) * 100
+            ).round(1)
+            abp_clust["% interactions ABP-actine"] = (
+                abp_clust["nb_inter"] / _total_abp_inter * 100
+            ).round(1)
+            st.caption(
+                f"{len(abp_pdbs)} PDB contenant cet ABP · "
+                f"{len(abp_int)} interactions hétéro actine–ABP · "
+                f"{abp_clust.shape[0]} clusters C70"
+            )
+            st.dataframe(
+                abp_clust.rename(columns={
+                    "cluster_data_70": "Cluster C70",
+                    "s1_binding_site_cluster_data_70": "Site liaison S1",
+                    "nb_inter": "Nb interactions",
+                    "nb_pdb": "Nb PDB",
+                })[["Cluster C70", "Site liaison S1",
+                    "Nb interactions", "% interactions ABP-actine", "Nb PDB", "% PDB"]],
+                hide_index=True,
+                use_container_width=True,
+            )
+
+            # ── Viewer 3D inline ──────────────────────────────────────────────
+            _bfac_dir_abp = _Path(
+                "data/filtered/details/structures_files/bfactor_c70_interface")
+            _valid_rows = [
+                row for _, row in abp_clust.iterrows()
+                if (_bfac_dir_abp / f"{row['cluster_data_70']}.pdb").exists()
+            ]
+            if not _valid_rows:
+                st.caption("Aucun fichier PDB C70 disponible pour ces clusters.")
+            else:
+                _ylord3d = ["#FFFFCC", "#FFF0A9", "#FEE186", "#FECA65", "#FDAA48",
+                            "#FC8C3B", "#FC5A2D", "#EC2D21", "#D30F20", "#800026"]
+                _grn3d = ["#FFFFCC", "#D9F0A3", "#ADDD8E", "#78C679",
+                          "#41AB5D", "#238443", "#006837"]
+                st.caption(
+                    "Jaune→rouge = actine (% ASA enfouie) · "
+                    "Jaune→vert = ABP · blanc = hors interface"
+                )
+                for _i3d in range(0, len(_valid_rows), 2):
+                    _pair = _valid_rows[_i3d:_i3d + 2]
+                    _cols3d = st.columns(len(_pair))
+                    for _ci3d, _crow3d in enumerate(_pair):
+                        _c70_3d = str(_crow3d["cluster_data_70"])
+                        _pdb_3d_txt = (_bfac_dir_abp / f"{_c70_3d}.pdb").read_text()
+                        _bmax_a3d, _bmax_b3d = 1.0, 1.0
+                        for _ln in _pdb_3d_txt.splitlines():
+                            if _ln.startswith("ATOM") and len(_ln) > 66:
+                                try:
+                                    _bv3 = float(_ln[60:66].strip())
+                                    if _ln[21] == "A":
+                                        _bmax_a3d = max(_bmax_a3d, _bv3)
+                                    elif _ln[21] == "B":
+                                        _bmax_b3d = max(_bmax_b3d, _bv3)
+                                except ValueError:
+                                    pass
+                        _v3d = py3Dmol.view(width="100%", height=380)
+                        _v3d.addModel(_pdb_3d_txt, "pdb")
+                        _v3d.setStyle({}, {})
+                        _v3d.addSurface(py3Dmol.SES,
+                                       {"opacity": 1, "colorscheme": {
+                                           "prop": "b", "gradient": "linear",
+                                           "colors": _ylord3d, "min": 0, "max": _bmax_a3d,
+                                       }}, {"chain": "A"})
+                        _v3d.addSurface(py3Dmol.SES,
+                                       {"opacity": 1, "colorscheme": {
+                                           "prop": "b", "gradient": "linear",
+                                           "colors": _grn3d, "min": 0, "max": _bmax_b3d,
+                                       }}, {"chain": "B"})
+                        _v3d.setBackgroundColor("white")
+                        _v3d.zoomTo()
+                        with _cols3d[_ci3d]:
+                            st.markdown(f"**{_c70_3d}**")
+                            st.components.v1.html(
+                                _v3d._make_html(), height=390, scrolling=False)
+
+        st.divider()
+
+    # ── Interactions actine-actine (homo) ─────────────────────────────────────
+    _homo_label = ("PDB sans ABP" if _is_no_abp
+                   else f"les mêmes PDB que {sel_abp[:30]}")
+    st.markdown(f"#### Interactions actine-actine (homo) — {_homo_label}")
     _df_homo = df_all_g.copy()
     _df_homo["_pdb"] = _df_homo["subunit_1"].str.split("_").str[0]
     homo_cooc = _df_homo[
@@ -3188,11 +3332,11 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
 
     total_homo = len(homo_cooc)
     st.caption(
-        f"{len(abp_pdbs)} PDB contenant cet ABP · "
-        f"{total_homo} interactions homo actine-actine co-présentes"
+        f"{len(abp_pdbs)} PDB · "
+        f"{total_homo} interactions homo actine-actine"
     )
     if homo_cooc.empty:
-        st.info("Aucune interaction homo actine-actine dans les PDB contenant cet ABP.")
+        st.info("Aucune interaction homo actine-actine dans ces PDB.")
     else:
         homo_summary = (
             homo_cooc.groupby(["cluster_data_70", "Binding sites"], dropna=False)
