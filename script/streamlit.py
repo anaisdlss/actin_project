@@ -3283,11 +3283,11 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
         # Désactiver la physique dès que la stabilisation est terminée
         # → les noeuds ne bougent plus quand on en déplace un
         _net_html = _net_html.replace(
-            "var network = new vis.Network(container, data, options);",
-            "var network = new vis.Network(container, data, options);\n"
-            "        network.once('stabilizationIterationsDone', function() {\n"
-            "            network.setOptions({ physics: { enabled: false } });\n"
-            "        });",
+            "network = new vis.Network(container, data, options);",
+            "network = new vis.Network(container, data, options);\n"
+            "                  network.once('stabilizationIterationsDone', function() {\n"
+            "                      network.setOptions({ physics: { enabled: false } });\n"
+            "                  });",
         )
         st.components.v1.html(_net_html, height=880, scrolling=False)
     else:
