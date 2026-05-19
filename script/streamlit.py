@@ -3213,21 +3213,22 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
             .agg(lambda x: x.value_counts().index[0])
             .to_dict()
         )
-        # Palette HSV : une couleur distincte par cluster (pas de répétition)
+        # Palette golden-ratio : chaque couleur saute ~222° → distance perceptuelle maximale
         import colorsys as _cs
         _s2c_all = sorted({v for v in _prot_s2c.values() if pd.notna(v)})
         _n_cls = max(len(_s2c_all), 1)
-        def _hsv_pal(n: int) -> list:
-            out = []
+        def _golden_pal(n: int) -> list:
+            _phi = 0.618033988749895
+            _h, out = 0.05, []
             for i in range(n):
-                h = i / n
-                s = 0.72 + 0.18 * (i % 2)
-                v = 0.90 - 0.18 * (i % 3 == 0)
-                r, g, b = _cs.hsv_to_rgb(h, s, v)
+                _h = (_h + _phi) % 1.0
+                _s = 0.88 if i % 2 == 0 else 0.62
+                _v = 0.95 if i % 3 != 1 else 0.72
+                r, g, b = _cs.hsv_to_rgb(_h, _s, _v)
                 out.append("#{:02x}{:02x}{:02x}".format(
                     int(r * 255), int(g * 255), int(b * 255)))
             return out
-        _s2c_color = dict(zip(_s2c_all, _hsv_pal(_n_cls)))
+        _s2c_color = dict(zip(_s2c_all, _golden_pal(_n_cls)))
 
         def _wrap_lbl(name: str, max_ch: int = 18) -> str:
             words, lines, cur = name.split(), [], ""
@@ -3257,7 +3258,7 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
         _all_n_c = {n for pair in _edge_wts for n in pair}
         for _nc in _all_n_c:
             _deg = _node_deg_c.get(_nc, 1)
-            _sz = 22 + 38 * _deg / _max_deg_c
+            _sz = 8 + 62 * (_deg / _max_deg_c) ** 0.6
             _s2c = _prot_s2c.get(_nc)
             _col = _s2c_color.get(_s2c, "#aaaaaa")
             _net_c.add_node(
