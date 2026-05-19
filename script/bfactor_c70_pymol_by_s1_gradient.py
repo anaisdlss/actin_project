@@ -97,8 +97,8 @@ for actin_site, s2_to_c70 in sorted(actin_to_s2.items()):
     s1_bfac_pdb = (BFAC_S1_DIR / f"{actin_site}.pdb").resolve()
     if s1_bfac_pdb.exists():
         bmax_s1 = _bmax_chain(s1_bfac_pdb, "A")
-        s1_color = (f"spectrum b, yellow_red, base_actin, minimum=0, maximum={bmax_s1}"
-                    if bmax_s1 > 1.0 else "color yellow, base_actin")
+        s1_color = (f"spectrum b, white_red, base_actin, minimum=0, maximum={bmax_s1}"
+                    if bmax_s1 > 1.0 else "color white, base_actin")
         ref_section = [
             "# ── Actine S1 — gradient jaune→rouge (% ASA), semi-transparente ─────",
             f"load {s1_bfac_pdb}, base_actin",
@@ -122,7 +122,7 @@ for actin_site, s2_to_c70 in sorted(actin_to_s2.items()):
     lines = [
         f"# PyMOL — gradient B-factor — cluster actine S1 : {actin_site}",
         f"# {len(s2_sorted)} partenaires",
-        "# Jaune→rouge = actine (% ASA enfouie) | Vert = ABP | Rose = actine homo",
+        "# Blanc→rouge = actine (% ASA enfouie) | Vert = ABP | Rose = actine homo",
         "# Actine de base : semi-transparente à 50 %",
         "",
     ] + ref_section + ["", "# ── Partenaires S2 ─────────────────────────────────────────────────────"]
