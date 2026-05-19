@@ -3197,28 +3197,45 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
             _node_deg_c[_b_c] = _node_deg_c.get(_b_c, 0) + _w_c
         _max_deg_c = max(_node_deg_c.values()) if _node_deg_c else 1
 
-        _net_c = Network(height="750px", width="100%",
-                         bgcolor="#ffffff", font_color="#111")
+        def _wrap_lbl(name: str, max_ch: int = 18) -> str:
+            words, lines, cur = name.split(), [], ""
+            for w in words:
+                if cur and len(cur) + 1 + len(w) > max_ch:
+                    lines.append(cur); cur = w
+                else:
+                    cur = (cur + " " + w).strip()
+            if cur:
+                lines.append(cur)
+            return "\n".join(lines)
+
+        # Positions statiques via networkx spring layout
+        _G_c = nx.Graph()
+        for (_a_c, _b_c), _w_c in _edge_wts.items():
+            _G_c.add_edge(_a_c, _b_c, weight=_w_c)
+        _pos_c = nx.spring_layout(_G_c, k=4.0, seed=42, weight="weight")
+
+        _net_c = Network(height="820px", width="100%", bgcolor="#ffffff",
+                         font_color="#111")
         _net_c.set_options(
-            '{"physics": {"barnesHut": {'
-            '  "springLength": 280, "springConstant": 0.03,'
-            '  "damping": 0.1, "avoidOverlap": 1.0,'
-            '  "gravitationalConstant": -15000, "centralGravity": 0.15},'
-            '  "stabilization": {"iterations": 500}},'
-            ' "nodes": {"shape": "dot", "font": {"size": 14, "face": "Arial",'
-            '   "bold": true}},'
-            ' "edges": {"smooth": {"type": "dynamic"}},'
+            '{"physics": {"enabled": false},'
+            ' "nodes": {"shape": "dot",'
+            '   "font": {"size": 16, "face": "Arial", "bold": true,'
+            '             "multi": true}},'
+            ' "edges": {"smooth": {"type": "continuous"}},'
             ' "interaction": {"hover": true, "tooltipDelay": 150}}'
         )
-        _all_n_c = {n for pair in _edge_wts for n in pair}
-        for _nc in _all_n_c:
+        for _nc, (_x_c, _y_c) in _pos_c.items():
             _deg = _node_deg_c.get(_nc, 1)
-            _sz = 12 + 28 * _deg / _max_deg_c
+            _sz = 22 + 38 * _deg / _max_deg_c
             _net_c.add_node(
-                _nc, label=_nc,
+                _nc,
+                label=_wrap_lbl(_nc),
                 title=f"<b>{_nc}</b><br/>Sites S1 partagés : {_deg}",
-                size=_sz, color={"background": "#4a90d9", "border": "#1a5fa0"},
+                x=float(_x_c * 900), y=float(_y_c * 900),
+                size=_sz,
+                color={"background": "#4a90d9", "border": "#1a5fa0"},
                 borderWidth=2,
+                physics=False,
             )
         _wmax_c = max(_edge_wts.values())
         for (_a_c, _b_c), _w_c in sorted(_edge_wts.items(),
@@ -3230,7 +3247,7 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
                 title=f"{_w_c} site(s) S1 partagé(s)",
                 color={"color": "#e07b54", "opacity": 0.65},
             )
-        st.components.v1.html(_net_c.generate_html(), height=770, scrolling=False)
+        st.components.v1.html(_net_c.generate_html(), height=840, scrolling=False)
     else:
         st.info("Pas de données de compétition disponibles.")
 
