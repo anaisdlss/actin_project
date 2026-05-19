@@ -3166,6 +3166,56 @@ if all(os.path.exists(f) for f in _ABP_HM_FILES):
         st.pyplot(_fig_hm)
         plt.close(_fig_hm)
 
+# ── Réseau de compétition ABP ─────────────────────────────────────────────────
+if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
+        and len(abp_global) > 0 and "Binding site S1" in abp_global.columns):
+    st.subheader("Réseau de compétition ABP")
+    st.caption(
+        "Deux ABPs sont reliés s'ils partagent au moins un site S1 sur l'actine. "
+        "L'épaisseur des arêtes encode le nombre de sites S1 partagés."
+    )
+    _s1_grps = (
+        merged.dropna(subset=["protein", "s1_binding_site_cluster_data_70"])
+        .groupby("s1_binding_site_cluster_data_70")["protein"]
+        .agg(lambda x: sorted(x.unique().tolist()))
+        .reset_index()
+    )
+    _s1_grps = _s1_grps[_s1_grps["protein"].apply(len) >= 2]
+    _edge_wts: dict = {}
+    for _, _rc in _s1_grps.iterrows():
+        _abps_rc = _rc["protein"]
+        for _ii in range(len(_abps_rc)):
+            for _jj in range(_ii + 1, len(_abps_rc)):
+                _k = (min(_abps_rc[_ii], _abps_rc[_jj]),
+                      max(_abps_rc[_ii], _abps_rc[_jj]))
+                _edge_wts[_k] = _edge_wts.get(_k, 0) + 1
+    if _edge_wts:
+        _net_c = Network(height="600px", width="100%",
+                         bgcolor="white", font_color="#333")
+        _net_c.set_options(
+            '{"physics": {"barnesHut": {"springLength": 130},'
+            ' "stabilization": {"iterations": 250}}}'
+        )
+        _all_n_c = {n for pair in _edge_wts for n in pair}
+        for _nc in _all_n_c:
+            _net_c.add_node(_nc, label=_nc, title=_nc, size=18, color="#4a90d9",
+                            font={"size": 11})
+        _wmax_c = max(_edge_wts.values())
+        for (_a_c, _b_c), _w_c in sorted(_edge_wts.items(),
+                                          key=lambda x: x[1], reverse=True):
+            _net_c.add_edge(
+                _a_c, _b_c,
+                value=_w_c,
+                width=1 + 5 * _w_c / _wmax_c,
+                title=f"{_w_c} site(s) S1 partagé(s)",
+                color={"color": "#e07b54", "opacity": 0.75},
+            )
+        st.components.v1.html(_net_c.generate_html(), height=620, scrolling=False)
+    else:
+        st.info("Pas de données de compétition disponibles.")
+
+    st.divider()
+
 # ── Détail par ABP ─────────────────────────────────────────────────────────────
 if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
         and len(abp_global) > 0 and "Binding site S1" in abp_global.columns):
