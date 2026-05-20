@@ -3820,33 +3820,86 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
 
     # ── Filament actine 10 sous-unités ────────────────────────────────────
     st.subheader("Filament actine — 10 sous-unités (PyMOL)")
-    st.caption(
-        "Filament reconstruit depuis les structures pairwise 8iah (chaînes A→J). "
-        "B-factor = somme % ASA buried des 4 clusters homo principaux (6685_1+2+3+4). "
-        "Spectre blanc → rouge : zones les plus contactées dans les interactions homo actine-actine."
+
+    _by_abp_dir = _Path(
+        "data/filtered/details/structures_files/filament/by_abp"
     )
-    _filament_pml = _Path(
-        "data/filtered/details/structures_files/filament/actin_filament_10.pml"
+    _global_base_pdb = _Path(
+        "data/filtered/details/structures_files/filament/filament_global_base.pdb"
     )
-    _filament_pdb = _Path(
-        "data/filtered/details/structures_files/filament/actin_filament_10.pdb"
-    )
-    _col_pml, _col_pdb = st.columns(2)
-    if _filament_pml.exists():
-        with open(_filament_pml, "rb") as _f:
-            _col_pml.download_button(
-                "Télécharger le script PyMOL (.pml)",
-                _f,
-                file_name="actin_filament_10.pml",
-                mime="text/plain",
-            )
+
+    if not _is_no_abp and _by_abp_dir.exists():
+        # Session ABP-spécifique : 2 filaments (base global + spécifique ABP)
+        import re as _re
+        _abp_sname = _re.sub(r"[^a-zA-Z0-9]+", "_", sel_abp).strip("_")[:60]
+        _abp_pml = _by_abp_dir / f"{_abp_sname}.pml"
+        _abp_pdb = _by_abp_dir / f"{_abp_sname}_abp.pdb"
+
+        st.caption(
+            "Session PyMOL avec 2 filaments : "
+            "**filament_base** (clusters globaux 0_7797_0 + 0_7797_1, blanc→rouge) et "
+            f"**filament_abp** (top 2 clusters spécifiques à {sel_abp[:30]}, blanc→orange). "
+            "B-factor = somme % ASA buried des sites de liaison S1."
+        )
+        _fc1, _fc2, _fc3 = st.columns(3)
+        if _abp_pml.exists():
+            with open(_abp_pml, "rb") as _f:
+                _fc1.download_button(
+                    "Session PyMOL (.pml)",
+                    _f,
+                    file_name=f"{_abp_sname}.pml",
+                    mime="text/plain",
+                    key=f"dl_pml_{_abp_sname}",
+                )
+        else:
+            _fc1.info("Session PML non disponible.")
+        if _global_base_pdb.exists():
+            with open(_global_base_pdb, "rb") as _f:
+                _fc2.download_button(
+                    "PDB filament base (.pdb)",
+                    _f,
+                    file_name="filament_global_base.pdb",
+                    mime="chemical/x-pdb",
+                    key=f"dl_base_{_abp_sname}",
+                )
+        if _abp_pdb.exists():
+            with open(_abp_pdb, "rb") as _f:
+                _fc3.download_button(
+                    f"PDB filament {sel_abp[:20]} (.pdb)",
+                    _f,
+                    file_name=f"{_abp_sname}_abp.pdb",
+                    mime="chemical/x-pdb",
+                    key=f"dl_abp_{_abp_sname}",
+                )
     else:
-        _col_pml.info("Script PyMOL non disponible.")
-    if _filament_pdb.exists():
-        with open(_filament_pdb, "rb") as _f:
-            _col_pdb.download_button(
-                "Télécharger le PDB filament (.pdb)",
-                _f,
-                file_name="actin_filament_10.pdb",
-                mime="chemical/x-pdb",
-            )
+        # Filament générique (PDB sans ABP ou fichiers ABP non disponibles)
+        st.caption(
+            "Filament reconstruit depuis les structures pairwise 8iah (chaînes A→J). "
+            "B-factor = somme % ASA buried des 4 clusters homo principaux (6685_1+2+3+4). "
+            "Spectre blanc → rouge : zones les plus contactées dans les interactions homo actine-actine."
+        )
+        _filament_pml = _Path(
+            "data/filtered/details/structures_files/filament/actin_filament_10.pml"
+        )
+        _filament_pdb = _Path(
+            "data/filtered/details/structures_files/filament/actin_filament_10.pdb"
+        )
+        _col_pml, _col_pdb = st.columns(2)
+        if _filament_pml.exists():
+            with open(_filament_pml, "rb") as _f:
+                _col_pml.download_button(
+                    "Télécharger le script PyMOL (.pml)",
+                    _f,
+                    file_name="actin_filament_10.pml",
+                    mime="text/plain",
+                )
+        else:
+            _col_pml.info("Script PyMOL non disponible.")
+        if _filament_pdb.exists():
+            with open(_filament_pdb, "rb") as _f:
+                _col_pdb.download_button(
+                    "Télécharger le PDB filament (.pdb)",
+                    _f,
+                    file_name="actin_filament_10.pdb",
+                    mime="chemical/x-pdb",
+                )

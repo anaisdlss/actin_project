@@ -220,6 +220,22 @@ def main():
         _flag.parent.mkdir(parents=True, exist_ok=True)
         _flag.touch()
 
+        # 15 — Sessions PyMOL filament par ABP (dépend bfactor_cluster + filtered_all_data)
+        _by_abp_dir = FILTERED / "details" / "structures_files" / "filament" / "by_abp"
+        if is_up_to_date(
+            _by_abp_dir,
+            FILTERED / "patches_infos_cluster_data_70.csv",
+            FILTERED / "filtered_all_data.csv",
+            FILTERED / "details" / "structures_files" / "bfactor_cluster",
+        ):
+            skip_step("15/15 — Sessions PyMOL filament par ABP")
+        else:
+            run_step(
+                "15/15 — Sessions PyMOL filament par ABP (filament_by_abp.py)",
+                [python_exec, "-m", "script.filament_by_abp"],
+                cwd=PROJECT_ROOT,
+            )
+
         print("\nPipeline terminé avec succès.")
 
     except subprocess.CalledProcessError as e:
