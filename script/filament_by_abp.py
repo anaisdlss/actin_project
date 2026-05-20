@@ -218,11 +218,11 @@ def build_filament_from_pairwise(
     return max_b
 
 
-GLOBAL_HELIX_ANGLE = 166.43  # angle de référence (filament nu 3j8a)
+C70_INTERFACE_DIR = FILTERED / "details" / "structures_files" / "bfactor_c70_interface"
 
 
-def _helix_angle(path: Path) -> float | None:
-    """Calcule l'angle de rotation hélicoïdal A→B d'un fichier pairwise."""
+def _helix_angle_and_longitudinal(path: Path) -> float | None:
+    """Retourne l'angle hélicoïdal A→B si c'est un contact longitudinal, sinon None."""
     ca_A, ca_B = {}, {}
     try:
         with open(path) as fh:
@@ -243,11 +243,10 @@ def _helix_angle(path: Path) -> float | None:
     common = sorted(set(ca_A) & set(ca_B))
     if len(common) < 50:
         return None
-    # Vérifier que c'est un contact longitudinal (dist centroïde 25-55 Å)
     cA = np.array(list(ca_A.values())).mean(0)
     cB = np.array(list(ca_B.values())).mean(0)
     if not (25 < np.linalg.norm(cB - cA) < 55):
-        return None
+        return None  # contact non-longitudinal
     P = np.array([ca_A[r] for r in common])
     Q = np.array([ca_B[r] for r in common])
     cP, cQ = P.mean(0), Q.mean(0)
@@ -258,47 +257,22 @@ def _helix_angle(path: Path) -> float | None:
     return float(np.degrees(np.arccos(np.clip((np.trace(R) - 1) / 2, -1, 1))))
 
 
-def find_pairwise_file(
-    interaction_ids: list[int],
-    preferred_pdbs: set[str] | None = None,
-) -> Path | None:
+def find_representative_pdb(patches: list[str]) -> Path | None:
     """
-    Trouve le fichier pairwise le plus représentatif du cluster :
-    1. Priorité aux PDBs de l'ABP (preferred_pdbs)
-    2. Parmi ceux-là, on garde les contacts longitudinaux (angle 155-172°)
-    3. On choisit celui dont l'angle diffère le plus du filament nu de référence
-    4. Fallback : tout fichier du cluster, même angle
+    Cherche le représentant C70 longitudinal (bfactor_c70_interface/) pour
+    les patches donnés, en priorité le premier patch ayant un contact longitudinal.
+    Fallback sur le premier fichier disponible.
     """
-    id_set = set(interaction_ids)
-    all_files = list(PAIRWISE_DIR.iterdir())
-
-    candidates: list[tuple[float, Path]] = []  # (|Δangle|, path)
     fallback: Path | None = None
-
-    for f in all_files:
-        try:
-            fid = int(f.name.split("_")[0])
-        except ValueError:
+    for patch in patches:
+        path = C70_INTERFACE_DIR / f"{patch}.pdb"
+        if not path.exists():
             continue
-        if fid not in id_set:
-            continue
-
-        # Préférence PDBs de l'ABP
-        pdb_in_name = "_".join(f.name.split("_")[1:3])  # ex. "9y9m_E"
-        from_abp_pdb = preferred_pdbs and any(p in f.name for p in preferred_pdbs)
-
-        angle = _helix_angle(f)
-        if angle is not None and 155 < angle < 172:
-            delta = abs(angle - GLOBAL_HELIX_ANGLE)
-            # Bonus fort si ce PDB appartient à l'ABP
-            score = delta + (50.0 if from_abp_pdb else 0.0)
-            candidates.append((score, f))
-        elif fallback is None:
-            fallback = f
-
-    if candidates:
-        candidates.sort(key=lambda x: -x[0])  # score décroissant
-        return candidates[0][1]
+        angle = _helix_angle_and_longitudinal(path)
+        if angle is not None:
+            return path  # contact longitudinal trouvé
+        if fallback is None:
+            fallback = path
     return fallback
 
 
@@ -354,8 +328,13 @@ def main() -> None:
 
     if not GLOBAL_BASE_PDB.exists():
         print("Génération filament_global_base.pdb …")
+        global_rep = find_representative_pdb(GLOBAL_PATCHES)
         global_bf = read_bfactors_sum(global_sites)
-        max_global = apply_bfactors_to_template(global_bf, GLOBAL_BASE_PDB)
+        if global_rep is not None:
+            print(f"  représentant C70 global : {global_rep.name}")
+            max_global = build_filament_from_pairwise(global_rep, global_bf, GLOBAL_BASE_PDB)
+        else:
+            max_global = apply_bfactors_to_template(global_bf, GLOBAL_BASE_PDB)
         print(f"  → max B-factor global : {max_global:.2f}")
     else:
         max_global = 0.0
@@ -392,22 +371,19 @@ def main() -> None:
         print(f"       sites S1 : {abp_sites}")
 
         if not abp_pdb.exists():
-            # Trouver une structure pairwise représentative du cluster dominant
-            dominant_patch = patches[0]
-            ids = patch_to_ids.get(dominant_patch, [])
-            pairwise_file = find_pairwise_file(ids, preferred_pdbs=abp_pdbs)
+            # Utiliser le représentant C70 officiel (bfactor_c70_interface/)
+            rep_pdb = find_representative_pdb(patches)
 
-            if pairwise_file is None:
-                print(f"       [warn] aucun fichier pairwise pour {dominant_patch}, utilisation du template 8iah")
-                abp_bf  = read_bfactors_sum(abp_sites)
+            abp_bf = read_bfactors_sum(abp_sites)
+            if rep_pdb is None:
+                print(f"       [warn] aucun représentant C70 trouvé, utilisation du template 8iah")
                 max_abp = apply_bfactors_to_template(abp_bf, abp_pdb)
             else:
-                print(f"       pairwise : {pairwise_file.name}")
-                abp_bf = read_bfactors_sum(abp_sites)
+                print(f"       représentant C70 : {rep_pdb.name}")
                 try:
-                    max_abp = build_filament_from_pairwise(pairwise_file, abp_bf, abp_pdb)
+                    max_abp = build_filament_from_pairwise(rep_pdb, abp_bf, abp_pdb)
                 except Exception as e:
-                    print(f"       [warn] construction pairwise échouée ({e}), fallback template")
+                    print(f"       [warn] construction échouée ({e}), fallback template")
                     max_abp = apply_bfactors_to_template(abp_bf, abp_pdb)
         else:
             max_abp = 0.0
