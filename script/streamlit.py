@@ -561,6 +561,7 @@ _AA_RESTYPE_HEX = {
     "?": "#AAAAAA",
 }
 
+
 @st.cache_data(show_spinner="Génération réseau C70…")
 def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
     """Réseau bipartite interactif pour un patch C70 : résidus actine (S1) ↔ résidus ABP (S2)."""
@@ -990,10 +991,12 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
     for i, pos in enumerate(all_s1):
         asa_v = float(asa_s1[pos]) if pos in asa_s1.index else 0.0
         if color_mode == "restype":
-            _aa_key = _aa1(s1_aa_majority.get(pos, "?")) if pos in s1_aa_majority else "?"
+            _aa_key = _aa1(s1_aa_majority.get(pos, "?")
+                           ) if pos in s1_aa_majority else "?"
             _t_s1 = asa_v / s1_ca_max if s1_ca_max > 0 else 0.0
             bg = _blend_white(_AA_RESTYPE_HEX.get(_aa_key, "#AAAAAA"), _t_s1)
-            tc = "#fff" if (_aa_key in ("K", "R", "D", "E") and _t_s1 > 0.6) else "#222"
+            tc = "#fff" if (_aa_key in ("K", "R", "D", "E")
+                            and _t_s1 > 0.6) else "#222"
         else:
             bg = _hex_s1(asa_v)
             tc = "#222" if asa_v < 55 else "#fff"
@@ -1029,12 +1032,15 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
         ca_val = float(avg_asa_s2.get(nid, 0.0))
         aa_dist = str(nd_to_aa_dist.get(nid, ""))
         sz = _node_radius(_s2_freq)
-        _s2_aa_key = str(nd_to_majority.get(nid, "?"))[:1] if nid in nd_to_majority.index else "?"
+        _s2_aa_key = str(nd_to_majority.get(nid, "?"))[
+            :1] if nid in nd_to_majority.index else "?"
         if color_mode == "restype":
             _t_s2 = ca_val / s2_ca_max if s2_ca_max > 0 else 0.0
-            col = _blend_white(_AA_RESTYPE_HEX.get(_s2_aa_key, "#AAAAAA"), _t_s2)
+            col = _blend_white(_AA_RESTYPE_HEX.get(
+                _s2_aa_key, "#AAAAAA"), _t_s2)
             _bord_h = "#555555"
-            tc_s2 = "#fff" if (_s2_aa_key in ("K", "R", "D", "E") and _t_s2 > 0.6) else "#222"
+            tc_s2 = "#fff" if (_s2_aa_key in (
+                "K", "R", "D", "E") and _t_s2 > 0.6) else "#222"
         elif partner == "Actine":
             col = _hex_s2_homo(ca_val)
             _bord_h = "#880044"
@@ -1497,6 +1503,8 @@ STEPS = {
     "3/14":  "Téléchargement de toutes les données (cluster table)",
     "4/14":  "Filtrage des structures (≥ 4 actines connectées) - notebook",
     "5/14":  "Téléchargement des interactions d'interface",
+    "5.5/14": "Nettoyage des chaînes orphelines",
+    "5.7/14": "Enrichissement table 4 avec % ASA buried - notebook",
     "6/14":  "Alignement MAFFT par cluster de séquences",
     "7/14":  "Analyse des clusters d'interaction C70 - notebook",
     "8/14":  "Calcul B-factors interface C70 par cluster",
@@ -1515,6 +1523,7 @@ STEP_OUTPUT_FILES = {
     "3/14":  "data/raw/all_data.csv",
     "4/14":  "data/filtered/filtered_pdb_entry.csv",
     "5/14":  "data/filtered/details/1.interactions.csv",
+    # 5.5 et 5.7 modifient des fichiers existants → pas de fichier unique à vérifier
     "6/14":  "data/alignments/.done",
     "7/14":  "data/filtered/patches_infos_cluster_data_70.csv",
     "8/14":  "data/filtered/details/structures_files/bfactor_c70_interface",
@@ -1595,7 +1604,11 @@ sub_progress_text = st.empty()
 if "just_downloaded" not in st.session_state:
     st.session_state.just_downloaded = False
 
-all_done = all(initial_state(k) == "skipped" for k in STEP_KEYS)
+all_done = all(
+    initial_state(k) == "skipped"
+    for k in STEP_KEYS
+    if STEP_OUTPUT_FILES.get(k)  # ignorer les étapes sans fichier indicateur
+)
 if all_done and not st.session_state.just_downloaded:
     st.write("✅ Données déjà téléchargées")
 
@@ -1958,92 +1971,57 @@ if os.path.exists(pdb_filt_path):
                 sel_inter = st.session_state.get("sel_inter")
                 sel_node = st.session_state.get("sel_node")
 
+                # Mapping chaîne → type pour colorier orange/vert dans le viewer
+                _chain_is_actin: dict[str, bool] = {}
+                if os.path.exists(pp_path):
+                    _df_pp_3d = read_csv(pp_path)
+                    for _, _nr in _df_pp_3d[
+                            _df_pp_3d["pdb_id"].str.upper() == selected_pdb
+                    ].iterrows():
+                        _letter = norm_chain_id(
+                            str(_nr["chain"])).split("_")[-1]
+                        _chain_is_actin[_letter] = bool(_nr["is_actin"])
+
                 # chain_colors : dict chain_letter → couleur (None = pas de sélection)
                 chain_colors = None
 
                 if sel_inter and sel_inter in int_ids:
-                    # Cas 1 : une arête est sélectionnée — A cyan, B magenta
-                    sub_c = df_cont4[df_cont4["interaction_id"]
-                                     == sel_inter]
+                    # Cas 1 : arête sélectionnée — A jaune, B vert
                     sel_row = df_int1_g[df_int1_g["interaction_id"]
                                         == sel_inter].iloc[0]
                     chain_colors = {
                         str(sel_row["chain_A_id"]).split("_")[-1]: "#FFD700",
                         str(sel_row["chain_B_id"]).split("_")[-1]: "#39FF14",
                     }
-
                 elif sel_node:
-                    # Cas 2 : un nœud est sélectionné
-                    # contacts : depuis 1.interactions.csv (données structurales)
-                    node_interactions = df_int1_g[
-                        (df_int1_g["chain_A_id"] == sel_node) |
-                        (df_int1_g["chain_B_id"] == sel_node)
-                    ]["interaction_id"].tolist()
-                    sub_c = df_cont4[df_cont4["interaction_id"].isin(
-                        node_interactions)]
-
-                    # couleurs : tous les partenaires depuis pdb_entry_results
-                    sel_letter = sel_node.split("_")[-1].upper()
-                    chain_colors = {sel_letter: "#FFD700"}
-                    if sub_raw_g is not None:
-                        for _, r in sub_raw_g.iterrows():
-                            i1 = norm_chain_id(str(r["Interactor 1"]))
-                            i2 = norm_chain_id(str(r["Interactor 2"]))
-                            if i1 == sel_node or i2 == sel_node:
-                                partner = i2 if i1 == sel_node else i1
-                                cl = partner.split("_")[-1].upper()
-                                chain_colors.setdefault(cl, "#00E5FF")
-
-                else:
-                    # Cas 3 : rien de sélectionné
-                    sub_c = df_cont4[df_cont4["interaction_id"].isin(
-                        int_ids)]
-
-                contact_res: dict = {}
-                for _, cr in sub_c.iterrows():
-                    for cc, rc in [("chain_A_id", "residue_A_structure"),
-                                   ("chain_B_id", "residue_B_structure")]:
-                        chain = str(cr.get(cc, "")).split("_")[-1]
-                        resi = cr.get(rc)
-                        if pd.notna(resi) and chain:
-                            try:
-                                contact_res.setdefault(
-                                    chain, set()).add(int(float(resi)))
-                            except (ValueError, TypeError):
-                                pass
+                    # Cas 2 : nœud sélectionné — sélection en jaune,
+                    # autres : orange=actine, vert=ABP
+                    sel_letter = sel_node.split("_")[-1]
+                    chain_colors = {}
+                    for _letter, _is_actin in _chain_is_actin.items():
+                        if _letter == sel_letter:
+                            chain_colors[_letter] = "#FFD700"
+                        else:
+                            chain_colors[_letter] = (
+                                "#E67E22" if _is_actin else "#2ECC71")
 
                 fmt = "cif" if pdb_file.endswith(".cif") else "pdb"
                 pdb_data = _load_pdb_file(
                     pdb_file, mtime=os.path.getmtime(pdb_file))
 
-                # Cache : ne recalcule le HTML que si sel_inter ou le PDB change
                 viewer_key = (selected_pdb, sel_inter, sel_node)
                 if st.session_state.get("viewer_key") != viewer_key:
                     view = py3Dmol.view(width=580, height=450)
                     view.addModel(pdb_data, fmt)
+                    view.setStyle({}, {})
                     if chain_colors:
-                        view.setStyle(
-                            {}, {"cartoon": {"color": "#BDBDBD", "opacity": 0.8}})
                         for chain, col in chain_colors.items():
-                            view.addStyle(
-                                {"chain": chain},
-                                {"cartoon": {"color": col, "opacity": 1.0}}
-                            )
+                            view.addSurface(py3Dmol.SES,
+                                            {"opacity": 1.0, "color": col},
+                                            {"chain": chain})
                     else:
-                        view.setStyle(
-                            {}, {"cartoon": {"color": "white", "opacity": 0.9}})
-                    for chain, residues in contact_res.items():
-                        resi_list = list(residues)
-                        # Cartoon rouge pour le squelette des résidus de contact
-                        view.addStyle(
-                            {"chain": chain, "resi": resi_list},
-                            {"cartoon": {"color": "red"}}
-                        )
-                        # Sticks rouges pour les chaînes latérales
-                        view.addStyle(
-                            {"chain": chain, "resi": resi_list},
-                            {"stick": {"color": "red", "radius": 0.15}}
-                        )
+                        view.addSurface(py3Dmol.SES,
+                                        {"opacity": 0.9, "color": "white"}, {})
                     view.setBackgroundColor("#1e1e1e")
                     view.zoomTo()
                     st.session_state["viewer_html"] = view._make_html()
@@ -2976,20 +2954,32 @@ if os.path.exists(proteins_path):
 
     if os.path.exists(_all_data_path):
         df_all_g = read_csv(_all_data_path)
-        hetero = df_all_g[df_all_g["s1_actine"] & ~df_all_g["s2_actine"]][
-            ["subunit_2", "s1_binding_site_cluster_data_70", "cluster_data_70"]
-        ].copy()
-        hetero["subunit_2"] = hetero["subunit_2"].str.lower()
+        df_all_g["s1_actine"] = df_all_g["s1_actine"].fillna(
+            False).astype(bool)
+        df_all_g["s2_actine"] = df_all_g["s2_actine"].fillna(
+            False).astype(bool)
+        # Direction 1 : ABP = subunit_2
+        _h1 = df_all_g[df_all_g["s1_actine"] & ~df_all_g["s2_actine"]][[
+            "subunit_2", "s1_binding_site_cluster_data_70", "cluster_data_70",
+        ]].rename(columns={"subunit_2": "_abp_chain",
+                           "s1_binding_site_cluster_data_70": "_s1_bs"})
+        # Direction 2 : ABP = subunit_1
+        _h2 = df_all_g[~df_all_g["s1_actine"] & df_all_g["s2_actine"]][[
+            "subunit_1", "s2_binding_site_cluster_data_70", "cluster_data_70",
+        ]].rename(columns={"subunit_1": "_abp_chain",
+                           "s2_binding_site_cluster_data_70": "_s1_bs"})
+        hetero = pd.concat([_h1, _h2], ignore_index=True)
+        hetero["_abp_chain"] = hetero["_abp_chain"].str.lower()
         df_abp = df_abp.copy()
         df_abp["chain_low"] = df_abp["chain"].str.lower()
         merged = df_abp.merge(hetero, left_on="chain_low",
-                              right_on="subunit_2", how="inner")
+                              right_on="_abp_chain", how="inner")
         abp_global = (
             merged.groupby("protein")
             .agg(
                 Nb_noeuds=("chain", "nunique"),
                 PDB=("pdb_id", lambda x: ", ".join(sorted(x.unique()))),
-                **{"Binding site S1": ("s1_binding_site_cluster_data_70", _fmt_ids)},
+                **{"Binding site S1": ("_s1_bs", _fmt_ids)},
                 **{"Cluster C70": ("cluster_data_70", _fmt_ids)},
             )
             .reset_index()
@@ -3107,6 +3097,194 @@ def _build_abp_heatmap_data(*_):
     return pivot, abp_freq, res_freq
 
 
+_S1_SUPER_FILES = [
+    "data/filtered/details/3.interface_residues.csv",
+    "data/filtered/details/1.interactions.csv",
+    "data/filtered/filtered_all_data.csv",
+]
+
+
+@st.cache_data(show_spinner="Calcul compétition C70 (recouvrement)…")
+def _build_c70_jaccard_edges(jaccard_threshold: float, *_mtimes):
+    """
+    Pour chaque cluster C70, construit l'empreinte de résidus canoniques actin contactés.
+    Deux ABPs sont en compétition si au moins une paire de leurs C70 a
+    recouvrement ≥ seuil, où recouvrement = |A ∩ B| / min(|A|, |B|).
+    Cela détecte le cas où une grande interface contient totalement une petite.
+    Retourne : dict {(abp_a, abp_b): n_paires_au_dessus_seuil}
+    """
+    import numpy as np  # noqa: F401
+
+    if not all(os.path.exists(f) for f in _S1_SUPER_FILES):
+        return {}
+
+    df3 = pd.read_csv(_S1_SUPER_FILES[0])
+    df3 = df3[df3["residue_number_canon_mafft"].notna()][[
+        "interaction_id", "chain", "residue_number_canon_mafft"
+    ]]
+    df1 = pd.read_csv(_S1_SUPER_FILES[1],
+                      usecols=["interaction_id", "chain_A_id", "chain_B_id"])
+    df_all_s = pd.read_csv(_S1_SUPER_FILES[2])
+    df_all_s["s1_actine"] = df_all_s["s1_actine"].fillna(False).astype(bool)
+    df_all_s["s2_actine"] = df_all_s["s2_actine"].fillna(False).astype(bool)
+
+    pp_c70 = pd.read_csv("data/filtered/proteins_per_pdb.csv")
+    abp_pp_c70 = pp_c70[~pp_c70["is_actin"]].copy()
+    abp_pp_c70["chain_low"] = abp_pp_c70["chain"].str.lower()
+
+    # Interactions hétéro (les deux directions) avec cluster C70 et chaîne actin
+    h1 = df_all_s[df_all_s["s1_actine"] & ~df_all_s["s2_actine"]][[
+        "subunit_1", "subunit_2", "cluster_data_70"
+    ]].rename(columns={"subunit_1": "actin_chain", "subunit_2": "abp_chain"})
+    h2 = df_all_s[~df_all_s["s1_actine"] & df_all_s["s2_actine"]][[
+        "subunit_2", "subunit_1", "cluster_data_70"
+    ]].rename(columns={"subunit_2": "actin_chain", "subunit_1": "abp_chain"})
+    hetero_c70 = pd.concat([h1, h2], ignore_index=True).dropna(
+        subset=["cluster_data_70"])
+    hetero_c70["abp_chain_low"] = hetero_c70["abp_chain"].str.lower()
+
+    # Récupérer interaction_id via 1.interactions.csv
+    hetero_c70 = hetero_c70.merge(
+        df1,
+        left_on=["actin_chain", "abp_chain"],
+        right_on=["chain_A_id", "chain_B_id"],
+        how="inner",
+    )
+
+    # Empreinte par cluster C70 : ensemble de résidus canoniques actin
+    merged_c70_df3 = hetero_c70.merge(df3, on="interaction_id", how="inner")
+    merged_c70_df3 = merged_c70_df3[
+        merged_c70_df3["chain"] == merged_c70_df3["actin_chain"]
+    ]
+    c70_footprint: dict = {}
+    for c70, grp in merged_c70_df3.groupby("cluster_data_70"):
+        c70_footprint[str(c70)] = set(
+            grp["residue_number_canon_mafft"].unique())
+
+    # ABP → ensemble de C70 avec leur empreinte connue
+    hetero_c70_abp = hetero_c70.merge(
+        abp_pp_c70[["chain_low", "protein"]],
+        left_on="abp_chain_low", right_on="chain_low", how="inner",
+    )
+    abp_to_c70s: dict = {}
+    for _, _r in hetero_c70_abp.dropna(subset=["protein", "cluster_data_70"]).iterrows():
+        _c = str(_r["cluster_data_70"])
+        if _c in c70_footprint:
+            abp_to_c70s.setdefault(_r["protein"], set()).add(_c)
+
+    # Arêtes : au moins 1 paire de C70 avec recouvrement ≥ seuil
+    abp_list_c70 = sorted(abp_to_c70s.keys())
+    edge_wts_c70: dict = {}
+    abp_c70_comp: dict = {}  # ABP → set de C70 impliqués dans au moins 1 compétition
+    for _ii, _a in enumerate(abp_list_c70):
+        for _b in abp_list_c70[_ii + 1:]:
+            n_pairs = 0
+            for _ca in abp_to_c70s[_a]:
+                fa = c70_footprint[_ca]
+                for _cb in abp_to_c70s[_b]:
+                    fb = c70_footprint[_cb]
+                    _inter = len(fa & fb)
+                    _min_sz = min(len(fa), len(fb))
+                    if _min_sz > 0 and _inter / _min_sz >= jaccard_threshold:
+                        n_pairs += 1
+                        abp_c70_comp.setdefault(_a, set()).add(_ca)
+                        abp_c70_comp.setdefault(_b, set()).add(_cb)
+            if n_pairs > 0:
+                _k = (min(_a, _b), max(_a, _b))
+                edge_wts_c70[_k] = n_pairs
+
+    abp_c70_comp_count = {k: len(v) for k, v in abp_c70_comp.items()}
+    return edge_wts_c70, abp_c70_comp_count
+
+
+@st.cache_data(show_spinner="Calcul super-clusters S1…")
+def _build_s1_superclusters(jaccard_threshold: float, *_mtimes):
+    """
+    Regroupe les sites S1 dont les résidus canoniques actin se chevauchent
+    (Jaccard ≥ jaccard_threshold) en super-clusters.
+
+    Retourne :
+      s1_to_super : dict  s1_site → supercluster_id (int)
+      n_clusters  : int   nombre de super-clusters
+    """
+    import numpy as np
+    from scipy.cluster.hierarchy import linkage, fcluster
+    from scipy.spatial.distance import squareform
+
+    if not all(os.path.exists(f) for f in _S1_SUPER_FILES):
+        return {}, 0
+
+    df3 = pd.read_csv(_S1_SUPER_FILES[0])
+    df1 = pd.read_csv(_S1_SUPER_FILES[1], usecols=[
+                      "interaction_id", "chain_A_id", "chain_B_id"])
+    df_all_s = pd.read_csv(_S1_SUPER_FILES[2])
+    df_all_s["s1_actine"] = df_all_s["s1_actine"].fillna(False).astype(bool)
+    df_all_s["s2_actine"] = df_all_s["s2_actine"].fillna(False).astype(bool)
+
+    # Interactions hétéro (actine = S1) — filtered_all_data n'a pas d'interaction_id
+    hetero_base = df_all_s[
+        df_all_s["s1_actine"] & ~df_all_s["s2_actine"]
+    ][["subunit_1", "subunit_2", "s1_binding_site_cluster_data_70"]].dropna(
+        subset=["s1_binding_site_cluster_data_70"]
+    )
+    # Obtenir interaction_id via 1.interactions.csv
+    hetero_s = hetero_base.merge(
+        df1,
+        left_on=["subunit_1", "subunit_2"],
+        right_on=["chain_A_id", "chain_B_id"],
+        how="inner",
+    )[["interaction_id", "subunit_1", "s1_binding_site_cluster_data_70"]].rename(columns={
+        "subunit_1": "actin_chain",
+        "s1_binding_site_cluster_data_70": "s1_site",
+    })
+
+    # Joindre avec df3 : garder uniquement les résidus actin (chain == actin_chain)
+    df3_canon = df3[df3["residue_number_canon_mafft"].notna()][
+        ["interaction_id", "chain", "residue_number_canon_mafft"]
+    ]
+    merged_s = hetero_s.merge(df3_canon, on="interaction_id", how="inner")
+    merged_s = merged_s[merged_s["chain"] == merged_s["actin_chain"]]
+
+    # Profil de chaque S1 = ensemble de positions canoniques contactées
+    s1_profiles: dict[str, set] = {}
+    for s1, grp in merged_s.groupby("s1_site"):
+        s1_profiles[s1] = set(grp["residue_number_canon_mafft"].unique())
+
+    s1_sites = sorted(s1_profiles.keys())
+    n = len(s1_sites)
+    if n == 0:
+        return {}, 0
+    if n == 1:
+        return {s1_sites[0]: 1}, 1
+
+    # Matrice de distance Jaccard (distance = 1 − similarité)
+    dist_mat = np.zeros((n, n))
+    for i in range(n):
+        for j in range(i + 1, n):
+            a, b = s1_profiles[s1_sites[i]], s1_profiles[s1_sites[j]]
+            union = len(a | b)
+            jac = len(a & b) / union if union > 0 else 0.0
+            dist_mat[i, j] = dist_mat[j, i] = 1.0 - jac
+
+    Z = linkage(squareform(dist_mat), method="average")
+    labels = fcluster(Z, t=1.0 - jaccard_threshold, criterion="distance")
+
+    s1_to_super = {s1_sites[i]: int(labels[i]) for i in range(n)}
+
+    # Sauvegarde CSV pour analyses extérieures
+    _sc_rows = [
+        {"s1_binding_site": s1, "supercluster": sc,
+         "n_residues": len(s1_profiles[s1]),
+         "jaccard_threshold": jaccard_threshold}
+        for s1, sc in s1_to_super.items()
+    ]
+    pd.DataFrame(_sc_rows).sort_values("supercluster").to_csv(
+        "data/filtered/s1_superclusters.csv", index=False
+    )
+
+    return s1_to_super, int(labels.max())
+
+
 if all(os.path.exists(f) for f in _ABP_HM_FILES):
     _hm_mtimes = tuple(
         os.path.getmtime(f) if os.path.exists(f) else 0.0
@@ -3174,42 +3352,112 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
         "Deux ABPs sont reliés s'ils partagent au moins un site S1 sur l'actine. "
         "L'épaisseur des arêtes encode le nombre de sites S1 partagés."
     )
+    _net_choice = st.radio(
+        "Critère de compétition",
+        ["Sites S1 partagés", "Super-zones S1 (Jaccard résidus)"],
+        horizontal=True, key="net_choice",
+    )
+    _col_search, _col_thresh = st.columns([2, 1])
+    with _col_search:
+        _search_abp = st.text_input(
+            "Rechercher un ABP", key="search_abp_net",
+            placeholder="Cofilin, Formin, Myosin…"
+        )
+    with _col_thresh:
+        if _net_choice == "Super-zones S1 (Jaccard résidus)":
+            _jac_thresh = st.select_slider(
+                "Seuil de recouvrement C70",
+                options=[0.25, 0.30, 0.40, 0.50, 0.60,
+                         0.70, 0.75, 0.80, 0.90, 1.00],
+                value=0.50, key="jac_thresh",
+                format_func=lambda x: f"{int(x*100)}%",
+            )
+        else:
+            _jac_thresh = 0.50
+    _min_edge_w = 1
+    # Dataset étendu : actine peut être S1 ou S2 (toutes données hétéro)
+    _df_s1_act = df_all_g[
+        df_all_g["s1_actine"].fillna(False).astype(bool) &
+        ~df_all_g["s2_actine"].fillna(False).astype(bool)
+    ][["subunit_2", "s1_binding_site_cluster_data_70", "s2_sequence_cluster_70",
+       "cluster_data_70"]].rename(
+        columns={"subunit_2": "_ch", "s1_binding_site_cluster_data_70": "_bs",
+                 "s2_sequence_cluster_70": "_seqcl", "cluster_data_70": "_c70"})
+    _df_s2_act = df_all_g[
+        ~df_all_g["s1_actine"].fillna(False).astype(bool) &
+        df_all_g["s2_actine"].fillna(False).astype(bool)
+    ][["subunit_1", "s2_binding_site_cluster_data_70", "s1_sequence_cluster_70",
+       "cluster_data_70"]].rename(
+        columns={"subunit_1": "_ch", "s2_binding_site_cluster_data_70": "_bs",
+                 "s1_sequence_cluster_70": "_seqcl", "cluster_data_70": "_c70"})
+    _hetero_net = pd.concat([_df_s1_act, _df_s2_act], ignore_index=True)
+    _hetero_net["_ch"] = _hetero_net["_ch"].str.lower()
+    _merged_net = _hetero_net.merge(
+        df_abp[["chain_low", "protein"]], left_on="_ch", right_on="chain_low", how="inner"
+    )
+    # Nombre de clusters C70 uniques par ABP
+    _abp_c70_count = (
+        _merged_net.dropna(subset=["_c70"])
+        .groupby("protein")["_c70"].nunique()
+        .to_dict()
+    )
+
     _s1_grps = (
-        merged.dropna(subset=["protein", "s1_binding_site_cluster_data_70"])
-        .groupby("s1_binding_site_cluster_data_70")["protein"]
+        _merged_net.dropna(subset=["protein", "_bs"])
+        .groupby("_bs")["protein"]
         .agg(lambda x: sorted(x.unique().tolist()))
         .reset_index()
     )
     _s1_grps = _s1_grps[_s1_grps["protein"].apply(len) >= 2]
-    _edge_wts: dict = {}
-    for _, _rc in _s1_grps.iterrows():
-        _abps_rc = _rc["protein"]
-        for _ii in range(len(_abps_rc)):
-            for _jj in range(_ii + 1, len(_abps_rc)):
-                _k = (min(_abps_rc[_ii], _abps_rc[_jj]),
-                      max(_abps_rc[_ii], _abps_rc[_jj]))
-                _edge_wts[_k] = _edge_wts.get(_k, 0) + 1
-    if _edge_wts:
-        # Degré pondéré : nb total de sites S1 partagés par ABP
+
+    if _net_choice == "Super-zones S1 (Jaccard résidus)":
+        # ── Réseau 2 : Jaccard direct par cluster C70 ─────────────────────
+        _sc_mtimes = tuple(
+            os.path.getmtime(f) if os.path.exists(f) else 0.0
+            for f in _S1_SUPER_FILES
+        )
+        _edge_wts, _abp_c70_comp_count = _build_c70_jaccard_edges(
+            _jac_thresh, *_sc_mtimes)
+        st.caption(
+            f"Seuil de recouvrement {int(_jac_thresh*100)}% — deux ABPs sont liés si au moins "
+            f"un de leurs clusters C70 couvre ≥{int(_jac_thresh*100)}% de la plus petite interface. "
+            f"{len(_edge_wts)} paires en compétition."
+        )
+    else:
+        # ── Réseau 1 : sites S1 partagés (critère original) ──────────────
+        _abp_c70_comp_count: dict = {}
+        _edge_wts = {}
+        for _, _rc in _s1_grps.iterrows():
+            _abps_rc = _rc["protein"]
+            for _ii in range(len(_abps_rc)):
+                for _jj in range(_ii + 1, len(_abps_rc)):
+                    _k = (min(_abps_rc[_ii], _abps_rc[_jj]),
+                          max(_abps_rc[_ii], _abps_rc[_jj]))
+                    _edge_wts[_k] = _edge_wts.get(_k, 0) + 1
+
+    # Tous les ABPs connus (y compris isolés)
+    _all_abp_net = set(_merged_net["protein"].dropna().unique())
+
+    if True:  # toujours entrer (même sans arêtes, afficher les nœuds isolés)
+        # Nombre de compétiteurs uniques (voisins distincts) par ABP
+        _abp_neighbors_c: dict = {}
+        for (_a_c, _b_c) in _edge_wts:
+            _abp_neighbors_c.setdefault(_a_c, set()).add(_b_c)
+            _abp_neighbors_c.setdefault(_b_c, set()).add(_a_c)
+        _abp_n_competitors: dict = {k: len(v)
+                                    for k, v in _abp_neighbors_c.items()}
+
+        # Degré pondéré pour dimensionner les nœuds
         _node_deg_c: dict = {}
         for (_a_c, _b_c), _w_c in _edge_wts.items():
             _node_deg_c[_a_c] = _node_deg_c.get(_a_c, 0) + _w_c
             _node_deg_c[_b_c] = _node_deg_c.get(_b_c, 0) + _w_c
         _max_deg_c = max(_node_deg_c.values()) if _node_deg_c else 1
 
-        # Cluster de séquence S2 (70%) par ABP → couleur
-        _df_s2lnk = df_all_g[
-            df_all_g["s1_actine"].fillna(False).astype(bool) &
-            ~df_all_g["s2_actine"].fillna(False).astype(bool) &
-            df_all_g["s2_sequence_cluster_70"].notna()
-        ][["subunit_2", "s2_sequence_cluster_70"]].copy()
-        _df_s2lnk["_low"] = _df_s2lnk["subunit_2"].str.lower()
-        _df_s2lnk = _df_s2lnk.merge(
-            df_abp[["chain_low", "protein"]],
-            left_on="_low", right_on="chain_low", how="inner"
-        )
+        # Cluster de séquence par ABP → couleur (deux directions)
+        _df_s2lnk = _merged_net.dropna(subset=["_seqcl"]).copy()
         _prot_s2c = (
-            _df_s2lnk.groupby("protein")["s2_sequence_cluster_70"]
+            _df_s2lnk.groupby("protein")["_seqcl"]
             .agg(lambda x: x.value_counts().index[0])
             .to_dict()
         )
@@ -3217,6 +3465,7 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
         import colorsys as _cs
         _s2c_all = sorted({v for v in _prot_s2c.values() if pd.notna(v)})
         _n_cls = max(len(_s2c_all), 1)
+
         def _golden_pal(n: int) -> list:
             _phi = 0.618033988749895
             _h, out = 0.05, []
@@ -3234,7 +3483,8 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
             words, lines, cur = name.split(), [], ""
             for w in words:
                 if cur and len(cur) + 1 + len(w) > max_ch:
-                    lines.append(cur); cur = w
+                    lines.append(cur)
+                    cur = w
                 else:
                     cur = (cur + " " + w).strip()
             if cur:
@@ -3242,43 +3492,72 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
             return "\n".join(lines)
 
         # Physique forceAtlas2 : stabilisation auto → groupes visibles, pas de flottement
-        _net_c = Network(height="860px", width="100%", bgcolor="#ffffff",
+        _net_c = Network(height="980px", width="100%", bgcolor="#ffffff",
                          font_color="#111")
         _net_c.set_options(
-            '{"physics": {"enabled": true, "solver": "forceAtlas2Based",'
-            '  "forceAtlas2Based": {"gravitationalConstant": -80,'
-            '    "centralGravity": 0.005, "springConstant": 0.1,'
-            '    "springLength": 120, "damping": 0.5, "avoidOverlap": 0.6},'
+            '{"physics": {"enabled": true, "solver": "barnesHut",'
+            '  "barnesHut": {"gravitationalConstant": -8000,'
+            '    "centralGravity": 1, "springLength": 100,'
+            '    "springConstant": 0.05, "damping": 0.2, "avoidOverlap": 1.0},'
             '  "stabilization": {"enabled": true, "iterations": 2000, "fit": true}},'
-            ' "nodes": {"shape": "dot",'
-            '   "font": {"size": 16, "face": "Arial", "bold": true, "multi": true}},'
+            ' "nodes": {"shape": "dot", "font": {"size": 7}},'
             ' "edges": {"smooth": false},'
-            ' "interaction": {"hover": true, "tooltipDelay": 150}}'
+            ' "interaction": {"hover": true, "tooltipDelay": 100, "hideEdgesOnDrag": false}}'
         )
-        _all_n_c = {n for pair in _edge_wts for n in pair}
-        for _nc in _all_n_c:
-            _deg = _node_deg_c.get(_nc, 1)
-            _sz = 70 - 62 * (_deg / _max_deg_c) ** 0.6
-            _s2c = _prot_s2c.get(_nc)
-            _col = _s2c_color.get(_s2c, "#aaaaaa")
+        # Seuil : label visible en permanence seulement si ≥ 3 compétiteurs
+
+        _pct_raw = {
+            _nc: (_abp_c70_comp_count.get(_nc, 0) / _abp_c70_count[_nc])
+            for _nc in _all_abp_net if _abp_c70_count.get(_nc, 0) > 0
+        }
+        _pct_min = min(_pct_raw.values()) if _pct_raw else 0.0
+        _pct_max = max(_pct_raw.values()) if _pct_raw else 1.0
+
+        def _pct_color(n_comp: int, n_total: int) -> str:
+            """Jaune → rouge selon % de C70 en compétition (normalisé min/max réel)."""
+            if n_total == 0:
+                return "#cccccc"
+            pct = n_comp / n_total
+            t = (pct - _pct_min) / (_pct_max - _pct_min) if _pct_max > _pct_min else 1.0
+            # jaune (#ffff00) → rouge (#cc0000)
+            r = int(255 + (204 - 255) * t)
+            g = int(255 * (1 - t))
+            b = 0
+            return f"#{r:02x}{g:02x}{b:02x}"
+
+        _label_thresh = 3
+        for _nc in sorted(_all_abp_net):
+            _deg = _node_deg_c.get(_nc, 0)
+            _sz = 5 + 18 * (_deg / _max_deg_c) ** 1.5 if _deg > 0 else 5
+            _n_c70_total = _abp_c70_count.get(_nc, 0)
+            _n_c70_comp = _abp_c70_comp_count.get(_nc, 0)
+            _n_comp_nc = _abp_n_competitors.get(_nc, 0)
+            _pct_val = round(_n_c70_comp / _n_c70_total *
+                             100) if _n_c70_total else 0
+            _col = _pct_color(_n_c70_comp, _n_c70_total)
+            _show_lbl = _n_comp_nc >= _label_thresh
+            _c70_line = (f"C70 en compétition : {_n_c70_comp} / {_n_c70_total} ({_pct_val}%)"
+                         if _n_c70_comp else f"C70 total : {_n_c70_total} (0%)")
             _net_c.add_node(
                 _nc,
-                label=_wrap_lbl(_nc),
-                title=(f"<b>{_nc}</b><br/>Sites S1 partagés : {_deg}"
-                       f"<br/>Cluster S2 séq. : {_s2c or 'N/A'}"),
+                label=_wrap_lbl(_nc) if _show_lbl else "",
+                title=(f"{_nc}\n"
+                       f"{_c70_line}\n"
+                       f"ABPs en compétition : {_n_comp_nc}"),
                 size=_sz,
-                color={"background": _col, "border": "#444444"},
+                color={"background": _col, "border": "#555555"},
                 borderWidth=2,
+                font={"size": 3, "face": "Arial", "color": "#111111"},
             )
-        _wmax_c = max(_edge_wts.values())
-        for (_a_c, _b_c), _w_c in sorted(_edge_wts.items(),
-                                          key=lambda x: x[1], reverse=True):
+        _filtered_edges = {k: v for k,
+                           v in _edge_wts.items() if v >= _min_edge_w}
+        for (_a_c, _b_c), _w_c in sorted(_filtered_edges.items(),
+                                         key=lambda x: x[1], reverse=True):
             _net_c.add_edge(
                 _a_c, _b_c,
-                value=_w_c,
-                width=1.5 + 6 * _w_c / _wmax_c,
-                title=f"{_w_c} site(s) S1 partagé(s)",
-                color={"color": "#666666", "opacity": 0.6},
+                width=1,
+                title=f"{_w_c} paire(s) C70 partagée(s)",
+                color={"color": "#505050", "opacity": 0.2},
             )
         _net_html = _net_c.generate_html()
         # Désactiver la physique dès que la stabilisation est terminée
@@ -3288,11 +3567,48 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
             "network = new vis.Network(container, data, options);\n"
             "                  network.once('stabilizationIterationsDone', function() {\n"
             "                      network.setOptions({ physics: { enabled: false } });\n"
+            "                      _applySearch();\n"
             "                  });",
         )
+        # Injection JS : mise en évidence des noeuds selon la recherche
+        _safe_q = (_search_abp or "").lower().replace(
+            "\\", "\\\\").replace('"', '\\"')
+        _search_js = f"""<script>
+var _searchTerm = "{_safe_q}";
+var _origNodeColors = {{}};
+function _applySearch() {{
+    var allNodes = network.body.data.nodes.get();
+    var updates = [];
+    allNodes.forEach(function(node) {{
+        if (!_origNodeColors[node.id]) {{
+            var bg = (node.color && node.color.background) ? node.color.background : (node.color || "#aaaaaa");
+            var bd = (node.color && node.color.border)     ? node.color.border     : "#444444";
+            _origNodeColors[node.id] = {{ bg: bg, bd: bd }};
+        }}
+        var label = (node.label || "").toLowerCase().replace(/\\n/g, " ");
+        var match  = !_searchTerm || label.includes(_searchTerm);
+        if (match) {{
+            updates.push({{ id: node.id,
+                color: {{ background: _origNodeColors[node.id].bg,
+                          border: _searchTerm ? "#ff2222" : _origNodeColors[node.id].bd }},
+                font: {{ color: "#111111" }},
+                borderWidth: _searchTerm ? 5 : 2 }});
+        }} else {{
+            updates.push({{ id: node.id,
+                color: {{ background: "#e4e4e4", border: "#cccccc" }},
+                font: {{ color: "#cccccc" }},
+                borderWidth: 1 }});
+        }}
+    }});
+    network.body.data.nodes.update(updates);
+}}
+</script>"""
+        _net_html = _net_html.replace("</body>", _search_js + "\n</body>")
         st.components.v1.html(_net_html, height=880, scrolling=False)
-    else:
-        st.info("Pas de données de compétition disponibles.")
+        st.caption(
+            "Couleur des nœuds : jaune = % min de clusters C70 en compétition "
+            "→ rouge = % max   ·   Taille : proportionnelle au nombre de paires C70 partagées"
+        )
 
     st.divider()
 
@@ -3303,7 +3619,8 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
 
     _NO_ABP_LABEL = "— PDB sans ABP —"
     abp_names = [_NO_ABP_LABEL] + abp_global["Protéine"].tolist()
-    sel_abp = st.selectbox("Sélectionner un ABP", abp_names, key="sel_abp_detail")
+    sel_abp = st.selectbox("Sélectionner un ABP",
+                           abp_names, key="sel_abp_detail")
     _is_no_abp = (sel_abp == _NO_ABP_LABEL)
 
     # PDB IDs selon la sélection
@@ -3317,14 +3634,21 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
     if not _is_no_abp:
         # ── Clusters actin–ABP (interactions hétéro) ─────────────────────────
         st.markdown("#### Clusters d'interaction actine–ABP")
-        _abp_subunits = set(merged[merged["protein"] == sel_abp]["subunit_2"])
+        _abp_subunits = set(merged[merged["protein"] == sel_abp]["_abp_chain"])
         _df_hetero = df_all_g.copy()
         _df_hetero["_pdb_h"] = _df_hetero["subunit_1"].str.split("_").str[0]
         abp_int = _df_hetero[
-            _df_hetero["s1_actine"].fillna(False).astype(bool) &
-            ~_df_hetero["s2_actine"].fillna(False).astype(bool) &
-            _df_hetero["subunit_2"].str.lower().isin(_abp_subunits) &
-            _df_hetero["cluster_data_70"].notna()
+            _df_hetero["cluster_data_70"].notna() & (
+                (
+                    _df_hetero["s1_actine"].fillna(False).astype(bool) &
+                    ~_df_hetero["s2_actine"].fillna(False).astype(bool) &
+                    _df_hetero["subunit_2"].str.lower().isin(_abp_subunits)
+                ) | (
+                    ~_df_hetero["s1_actine"].fillna(False).astype(bool) &
+                    _df_hetero["s2_actine"].fillna(False).astype(bool) &
+                    _df_hetero["subunit_1"].str.lower().isin(_abp_subunits)
+                )
+            )
         ].copy()
 
         if abp_int.empty:
@@ -3338,25 +3662,24 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
                 best = pairs.idxmax()
                 return pd.Series({"rep_actin": best[0], "rep_abp": best[1]})
 
+            _grp_cols = [
+                "cluster_data_70",
+                "s1_binding_site_cluster_data_70",
+                "s2_binding_site_cluster_data_70",
+            ]
             _stats = (
-                abp_int.groupby(
-                    ["cluster_data_70", "s1_binding_site_cluster_data_70"],
-                    dropna=False,
-                )
+                abp_int.groupby(_grp_cols, dropna=False)
                 .agg(nb_inter=("subunit_1", "count"), nb_pdb=("_pdb_h", "nunique"))
                 .reset_index()
             )
             _pairs = (
-                abp_int.groupby(
-                    ["cluster_data_70", "s1_binding_site_cluster_data_70"],
-                    dropna=False,
-                )
+                abp_int.groupby(_grp_cols, dropna=False)
                 .apply(_most_freq_pair)
                 .reset_index()
             )
-            abp_clust = _stats.merge(
-                _pairs, on=["cluster_data_70", "s1_binding_site_cluster_data_70"]
-            ).sort_values("nb_inter", ascending=False)
+            abp_clust = _stats.merge(_pairs, on=_grp_cols).sort_values(
+                "nb_inter", ascending=False
+            )
             _total_abp_inter = max(len(abp_int), 1)
             abp_clust["% PDB"] = (
                 abp_clust["nb_pdb"] / max(len(abp_pdbs), 1) * 100
@@ -3369,13 +3692,17 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
                 f"{len(abp_int)} interactions hétéro actine–ABP · "
                 f"{abp_clust.shape[0]} clusters C70"
             )
+            abp_clust["Site liaison"] = (
+                abp_clust["s1_binding_site_cluster_data_70"].astype(str)
+                + " × "
+                + abp_clust["s2_binding_site_cluster_data_70"].astype(str)
+            )
             st.dataframe(
                 abp_clust.rename(columns={
                     "cluster_data_70": "Cluster C70",
-                    "s1_binding_site_cluster_data_70": "Site liaison S1",
                     "nb_inter": "Nb interactions",
                     "nb_pdb": "Nb PDB",
-                })[["Cluster C70", "Site liaison S1",
+                })[["Cluster C70", "Site liaison",
                     "Nb interactions", "% interactions ABP-actine", "Nb PDB", "% PDB"]],
                 hide_index=True,
                 use_container_width=True,
@@ -3389,7 +3716,8 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
                 if (_bfac_dir_abp / f"{row['cluster_data_70']}.pdb").exists()
             ]
             if not _valid_rows:
-                st.caption("Aucun fichier PDB C70 disponible pour ces clusters.")
+                st.caption(
+                    "Aucun fichier PDB C70 disponible pour ces clusters.")
             else:
                 _ylord3d = ["#FFFFCC", "#FFF0A9", "#FEE186", "#FECA65", "#FDAA48",
                             "#FC8C3B", "#FC5A2D", "#EC2D21", "#D30F20", "#800026"]
@@ -3404,7 +3732,8 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
                     _cols3d = st.columns(len(_pair))
                     for _ci3d, _crow3d in enumerate(_pair):
                         _c70_3d = str(_crow3d["cluster_data_70"])
-                        _pdb_3d_txt = (_bfac_dir_abp / f"{_c70_3d}.pdb").read_text()
+                        _pdb_3d_txt = (_bfac_dir_abp /
+                                       f"{_c70_3d}.pdb").read_text()
                         _bmax_a3d, _bmax_b3d = 1.0, 1.0
                         for _ln in _pdb_3d_txt.splitlines():
                             if _ln.startswith("ATOM") and len(_ln) > 66:
@@ -3420,15 +3749,15 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
                         _v3d.addModel(_pdb_3d_txt, "pdb")
                         _v3d.setStyle({}, {})
                         _v3d.addSurface(py3Dmol.SES,
-                                       {"opacity": 1, "colorscheme": {
-                                           "prop": "b", "gradient": "linear",
-                                           "colors": _ylord3d, "min": 0, "max": _bmax_a3d,
-                                       }}, {"chain": "A"})
+                                        {"opacity": 1, "colorscheme": {
+                                            "prop": "b", "gradient": "linear",
+                                            "colors": _ylord3d, "min": 0, "max": _bmax_a3d,
+                                        }}, {"chain": "A"})
                         _v3d.addSurface(py3Dmol.SES,
-                                       {"opacity": 1, "colorscheme": {
-                                           "prop": "b", "gradient": "linear",
-                                           "colors": _grn3d, "min": 0, "max": _bmax_b3d,
-                                       }}, {"chain": "B"})
+                                        {"opacity": 1, "colorscheme": {
+                                            "prop": "b", "gradient": "linear",
+                                            "colors": _grn3d, "min": 0, "max": _bmax_b3d,
+                                        }}, {"chain": "B"})
                         _v3d.setBackgroundColor("white")
                         _v3d.zoomTo()
                         with _cols3d[_ci3d]:
@@ -3469,7 +3798,8 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
         st.info("Aucune interaction homo actine-actine dans ces PDB.")
     else:
         homo_summary = (
-            homo_cooc.groupby(["cluster_data_70", "Binding sites"], dropna=False)
+            homo_cooc.groupby(
+                ["cluster_data_70", "Binding sites"], dropna=False)
             .agg(nb_pdb=("_pdb", "nunique"), nb_inter=("_pdb", "count"))
             .reset_index()
             .sort_values("nb_pdb", ascending=False)

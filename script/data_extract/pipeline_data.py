@@ -116,6 +116,14 @@ def main():
         print("=" * 60)
         cleanup_orphan_chains(FILTERED, DETAILS)
 
+        # 5.7 — Enrichissement table 4 avec % ASA buried
+        # (cellules 15-16 de graphe_filter.ipynb, différées car elles lisent
+        #  3.interface_residues.csv qui n'existe qu'après l'étape 5)
+        run_notebook(
+            "5.7/14 — Enrichissement table 4 avec % ASA buried (graphe_filter.ipynb — phase 2)",
+            FILTER_NOTEBOOK,
+        )
+
         # 6 — Alignement MAFFT
         run_step(
             "6/14 — Alignement MAFFT par cluster de séquences",

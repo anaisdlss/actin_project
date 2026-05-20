@@ -1,9 +1,9 @@
 """
-Génère un script PyMOL par cluster S1 — couleurs physicochimiques sur TOUT.
+Génère un script PyMOL par cluster S1 — couleurs physicochimiques + intensité B-factor.
 
-Différences vs by_s1_cluster :
-  - Actine S1 de base : physicochimique + transparente (transparency 0.4)
-  - Partenaires S2 : également physicochimique (pas de gradient B-factor)
+Chaque résidu d'interface (b > 10) est coloré selon :
+  - la teinte  → type physicochimique (bleu=+, rouge=-, gris=hydrophobe…)
+  - l'intensité → valeur du B-factor (blanc=faible, couleur saturée=élevé)
 
 Usage :
   python -m script.bfactor_c70_pymol_by_s1_physicochemical
@@ -64,6 +64,41 @@ def _bmax_chain(pdb_path: Path, ch: str) -> float:
     return round(bmax, 2)
 
 
+_BTHRESH = 10
+
+def _restype_surf_cmds(obj: str, bthresh: float = _BTHRESH,
+                       base_color: str = "orange", bmax: float = 0.0) -> list[str]:
+    """Physicochimique + intensité B-factor.
+
+    Résidus non-interface (b <= bthresh) : base_color.
+    Résidus interface (b > bthresh)      : teinte physicochimique, intensité ∝ B-factor.
+    """
+    sel = f"{obj} and b > {bthresh}"
+    cmds = [f"color {base_color}, {obj}"]
+    if bmax > 1.0:
+        m = f"minimum=0, maximum={bmax}"
+        cmds += [
+            f"spectrum b, white_grey60,   {sel} and (resn ALA+GLY+ILE+LEU+MET+VAL), {m}",
+            f"spectrum b, white_hotpink,  {sel} and (resn PHE+TRP+TYR), {m}",
+            f"spectrum b, white_cyan,     {sel} and (resn HIS+ASN+GLN+SER+THR), {m}",
+            f"spectrum b, white_blue,     {sel} and (resn LYS+ARG), {m}",
+            f"spectrum b, white_red,      {sel} and (resn ASP+GLU), {m}",
+            f"spectrum b, white_yellow,   {sel} and resn CYS, {m}",
+            f"spectrum b, white_limegreen,{sel} and resn PRO, {m}",
+        ]
+    else:
+        cmds += [
+            f"color grey60,    {sel} and (resn ALA+GLY+ILE+LEU+MET+VAL)",
+            f"color hotpink,   {sel} and (resn PHE+TRP+TYR)",
+            f"color cyan,      {sel} and (resn HIS+ASN+GLN+SER+THR)",
+            f"color blue,      {sel} and (resn LYS+ARG)",
+            f"color red,       {sel} and (resn ASP+GLU)",
+            f"color yellow,    {sel} and resn CYS",
+            f"color limegreen, {sel} and resn PRO",
+        ]
+    return cmds
+
+
 df_valid = df_all[df_all["cluster_data_70"].notna()].copy()
 df_valid["s1_bs"] = df_valid["s1_binding_site_cluster_data_70"].astype(str)
 df_valid["s2_bs"] = df_valid["s2_binding_site_cluster_data_70"].astype(str)
@@ -97,33 +132,29 @@ for actin_site, s2_to_c70 in sorted(actin_to_s2.items()):
     s1_bfac_pdb = (BFAC_S1_DIR / f"{actin_site}.pdb").resolve()
     if s1_bfac_pdb.exists():
         bmax_s1 = _bmax_chain(s1_bfac_pdb, "A")
-        s1_color = (f"spectrum b, white_orange, base_actin, minimum=0, maximum={bmax_s1}"
-                    if bmax_s1 > 1.0 else "color white, base_actin")
         ref_section = [
-            "# ── Actine S1 — blanc→orange selon % ASA, semi-transparente ─────────",
+            "# ── Actine S1 — physicochimique + intensité B-factor, semi-transparente ─",
             f"load {s1_bfac_pdb}, base_actin",
             "hide everything, base_actin",
             "show surface, base_actin",
-            s1_color,
-            "set transparency, 0.4, base_actin",
-        ]
+        ] + _restype_surf_cmds("base_actin", base_color="orange", bmax=bmax_s1)
     else:
         ref_section = [
-            "# ── Actine S1 — blanche semi-transparente (pas de B-factor) ─────────",
+            "# ── Actine S1 — orange (pas de B-factor) ────────────────────────────",
             f"load {ref_pdb_abs}, _ref_complex",
             "create base_actin, _ref_complex and chain A",
             "delete _ref_complex",
             "hide everything, base_actin",
             "show surface, base_actin",
-            "color white, base_actin",
-            "set transparency, 0.4, base_actin",
+            "color orange, base_actin",
         ]
 
     lines = [
-        f"# PyMOL — orange/vert — cluster actine S1 : {actin_site}",
+        f"# PyMOL — physicochimique + B-factor — cluster actine S1 : {actin_site}",
         f"# {len(s2_sorted)} partenaires",
-        "# Blanc→orange = actine S1 (% ASA enfouie) · Blanc→vert = ABP hétéro",
-        "# Blanc→orange = actine homo (même code couleur) · Actine base : 40 % transparent",
+        "# Résidus interface (b > 10) : teinte=type physicochimique, intensité=B-factor",
+        "# gris=hydrophobe · rose=aromatique · cyan=polaire · bleu=+ · rouge=- · jaune=Cys",
+        "# Base : orange=actine · vert pâle=ABP",
         "",
     ] + ref_section + ["", "# ── Partenaires S2 ─────────────────────────────────────────────────────"]
 
@@ -141,13 +172,8 @@ for actin_site, s2_to_c70 in sorted(actin_to_s2.items()):
         align_ch    = "B" if is_swapped else "A"
         partner_ch  = "A" if is_swapped else "B"
 
-        bmax = _bmax_chain(pdb_path, partner_ch)
-        if itype == "homo":
-            color_cmd = (f"spectrum b, white_orange, {obj_partner}, minimum=0, maximum={bmax}"
-                         if bmax > 1.0 else f"color white, {obj_partner}")
-        else:
-            color_cmd = (f"spectrum b, white_green, {obj_partner}, minimum=0, maximum={bmax}"
-                         if bmax > 1.0 else f"color palegreen, {obj_partner}")
+        bmax        = _bmax_chain(pdb_path, partner_ch)
+        base_col    = "orange" if itype == "homo" else "palegreen"
 
         swap_note = " [vue swappée]" if is_swapped else ""
         label = (f"# {s2_site} ({itype}{swap_note}) — C70 : {c70_patch} "
@@ -161,9 +187,7 @@ for actin_site, s2_to_c70 in sorted(actin_to_s2.items()):
             f"delete {obj_tmp}",
             f"hide everything, {obj_partner}",
             f"show surface, {obj_partner}",
-            color_cmd,
-            "",
-        ]
+        ] + _restype_surf_cmds(obj_partner, base_color=base_col, bmax=bmax) + [""]
         n_loaded += 1
 
     if n_loaded == 0:
