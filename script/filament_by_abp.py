@@ -1,10 +1,10 @@
 # filament_by_abp.py
-# Pour chaque ABP, génère une session PyMOL avec 2 filaments actine 10 sous-unités :
-#   filament_base : top 2 clusters C70 homo GLOBAUX (0_7797_0 + 0_7797_1),
-#                   construit depuis le template 8iah, white→red
-#   filament_abp  : top 2 clusters C70 homo SPÉCIFIQUES à l'ABP,
-#                   construit depuis une structure pairwise du cluster dominant, white→orange
-# B-factors = somme des % ASA buried des sites de liaison S1 des clusters C70
+# Pour chaque ABP, génère une session PyMOL avec 2 filaments actine 13 sous-unités :
+#   filament_base : top 2 clusters C70 homo GLOBAUX (0_7797_0 + 0_7797_1)
+#   filament_abp  : top 2 clusters C70 homo SPÉCIFIQUES à l'ABP
+# Géométrie : représentant C70 officiel (bfactor_c70_interface/)
+# B-factors : % ASA buried chaîne A du représentant C70, sommés sur les top patches
+# Spectre white→red dans les deux cas
 #
 # Exécution : python -m script.filament_by_abp
 
@@ -26,8 +26,8 @@ OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 GLOBAL_BASE_PDB = FILTERED / "details" / "structures_files" / "filament" / "filament_global_base.pdb"
 GLOBAL_PATCHES  = ["0_7797_0", "0_7797_1"]
-CHAIN_LABELS    = "ABCDEFGHIJKLMNOP"
-N_SUBUNITS      = 16
+CHAIN_LABELS    = "ABCDEFGHIJKLM"
+N_SUBUNITS      = 13
 
 
 # ── utilitaires ──────────────────────────────────────────────────────────────
@@ -41,17 +41,22 @@ def parse_ids(s: str) -> list[int]:
     return [int(x) for x in re.findall(r"\d+", s)]
 
 
-def read_bfactors_sum(s1_sites: list[str]) -> dict[int, float]:
-    """Somme les B-factors par numéro de résidu sur tous les fichiers S1."""
+def read_bfactors_from_c70(patches: list[str], chain: str = "A") -> dict[int, float]:
+    """
+    Lit les B-factors (% ASA buried) de la chaîne `chain` des représentants C70,
+    et les somme sur tous les patches donnés.
+    """
     totals: dict[int, float] = {}
-    for site in s1_sites:
-        path = BFACTOR_DIR / f"{site}.pdb"
+    for patch in patches:
+        path = C70_INTERFACE_DIR / f"{patch}.pdb"
         if not path.exists():
-            print(f"  [warn] fichier manquant : {path.name}")
+            print(f"  [warn] représentant C70 manquant : {patch}.pdb")
             continue
         with open(path) as fh:
             for line in fh:
                 if not (line.startswith("ATOM") or line.startswith("HETATM")):
+                    continue
+                if line[21] != chain:
                     continue
                 resi = int(line[22:26])
                 b = float(line[60:66])
@@ -278,46 +283,30 @@ def find_representative_pdb(patches: list[str]) -> Path | None:
 
 # ── PML ──────────────────────────────────────────────────────────────────────
 
-# Gradient de 16 couleurs bleu→rouge (une par sous-unité)
-_CHAIN_COLORS = [
-    "0x1a2eff", "0x2255ff", "0x2a7dff", "0x22aaff",
-    "0x11ccee", "0x00ddcc", "0x00cc99", "0x22bb55",
-    "0x55aa11", "0x88bb00", "0xbbcc00", "0xeecc00",
-    "0xffaa00", "0xff7700", "0xff4400", "0xff1100",
-]
-
-
-def _chain_color_cmds(obj: str, n: int = N_SUBUNITS) -> str:
-    chains = CHAIN_LABELS[:n]
-    lines = []
-    for i, ch in enumerate(chains):
-        col = _CHAIN_COLORS[i % len(_CHAIN_COLORS)]
-        lines.append(f"color {col}, {obj} and chain {ch}")
-    return "\n".join(lines)
-
-
 def write_pml(pml_path: Path, base_pdb: Path, abp_pdb: Path,
+              max_base: float, max_abp: float,
               abp_title: str,
               base_patches: list[str], abp_patches: list[str]) -> None:
-    base_colors = _chain_color_cmds("filament_base")
-    abp_colors  = _chain_color_cmds("filament_abp")
     content = f"""\
 # PyMOL — Filament actine {N_SUBUNITS} s-u — {abp_title}
-# filament_base : représentant {' + '.join(base_patches)}
-# filament_abp  : représentant {' + '.join(abp_patches) if abp_patches else 'aucun'}
-# Couleur : gradient bleu→rouge par sous-unité (chaîne A→{CHAIN_LABELS[N_SUBUNITS-1]})
+# filament_base : représentant {' + '.join(base_patches)}, max B={max_base:.2f}
+# filament_abp  : représentant {' + '.join(abp_patches) if abp_patches else 'aucun'}, max B={max_abp:.2f}
+# B-factor = somme % ASA buried (chaîne A des représentants C70)
+# Spectre white→red : blanc=non contacté, rouge=très contacté
 
 # ── filament_base ──
 load {base_pdb.as_posix()}, filament_base
 hide everything, filament_base
 show surface, filament_base
-{base_colors}
+color white, filament_base
+spectrum b, white_red, filament_base, minimum=0, maximum={max_base:.2f}
 
 # ── filament_abp ──
 load {abp_pdb.as_posix()}, filament_abp
 hide everything, filament_abp
 show surface, filament_abp
-{abp_colors}
+color white, filament_abp
+spectrum b, white_red, filament_abp, minimum=0, maximum={max_abp:.2f}
 
 set surface_quality, 1
 bg_color white
@@ -343,27 +332,22 @@ def main() -> None:
 
     # ── filament global base (même pour tous les ABPs) ──────────────────────
     global_sites = get_s1_sites(GLOBAL_PATCHES, df_patches)
-    print(f"Sites globaux ({' + '.join(GLOBAL_PATCHES)}) : {global_sites}")
+    # B-factors globaux (chaîne A des représentants C70)
+    global_bf = read_bfactors_from_c70(GLOBAL_PATCHES, chain="A")
+    max_global = max(global_bf.values()) if global_bf else 1.0
+    print(f"B-factors globaux : {len(global_bf)} résidus, max={max_global:.2f}")
 
     if not GLOBAL_BASE_PDB.exists():
         print("Génération filament_global_base.pdb …")
         global_rep = find_representative_pdb(GLOBAL_PATCHES)
         if global_rep is not None:
             print(f"  représentant C70 global : {global_rep.name}")
-            build_filament_from_pairwise(global_rep, None, GLOBAL_BASE_PDB)
+            build_filament_from_pairwise(global_rep, global_bf, GLOBAL_BASE_PDB)
         else:
-            apply_bfactors_to_template(None, GLOBAL_BASE_PDB)
-        print(f"  → filament_global_base.pdb généré")
+            apply_bfactors_to_template(global_bf, GLOBAL_BASE_PDB)
+        print(f"  → filament_global_base.pdb généré (max B={max_global:.2f})")
     else:
-        max_global = 0.0
-        with open(GLOBAL_BASE_PDB) as fh:
-            for line in fh:
-                if line.startswith("ATOM") or line.startswith("HETATM"):
-                    try:
-                        max_global = max(max_global, float(line[60:66]))
-                    except ValueError:
-                        pass
-        print(f"filament_global_base.pdb existant, max B = {max_global:.2f}")
+        print(f"filament_global_base.pdb existant")
 
     # ── par ABP ─────────────────────────────────────────────────────────────
     abp_groups = df_hetero.groupby("subunit_2_title")
@@ -385,20 +369,25 @@ def main() -> None:
             print("       [skip] aucun patch homo trouvé")
             continue
 
+        # B-factors ABP-spécifiques
+        abp_bf  = read_bfactors_from_c70(patches, chain="A")
+        max_abp = max(abp_bf.values()) if abp_bf else 1.0
+
         if not abp_pdb.exists():
             rep_pdb = find_representative_pdb(patches)
             if rep_pdb is None:
                 print(f"       [warn] aucun représentant C70, fallback template 8iah")
-                apply_bfactors_to_template(None, abp_pdb)
+                apply_bfactors_to_template(abp_bf, abp_pdb)
             else:
-                print(f"       représentant C70 : {rep_pdb.name}")
+                print(f"       représentant C70 : {rep_pdb.name}  max B={max_abp:.2f}")
                 try:
-                    build_filament_from_pairwise(rep_pdb, None, abp_pdb)
+                    build_filament_from_pairwise(rep_pdb, abp_bf, abp_pdb)
                 except Exception as e:
                     print(f"       [warn] construction échouée ({e}), fallback template")
-                    apply_bfactors_to_template(None, abp_pdb)
+                    apply_bfactors_to_template(abp_bf, abp_pdb)
 
         write_pml(pml_path, GLOBAL_BASE_PDB, abp_pdb,
+                  max_global, max_abp,
                   abp_title, GLOBAL_PATCHES, patches)
 
     print("\nTerminé.")
