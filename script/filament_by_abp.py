@@ -218,18 +218,88 @@ def build_filament_from_pairwise(
     return max_b
 
 
-def find_pairwise_file(interaction_ids: list[int]) -> Path | None:
-    """Trouve le premier fichier pairwise correspondant à l'un des IDs."""
+GLOBAL_HELIX_ANGLE = 166.43  # angle de référence (filament nu 3j8a)
+
+
+def _helix_angle(path: Path) -> float | None:
+    """Calcule l'angle de rotation hélicoïdal A→B d'un fichier pairwise."""
+    ca_A, ca_B = {}, {}
+    try:
+        with open(path) as fh:
+            for line in fh:
+                if not (line.startswith("ATOM") or line.startswith("HETATM")):
+                    continue
+                ch = line[21]
+                if line[12:16].strip() != "CA":
+                    continue
+                resi = int(line[22:26])
+                xyz = np.array([float(line[30:38]), float(line[38:46]), float(line[46:54])])
+                if ch == "A":
+                    ca_A[resi] = xyz
+                elif ch == "B":
+                    ca_B[resi] = xyz
+    except Exception:
+        return None
+    common = sorted(set(ca_A) & set(ca_B))
+    if len(common) < 50:
+        return None
+    # Vérifier que c'est un contact longitudinal (dist centroïde 25-55 Å)
+    cA = np.array(list(ca_A.values())).mean(0)
+    cB = np.array(list(ca_B.values())).mean(0)
+    if not (25 < np.linalg.norm(cB - cA) < 55):
+        return None
+    P = np.array([ca_A[r] for r in common])
+    Q = np.array([ca_B[r] for r in common])
+    cP, cQ = P.mean(0), Q.mean(0)
+    H = (P - cP).T @ (Q - cQ)
+    U, S, Vt = np.linalg.svd(H)
+    d = np.linalg.det(Vt.T @ U.T)
+    R = Vt.T @ np.diag([1, 1, d]) @ U.T
+    return float(np.degrees(np.arccos(np.clip((np.trace(R) - 1) / 2, -1, 1))))
+
+
+def find_pairwise_file(
+    interaction_ids: list[int],
+    preferred_pdbs: set[str] | None = None,
+) -> Path | None:
+    """
+    Trouve le fichier pairwise le plus représentatif du cluster :
+    1. Priorité aux PDBs de l'ABP (preferred_pdbs)
+    2. Parmi ceux-là, on garde les contacts longitudinaux (angle 155-172°)
+    3. On choisit celui dont l'angle diffère le plus du filament nu de référence
+    4. Fallback : tout fichier du cluster, même angle
+    """
     id_set = set(interaction_ids)
-    files = list(PAIRWISE_DIR.iterdir())
-    for f in sorted(files):
+    all_files = list(PAIRWISE_DIR.iterdir())
+
+    candidates: list[tuple[float, Path]] = []  # (|Δangle|, path)
+    fallback: Path | None = None
+
+    for f in all_files:
         try:
             fid = int(f.name.split("_")[0])
         except ValueError:
             continue
-        if fid in id_set:
-            return f
-    return None
+        if fid not in id_set:
+            continue
+
+        # Préférence PDBs de l'ABP
+        pdb_in_name = "_".join(f.name.split("_")[1:3])  # ex. "9y9m_E"
+        from_abp_pdb = preferred_pdbs and any(p in f.name for p in preferred_pdbs)
+
+        angle = _helix_angle(f)
+        if angle is not None and 155 < angle < 172:
+            delta = abs(angle - GLOBAL_HELIX_ANGLE)
+            # Bonus fort si ce PDB appartient à l'ABP
+            score = delta + (50.0 if from_abp_pdb else 0.0)
+            candidates.append((score, f))
+        elif fallback is None:
+            fallback = f
+
+    if candidates:
+        candidates.sort(key=lambda x: -x[0])  # score décroissant
+        return candidates[0][1]
+    return fallback
 
 
 # ── PML ──────────────────────────────────────────────────────────────────────
@@ -325,7 +395,7 @@ def main() -> None:
             # Trouver une structure pairwise représentative du cluster dominant
             dominant_patch = patches[0]
             ids = patch_to_ids.get(dominant_patch, [])
-            pairwise_file = find_pairwise_file(ids)
+            pairwise_file = find_pairwise_file(ids, preferred_pdbs=abp_pdbs)
 
             if pairwise_file is None:
                 print(f"       [warn] aucun fichier pairwise pour {dominant_patch}, utilisation du template 8iah")
