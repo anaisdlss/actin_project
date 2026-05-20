@@ -3817,3 +3817,36 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
         })[["Cluster C70", "Binding sites",
             "Nb PDB", "% PDB", "Nb interactions homo", "% interactions homo"]]
         st.dataframe(homo_summary, hide_index=True, use_container_width=True)
+
+    # ── Filament actine 10 sous-unités ────────────────────────────────────
+    st.subheader("Filament actine — 10 sous-unités (PyMOL)")
+    st.caption(
+        "Filament reconstruit depuis les structures pairwise 8iah (chaînes A→J). "
+        "B-factor = somme % ASA buried des 4 clusters homo principaux (6685_1+2+3+4). "
+        "Spectre blanc → rouge : zones les plus contactées dans les interactions homo actine-actine."
+    )
+    _filament_pml = _Path(
+        "data/filtered/details/structures_files/filament/actin_filament_10.pml"
+    )
+    _filament_pdb = _Path(
+        "data/filtered/details/structures_files/filament/actin_filament_10.pdb"
+    )
+    _col_pml, _col_pdb = st.columns(2)
+    if _filament_pml.exists():
+        with open(_filament_pml, "rb") as _f:
+            _col_pml.download_button(
+                "Télécharger le script PyMOL (.pml)",
+                _f,
+                file_name="actin_filament_10.pml",
+                mime="text/plain",
+            )
+    else:
+        _col_pml.info("Script PyMOL non disponible.")
+    if _filament_pdb.exists():
+        with open(_filament_pdb, "rb") as _f:
+            _col_pdb.download_button(
+                "Télécharger le PDB filament (.pdb)",
+                _f,
+                file_name="actin_filament_10.pdb",
+                mime="chemical/x-pdb",
+            )
