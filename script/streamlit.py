@@ -3851,18 +3851,40 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
     )
 
     if not _is_no_abp and _by_abp_dir.exists():
-        # Session ABP-spécifique : 2 filaments (base global + spécifique ABP)
         import re as _re
         _abp_sname = _re.sub(r"[^a-zA-Z0-9]+", "_", sel_abp).strip("_")[:60]
         _abp_pml = _by_abp_dir / f"{_abp_sname}.pml"
         _abp_pdb = _by_abp_dir / f"{_abp_sname}_abp.pdb"
 
-        st.caption(
-            "Session PyMOL avec 2 filaments : "
-            "**filament_base** (clusters globaux 0_7797_0 + 0_7797_1, blanc→rouge) et "
-            f"**filament_abp** (top 2 clusters spécifiques à {sel_abp[:30]}, blanc→orange). "
-            "B-factor = somme % ASA buried des sites de liaison S1."
-        )
+        # Lire patches_by_abp.csv pour savoir si même filament que base
+        _patches_csv = _by_abp_dir / "patches_by_abp.csv"
+        _same_as_base = False
+        _abp_patch1 = _abp_patch2 = None
+        if _patches_csv.exists():
+            _df_patches_abp = pd.read_csv(_patches_csv)
+            _row_abp = _df_patches_abp[_df_patches_abp["abp_sname"] == _abp_sname]
+            if not _row_abp.empty:
+                _same_as_base = bool(_row_abp.iloc[0]["same_as_base"])
+                _abp_patch1 = _row_abp.iloc[0]["patch_1"]
+                _abp_patch2 = _row_abp.iloc[0]["patch_2"]
+
+        if _same_as_base:
+            st.info(
+                f"Le filament de {sel_abp} utilise les **memes clusters d'interface que le filament de reference** "
+                f"({_abp_patch1} + {_abp_patch2}). "
+                "La session PyMOL contient uniquement le filament global (identique)."
+            )
+        else:
+            _p_str = ""
+            if _abp_patch1:
+                _p_str = f"{_abp_patch1}" + (f" + {_abp_patch2}" if pd.notna(_abp_patch2) else "")
+            st.caption(
+                "Session PyMOL avec 2 filaments : "
+                "**filament_base** (clusters globaux 0_7797_0 + 0_7797_1, blanc→rouge) et "
+                f"**filament_abp** (clusters {_p_str}, blanc→orange). "
+                "B-factor = somme % ASA buried des sites de liaison S1."
+            )
+
         _fc1, _fc2, _fc3 = st.columns(3)
         if _abp_pml.exists():
             with open(_abp_pml, "rb") as _f:
@@ -3884,7 +3906,7 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
                     mime="chemical/x-pdb",
                     key=f"dl_base_{_abp_sname}",
                 )
-        if _abp_pdb.exists():
+        if not _same_as_base and _abp_pdb.exists():
             with open(_abp_pdb, "rb") as _f:
                 _fc3.download_button(
                     f"PDB filament {sel_abp[:20]} (.pdb)",

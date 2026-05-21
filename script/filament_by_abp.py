@@ -354,6 +354,8 @@ def main() -> None:
     n = len(abp_groups)
     print(f"\n{n} ABPs à traiter\n")
 
+    patches_records = []
+
     for i, (abp_title, group) in enumerate(abp_groups, 1):
         sname    = safe_name(abp_title)
         pml_path = OUT_DIR / f"{sname}.pml"
@@ -367,6 +369,37 @@ def main() -> None:
 
         if not patches:
             print("       [skip] aucun patch homo trouvé")
+            patches_records.append({
+                "abp_sname": sname, "abp_title": abp_title,
+                "patch_1": None, "patch_2": None, "same_as_base": False,
+            })
+            continue
+
+        same_as_base = set(patches) == set(GLOBAL_PATCHES)
+        patches_records.append({
+            "abp_sname": sname, "abp_title": abp_title,
+            "patch_1": patches[0] if len(patches) > 0 else None,
+            "patch_2": patches[1] if len(patches) > 1 else None,
+            "same_as_base": same_as_base,
+        })
+
+        if same_as_base:
+            print(f"       → même clusters que filament global — PML identique, pas de PDB ABP séparé")
+            # PML simplifié : un seul filament (le global base)
+            content = (
+                f"# PyMOL — Filament actine {N_SUBUNITS} s-u — {abp_title}\n"
+                f"# Clusters ABP-spécifiques identiques aux clusters globaux ({' + '.join(patches)})\n"
+                f"# Filament identique au filament de référence sans ABP\n\n"
+                f"load {GLOBAL_BASE_PDB.as_posix()}, filament_base\n"
+                f"hide everything, filament_base\n"
+                f"show surface, filament_base\n"
+                f"color white, filament_base\n"
+                f"spectrum b, white_red, filament_base, minimum=0, maximum={max_global:.2f}\n"
+                f"set surface_quality, 1\n"
+                f"bg_color white\n"
+                f"zoom filament_base\n"
+            )
+            pml_path.write_text(content)
             continue
 
         # B-factors ABP-spécifiques
@@ -390,6 +423,9 @@ def main() -> None:
                   max_global, max_abp,
                   abp_title, GLOBAL_PATCHES, patches)
 
+    # Sauvegarde du tableau patches par ABP (utilisé par Streamlit)
+    pd.DataFrame(patches_records).to_csv(
+        OUT_DIR / "patches_by_abp.csv", index=False)
     print("\nTerminé.")
 
 
