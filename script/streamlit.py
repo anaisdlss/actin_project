@@ -3887,14 +3887,15 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
 
         _fc1, _fc2, _fc3 = st.columns(3)
         if _abp_pml.exists():
-            with open(_abp_pml, "rb") as _f:
-                _fc1.download_button(
-                    "Session PyMOL (.pml)",
-                    _f,
-                    file_name=f"{_abp_sname}.pml",
-                    mime="text/plain",
-                    key=f"dl_pml_{_abp_sname}",
-                )
+            # Lire le PML et remplacer les chemins par des chemins absolus résolus sur cette machine
+            _pml_text = _abp_pml.read_text()
+            _fc1.download_button(
+                "Session PyMOL (.pml)",
+                _pml_text.encode(),
+                file_name=f"{_abp_sname}.pml",
+                mime="text/plain",
+                key=f"dl_pml_{_abp_sname}",
+            )
         else:
             _fc1.info("Session PML non disponible.")
         if _global_base_pdb.exists():
@@ -3951,22 +3952,48 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
                     )
                 },
             )
-        # Session PyMOL avec tous les filaments spécifiques
-        _all_pml = _Path(
-            "data/filtered/details/structures_files/filament/by_abp/all_specific_filaments.pml"
-        )
-        if _all_pml.exists():
-            with open(_all_pml, "rb") as _f:
-                st.download_button(
-                    "Session PyMOL — tous les filaments specifiques (.pml)",
-                    _f,
-                    file_name="all_specific_filaments.pml",
-                    mime="text/plain",
-                    key="dl_all_filaments",
-                )
+        # Session PyMOL avec tous les filaments spécifiques — générée à la volée
+        _by_abp_dir2 = _Path("data/filtered/details/structures_files/filament/by_abp")
+        _global_base2 = _Path("data/filtered/details/structures_files/filament/filament_global_base.pdb")
+        _patches_csv2 = _by_abp_dir2 / "patches_by_abp.csv"
+        if _patches_csv2.exists() and _global_base2.exists():
+            import re as _re2
+            _df_p2 = pd.read_csv(_patches_csv2)
+            _diff2 = _df_p2[_df_p2["same_as_base"] == False].dropna(subset=["patch_1"])
+            _pml_lines2 = [
+                "# PyMOL — Tous les filaments actine uniques (base + ABPs specifiques)",
+                "",
+                f"load {_global_base2.resolve().as_posix()}, filament_base",
+                "hide everything, filament_base",
+                "show surface, filament_base",
+                "spectrum b, white_red, filament_base, minimum=0",
+                "",
+            ]
+            for _, _rec2 in _diff2.iterrows():
+                _pdb2 = _by_abp_dir2 / f"{_rec2['abp_sname']}_abp.pdb"
+                if not _pdb2.exists():
+                    continue
+                _obj2 = _re2.sub(r"[^a-zA-Z0-9]+", "_", str(_rec2["abp_title"]))[:30].strip("_")
+                _pml_lines2 += [
+                    f"# {_rec2['abp_title']}",
+                    f"load {_pdb2.resolve().as_posix()}, {_obj2}",
+                    f"hide everything, {_obj2}",
+                    f"show surface, {_obj2}",
+                    f"spectrum b, white_red, {_obj2}, minimum=0",
+                    "",
+                ]
+            _pml_lines2 += ["set surface_quality, 1", "bg_color white", "zoom filament_base"]
+            _pml_content2 = "\n".join(_pml_lines2).encode()
+            st.download_button(
+                "Session PyMOL — tous les filaments specifiques (.pml)",
+                _pml_content2,
+                file_name="all_specific_filaments.pml",
+                mime="text/plain",
+                key="dl_all_filaments",
+            )
             st.caption(
-                "Contient le filament de reference + les 6 ABPs dont le filament "
-                "differe de la base (Cofilin-1/2, Coronin-1B, MAL, PHACTR1, WDR1)."
+                "Contient le filament de reference + les ABPs dont le filament "
+                "differe de la base. Chemins absolus generes depuis cette machine."
             )
 
         _filament_pml = _Path(
