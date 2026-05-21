@@ -740,11 +740,15 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
 
     def _aa_majority_eq(grp):
         """AA le plus fréquent en moyenne équitable par couple."""
-        majorities = [
-            c_grp["residue_name"].value_counts().index[0]
-            for _, c_grp in grp.groupby("couple")
-        ]
-        return pd.Series(majorities).value_counts().index[0]
+        majorities = []
+        for _, c_grp in grp.groupby("couple"):
+            vc = c_grp["residue_name"].value_counts()
+            if len(vc) > 0:
+                majorities.append(vc.index[0])
+        if not majorities:
+            return "?"
+        vc2 = pd.Series(majorities).value_counts()
+        return vc2.index[0] if len(vc2) > 0 else "?"
 
     def _aa_dist_eq(grp):
         """Distribution AA en proportions moyennées équitablement par couple."""
@@ -866,7 +870,7 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
     # Moyenne asa_pct_B — équitable par couple
     t4_s2 = t4[t4["partner"].notna() & t4["residue_B_canon_mafft"].notna()].copy()
     if t4_s2.empty:
-        return None, 0, 0, 0
+        return None, 0, 0, 0, None
     t4_s2["s2_pos4"] = t4_s2["residue_B_canon_mafft"].astype(int)
     t4_s2["node_id4"] = t4_s2["partner"].astype(
         str).str[:15] + "_" + t4_s2["s2_pos4"].astype(str)
@@ -914,7 +918,7 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
                           + "_" + t4_both["_s2_pos4b"].astype(str))
     t4_both = t4_both[t4_both["s2_node"].isin(top_s2)].copy()
     if t4_both.empty:
-        return None, 0, 0, 0
+        return None, 0, 0, 0, None
     edge_counts = (t4_both.groupby(["s1_canon", "s2_node"])["couple"]
                    .nunique().reset_index())
     edge_counts.columns = ["s1_canon", "s2_node", "n_couples"]
