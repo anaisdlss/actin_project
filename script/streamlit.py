@@ -1087,7 +1087,7 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
         ecol = _edge_col(row["contact_type"])
         net.add_edge(
             f"s1_{int(row['s1_canon'])}", f"s2_{row['s2_node']}",
-            width=0.5 + 5.5 * (nc / max(n_couples_total, 1)),
+            width=6.0 if nc == n_couples_total else 0.5,
             color={"color": ecol, "highlight": "#FF4400", "hover": "#FF4400"},
             title=f"{nc}/{n_couples_total} couples · {row['contact_type']}",
             smooth={"enabled": False} if bipartite else {
