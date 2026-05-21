@@ -287,22 +287,26 @@ def write_pml(pml_path: Path, base_pdb: Path, abp_pdb: Path,
               max_base: float, max_abp: float,
               abp_title: str,
               base_patches: list[str], abp_patches: list[str]) -> None:
+    # Chemins relatifs à la racine du projet (là où PyMOL doit être lancé)
+    rel_base = base_pdb.relative_to(PROJECT_ROOT).as_posix()
+    rel_abp  = abp_pdb.relative_to(PROJECT_ROOT).as_posix()
     content = f"""\
 # PyMOL — Filament actine {N_SUBUNITS} s-u — {abp_title}
 # filament_base : représentant {' + '.join(base_patches)}, max B={max_base:.2f}
 # filament_abp  : représentant {' + '.join(abp_patches) if abp_patches else 'aucun'}, max B={max_abp:.2f}
 # B-factor = somme % ASA buried (chaîne A des représentants C70)
-# Spectre white→red : blanc=non contacté, rouge=très contacté
+# Spectre white->red : blanc=non contacte, rouge=tres contacte
+# Lancer PyMOL depuis la racine du projet : pymol {pml_path.relative_to(PROJECT_ROOT).as_posix()}
 
 # ── filament_base ──
-load {base_pdb.as_posix()}, filament_base
+load {rel_base}, filament_base
 hide everything, filament_base
 show surface, filament_base
 color white, filament_base
 spectrum b, white_red, filament_base, minimum=0, maximum={max_base:.2f}
 
 # ── filament_abp ──
-load {abp_pdb.as_posix()}, filament_abp
+load {rel_abp}, filament_abp
 hide everything, filament_abp
 show surface, filament_abp
 color white, filament_abp
@@ -390,7 +394,7 @@ def main() -> None:
                 f"# PyMOL — Filament actine {N_SUBUNITS} s-u — {abp_title}\n"
                 f"# Clusters ABP-spécifiques identiques aux clusters globaux ({' + '.join(patches)})\n"
                 f"# Filament identique au filament de référence sans ABP\n\n"
-                f"load {GLOBAL_BASE_PDB.as_posix()}, filament_base\n"
+                f"load {GLOBAL_BASE_PDB.relative_to(PROJECT_ROOT).as_posix()}, filament_base\n"
                 f"hide everything, filament_base\n"
                 f"show surface, filament_base\n"
                 f"color white, filament_base\n"
