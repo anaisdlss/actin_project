@@ -3962,6 +3962,7 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
             _diff2 = _df_p2[_df_p2["same_as_base"] == False].dropna(subset=["patch_1"])
             _pml_lines2 = [
                 "# PyMOL — Tous les filaments actine uniques (base + ABPs specifiques)",
+                "# ABPs charges mais caches : faire 'show surface, NomObjet' pour les afficher",
                 "",
                 f"load {_global_base2.resolve().as_posix()}, filament_base",
                 "hide everything, filament_base",
@@ -3975,14 +3976,13 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
                     continue
                 _obj2 = _re2.sub(r"[^a-zA-Z0-9]+", "_", str(_rec2["abp_title"]))[:30].strip("_")
                 _pml_lines2 += [
-                    f"# {_rec2['abp_title']}",
+                    f"# {_rec2['abp_title']} — faire 'show surface, {_obj2}' pour afficher",
                     f"load {_pdb2.resolve().as_posix()}, {_obj2}",
                     f"hide everything, {_obj2}",
-                    f"show surface, {_obj2}",
                     f"spectrum b, white_red, {_obj2}, minimum=0",
                     "",
                 ]
-            _pml_lines2 += ["set surface_quality, 1", "bg_color white", "zoom filament_base"]
+            _pml_lines2 += ["set surface_quality, 0", "bg_color white", "zoom filament_base"]
             _pml_content2 = "\n".join(_pml_lines2).encode()
             st.download_button(
                 "Session PyMOL — tous les filaments specifiques (.pml)",

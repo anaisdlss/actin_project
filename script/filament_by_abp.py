@@ -435,6 +435,7 @@ def main() -> None:
     diff_rows = df_records[df_records["same_as_base"] == False].dropna(subset=["patch_1"])
     all_pml_lines = [
         "# PyMOL — Tous les filaments actine uniques (base + ABPs specifiques)",
+        "# ABPs charges mais caches : faire 'show surface, NomObjet' pour les afficher",
         "",
         f"load {GLOBAL_BASE_PDB.as_posix()}, filament_base",
         "hide everything, filament_base",
@@ -448,14 +449,13 @@ def main() -> None:
             continue
         obj = safe_name(rec["abp_title"])[:30]
         all_pml_lines += [
-            f"# {rec['abp_title']}",
+            f"# {rec['abp_title']} — faire 'show surface, {obj}' pour afficher",
             f"load {abp_pdb_path.as_posix()}, {obj}",
             f"hide everything, {obj}",
-            f"show surface, {obj}",
             f"spectrum b, white_red, {obj}, minimum=0",
             "",
         ]
-    all_pml_lines += ["set surface_quality, 1", "bg_color white", "zoom filament_base"]
+    all_pml_lines += ["set surface_quality, 0", "bg_color white", "zoom filament_base"]
     (OUT_DIR / "all_specific_filaments.pml").write_text("\n".join(all_pml_lines))
     print(f"PML maitre genere : {len(diff_rows)} filaments specifiques + base")
 
