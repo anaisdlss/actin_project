@@ -1498,41 +1498,40 @@ with st.sidebar:
 st.header("Téléchargement des données")
 
 STEPS = {
-    "1/14":  "Téléchargement du summary PPI3D (BLAST)",
-    "2/14":  "Téléchargement des entrées PDB",
-    "3/14":  "Téléchargement de toutes les données (cluster table)",
-    "4/14":  "Filtrage des structures (≥ 4 actines connectées) - notebook",
-    "5/14":  "Téléchargement des interactions d'interface",
-    "5.5/14": "Nettoyage des chaînes orphelines",
-    "5.7/14": "Enrichissement table 4 avec % ASA buried - notebook",
-    "6/14":  "Alignement MAFFT par cluster de séquences",
-    "7/14":  "Analyse des clusters d'interaction C70 - notebook",
-    "8/14":  "Calcul B-factors interface C70 par cluster",
-    "9/14":  "Génération script PyMOL surface complète C70",
-    "10/14": "Génération scripts PyMOL par site S1",
-    "11/14": "Analyse interface par cluster C70 - notebook",
-    "12/14": "Heatmap S1 binding site et références clusters - notebook",
-    "13/14": "Calcul B-factors S1 par cluster",
-    "14/14": "Analyse ABP — compétition et interfaces - notebook",
+    "1/15":  "Téléchargement du summary PPI3D (BLAST)",
+    "2/15":  "Téléchargement des entrées PDB",
+    "3/15":  "Téléchargement de toutes les données (cluster table)",
+    "4/15":  "Filtrage des structures (≥ 4 actines connectées) - notebook",
+    "5/15":  "Téléchargement des interactions d'interface",
+    "6/15":  "Alignement MAFFT par cluster de séquences",
+    "7/15":  "Analyse des clusters d'interaction C70 - notebook",
+    "8/15":  "Calcul B-factors interface C70 par cluster",
+    "9/15":  "Génération script PyMOL surface complète C70",
+    "10/15": "Génération scripts PyMOL par site S1",
+    "11/15": "Analyse interface par cluster C70 - notebook",
+    "12/15": "Heatmap S1 binding site et références clusters - notebook",
+    "13/15": "Calcul B-factors S1 par cluster",
+    "14/15": "Analyse ABP — compétition et interfaces - notebook",
+    "15/15": "Sessions PyMOL filament par ABP",
 }
 
 # Fichier de sortie attendu pour chaque étape
 STEP_OUTPUT_FILES = {
-    "1/14":  "data/raw/ppi3d_actin_summary.csv",
-    "2/14":  "data/raw/pdb_entry_results.csv",
-    "3/14":  "data/raw/all_data.csv",
-    "4/14":  "data/filtered/filtered_pdb_entry.csv",
-    "5/14":  "data/filtered/details/1.interactions.csv",
-    # 5.5 et 5.7 modifient des fichiers existants → pas de fichier unique à vérifier
-    "6/14":  "data/alignments/.done",
-    "7/14":  "data/filtered/patches_infos_cluster_data_70.csv",
-    "8/14":  "data/filtered/details/structures_files/bfactor_c70_interface",
-    "9/14":  "data/filtered/details/structures_files/bfactor_c70_interface/view_full_surface.pml",
-    "10/14": "data/filtered/details/structures_files/bfactor_c70_interface/by_s1_cluster",
-    "11/14": "visualisations/actin_c70_contacts",
-    "12/14": "visualisations/actin_s1_all_equitable_heatmap.png",
-    "13/14": "data/filtered/details/structures_files/bfactor_cluster",
-    "14/14": "visualisations/abp_analysis_done.flag",
+    "1/15":  "data/raw/ppi3d_actin_summary.csv",
+    "2/15":  "data/raw/pdb_entry_results.csv",
+    "3/15":  "data/raw/all_data.csv",
+    "4/15":  "data/filtered/filtered_pdb_entry.csv",
+    "5/15":  "data/filtered/details/1.interactions.csv",
+    "6/15":  "data/alignments/.done",
+    "7/15":  "data/filtered/patches_infos_cluster_data_70.csv",
+    "8/15":  "data/filtered/details/structures_files/bfactor_c70_interface",
+    "9/15":  "data/filtered/details/structures_files/bfactor_c70_interface/view_full_surface.pml",
+    "10/15": "data/filtered/details/structures_files/bfactor_c70_interface/by_s1_cluster",
+    "11/15": "visualisations/actin_c70_contacts",
+    "12/15": "visualisations/actin_s1_all_equitable_heatmap.png",
+    "13/15": "data/filtered/details/structures_files/bfactor_cluster",
+    "14/15": "visualisations/abp_analysis_done.flag",
+    "15/15": "data/filtered/details/structures_files/filament/by_abp",
 }
 
 STEP_KEYS = list(STEPS.keys())
@@ -1643,7 +1642,7 @@ if clicked:
 
         # Détecter le début d'une nouvelle étape
         for i, key in enumerate(STEP_KEYS):
-            if "ETAPE" in line and key in line:
+            if f"ETAPE : {key}" in line:
                 if current_idx >= 0:
                     prev_key = STEP_KEYS[current_idx]
                     state = "skipped" if step_had_skip.get(
@@ -3543,7 +3542,7 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
                 label=_wrap_lbl(_nc) if _show_lbl else "",
                 title=(f"{_nc}\n"
                        f"{_c70_line}\n"
-                       f"ABPs en compétition : {_n_comp_nc}"),
+                       f"Partenaires ABP uniques en concurrence : {_n_comp_nc}"),
                 size=_sz,
                 color={"background": _col, "border": "#555555"},
                 borderWidth=2,

@@ -2,7 +2,6 @@ import sys
 import os
 import subprocess
 from pathlib import Path
-import pandas as pd
 
 # execution : caffeinate -i python -m script.data_extract.pipeline_data
 
@@ -13,11 +12,12 @@ C70_NOTEBOOK      = PROJECT_ROOT / "notebooks" / "interface_analysis_c70.ipynb"
 S1_NOTEBOOK       = PROJECT_ROOT / "notebooks" / "interface_analysis_s1.ipynb"
 ABP_NOTEBOOK      = PROJECT_ROOT / "notebooks" / "abp_analysis.ipynb"
 
-DATA      = PROJECT_ROOT / "data"
-RAW       = DATA / "raw"
-FILTERED  = DATA / "filtered"
-DETAILS   = FILTERED / "details"
-ALIGNMENTS = DATA / "alignments"
+DATA          = PROJECT_ROOT / "data"
+RAW           = DATA / "raw"
+FILTERED      = DATA / "filtered"
+DETAILS       = FILTERED / "details"
+ALIGNMENTS    = DATA / "alignments"
+VISUALISATIONS = PROJECT_ROOT / "visualisations"
 
 
 def is_up_to_date(output: Path, *inputs: Path) -> bool:
@@ -42,24 +42,6 @@ def skip_step(label):
     print("Already up to date — Nothing to do")
 
 
-def cleanup_orphan_chains(filtered_dir: Path, details_dir: Path):
-    """Supprime de 3.interface_residues.csv les chaînes absentes de filtered_all_data
-    (pas de séquence connue → impossible d'aligner avec MAFFT)."""
-    df_all = pd.read_csv(filtered_dir / "filtered_all_data.csv")
-    valid_chains = set(df_all["subunit_1"]) | set(df_all["subunit_2"])
-
-    df3_path = details_dir / "3.interface_residues.csv"
-    df3 = pd.read_csv(df3_path)
-    before = len(df3)
-    df3_clean = df3[df3["chain"].isin(valid_chains)]
-    removed = before - len(df3_clean)
-    if removed > 0:
-        df3_clean.to_csv(df3_path, index=False)
-        print(f"  Chaînes orphelines supprimées : {removed} résidus retirés de df3")
-    else:
-        print("  Aucune chaîne orpheline détectée dans df3")
-
-
 def run_notebook(label, notebook_path):
     run_step(label, [
         sys.executable, "-m", "jupyter", "nbconvert",
@@ -78,64 +60,68 @@ def main():
     try:
         # 1 — Toujours exécuté : le script détecte lui-même si PPI3D a été mis à jour
         run_step(
-            "1/14 — Téléchargement du summary des interactions actine (PPI3D BLAST)",
+            "1/15 — Téléchargement du summary des interactions actine (PPI3D BLAST)",
             [python_exec, "-m", "script.data_extract.get_summary_results"],
         )
 
         # 2 — Re-télécharge les entrées PDB si le summary a changé
         if is_up_to_date(RAW / "pdb_entry_results.csv", RAW / "ppi3d_actin_summary.csv"):
-            skip_step("2/14 — Téléchargement des entrées PDB pour chaque structure")
+            skip_step("2/15 — Téléchargement des entrées PDB pour chaque structure")
         else:
             run_step(
-                "2/14 — Téléchargement des entrées PDB pour chaque structure",
+                "2/15 — Téléchargement des entrées PDB pour chaque structure",
                 [python_exec, "-m", "script.data_extract.get_pdb_entries"],
             )
 
         # 3 — Toujours exécuté : le script détecte lui-même si PPI3D a été mis à jour
         run_step(
-            "3/14 — Téléchargement de toutes les données (cluster table PPI3D)",
+            "3/15 — Téléchargement de toutes les données (cluster table PPI3D)",
             [python_exec, "-m", "script.data_extract.get_cluster_table"],
         )
 
         # 4 — Filtrage des structures (notebook)
-        run_notebook(
-            "4/14 — Filtrage des structures (≥ 4 actines connectées)",
+        if is_up_to_date(
+            FILTERED / "filtered_all_data.csv",
+            RAW / "all_data.csv",
+            RAW / "pdb_entry_results.csv",
             FILTER_NOTEBOOK,
-        )
+        ):
+            skip_step("4/15 — Filtrage des structures (≥ 4 actines connectées)")
+        else:
+            run_notebook(
+                "4/15 — Filtrage des structures (≥ 4 actines connectées)",
+                FILTER_NOTEBOOK,
+            )
+            (FILTERED / "filtered_all_data.csv").touch()
 
         # 5 — get_interaction_details gère lui-même le cache (hash du summary + progress.csv)
         run_step(
-            "5/14 — Téléchargement des interactions d'interface",
+            "5/15 — Téléchargement des interactions d'interface",
             [python_exec, "-m", "script.data_extract.get_interaction_details"],
             input_text="f\n",
         )
 
-        # 5.5 — Nettoyage des chaînes orphelines (absentes de filtered_all_data)
-        print("\n" + "=" * 60)
-        print("ETAPE : 5.5/14 — Nettoyage des chaînes orphelines")
-        print("=" * 60)
-        cleanup_orphan_chains(FILTERED, DETAILS)
-
-        # 5.7 — Enrichissement table 4 avec % ASA buried
-        # (cellules 15-16 de graphe_filter.ipynb, différées car elles lisent
-        #  3.interface_residues.csv qui n'existe qu'après l'étape 5)
-        run_notebook(
-            "5.7/14 — Enrichissement table 4 avec % ASA buried (graphe_filter.ipynb — phase 2)",
-            FILTER_NOTEBOOK,
-        )
-
         # 6 — Alignement MAFFT
         run_step(
-            "6/14 — Alignement MAFFT par cluster de séquences",
+            "6/15 — Alignement MAFFT par cluster de séquences",
             [python_exec, "-m", "script.mafft_pipeline"],
             cwd=PROJECT_ROOT,
         )
 
         # 7 — Analyse clusters d'interaction C70 (notebook)
-        run_notebook(
-            "7/14 — Analyse des clusters d'interaction C70",
+        if is_up_to_date(
+            FILTERED / "patches_infos_cluster_data_70.csv",
+            DETAILS / "1.interactions.csv",
+            FILTERED / "filtered_all_data.csv",
             CLUSTER_NOTEBOOK,
-        )
+        ):
+            skip_step("7/15 — Analyse des clusters d'interaction C70")
+        else:
+            run_notebook(
+                "7/15 — Analyse des clusters d'interaction C70",
+                CLUSTER_NOTEBOOK,
+            )
+            (FILTERED / "patches_infos_cluster_data_70.csv").touch()
 
         # 8 — Calcul B-factors interface C70 (doit précéder le notebook C70)
         if is_up_to_date(
@@ -144,10 +130,10 @@ def main():
             DETAILS / "4.inter-residue_contacts.csv",
             DETAILS / "8.structures.csv",
         ):
-            skip_step("8/14 — Calcul B-factors interface C70 par cluster")
+            skip_step("8/15 — Calcul B-factors interface C70 par cluster")
         else:
             run_step(
-                "8/14 — Calcul B-factors interface C70 par cluster (bfactor_c70_interface.py)",
+                "8/15 — Calcul B-factors interface C70 par cluster (bfactor_c70_interface.py)",
                 [python_exec, "-m", "script.bfactor_c70_interface"],
                 cwd=PROJECT_ROOT,
             )
@@ -159,10 +145,10 @@ def main():
             FILTERED / "patches_infos_cluster_data_70.csv",
             FILTERED / "details" / "structures_files" / "bfactor_c70_interface",
         ):
-            skip_step("9/14 — Génération script PyMOL surface complète C70")
+            skip_step("9/15 — Génération script PyMOL surface complète C70")
         else:
             run_step(
-                "9/14 — Génération script PyMOL surface complète C70 (bfactor_c70_pymol_full_surface.py)",
+                "9/15 — Génération script PyMOL surface complète C70 (bfactor_c70_pymol_full_surface.py)",
                 [python_exec, "-m", "script.bfactor_c70_pymol_full_surface"],
                 cwd=PROJECT_ROOT,
             )
@@ -175,25 +161,45 @@ def main():
             FILTERED / "filtered_all_data.csv",
             FILTERED / "details" / "structures_files" / "bfactor_c70_interface",
         ):
-            skip_step("10/14 — Génération scripts PyMOL par site S1")
+            skip_step("10/15 — Génération scripts PyMOL par site S1")
         else:
             run_step(
-                "10/14 — Génération scripts PyMOL par site S1 (bfactor_c70_pymol_by_s1.py)",
+                "10/15 — Génération scripts PyMOL par site S1 (bfactor_c70_pymol_by_s1.py)",
                 [python_exec, "-m", "script.bfactor_c70_pymol_by_s1"],
                 cwd=PROJECT_ROOT,
             )
 
         # 11 — Analyse interface C70 détaillée (notebook)
-        run_notebook(
-            "11/14 — Analyse interface par cluster C70",
+        if is_up_to_date(
+            VISUALISATIONS / "actin_c70_contacts",
+            FILTERED / "patches_infos_cluster_data_70.csv",
+            DETAILS / "3.interface_residues.csv",
+            DETAILS / "4.inter-residue_contacts.csv",
             C70_NOTEBOOK,
-        )
+        ):
+            skip_step("11/15 — Analyse interface par cluster C70")
+        else:
+            run_notebook(
+                "11/15 — Analyse interface par cluster C70",
+                C70_NOTEBOOK,
+            )
+            (VISUALISATIONS / "actin_c70_contacts").touch()
 
         # 12 — Heatmap S1 binding site + mise à jour références (notebook)
-        run_notebook(
-            "12/14 — Heatmap S1 binding site et références clusters",
+        if is_up_to_date(
+            VISUALISATIONS / "actin_s1_all_equitable_heatmap.png",
+            FILTERED / "patches_infos_cluster_data_70.csv",
+            DETAILS / "3.interface_residues.csv",
+            DETAILS / "4.inter-residue_contacts.csv",
             S1_NOTEBOOK,
-        )
+        ):
+            skip_step("12/15 — Heatmap S1 binding site et références clusters")
+        else:
+            run_notebook(
+                "12/15 — Heatmap S1 binding site et références clusters",
+                S1_NOTEBOOK,
+            )
+            (VISUALISATIONS / "actin_s1_all_equitable_heatmap.png").touch()
 
         # 13 — Calcul B-factors S1 par cluster (pour PyMOL / Streamlit)
         if is_up_to_date(
@@ -202,23 +208,31 @@ def main():
             FILTERED / "patches_infos_cluster_data_70.csv",
             DETAILS / "3.interface_residues.csv",
         ):
-            skip_step("13/14 — Calcul B-factors S1 par cluster")
+            skip_step("13/15 — Calcul B-factors S1 par cluster")
         else:
             run_step(
-                "13/14 — Calcul B-factors S1 par cluster (bfactor.py)",
+                "13/15 — Calcul B-factors S1 par cluster (bfactor.py)",
                 [python_exec, "-m", "script.bfactor"],
                 cwd=PROJECT_ROOT,
             )
 
         # 14 — Analyse ABP : compétition, interfaces, PDB sans ABP (notebook)
-        run_notebook(
-            "14/14 — Analyse ABP — compétition et interfaces",
-            ABP_NOTEBOOK,
-        )
-        # Flag de sortie pour le suivi Streamlit
-        _flag = PROJECT_ROOT / "visualisations" / "abp_analysis_done.flag"
+        _flag = VISUALISATIONS / "abp_analysis_done.flag"
         _flag.parent.mkdir(parents=True, exist_ok=True)
-        _flag.touch()
+        if is_up_to_date(
+            _flag,
+            FILTERED / "filtered_all_data.csv",
+            FILTERED / "patches_infos_cluster_data_70.csv",
+            FILTERED / "patches_infos_s1_binding_site.csv",
+            ABP_NOTEBOOK,
+        ):
+            skip_step("14/15 — Analyse ABP — compétition et interfaces")
+        else:
+            run_notebook(
+                "14/15 — Analyse ABP — compétition et interfaces",
+                ABP_NOTEBOOK,
+            )
+            _flag.touch()
 
         # 15 — Sessions PyMOL filament par ABP (dépend bfactor_cluster + filtered_all_data)
         _by_abp_dir = FILTERED / "details" / "structures_files" / "filament" / "by_abp"

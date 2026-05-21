@@ -178,7 +178,12 @@ if metadata and os.path.exists(summary_path):
     print("Stored hash :", metadata.get("summary_hash"))
     print("Current hash:", current_hash)
 
-    if metadata["ppi3d_last_update"] != current_update:
+    if current_update == "unknown":
+
+        print("\nWarning: PPI3D server unreachable — impossible de vérifier les mises à jour")
+        print("Utilisation du dataset existant (dernière mise à jour connue :", metadata["ppi3d_last_update"], ")")
+
+    elif metadata["ppi3d_last_update"] != current_update:
 
         print("\nDatabase update detected → regenerate dataset")
         metadata = None
