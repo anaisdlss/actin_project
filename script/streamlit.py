@@ -919,6 +919,9 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
     t4_both = t4_both[t4_both["s2_node"].isin(top_s2)].copy()
     if t4_both.empty:
         return None, 0, 0, 0, None
+    # Couples ayant réellement des contacts dans table 4 (peut différer de n_couples_total
+    # si certains couples n'ont pas de données de résidus dans table 4)
+    n_couples_with_data = t4_both["couple"].nunique()
     edge_counts = (t4_both.groupby(["s1_canon", "s2_node"])["couple"]
                    .nunique().reset_index())
     edge_counts.columns = ["s1_canon", "s2_node", "n_couples"]
@@ -1087,9 +1090,9 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
         ecol = _edge_col(row["contact_type"])
         net.add_edge(
             f"s1_{int(row['s1_canon'])}", f"s2_{row['s2_node']}",
-            width=6.0 if nc == n_couples_total else 0.5,
+            width=6.0 if nc == n_couples_with_data else 0.5,
             color={"color": ecol, "highlight": "#FF4400", "hover": "#FF4400"},
-            title=f"{nc}/{n_couples_total} couples · {row['contact_type']}",
+            title=f"{nc}/{n_couples_with_data} couples avec données · {row['contact_type']}",
             smooth={"enabled": False} if bipartite else {
                 "enabled": True, "type": "dynamic"},
         )
