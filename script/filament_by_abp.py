@@ -283,30 +283,35 @@ def find_representative_pdb(patches: list[str]) -> Path | None:
 
 # ── PML ──────────────────────────────────────────────────────────────────────
 
+_PML_CD_BLOCK = """\
+python
+import os as _os
+_os.chdir(_os.path.dirname(_os.path.abspath(__script__)))
+python end
+"""
+
+
 def write_pml(pml_path: Path, base_pdb: Path, abp_pdb: Path,
               max_base: float, max_abp: float,
               abp_title: str,
               base_patches: list[str], abp_patches: list[str]) -> None:
-    # Chemins relatifs à la racine du projet (là où PyMOL doit être lancé)
-    rel_base = base_pdb.relative_to(PROJECT_ROOT).as_posix()
-    rel_abp  = abp_pdb.relative_to(PROJECT_ROOT).as_posix()
+    # Noms de fichiers seuls — le bloc python cd vers le répertoire du .pml
     content = f"""\
 # PyMOL — Filament actine {N_SUBUNITS} s-u — {abp_title}
-# filament_base : représentant {' + '.join(base_patches)}, max B={max_base:.2f}
-# filament_abp  : représentant {' + '.join(abp_patches) if abp_patches else 'aucun'}, max B={max_abp:.2f}
-# B-factor = somme % ASA buried (chaîne A des représentants C70)
+# filament_base : {' + '.join(base_patches)}, max B={max_base:.2f}
+# filament_abp  : {' + '.join(abp_patches) if abp_patches else 'aucun'}, max B={max_abp:.2f}
+# B-factor = somme % ASA buried (chaine A des representants C70)
 # Spectre white->red : blanc=non contacte, rouge=tres contacte
-# Lancer PyMOL depuis la racine du projet : pymol {pml_path.relative_to(PROJECT_ROOT).as_posix()}
-
+{_PML_CD_BLOCK}
 # ── filament_base ──
-load {rel_base}, filament_base
+load {base_pdb.name}, filament_base
 hide everything, filament_base
 show surface, filament_base
 color white, filament_base
 spectrum b, white_red, filament_base, minimum=0, maximum={max_base:.2f}
 
 # ── filament_abp ──
-load {rel_abp}, filament_abp
+load {abp_pdb.name}, filament_abp
 hide everything, filament_abp
 show surface, filament_abp
 color white, filament_abp
@@ -389,12 +394,12 @@ def main() -> None:
 
         if same_as_base:
             print(f"       → même clusters que filament global — PML identique, pas de PDB ABP séparé")
-            # PML simplifié : un seul filament (le global base)
             content = (
                 f"# PyMOL — Filament actine {N_SUBUNITS} s-u — {abp_title}\n"
-                f"# Clusters ABP-spécifiques identiques aux clusters globaux ({' + '.join(patches)})\n"
-                f"# Filament identique au filament de référence sans ABP\n\n"
-                f"load {GLOBAL_BASE_PDB.relative_to(PROJECT_ROOT).as_posix()}, filament_base\n"
+                f"# Clusters identiques aux clusters globaux ({' + '.join(patches)})\n"
+                f"# Filament identique au filament de reference sans ABP\n"
+                + _PML_CD_BLOCK + "\n"
+                f"load {GLOBAL_BASE_PDB.name}, filament_base\n"
                 f"hide everything, filament_base\n"
                 f"show surface, filament_base\n"
                 f"color white, filament_base\n"
@@ -431,14 +436,19 @@ def main() -> None:
     df_records = pd.DataFrame(patches_records)
     df_records.to_csv(OUT_DIR / "patches_by_abp.csv", index=False)
 
+    # ── Copie filament_global_base.pdb dans by_abp/ (pour PMLs autonomes) ────
+    import shutil as _shutil
+    _base_copy = OUT_DIR / GLOBAL_BASE_PDB.name
+    if not _base_copy.exists() or _base_copy.stat().st_mtime < GLOBAL_BASE_PDB.stat().st_mtime:
+        _shutil.copy2(GLOBAL_BASE_PDB, _base_copy)
+        print(f"filament_global_base.pdb copié dans by_abp/")
+
     # ── PML maître : tous les filaments uniques (base + ABPs spécifiques) ───
     diff_rows = df_records[df_records["same_as_base"] == False].dropna(subset=["patch_1"])
-    rel_base = GLOBAL_BASE_PDB.relative_to(PROJECT_ROOT).as_posix()
     all_pml_lines = [
         "# PyMOL — Tous les filaments actine uniques (base + ABPs specifiques)",
-        f"# Lancer depuis la racine du projet : pymol {(OUT_DIR / 'all_specific_filaments.pml').relative_to(PROJECT_ROOT).as_posix()}",
-        "",
-        f"load {rel_base}, filament_base",
+        _PML_CD_BLOCK,
+        f"load {GLOBAL_BASE_PDB.name}, filament_base",
         "hide everything, filament_base",
         "show surface, filament_base",
         f"spectrum b, white_red, filament_base, minimum=0, maximum={max_global:.2f}",
@@ -448,11 +458,10 @@ def main() -> None:
         abp_pdb_path = OUT_DIR / f"{rec['abp_sname']}_abp.pdb"
         if not abp_pdb_path.exists():
             continue
-        rel_pdb = abp_pdb_path.relative_to(PROJECT_ROOT).as_posix()
         obj = safe_name(rec["abp_title"])[:30]
         all_pml_lines += [
             f"# {rec['abp_title']}",
-            f"load {rel_pdb}, {obj}",
+            f"load {abp_pdb_path.name}, {obj}",
             f"hide everything, {obj}",
             f"show surface, {obj}",
             f"spectrum b, white_red, {obj}, minimum=0",
@@ -460,7 +469,7 @@ def main() -> None:
         ]
     all_pml_lines += ["set surface_quality, 1", "bg_color white", "zoom filament_base"]
     (OUT_DIR / "all_specific_filaments.pml").write_text("\n".join(all_pml_lines))
-    print(f"PML maître généré : {len(diff_rows)} filaments spécifiques + base")
+    print(f"PML maitre genere : {len(diff_rows)} filaments specifiques + base")
 
     print("\nTerminé.")
 
