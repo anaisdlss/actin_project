@@ -549,16 +549,16 @@ def _load_res4(_v, *_mtimes):
 
 
 _AA_RESTYPE_HEX = {
-    "A": "#C0C0C0", "G": "#C0C0C0", "I": "#C0C0C0", "L": "#C0C0C0",
-    "M": "#C0C0C0", "V": "#C0C0C0",          # hydrophobe → gris
-    "F": "#FFB6C1", "W": "#FFB6C1", "Y": "#FFB6C1",  # aromatique → rose
-    "H": "#87CEEB", "N": "#87CEEB", "Q": "#87CEEB",
-    "S": "#87CEEB", "T": "#87CEEB",          # polaire → bleu ciel
-    "K": "#4169E1", "R": "#4169E1",          # positif → bleu roi
-    "D": "#DC143C", "E": "#DC143C",          # négatif → rouge
-    "C": "#FFD700",                           # cystéine → doré
-    "P": "#90EE90",                           # proline → vert clair
-    "?": "#AAAAAA",
+    "A": "#444444", "G": "#444444", "I": "#444444", "L": "#444444",
+    "M": "#444444", "V": "#444444",          # hydrophobe → gris foncé / noir
+    "F": "#FF0080", "W": "#FF0080", "Y": "#FF0080",  # aromatique → rose vif
+    "H": "#1E90FF", "N": "#1E90FF", "Q": "#1E90FF",
+    "S": "#1E90FF", "T": "#1E90FF",          # polaire → bleu vif
+    "K": "#0000CC", "R": "#0000CC",          # positif → bleu marine
+    "D": "#CC0000", "E": "#CC0000",          # négatif → rouge vif
+    "C": "#E6B800",                           # cystéine → doré foncé
+    "P": "#1A8C1A",                           # proline → vert forêt
+    "?": "#888888",
 }
 
 
@@ -582,7 +582,7 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
         )
 
     if not all(os.path.exists(f) for f in _BIPARTITE_FILES):
-        return None, 0, 0, 0
+        return None, 0, 0, 0, None
 
     df_int = pd.read_csv(_BIPARTITE_FILES[1])
     df_all = pd.read_csv(_BIPARTITE_FILES[2])
@@ -594,12 +594,12 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
 
     rows_c70 = df_c70b[df_c70b["patch"].astype(str) == str(patch_c70)]
     if rows_c70.empty:
-        return None, 0, 0, 0
+        return None, 0, 0, 0, None
     all_iids: set = set()
     for _, r in rows_c70.iterrows():
         all_iids |= _p(r["ids_interactions"])
     if not all_iids:
-        return None, 0, 0, 0
+        return None, 0, 0, 0, None
     n_total = len(all_iids)
 
     s1_chain = df_int.set_index("interaction_id")["chain_A_id"].str.lower()
@@ -770,7 +770,7 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
     # Charger table 4 (contient asa_pct_A et asa_pct_B)
     df_res4 = _load_res4(_v, *_mtimes)
     if df_res4 is None:
-        return None, 0, 0, 0
+        return None, 0, 0, 0, None
     t4 = df_res4[df_res4["interaction_id"].isin(all_iids)].copy()
     t4["partner"] = t4["interaction_id"].map(_partner)
     t4["couple"] = t4["interaction_id"].map(iid_to_couple)
@@ -832,7 +832,7 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
     # Stats S1 — moyenne équitable par couple : mean(sum/n_couple par canon)
     t4_s1 = t4[t4["residue_A_canon_mafft"].notna()].copy()
     if t4_s1.empty:
-        return None, 0, 0, 0
+        return None, 0, 0, 0, None
     t4_s1["canon"] = t4_s1["residue_A_canon_mafft"].astype(int)
     t4_s1["residue_name"] = t4_s1["residue_A_name"]
     _s1_profiles = []
@@ -999,8 +999,7 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
                            ) if pos in s1_aa_majority else "?"
             _t_s1 = asa_v / s1_ca_max if s1_ca_max > 0 else 0.0
             bg = _blend_white(_AA_RESTYPE_HEX.get(_aa_key, "#AAAAAA"), _t_s1)
-            tc = "#fff" if (_aa_key in ("K", "R", "D", "E")
-                            and _t_s1 > 0.6) else "#222"
+            tc = "#fff" if (_aa_key != "C" and _t_s1 > 0.45) else "#222"
         else:
             bg = _hex_s1(asa_v)
             tc = "#222" if asa_v < 55 else "#fff"
@@ -1043,8 +1042,7 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
             col = _blend_white(_AA_RESTYPE_HEX.get(
                 _s2_aa_key, "#AAAAAA"), _t_s2)
             _bord_h = "#555555"
-            tc_s2 = "#fff" if (_s2_aa_key in (
-                "K", "R", "D", "E") and _t_s2 > 0.6) else "#222"
+            tc_s2 = "#fff" if (_s2_aa_key != "C" and _t_s2 > 0.45) else "#222"
         elif partner == "Actine":
             col = _hex_s2_homo(ca_val)
             _bord_h = "#880044"
@@ -1089,7 +1087,7 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
         ecol = _edge_col(row["contact_type"])
         net.add_edge(
             f"s1_{int(row['s1_canon'])}", f"s2_{row['s2_node']}",
-            width=6.0 if nc == n_couples_total else 0.5,
+            width=0.5 + 5.5 * (nc / max(n_couples_total, 1)),
             color={"color": ecol, "highlight": "#FF4400", "hover": "#FF4400"},
             title=f"{nc}/{n_couples_total} couples · {row['contact_type']}",
             smooth={"enabled": False} if bipartite else {
