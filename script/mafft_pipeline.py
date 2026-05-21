@@ -118,6 +118,9 @@ def main():
     source_files  = [
         DATA_DIR / "filtered/filtered_all_data.csv",
         DATA_DIR / "filtered/filtered_summary.csv",
+        DATA_DIR / "filtered/details/1.interactions.csv",
+        DATA_DIR / "filtered/details/3.interface_residues.csv",
+        DATA_DIR / "filtered/details/4.inter-residue_contacts.csv",
     ]
     if done_sentinel.exists():
         done_mtime = done_sentinel.stat().st_mtime

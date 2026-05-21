@@ -101,12 +101,22 @@ def main():
             input_text="f\n",
         )
 
-        # 6 — Alignement MAFFT
-        run_step(
-            "6/15 — Alignement MAFFT par cluster de séquences",
-            [python_exec, "-m", "script.mafft_pipeline"],
-            cwd=PROJECT_ROOT,
-        )
+        # 6 — Alignement MAFFT + enrichissement asa_pct dans table 4
+        if is_up_to_date(
+            ALIGNMENTS / ".done",
+            FILTERED / "filtered_all_data.csv",
+            FILTERED / "filtered_summary.csv",
+            DETAILS / "1.interactions.csv",
+            DETAILS / "3.interface_residues.csv",
+            DETAILS / "4.inter-residue_contacts.csv",
+        ):
+            skip_step("6/15 — Alignement MAFFT par cluster de séquences")
+        else:
+            run_step(
+                "6/15 — Alignement MAFFT par cluster de séquences",
+                [python_exec, "-m", "script.mafft_pipeline"],
+                cwd=PROJECT_ROOT,
+            )
 
         # 7 — Analyse clusters d'interaction C70 (notebook)
         if is_up_to_date(
