@@ -301,6 +301,34 @@ def main():
     print(f"  Table 4 : {n4a}/{len(df_res4)} contacts avec residue_A_canon_mafft  |  {n4b}/{len(df_res4)} avec residue_B_canon_mafft")
     print(f"  Table 3 : {n3}/{len(df_res3)} résidus avec residue_number_canon_mafft")
 
+    # Enrichissement asa_pct_A/B : jointure table 3 → table 4
+    # (table 4 brute téléchargée par get_interaction_details ne contient pas ces colonnes)
+    _df3_asa = df_res3.copy()
+    _df3_asa["buried_ASA_percent"] = pd.to_numeric(
+        _df3_asa["buried_ASA_percent"].astype(str).str.replace("%", "", regex=False),
+        errors="coerce",
+    )
+    _df3_dedup = (
+        _df3_asa.groupby(["interaction_id", "chain", "residue_number_sequence"], sort=False)
+        ["buried_ASA_percent"].max().reset_index()
+    )
+    df_res4 = df_res4.drop(columns=["asa_pct_A", "asa_pct_B"], errors="ignore")
+    df_res4 = df_res4.merge(
+        _df3_dedup.rename(columns={"chain": "chain_A_id",
+                                   "residue_number_sequence": "residue_A_sequence",
+                                   "buried_ASA_percent": "asa_pct_A"}),
+        on=["interaction_id", "chain_A_id", "residue_A_sequence"], how="left",
+    )
+    df_res4 = df_res4.merge(
+        _df3_dedup.rename(columns={"chain": "chain_B_id",
+                                   "residue_number_sequence": "residue_B_sequence",
+                                   "buried_ASA_percent": "asa_pct_B"}),
+        on=["interaction_id", "chain_B_id", "residue_B_sequence"], how="left",
+    )
+    ok_A = df_res4["asa_pct_A"].notna().sum()
+    ok_B = df_res4["asa_pct_B"].notna().sum()
+    print(f"  asa_pct_A/B : {ok_A}/{len(df_res4)} renseignés")
+
     df_res4.to_csv(DETAILS_PATH / "4.inter-residue_contacts.csv", index=False)
     df_res3.to_csv(DETAILS_PATH / "3.interface_residues.csv", index=False)
     print("  Tables 3 et 4 mises à jour ✓")

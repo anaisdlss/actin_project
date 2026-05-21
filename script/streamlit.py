@@ -3012,8 +3012,9 @@ if os.path.exists(proteins_path):
 # ── Heatmap ABP × résidus actin ──────────────────────────────────────────────
 st.subheader("Heatmap — résidus actin contactés par les ABP")
 st.caption(
-    "Chaque cellule = % ASA buried moyen du résidu actin (position canonique) "
-    "sur toutes les interactions de l'ABP — les interactions sans contact comptent 0%."
+    "Chaque cellule = % ASA buried moyen équitable du résidu actin (position canonique). "
+    "Moyenne en deux étapes : d'abord par cluster C70 (0% si pas de contact), "
+    "puis moyenne équitable entre clusters C70."
 )
 
 _ABP_HM_FILES = [
@@ -3053,7 +3054,7 @@ def _build_abp_heatmap_data(*_):
         df_int_h[~df_int_h["interaction_id"].isin(homo_iids)]
         .merge(
             df_all_h[["subunit_1", "subunit_2",
-                      "subunit_2_title", "s2_actine"]],
+                      "subunit_2_title", "s2_actine", "cluster_data_70"]],
             left_on=["chain_A_id", "chain_B_id"],
             right_on=["subunit_1", "subunit_2"], how="left",
         )
@@ -3066,6 +3067,7 @@ def _build_abp_heatmap_data(*_):
     )
     _s1ch = het_int.set_index("interaction_id")["chain_A_id"].str.lower()
     _abpn = het_int.set_index("interaction_id")["abp_name"]
+    _c70n = het_int.set_index("interaction_id")["cluster_data_70"]
 
     het_ids = set(het_int["interaction_id"])
     df3_h = df3[df3["interaction_id"].isin(het_ids)].copy()
@@ -3073,20 +3075,43 @@ def _build_abp_heatmap_data(*_):
     df3_h = df3_h[df3_h["chain"].str.lower() == df3_h["_s1c"]].copy()
     df3_h["abp"] = df3_h["interaction_id"].map(_abpn)
     df3_h["canon"] = df3_h["residue_number_canon_mafft"].astype(int)
+    df3_h["c70"] = df3_h["interaction_id"].map(_c70n)
 
+    # Nombre d'interactions (pour label et tri)
     abp_freq = (
         df3_h.groupby("abp")["interaction_id"].nunique()
         .sort_values(ascending=False)
     )
-    # Moyenne en comptant 0 pour les interactions sans contact
-    agg_sum = (
-        df3_h.groupby(["abp", "canon"])["buried_ASA_percent"]
+
+    # ── Moyenne équitable par cluster C70 ────────────────────────────────────
+    # Étape 1 : n interactions par (abp, c70)
+    _abp_c70_n = df3_h.groupby(["abp", "c70"])["interaction_id"].nunique()
+
+    # Étape 2 : somme ASA par (abp, c70, canon) — 0 implicite si absent
+    _agg_c70 = (
+        df3_h.groupby(["abp", "c70", "canon"])["buried_ASA_percent"]
         .sum().reset_index(name="asa_sum")
     )
-    agg_sum["buried_ASA_percent"] = (
-        agg_sum["asa_sum"] / agg_sum["abp"].map(abp_freq)
+
+    # Étape 3 : moyenne par c70 (dénominateur = toutes les interactions du c70)
+    _agg_c70["asa_c70"] = _agg_c70.apply(
+        lambda r: r["asa_sum"] / max(_abp_c70_n.get((r["abp"], r["c70"]), 1), 1),
+        axis=1,
     )
-    agg = agg_sum[["abp", "canon", "buried_ASA_percent"]]
+
+    # Étape 4 : n clusters C70 par ABP
+    _n_c70_abp = df3_h.groupby("abp")["c70"].nunique()
+
+    # Étape 5 : moyenne équitable (chaque c70 pèse 1)
+    _agg_eq = (
+        _agg_c70.groupby(["abp", "canon"])["asa_c70"]
+        .sum().reset_index()
+    )
+    _agg_eq["buried_ASA_percent"] = (
+        _agg_eq["asa_c70"] / _agg_eq["abp"].map(_n_c70_abp)
+    )
+    agg = _agg_eq[["abp", "canon", "buried_ASA_percent"]]
+
     n_abp = max(abp_freq.shape[0], 1)
     res_freq = agg.groupby("canon")["abp"].nunique() / n_abp
 
