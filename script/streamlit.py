@@ -3951,6 +3951,24 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
                     )
                 },
             )
+        # Session PyMOL avec tous les filaments spécifiques
+        _all_pml = _Path(
+            "data/filtered/details/structures_files/filament/by_abp/all_specific_filaments.pml"
+        )
+        if _all_pml.exists():
+            with open(_all_pml, "rb") as _f:
+                st.download_button(
+                    "Session PyMOL — tous les filaments specifiques (.pml)",
+                    _f,
+                    file_name="all_specific_filaments.pml",
+                    mime="text/plain",
+                    key="dl_all_filaments",
+                )
+            st.caption(
+                "Contient le filament de reference + les 6 ABPs dont le filament "
+                "differe de la base (Cofilin-1/2, Coronin-1B, MAL, PHACTR1, WDR1)."
+            )
+
         _filament_pml = _Path(
             "data/filtered/details/structures_files/filament/actin_filament_10.pml"
         )
