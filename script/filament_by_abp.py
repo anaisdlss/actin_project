@@ -428,8 +428,40 @@ def main() -> None:
                   abp_title, GLOBAL_PATCHES, patches)
 
     # Sauvegarde du tableau patches par ABP (utilisé par Streamlit)
-    pd.DataFrame(patches_records).to_csv(
-        OUT_DIR / "patches_by_abp.csv", index=False)
+    df_records = pd.DataFrame(patches_records)
+    df_records.to_csv(OUT_DIR / "patches_by_abp.csv", index=False)
+
+    # ── PML maître : tous les filaments uniques (base + ABPs spécifiques) ───
+    diff_rows = df_records[df_records["same_as_base"] == False].dropna(subset=["patch_1"])
+    rel_base = GLOBAL_BASE_PDB.relative_to(PROJECT_ROOT).as_posix()
+    all_pml_lines = [
+        "# PyMOL — Tous les filaments actine uniques (base + ABPs specifiques)",
+        f"# Lancer depuis la racine du projet : pymol {(OUT_DIR / 'all_specific_filaments.pml').relative_to(PROJECT_ROOT).as_posix()}",
+        "",
+        f"load {rel_base}, filament_base",
+        "hide everything, filament_base",
+        "show surface, filament_base",
+        f"spectrum b, white_red, filament_base, minimum=0, maximum={max_global:.2f}",
+        "",
+    ]
+    for _, rec in diff_rows.iterrows():
+        abp_pdb_path = OUT_DIR / f"{rec['abp_sname']}_abp.pdb"
+        if not abp_pdb_path.exists():
+            continue
+        rel_pdb = abp_pdb_path.relative_to(PROJECT_ROOT).as_posix()
+        obj = safe_name(rec["abp_title"])[:30]
+        all_pml_lines += [
+            f"# {rec['abp_title']}",
+            f"load {rel_pdb}, {obj}",
+            f"hide everything, {obj}",
+            f"show surface, {obj}",
+            f"spectrum b, white_red, {obj}, minimum=0",
+            "",
+        ]
+    all_pml_lines += ["set surface_quality, 1", "bg_color white", "zoom filament_base"]
+    (OUT_DIR / "all_specific_filaments.pml").write_text("\n".join(all_pml_lines))
+    print(f"PML maître généré : {len(diff_rows)} filaments spécifiques + base")
+
     print("\nTerminé.")
 
 
