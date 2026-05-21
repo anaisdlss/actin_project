@@ -3922,6 +3922,35 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
             "B-factor = somme % ASA buried des 4 clusters homo principaux (6685_1+2+3+4). "
             "Spectre blanc → rouge : zones les plus contactées dans les interactions homo actine-actine."
         )
+
+        # Tableau récapitulatif : quels ABPs ont le même filament que la base ?
+        _patches_csv_noabp = _Path(
+            "data/filtered/details/structures_files/filament/by_abp/patches_by_abp.csv"
+        )
+        if _patches_csv_noabp.exists():
+            _df_abp_patches = pd.read_csv(_patches_csv_noabp)
+            _df_abp_patches = _df_abp_patches[_df_abp_patches["patch_1"].notna()].copy()
+            _df_abp_patches["Filament"] = _df_abp_patches["same_as_base"].map(
+                {True: "Identique a la reference", False: "Specifique a l'ABP"}
+            )
+            _df_abp_patches["Clusters utilises"] = _df_abp_patches.apply(
+                lambda r: str(r["patch_1"]) + (
+                    f" + {r['patch_2']}" if pd.notna(r["patch_2"]) else ""), axis=1
+            )
+            _df_display = _df_abp_patches[
+                ["abp_title", "Clusters utilises", "Filament"]
+            ].rename(columns={"abp_title": "ABP"})
+            st.markdown("**Filament par ABP — comparaison avec la reference sans ABP**")
+            st.dataframe(
+                _df_display.sort_values("Filament"),
+                hide_index=True,
+                use_container_width=True,
+                column_config={
+                    "Filament": st.column_config.TextColumn(
+                        "Filament", width="medium"
+                    )
+                },
+            )
         _filament_pml = _Path(
             "data/filtered/details/structures_files/filament/actin_filament_10.pml"
         )
