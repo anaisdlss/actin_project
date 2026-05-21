@@ -9,6 +9,7 @@ Le pipeline récupère l'ensemble des co-structures 3D disponibles, filtre les a
 ## Installation
 
 > **Systèmes supportés :** macOS (Intel et Apple Silicon) et Linux. Windows n'est pas supporté en raison d'une dépendance (MAFFT) non disponible sur cette plateforme.
+> S'asurrer que **pixi** est installée sur l'ordinateur
 
 ### 0 — Ouvrir un terminal
 
@@ -17,32 +18,24 @@ Toutes les commandes ci-dessous s'exécutent dans un terminal :
 - **macOS** : `Cmd + Espace` → taper `Terminal` → Entrée
 - **Linux** : `Ctrl + Alt + T`
 
-### 1 — Installer pixi
-
-Copier-coller la commande dans le terminal, puis appuyer sur Entrée.
+### 1 — Cloner le dépôt
 
 ```bash
-curl -fsSL https://pixi.sh/install.sh | bash
-```
-
-**Fermer et rouvrir le terminal** avant de continuer.
-
-### 2 — Cloner le dépôt
-
-```bash
+cd
+cd Desktop/
 git clone https://github.com/anaisdlss/actin_project.git
 cd actin_project
 ```
 
-### 3 — Installer l'environnement
+### 2 — Installer l'environnement
 
 ```bash
 pixi install
 ```
 
-Quelques minutes sont nécessaires lors de la première exécution.
+Quelques minutes peuvent être nécessaires lors de la première exécution.
 
-### 4 — Lancer l'interface web
+### 3 — Lancer l'interface web
 
 ```bash
 pixi run streamlit run script/streamlit.py
