@@ -3446,12 +3446,7 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
         _abp_n_competitors: dict = {k: len(v)
                                     for k, v in _abp_neighbors_c.items()}
 
-        # Degré pondéré pour dimensionner les nœuds
-        _node_deg_c: dict = {}
-        for (_a_c, _b_c), _w_c in _edge_wts.items():
-            _node_deg_c[_a_c] = _node_deg_c.get(_a_c, 0) + _w_c
-            _node_deg_c[_b_c] = _node_deg_c.get(_b_c, 0) + _w_c
-        _max_deg_c = max(_node_deg_c.values()) if _node_deg_c else 1
+        _max_comp_c = max(_abp_n_competitors.values()) if _abp_n_competitors else 1
 
         # Cluster de séquence par ABP → couleur (deux directions)
         _df_s2lnk = _merged_net.dropna(subset=["_seqcl"]).copy()
@@ -3526,11 +3521,10 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
 
         _label_thresh = 3
         for _nc in sorted(_all_abp_net):
-            _deg = _node_deg_c.get(_nc, 0)
-            _sz = 5 + 18 * (_deg / _max_deg_c) ** 1.5 if _deg > 0 else 5
             _n_c70_total = _abp_c70_count.get(_nc, 0)
             _n_c70_comp = _abp_c70_comp_count.get(_nc, 0)
             _n_comp_nc = _abp_n_competitors.get(_nc, 0)
+            _sz = 5 + 18 * (_n_comp_nc / _max_comp_c) ** 1.5 if _n_comp_nc > 0 else 5
             _pct_val = round(_n_c70_comp / _n_c70_total *
                              100) if _n_c70_total else 0
             _col = _pct_color(_n_c70_comp, _n_c70_total)

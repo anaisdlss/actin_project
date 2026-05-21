@@ -37,6 +37,34 @@ df4_raw["residue_A_canon_mafft"] = pd.to_numeric(df4_raw["residue_A_canon_mafft"
 df3_raw  = pd.read_csv(TABLE3)
 df3_raw["residue_number_canon_mafft"] = pd.to_numeric(
     df3_raw["residue_number_canon_mafft"], errors="coerce")
+
+# ── Calcul asa_pct_A/B si absentes (table 4 réécrite par get_interaction_details) ──
+if "asa_pct_A" not in df4_raw.columns or "asa_pct_B" not in df4_raw.columns:
+    print("asa_pct_A/B absentes de la table 4 → recalcul depuis table 3")
+    _df3_asa = df3_raw.copy()
+    _df3_asa["buried_ASA_percent"] = pd.to_numeric(
+        _df3_asa["buried_ASA_percent"].astype(str).str.replace("%", "", regex=False),
+        errors="coerce"
+    )
+    _df3_dedup = (
+        _df3_asa.groupby(["interaction_id", "chain", "residue_number_sequence"], sort=False)
+        ["buried_ASA_percent"].max().reset_index()
+    )
+    df4_raw = df4_raw.drop(columns=["asa_pct_A", "asa_pct_B"], errors="ignore")
+    df4_raw = df4_raw.merge(
+        _df3_dedup.rename(columns={"chain": "chain_A_id",
+                                   "residue_number_sequence": "residue_A_sequence",
+                                   "buried_ASA_percent": "asa_pct_A"}),
+        on=["interaction_id", "chain_A_id", "residue_A_sequence"], how="left"
+    )
+    df4_raw = df4_raw.merge(
+        _df3_dedup.rename(columns={"chain": "chain_B_id",
+                                   "residue_number_sequence": "residue_B_sequence",
+                                   "buried_ASA_percent": "asa_pct_B"}),
+        on=["interaction_id", "chain_B_id", "residue_B_sequence"], how="left"
+    )
+    print(f"  asa_pct_A : {df4_raw['asa_pct_A'].notna().sum()}/{len(df4_raw)} renseignés")
+    print(f"  asa_pct_B : {df4_raw['asa_pct_B'].notna().sum()}/{len(df4_raw)} renseignés")
 df8      = pd.read_csv(TABLE8)
 df_all   = pd.read_csv(ALL_DATA)
 df_c70   = pd.read_csv(C70_CSV)
