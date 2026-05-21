@@ -1527,10 +1527,10 @@ STEP_OUTPUT_FILES = {
     "8/15":  "data/filtered/details/structures_files/bfactor_c70_interface",
     "9/15":  "data/filtered/details/structures_files/bfactor_c70_interface/view_full_surface.pml",
     "10/15": "data/filtered/details/structures_files/bfactor_c70_interface/by_s1_cluster",
-    "11/15": "visualisations/actin_c70_contacts",
-    "12/15": "visualisations/actin_s1_all_equitable_heatmap.png",
+    "11/15": "data/visualisations/actin_c70_contacts",
+    "12/15": "data/visualisations/actin_s1_all_equitable_heatmap.png",
     "13/15": "data/filtered/details/structures_files/bfactor_cluster",
-    "14/15": "visualisations/abp_analysis_done.flag",
+    "14/15": "data/visualisations/abp_analysis_done.flag",
     "15/15": "data/filtered/details/structures_files/filament/by_abp",
 }
 
@@ -2660,21 +2660,21 @@ st.header("Clusters d'intéractions")
 
 PATCHES_S1_CSV = "data/filtered/patches_infos_s1_binding_site.csv"
 PATCHES_C70_CSV = "data/filtered/patches_infos_cluster_data_70.csv"
-GLOBAL_GRAPH_IMG = "visualisations/patch_graphs/global.png"
-GLOBAL_HEATMAP_IMG = "visualisations/patch_graphs/heatmap_binary.png"
-S1_GRAPHS_DIR = "visualisations/patch_graphs/s1_binding_site"
-C70_GRAPHS_DIR = "visualisations/patch_graphs/cluster_data_70"
-S1_HEATMAPS_F4_DIR = "visualisations/patch_heatmaps_s1_contacts"
-C70_HEATMAPS_F4_DIR = "visualisations/patch_heatmaps_c70_contacts"
-C70_CONTACTS_DIR = "visualisations/actin_c70_contacts"
-C70_CONTACTS_SURFACE_AREA_DIR = "visualisations/actin_c70_contacts_surface_area"
-C70_HEATMAP_SURFACE_AREA = "visualisations/actin_c70_heatmap_surface_area.png"
-S1_HEATMAP_RAW = "visualisations/actin_s1_homo_used_heatmap.png"
-S1_HEATMAP_EQUITABLE = "visualisations/actin_s1_all_equitable_heatmap.png"
-S1_HEATMAP_ABSOLUTE = "visualisations/actin_s1_heatmap_absolute.png"
+GLOBAL_GRAPH_IMG = "data/visualisations/patch_graphs/global.png"
+GLOBAL_HEATMAP_IMG = "data/visualisations/patch_graphs/heatmap_binary.png"
+S1_GRAPHS_DIR = "data/visualisations/patch_graphs/s1_binding_site"
+C70_GRAPHS_DIR = "data/visualisations/patch_graphs/cluster_data_70"
+S1_HEATMAPS_F4_DIR = "data/visualisations/patch_heatmaps_s1_contacts"
+C70_HEATMAPS_F4_DIR = "data/visualisations/patch_heatmaps_c70_contacts"
+C70_CONTACTS_DIR = "data/visualisations/actin_c70_contacts"
+C70_CONTACTS_SURFACE_AREA_DIR = "data/visualisations/actin_c70_contacts_surface_area"
+C70_HEATMAP_SURFACE_AREA = "data/visualisations/actin_c70_heatmap_surface_area.png"
+S1_HEATMAP_RAW = "data/visualisations/actin_s1_homo_used_heatmap.png"
+S1_HEATMAP_EQUITABLE = "data/visualisations/actin_s1_all_equitable_heatmap.png"
+S1_HEATMAP_ABSOLUTE = "data/visualisations/actin_s1_heatmap_absolute.png"
 S1_INTERFACE_FREQ_CSV = "data/filtered/actin_s1_canon_area_by_cluster.csv"
-S1_INTERFACE_CLUSTER_DIR = "visualisations/actin_s1_clusters"
-S1_INTERFACE_CLUSTER_BY_C70_DIR = "visualisations/actin_s1_clusters_by_c70"
+S1_INTERFACE_CLUSTER_DIR = "data/visualisations/actin_s1_clusters"
+S1_INTERFACE_CLUSTER_BY_C70_DIR = "data/visualisations/actin_s1_clusters_by_c70"
 BFACTOR_CLUSTER_DIR = "data/filtered/details/structures_files/bfactor_cluster"
 
 

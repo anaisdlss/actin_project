@@ -17,7 +17,7 @@ RAW           = DATA / "raw"
 FILTERED      = DATA / "filtered"
 DETAILS       = FILTERED / "details"
 ALIGNMENTS    = DATA / "alignments"
-VISUALISATIONS = PROJECT_ROOT / "visualisations"
+VISUALISATIONS = PROJECT_ROOT / "data" / "visualisations"
 
 
 def is_up_to_date(output: Path, *inputs: Path) -> bool:
