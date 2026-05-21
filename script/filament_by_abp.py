@@ -283,35 +283,24 @@ def find_representative_pdb(patches: list[str]) -> Path | None:
 
 # ── PML ──────────────────────────────────────────────────────────────────────
 
-_PML_CD_BLOCK = """\
-python
-import os as _os
-_os.chdir(_os.path.dirname(_os.path.abspath(__script__)))
-python end
-"""
-
-
 def write_pml(pml_path: Path, base_pdb: Path, abp_pdb: Path,
               max_base: float, max_abp: float,
               abp_title: str,
               base_patches: list[str], abp_patches: list[str]) -> None:
-    # Noms de fichiers seuls — le bloc python cd vers le répertoire du .pml
     content = f"""\
 # PyMOL — Filament actine {N_SUBUNITS} s-u — {abp_title}
 # filament_base : {' + '.join(base_patches)}, max B={max_base:.2f}
 # filament_abp  : {' + '.join(abp_patches) if abp_patches else 'aucun'}, max B={max_abp:.2f}
 # B-factor = somme % ASA buried (chaine A des representants C70)
 # Spectre white->red : blanc=non contacte, rouge=tres contacte
-{_PML_CD_BLOCK}
-# ── filament_base ──
-load {base_pdb.name}, filament_base
+
+load {base_pdb.as_posix()}, filament_base
 hide everything, filament_base
 show surface, filament_base
 color white, filament_base
 spectrum b, white_red, filament_base, minimum=0, maximum={max_base:.2f}
 
-# ── filament_abp ──
-load {abp_pdb.name}, filament_abp
+load {abp_pdb.as_posix()}, filament_abp
 hide everything, filament_abp
 show surface, filament_abp
 color white, filament_abp
@@ -397,9 +386,8 @@ def main() -> None:
             content = (
                 f"# PyMOL — Filament actine {N_SUBUNITS} s-u — {abp_title}\n"
                 f"# Clusters identiques aux clusters globaux ({' + '.join(patches)})\n"
-                f"# Filament identique au filament de reference sans ABP\n"
-                + _PML_CD_BLOCK + "\n"
-                f"load {GLOBAL_BASE_PDB.name}, filament_base\n"
+                f"# Filament identique au filament de reference sans ABP\n\n"
+                f"load {GLOBAL_BASE_PDB.as_posix()}, filament_base\n"
                 f"hide everything, filament_base\n"
                 f"show surface, filament_base\n"
                 f"color white, filament_base\n"
@@ -447,8 +435,8 @@ def main() -> None:
     diff_rows = df_records[df_records["same_as_base"] == False].dropna(subset=["patch_1"])
     all_pml_lines = [
         "# PyMOL — Tous les filaments actine uniques (base + ABPs specifiques)",
-        _PML_CD_BLOCK,
-        f"load {GLOBAL_BASE_PDB.name}, filament_base",
+        "",
+        f"load {GLOBAL_BASE_PDB.as_posix()}, filament_base",
         "hide everything, filament_base",
         "show surface, filament_base",
         f"spectrum b, white_red, filament_base, minimum=0, maximum={max_global:.2f}",
@@ -461,7 +449,7 @@ def main() -> None:
         obj = safe_name(rec["abp_title"])[:30]
         all_pml_lines += [
             f"# {rec['abp_title']}",
-            f"load {abp_pdb_path.name}, {obj}",
+            f"load {abp_pdb_path.as_posix()}, {obj}",
             f"hide everything, {obj}",
             f"show surface, {obj}",
             f"spectrum b, white_red, {obj}, minimum=0",
