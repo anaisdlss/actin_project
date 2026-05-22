@@ -3,7 +3,10 @@ import streamlit as st
 import pandas as pd
 import networkx as nx
 import py3Dmol
-from Bio import AlignIO
+from Bio import AlignIO, SeqIO
+from Bio.Seq import Seq
+from Bio.SeqRecord import SeqRecord
+import shutil
 from pyvis.network import Network
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
@@ -1493,6 +1496,7 @@ with st.sidebar:
 - [Structures PDB valides](#structures-pdb-valides)
 - [Clusters d'interactions](#clusters-d-interactions)
 - [ABP](#abp)
+- [MSA — Protéines d'interface](#msa-proteines)
 """)
 
 # ---------------------------------------------------------------------------
@@ -4021,3 +4025,426 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
                     file_name="actin_filament_10.pdb",
                     mime="chemical/x-pdb",
                 )
+
+# ── MSA — Protéines d'interface ───────────────────────────────────────────────
+
+st.header("MSA — Protéines d'interface", anchor="msa-proteines")
+
+_MSA_ALN_DIR    = _Path("data/alignments")
+_MSA_RIGOR_PDBS = {"5jlh", "6c1h", "7aln", "7jh7", "8efi", "8enc", "8zb7", "8zbm", "8zbn"}
+
+_MSA_TAX = {
+    9606: "H.sapiens", 10090: "M.musculus", 9986: "O.cuniculus",
+    10116: "R.norvegicus", 9823: "S.scrofa", 9031: "G.gallus",
+    9913: "B.taurus", 44689: "D.discoideum", 5811: "T.gondii",
+    36329: "P.falciparum", 5843: "P.knowlesi", 5833: "P.vivax",
+    5791: "Plasmodium", 5850: "P.falciparum3D7", 7227: "D.melanogaster",
+    4932: "S.cerevisiae", 559292: "S.cerevisiae", 4896: "S.pombe",
+    6577: "A.irradians", 31199: "A.irradians", 6637: "Mollusc",
+    6100: "other", 229533: "Acanthamoeba", 5754: "Acanthamoeba",
+    5759: "Acanthamoeba", 1051067: "bacteria", 1579: "bacteria",
+    32630: "synthetic", 32644: "unknown", 0: "chimera",
+}
+
+
+def _msa_extract_interface_seqs(filter_fn, rigor_pdbs=None):
+    """
+    Pour chaque séquence unique du groupe, extrait les résidus d'interface
+    (union des positions sur toutes les chaînes de cette séquence) et retourne
+    une DataFrame : seq_id, title, organism, length_full, n_interface, interface_seq.
+    Clé de coloration : interface_seq.lower() → set(range(1, n+1)) (toutes positions = interface).
+    """
+    from collections import defaultdict
+    filt_path = _Path("data/filtered/filtered_all_data.csv")
+    int3_path = _Path("data/filtered/details/3.interface_residues.csv")
+    if not filt_path.exists() or not int3_path.exists():
+        return pd.DataFrame()
+
+    df_filt = pd.read_csv(filt_path, low_memory=False)
+    if rigor_pdbs:
+        df_filt = df_filt[df_filt["pdb_id"].isin(rigor_pdbs)]
+    df3 = pd.read_csv(int3_path)
+
+    mask = df_filt["subunit_2_title"].apply(lambda t: filter_fn(str(t)))
+    rows = df_filt[mask][
+        ["subunit_2", "subunit_2_title", "s2_sequence", "s2_taxonomy_id"]
+    ].drop_duplicates(subset=["subunit_2"])
+
+    chain_to_fullseq = {r["subunit_2"]: str(r["s2_sequence"]).strip() for _, r in rows.iterrows()}
+    chain_to_seqlow  = {ch: s.lower() for ch, s in chain_to_fullseq.items()}
+    chain_to_title   = {r["subunit_2"]: str(r["subunit_2_title"]) for _, r in rows.iterrows()}
+    chain_to_taxid   = {r["subunit_2"]: r["s2_taxonomy_id"] for _, r in rows.iterrows()}
+
+    res = df3[df3["chain"].isin(chain_to_fullseq.keys())][
+        ["chain", "residue_number_sequence"]
+    ].dropna()
+
+    # seqlow → {chain → set(pos)}
+    seq_chains_pos: dict = defaultdict(dict)
+    for _, row in res.iterrows():
+        ch = row["chain"]
+        seqlow = chain_to_seqlow.get(ch)
+        if seqlow is None:
+            continue
+        seq_chains_pos[seqlow].setdefault(ch, set()).add(int(row["residue_number_sequence"]))
+
+    # Premier chain représentatif par séquence unique
+    seqlow_to_chain: dict = {}
+    for ch, seqlow in chain_to_seqlow.items():
+        seqlow_to_chain.setdefault(seqlow, ch)
+
+    records = []
+    for seqlow, chains_pos in seq_chains_pos.items():
+        union_pos = set()
+        for s in chains_pos.values():
+            union_pos |= s
+        if not union_pos:
+            continue
+        first_ch = seqlow_to_chain[seqlow]
+        full_seq  = chain_to_fullseq[first_ch]
+        iface_seq = "".join(
+            full_seq[p - 1] if 0 < p <= len(full_seq) else "X"
+            for p in sorted(union_pos)
+        )
+        taxid    = chain_to_taxid[first_ch]
+        organism = _MSA_TAX.get(int(taxid), f"taxid:{int(taxid)}") if pd.notna(taxid) else "unknown"
+        records.append({
+            "title":        chain_to_title[first_ch],
+            "organism":     organism,
+            "length_full":  len(full_seq),
+            "n_interface":  len(union_pos),
+            "interface_seq": iface_seq,
+        })
+
+    if not records:
+        return pd.DataFrame()
+
+    df = pd.DataFrame(records)
+    base_ids = (
+        df["title"].str[:24].str.replace(r"[^\w]", "_", regex=True)
+        + "_" + df["organism"]
+        + "_n" + df["n_interface"].astype(str)
+    )
+    seen: dict = {}
+    uid: list = []
+    for bid in base_ids:
+        cnt = seen.get(bid, 0)
+        uid.append(bid if cnt == 0 else f"{bid}_{cnt}")
+        seen[bid] = cnt + 1
+    df["seq_id"] = uid
+    return df[["seq_id", "title", "organism", "length_full", "n_interface", "interface_seq"]].reset_index(drop=True)
+
+
+def _msa_run_mafft(fasta_path: _Path, aln_path: _Path):
+    mafft_bin = shutil.which("mafft")
+    if mafft_bin is None:
+        return False, "mafft introuvable dans le PATH"
+    try:
+        with open(aln_path, "w") as out:
+            res = subprocess.run(
+                [mafft_bin, "--auto", "--reorder", str(fasta_path)],
+                stdout=out, stderr=subprocess.PIPE, text=True, timeout=600,
+            )
+        if res.returncode != 0:
+            return False, res.stderr[:500]
+        return aln_path.exists() and aln_path.stat().st_size > 0, res.stderr
+    except subprocess.TimeoutExpired:
+        return False, "Timeout (>10 min)"
+
+
+def _msa_col_colors(alignment, core_by_seqlow: dict, var_by_seqlow: dict) -> dict:
+    """
+    Précalcule pour chaque (record.id, colonne_alignement) la couleur :
+      'orange' : aa majoritaire ET toutes les séquences non-gap ont une interface ici.
+      'red'    : aa minoritaire à cette colonne.
+      'yellow' : colonne avec gap OU interface présente seulement dans certaines séquences.
+    Retourne dict{ record.id → dict{ aln_col → 'orange'|'red'|'yellow' } }
+    """
+    from collections import Counter
+
+    n_seqs = len(alignment)
+
+    # Étape 1 : seq_pos → colonne alignement pour chaque séquence
+    seq_to_aln: dict = {}
+    for record in alignment:
+        m: dict = {}
+        sp = 0
+        for col, aa in enumerate(str(record.seq)):
+            if aa != "-":
+                sp += 1
+                m[sp] = col
+        seq_to_aln[str(record.id)] = m
+
+    # Étape 2 : colonnes ayant au moins un gap + nb séquences non-gap par colonne
+    gap_cols: set = set()
+    non_gap_count: dict = {}  # aln_col → nb séquences sans gap
+    for record in alignment:
+        for col, aa in enumerate(str(record.seq)):
+            if aa == "-":
+                gap_cols.add(col)
+            else:
+                non_gap_count[col] = non_gap_count.get(col, 0) + 1
+
+    # Étape 3 : pour chaque colonne, compter les séquences avec résidu d'interface
+    col_counter: dict = {}        # aln_col → Counter{aa → count}
+    col_interface_count: dict = {}  # aln_col → nb séquences avec interface ici
+    for record in alignment:
+        seq_low  = str(record.seq).replace("-", "").lower()
+        core_pos = core_by_seqlow.get(seq_low, set())
+        var_pos  = var_by_seqlow.get(seq_low,  set())
+        seq_str  = str(record.seq)
+        for sp, col in seq_to_aln[str(record.id)].items():
+            if sp in core_pos or sp in var_pos:
+                aa = seq_str[col].upper()
+                if col not in col_counter:
+                    col_counter[col] = Counter()
+                col_counter[col][aa] += 1
+                col_interface_count[col] = col_interface_count.get(col, 0) + 1
+
+    # Colonnes où l'interface est partielle : certaines séquences non-gap n'ont pas d'interface
+    partial_cols: set = {
+        col for col, n_int in col_interface_count.items()
+        if n_int < non_gap_count.get(col, n_seqs)
+    }
+
+    # Étape 4 : couleur par (record, colonne)
+    result: dict = {}
+    for record in alignment:
+        seq_low  = str(record.seq).replace("-", "").lower()
+        core_pos = core_by_seqlow.get(seq_low, set())
+        var_pos  = var_by_seqlow.get(seq_low,  set())
+        seq_str  = str(record.seq)
+        colors: dict = {}
+        for sp, col in seq_to_aln[str(record.id)].items():
+            if sp in core_pos or sp in var_pos:
+                if col in gap_cols or col in partial_cols:
+                    colors[col] = "yellow"
+                else:
+                    counter   = col_counter.get(col, Counter())
+                    max_count = max(counter.values()) if counter else 1
+                    aa        = seq_str[col].upper()
+                    colors[col] = "orange" if counter[aa] == max_count else "red"
+        result[str(record.id)] = colors
+    return result
+
+
+def _msa_render_full(alignment, core_by_seqlow: dict, var_by_seqlow: dict, cols_per_line: int = 60) -> str:
+    """
+    HTML de l'alignement complet.
+    Orange : cœur d'interface ET aa conservé à cette colonne MSA.
+    Rouge  : interface mais aa variable ou position non partagée.
+    Gris   : non-interface.
+    """
+    col_colors = _msa_col_colors(alignment, core_by_seqlow, var_by_seqlow)
+    aln_len = alignment.get_alignment_length()
+    n_lines = (aln_len + cols_per_line - 1) // cols_per_line
+    label_w = min(max(len(str(r.id)) for r in alignment), 36)
+    parts = [
+        '<div style="font-family:\'Courier New\',Courier,monospace;font-size:11px;'
+        'line-height:1.6;background:#fafafa;padding:10px;'
+        'user-select:none;-webkit-user-select:none;cursor:default;">'
+    ]
+    for li in range(n_lines):
+        c0 = li * cols_per_line
+        c1 = min(c0 + cols_per_line, aln_len)
+        parts.append(
+            f'<div style="color:#aaa;font-size:10px;margin:{("14px" if li else "0")} 0 2px 0">'
+            f'Positions {c0 + 1}–{c1}</div>'
+        )
+        parts.append('<table style="border-collapse:collapse;">')
+        for record in alignment:
+            rec_colors = col_colors.get(str(record.id), {})
+            label      = str(record.id)[:label_w].ljust(label_w).replace(" ", "&nbsp;")
+            block      = str(record.seq)[c0:c1]
+            seg_parts  = []
+            buf_grey   = []
+            for i, aa in enumerate(block):
+                aln_col = c0 + i
+                if aa == "-":
+                    if buf_grey:
+                        seg_parts.append(f'<span style="color:#ccc">{"".join(buf_grey)}</span>')
+                        buf_grey = []
+                    seg_parts.append('<span style="color:#e0e0e0">-</span>')
+                    continue
+                aa_u  = aa.upper()
+                color = rec_colors.get(aln_col)
+                if color == "orange":
+                    if buf_grey:
+                        seg_parts.append(f'<span style="color:#ccc">{"".join(buf_grey)}</span>')
+                        buf_grey = []
+                    seg_parts.append(f'<span style="background:#27ae60;color:#fff">{aa_u}</span>')
+                elif color == "red":
+                    if buf_grey:
+                        seg_parts.append(f'<span style="color:#ccc">{"".join(buf_grey)}</span>')
+                        buf_grey = []
+                    seg_parts.append(f'<span style="background:#8e44ad;color:#fff">{aa_u}</span>')
+                elif color == "yellow":
+                    if buf_grey:
+                        seg_parts.append(f'<span style="color:#ccc">{"".join(buf_grey)}</span>')
+                        buf_grey = []
+                    seg_parts.append(f'<span style="background:#e74c3c;color:#fff">{aa_u}</span>')
+                else:
+                    buf_grey.append(aa_u)
+            if buf_grey:
+                seg_parts.append(f'<span style="color:#ccc">{"".join(buf_grey)}</span>')
+            parts.append(
+                f'<tr>'
+                f'<td style="padding-right:12px;color:#555;font-size:10px;'
+                f'white-space:pre;vertical-align:top">{label}</td>'
+                f'<td style="white-space:pre">{"".join(seg_parts)}</td>'
+                f'</tr>'
+            )
+        parts.append("</table>")
+    # Légende
+    parts.append(
+        '<div style="margin-top:14px;font-size:10px;color:#666">'
+        '<span style="background:#27ae60;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">'
+        '&#9632; Majoritaire (aa conservé)</span>'
+        '<span style="background:#8e44ad;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">'
+        '&#9632; Minoritaire (aa rare)</span>'
+        '<span style="background:#e74c3c;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">'
+        '&#9632; Interface + gap dans la colonne</span>'
+        '<span style="color:#ccc;margin-right:6px">&#9632; Non-interface</span>'
+        '</div></div>'
+    )
+    return "".join(parts)
+
+
+# ── UI MSA ────────────────────────────────────────────────────────────────────
+
+def _msa_section(group_label, group_key, filter_fn, rigor_pdbs=None, note=None):
+    """Affiche une section MSA (résidus d'interface seulement) dans un expander."""
+    with st.expander(f"**{group_label}**", expanded=(group_key == "myosin")):
+        if note:
+            st.caption(note)
+
+        df_seqs = _msa_extract_interface_seqs(filter_fn, rigor_pdbs)
+
+        if df_seqs.empty:
+            st.info("Aucun résidu d'interface trouvé pour ce groupe.")
+            return
+
+        st.markdown(
+            f"**{len(df_seqs)} séquences uniques** · "
+            f"résidus d'interface : {df_seqs['n_interface'].min()}–{df_seqs['n_interface'].max()} aa "
+            f"*(sur {df_seqs['length_full'].min()}–{df_seqs['length_full'].max()} aa totaux)*"
+        )
+        with st.expander("Détail des séquences"):
+            st.dataframe(
+                df_seqs[["seq_id", "organism", "n_interface", "length_full"]],
+                use_container_width=True, hide_index=True,
+            )
+
+        if len(df_seqs) < 2:
+            st.info("Moins de 2 séquences — alignement impossible.")
+            return
+
+        fasta_path = _MSA_ALN_DIR / f"{group_key}_msa.fasta"
+        aln_path   = _MSA_ALN_DIR / f"{group_key}_msa.aln"
+
+        _btn_c, _force_c = st.columns([1, 2])
+        _run   = _btn_c.button("Lancer MAFFT", key=f"msa_{group_key}_btn")
+        _force = _force_c.checkbox("Forcer recalcul", key=f"msa_{group_key}_force")
+
+        if _run or aln_path.exists():
+            if _run or not aln_path.exists() or _force:
+                _MSA_ALN_DIR.mkdir(parents=True, exist_ok=True)
+                _recs = [
+                    SeqRecord(Seq(row["interface_seq"]), id=row["seq_id"][:50], description="")
+                    for _, row in df_seqs.iterrows()
+                ]
+                SeqIO.write(_recs, fasta_path, "fasta")
+                with st.spinner(f"MAFFT sur {len(df_seqs)} séquences d'interface…"):
+                    _ok, _err = _msa_run_mafft(fasta_path, aln_path)
+                if not _ok:
+                    st.error(f"Erreur MAFFT : {_err}")
+
+            if aln_path.exists():
+                try:
+                    _aln = AlignIO.read(str(aln_path), "fasta")
+                except Exception as _e:
+                    st.error(f"Impossible de lire l'alignement : {_e}")
+                    return
+
+                _nseqs = len(_aln)
+                _alen  = _aln.get_alignment_length()
+                st.success(f"**{_nseqs} séquences × {_alen} colonnes**")
+
+                # En mode interface-only, toutes les positions sont des résidus d'interface
+                _core_iface: dict = {}
+                _var_iface:  dict = {}
+                for _, row in df_seqs.iterrows():
+                    iseq_low = row["interface_seq"].lower()
+                    _core_iface[iseq_low] = set(range(1, len(row["interface_seq"]) + 1))
+
+                _n_iface = df_seqs["n_interface"].sum()
+                st.caption(f"Résidus d'interface alignés : {_n_iface} au total")
+
+                _html   = _msa_render_full(_aln, _core_iface, _var_iface, 100)
+                _n_blk  = (_alen + 99) // 100
+                _height = min(_n_blk * (_nseqs * 18 + 28) + 80, 6000)
+                st.components.v1.html(_html, height=_height, scrolling=True)
+
+                with open(aln_path, "rb") as _f:
+                    st.download_button(
+                        f"Télécharger {group_key}_msa.aln",
+                        _f,
+                        file_name=f"{group_key}_msa.aln",
+                        mime="text/plain",
+                        key=f"msa_{group_key}_dl",
+                    )
+
+
+if not _Path("data/filtered/filtered_all_data.csv").exists():
+    st.warning("filtered_all_data.csv non trouvé — lancer d'abord les étapes de filtrage.")
+else:
+    _MSA_ALN_DIR.mkdir(parents=True, exist_ok=True)
+
+    st.caption(
+        "Chaque section aligne uniquement les **résidus d'interface** (zone de contact actine) "
+        "— vert = aa majoritaire universel · violet = minoritaire · rouge = position absente dans certaines séquences"
+    )
+
+    _msa_section(
+        "Myosines (rigor — sans ADP)", "myosin",
+        lambda t: "myosin" in t.lower() and "tropomyosin" not in t.lower(),
+        rigor_pdbs=_MSA_RIGOR_PDBS,
+        note="Restreint aux 9 structures rigor (sans ADP sur la chaîne myosine).",
+    )
+    _msa_section(
+        "Tropomyosines", "tropomyosin",
+        lambda t: "tropomyosin" in t.lower(),
+    )
+    _msa_section(
+        "Plastin et apparentés", "plastin",
+        lambda t: any(x in t.lower() for x in ["plastin", "spectrin beta", "filamin", "utrophin"]),
+        note="Plastin-3, Spectrin beta chain, Filamin-A, Utrophin.",
+    )
+    _msa_section(
+        "Cofilin / ADF", "cofilin",
+        lambda t: "cofilin" in t.lower() or "actin-depolymerizing" in t.lower(),
+    )
+    _msa_section(
+        "Coronin", "coronin",
+        lambda t: "coronin" in t.lower(),
+    )
+    _msa_section(
+        "Arp2/3", "arp",
+        lambda t: "actin-related protein" in t.lower() or "arp2/3" in t.lower(),
+    )
+    _msa_section(
+        "Formin", "formin",
+        lambda t: "formin" in t.lower(),
+    )
+    _msa_section(
+        "Talin", "talin",
+        lambda t: "talin" in t.lower(),
+    )
+    _msa_section(
+        "Vinculin", "vinculin",
+        lambda t: "vinculin" in t.lower(),
+    )
+    _msa_section(
+        "Profilin", "profilin",
+        lambda t: "profilin" in t.lower(),
+    )
