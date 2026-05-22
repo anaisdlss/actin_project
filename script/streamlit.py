@@ -4542,10 +4542,10 @@ def _msa_section_full(group_label, group_key, filter_fn, rigor_pdbs=None, note=N
                     )
 
 
-def _msa_section_clusters():
+def _msa_section_s2_clusters():
     """
-    Barre déroulante : tous les clusters s2_sequence_cluster_70 hors familles nommées.
-    MAFFT sur sous-séquences d'interface, affichage de la séquence COMPLÈTE colorée.
+    Clusters S2 (s2_sequence_cluster_70) hors 3 familles nommées.
+    MAFFT sur séquence COMPLÈTE + interface colorée — identique aux 3 familles.
     """
     _EXCLUDE_FN = lambda t: (
         ("myosin" in t.lower() and "tropomyosin" not in t.lower())
@@ -4557,11 +4557,123 @@ def _msa_section_clusters():
             and "actin-depolymerizing" not in t.lower())
     )
 
-    with st.expander("**Autres clusters — alignement sur résidus d'interface**"):
+    with st.expander("**Autres clusters de protéines — séquence complète**"):
+        st.caption("MAFFT sur séquence complète, résidus d'interface colorés (s2_sequence_cluster_70).")
+
+        filt_path = _Path("data/filtered/filtered_all_data.csv")
+        int3_path = _Path("data/filtered/details/3.interface_residues.csv")
+        if not filt_path.exists() or not int3_path.exists():
+            st.warning("Données manquantes.")
+            return
+
+        from collections import defaultdict
+        df_filt = pd.read_csv(filt_path, low_memory=False)
+        df3     = pd.read_csv(int3_path)
+
+        mask    = ~df_filt["subunit_2_title"].apply(lambda t: _EXCLUDE_FN(str(t)))
+        df_other = df_filt[mask].copy()
+
+        clusters = (
+            df_other[["s2_sequence_cluster_70", "subunit_2_title"]]
+            .dropna(subset=["s2_sequence_cluster_70"]).drop_duplicates()
+            .groupby("s2_sequence_cluster_70")["subunit_2_title"]
+            .apply(lambda x: ", ".join(sorted(set(x))[:3])).reset_index()
+        )
+        clusters.columns = ["cluster_id", "titles"]
+
+        for _, crow in clusters.sort_values("cluster_id").iterrows():
+            cid   = int(crow["cluster_id"])
+            ckey  = f"s2c_{cid}"
+            rows_c = df_other[df_other["s2_sequence_cluster_70"] == cid][
+                ["subunit_2", "subunit_2_title", "s2_sequence", "s2_taxonomy_id"]
+            ].drop_duplicates(subset=["subunit_2"])
+
+            chain_to_full   = {r["subunit_2"]: str(r["s2_sequence"]).strip() for _, r in rows_c.iterrows()}
+            chain_to_seqlow = {ch: s.lower() for ch, s in chain_to_full.items()}
+            chain_to_title  = {r["subunit_2"]: str(r["subunit_2_title"]) for _, r in rows_c.iterrows()}
+            chain_to_taxid  = {r["subunit_2"]: r["s2_taxonomy_id"] for _, r in rows_c.iterrows()}
+
+            # Interface positions per unique sequence
+            res_c = df3[df3["chain"].isin(chain_to_full)][["chain","residue_number_sequence"]].dropna()
+            seq_iface_chains: dict = defaultdict(dict)
+            for _, rrow in res_c.iterrows():
+                seqlow = chain_to_seqlow.get(rrow["chain"])
+                if seqlow:
+                    seq_iface_chains[seqlow].setdefault(rrow["chain"], set()).add(int(rrow["residue_number_sequence"]))
+
+            # Build core/variable for _msa_render_full
+            core_c: dict = {}
+            var_c:  dict = {}
+            for seqlow, cpos in seq_iface_chains.items():
+                sets = list(cpos.values())
+                if len(sets) == 1:
+                    core_c[seqlow], var_c[seqlow] = sets[0].copy(), set()
+                else:
+                    inter = sets[0].copy(); union = sets[0].copy()
+                    for s in sets[1:]: inter &= s; union |= s
+                    core_c[seqlow], var_c[seqlow] = inter, union - inter
+
+            # Unique sequences (full) with interface data
+            seen: set = set()
+            uniq: list = []
+            for ch, seqlow in chain_to_seqlow.items():
+                if seqlow not in seen and seqlow in seq_iface_chains:
+                    seen.add(seqlow)
+                    taxid = chain_to_taxid[ch]
+                    org   = _MSA_TAX.get(int(taxid), f"taxid:{int(taxid)}") if pd.notna(taxid) else "unk"
+                    title = chain_to_title[ch]
+                    bid   = (title[:20].replace(" ","_").replace(",","") + "_" + org)[:40]
+                    uniq.append({"seq_id": bid, "seq": chain_to_full[ch]})
+
+            if len(uniq) < 2:
+                continue
+
+            clabel = crow["titles"][:60]
+            with st.expander(f"Cluster {cid} — {clabel} ({len(uniq)} séq.)"):
+                fasta_path = _MSA_ALN_DIR / f"{ckey}_msa.fasta"
+                aln_path   = _MSA_ALN_DIR / f"{ckey}_msa.aln"
+                _bc, _fc = st.columns([1, 2])
+                _run2   = _bc.button("Lancer MAFFT", key=f"msa_{ckey}_btn")
+                _force2 = _fc.checkbox("Forcer recalcul", key=f"msa_{ckey}_force")
+
+                if _run2 or aln_path.exists():
+                    if _run2 or not aln_path.exists() or _force2:
+                        _MSA_ALN_DIR.mkdir(parents=True, exist_ok=True)
+                        SeqIO.write(
+                            [SeqRecord(Seq(s["seq"]), id=s["seq_id"][:50], description="") for s in uniq],
+                            fasta_path, "fasta",
+                        )
+                        with st.spinner(f"MAFFT ({len(uniq)} séq.)…"):
+                            _ok2, _err2 = _msa_run_mafft(fasta_path, aln_path)
+                        if not _ok2:
+                            st.error(f"Erreur MAFFT : {_err2}")
+
+                    if aln_path.exists():
+                        try:
+                            _aln2 = AlignIO.read(str(aln_path), "fasta")
+                        except Exception as _e2:
+                            st.error(f"Impossible de lire l'alignement : {_e2}"); continue
+                        _ns2 = len(_aln2); _al2 = _aln2.get_alignment_length()
+                        st.success(f"**{_ns2} séq. × {_al2} col.**")
+                        _html2 = _msa_render_full(_aln2, core_c, var_c, 100)
+                        _height2 = min(((_al2+99)//100) * (_ns2 * 18 + 28) + 80, 8000)
+                        st.components.v1.html(_html2, height=_height2, scrolling=True)
+
+
+def _msa_section_s1_clusters():
+    """
+    Clusters S1 binding site (s1_binding_site_cluster_data_70) — interactions hétéro uniquement.
+    MAFFT sur les résidus d'interface de l'ACTINE (S1) ; affiche uniquement ces résidus.
+    """
+    def _is_actin(t):
+        t = t.lower()
+        return t.startswith("actin") and "actin-related" not in t and "actin-depolymerizing" not in t
+
+    with st.expander("**Clusters S1 — site de liaison actine (résidus d'interface uniquement)**"):
         st.caption(
-            "Chaque cluster regroupe des protéines similaires (s2_sequence_cluster_70). "
-            "MAFFT est lancé sur les sous-séquences d'interface ; la séquence complète est affichée "
-            "avec les résidus d'interface colorés."
+            "Chaque cluster regroupe les interactions qui partagent le même site de liaison sur l'actine. "
+            "MAFFT est lancé sur les sous-séquences d'interface de l'actine (S1). "
+            "Seules les colonnes contenant ≥2 séquences actin uniques avec interface sont affichées."
         )
 
         filt_path = _Path("data/filtered/filtered_all_data.csv")
@@ -4574,115 +4686,90 @@ def _msa_section_clusters():
         df_filt = pd.read_csv(filt_path, low_memory=False)
         df3     = pd.read_csv(int3_path)
 
-        # Filtrer : garder seulement les non-familles-nommées, non-actine
-        mask = ~df_filt["subunit_2_title"].apply(lambda t: _EXCLUDE_FN(str(t)))
-        df_other = df_filt[mask].copy()
-        if df_other.empty:
-            st.info("Aucun cluster trouvé.")
-            return
+        # Interactions hétérodimériques (S2 ≠ actine)
+        df_h = df_filt[~df_filt["subunit_2_title"].apply(lambda t: _is_actin(str(t)))]
 
-        # Grouper par s2_sequence_cluster_70
-        clusters = (
-            df_other[["s2_sequence_cluster_70", "subunit_2_title"]]
-            .dropna(subset=["s2_sequence_cluster_70"])
-            .drop_duplicates()
-            .groupby("s2_sequence_cluster_70")["subunit_2_title"]
-            .apply(lambda x: ", ".join(sorted(set(x))[:3]))
-            .reset_index()
+        clusters_s1 = (
+            df_h[["s1_binding_site_cluster_data_70", "subunit_2_title"]]
+            .dropna(subset=["s1_binding_site_cluster_data_70"]).drop_duplicates()
+            .groupby("s1_binding_site_cluster_data_70")["subunit_2_title"]
+            .apply(lambda x: ", ".join(sorted(set(x))[:4])).reset_index()
         )
-        clusters.columns = ["cluster_id", "titles"]
-        clusters = clusters.sort_values("cluster_id")
+        clusters_s1.columns = ["cluster_id", "partners"]
+        clusters_s1 = clusters_s1.sort_values("cluster_id")
 
-        for _, crow in clusters.iterrows():
-            cid    = int(crow["cluster_id"])
-            clabel = crow["titles"][:60]
-            ckey   = f"clust_{cid}"
+        for _, crow in clusters_s1.iterrows():
+            cid   = str(crow["cluster_id"])
+            ckey  = "s1bs_" + cid.replace("_", "x")
 
-            # Séquences uniques de ce cluster
-            rows_c = df_other[df_other["s2_sequence_cluster_70"] == cid][
-                ["subunit_2", "subunit_2_title", "s2_sequence", "s2_taxonomy_id"]
-            ].drop_duplicates(subset=["subunit_2"])
+            rows_s1 = df_h[df_h["s1_binding_site_cluster_data_70"] == cid][
+                ["subunit_1", "subunit_1_title", "s1_sequence", "s1_taxonomy_id"]
+            ].drop_duplicates(subset=["subunit_1"])
 
-            chain_to_full  = {r["subunit_2"]: str(r["s2_sequence"]).strip() for _, r in rows_c.iterrows()}
+            chain_to_full   = {r["subunit_1"]: str(r["s1_sequence"]).strip() for _, r in rows_s1.iterrows()}
             chain_to_seqlow = {ch: s.lower() for ch, s in chain_to_full.items()}
-            chain_to_title  = {r["subunit_2"]: str(r["subunit_2_title"]) for _, r in rows_c.iterrows()}
-            chain_to_taxid  = {r["subunit_2"]: r["s2_taxonomy_id"] for _, r in rows_c.iterrows()}
+            chain_to_title  = {r["subunit_1"]: str(r["subunit_1_title"]) for _, r in rows_s1.iterrows()}
+            chain_to_taxid  = {r["subunit_1"]: r["s1_taxonomy_id"] for _, r in rows_s1.iterrows()}
 
-            # Positions d'interface par séquence
-            res_c = df3[df3["chain"].isin(chain_to_full)][["chain", "residue_number_sequence"]].dropna()
+            # Interface positions (actin side) per unique sequence
+            res_s1 = df3[df3["chain"].isin(chain_to_full)][["chain","residue_number_sequence"]].dropna()
             seq_iface: dict = defaultdict(set)
-            for _, rrow in res_c.iterrows():
+            for _, rrow in res_s1.iterrows():
                 seqlow = chain_to_seqlow.get(rrow["chain"])
                 if seqlow:
                     seq_iface[seqlow].add(int(rrow["residue_number_sequence"]))
 
-            # Séquences uniques avec positions d'interface
-            seen_seqlow: set = set()
-            uniq_seqs = []
+            # Unique actin sequences with interface data
+            seen: set = set()
+            uniq: list = []
             for ch, seqlow in chain_to_seqlow.items():
-                if seqlow not in seen_seqlow and seqlow in seq_iface:
-                    seen_seqlow.add(seqlow)
+                if seqlow not in seen and seqlow in seq_iface:
+                    seen.add(seqlow)
                     taxid = chain_to_taxid[ch]
                     org   = _MSA_TAX.get(int(taxid), f"taxid:{int(taxid)}") if pd.notna(taxid) else "unk"
-                    title = chain_to_title[ch]
-                    base_id = (title[:20].replace(" ", "_").replace(",", "") + "_" + org)[:40]
-                    uniq_seqs.append({
-                        "seq_id": base_id,
-                        "title":  title,
-                        "full_seq": chain_to_full[ch],
-                        "iface_seq": "".join(
-                            chain_to_full[ch][p - 1] if 0 < p <= len(chain_to_full[ch]) else "X"
-                            for p in sorted(seq_iface[seqlow])
-                        ),
-                        "iface_positions": sorted(seq_iface[seqlow]),
-                        "n_iface": len(seq_iface[seqlow]),
-                    })
+                    ipos  = sorted(seq_iface[seqlow])
+                    full  = chain_to_full[ch]
+                    iseq  = "".join(full[p-1] if 0 < p <= len(full) else "X" for p in ipos)
+                    bid   = (chain_to_title[ch][:16].replace(" ","_") + "_" + org + f"_n{len(ipos)}")[:45]
+                    uniq.append({"seq_id": bid, "iface_seq": iseq, "n_iface": len(ipos)})
 
-            if len(uniq_seqs) < 2:
-                continue  # pas assez de séquences avec interface → pas de section
+            if len(uniq) < 2:
+                continue
 
-            with st.expander(f"Cluster {cid} — {clabel} ({len(uniq_seqs)} séq.)"):
+            partners = crow["partners"][:70]
+            with st.expander(f"**{cid}** — {partners} ({len(uniq)} séq. actin)"):
                 fasta_path = _MSA_ALN_DIR / f"{ckey}_msa.fasta"
                 aln_path   = _MSA_ALN_DIR / f"{ckey}_msa.aln"
+                _bc3, _fc3 = st.columns([1, 2])
+                _run3   = _bc3.button("Lancer MAFFT", key=f"msa_{ckey}_btn")
+                _force3 = _fc3.checkbox("Forcer recalcul", key=f"msa_{ckey}_force")
 
-                _btn_c2, _force_c2 = st.columns([1, 2])
-                _run2   = _btn_c2.button("Lancer MAFFT", key=f"msa_{ckey}_btn")
-                _force2 = _force_c2.checkbox("Forcer recalcul", key=f"msa_{ckey}_force")
-
-                if _run2 or aln_path.exists():
-                    if _run2 or not aln_path.exists() or _force2:
+                if _run3 or aln_path.exists():
+                    if _run3 or not aln_path.exists() or _force3:
                         _MSA_ALN_DIR.mkdir(parents=True, exist_ok=True)
                         SeqIO.write(
-                            [SeqRecord(Seq(s["iface_seq"]), id=s["seq_id"][:50], description="")
-                             for s in uniq_seqs],
+                            [SeqRecord(Seq(s["iface_seq"]), id=s["seq_id"][:50], description="") for s in uniq],
                             fasta_path, "fasta",
                         )
-                        with st.spinner(f"MAFFT interface ({len(uniq_seqs)} séq.)…"):
-                            _ok2, _err2 = _msa_run_mafft(fasta_path, aln_path)
-                        if not _ok2:
-                            st.error(f"Erreur MAFFT : {_err2}")
+                        with st.spinner(f"MAFFT interface actin ({len(uniq)} séq.)…"):
+                            _ok3, _err3 = _msa_run_mafft(fasta_path, aln_path)
+                        if not _ok3:
+                            st.error(f"Erreur MAFFT : {_err3}")
 
                     if aln_path.exists():
                         try:
-                            _aln2 = AlignIO.read(str(aln_path), "fasta")
-                        except Exception as _e2:
-                            st.error(f"Impossible de lire l'alignement : {_e2}")
-                            continue
-
-                        _nseqs2 = len(_aln2)
-                        _alen2  = _aln2.get_alignment_length()
-                        st.success(f"**{_nseqs2} séq. × {_alen2} col. (interface)**")
-
-                        # Projection sur séquences complètes
-                        full_seqs_by_id = {s["seq_id"][:50]: s["full_seq"] for s in uniq_seqs}
-                        iface_pos_by_id = {s["seq_id"][:50]: s["iface_positions"] for s in uniq_seqs}
-
-                        _html2  = _msa_render_projected(full_seqs_by_id, _aln2, iface_pos_by_id, 100)
-                        _nseqs2 = len(_aln2)
-                        _max_len = max(len(s["full_seq"]) for s in uniq_seqs)
-                        _n_blk2 = (_max_len + 99) // 100
-                        _height2 = min(_n_blk2 * (_nseqs2 * 18 + 28) + 80, 8000)
-                        st.components.v1.html(_html2, height=_height2, scrolling=True)
+                            _aln3 = AlignIO.read(str(aln_path), "fasta")
+                        except Exception as _e3:
+                            st.error(f"Impossible de lire : {_e3}"); continue
+                        _ns3 = len(_aln3); _al3 = _aln3.get_alignment_length()
+                        st.success(f"**{_ns3} séq. × {_al3} col. (interface actine)**")
+                        # Toutes les positions = interface → colorer tout
+                        _core3: dict = {}
+                        for s in uniq:
+                            _core3[s["iface_seq"].lower()] = set(range(1, s["n_iface"] + 1))
+                        _html3  = _msa_render_full(_aln3, _core3, {}, 100)
+                        _height3 = min(((_al3+99)//100) * (_ns3 * 18 + 28) + 80, 4000)
+                        st.components.v1.html(_html3, height=_height3, scrolling=True)
 
 
 if not _Path("data/filtered/filtered_all_data.csv").exists():
@@ -4711,4 +4798,5 @@ else:
         lambda t: any(x in t.lower() for x in ["plastin", "spectrin beta", "filamin", "utrophin"]),
         note="Plastin-3, Spectrin beta chain, Filamin-A, Utrophin.",
     )
-    _msa_section_clusters()
+    _msa_section_s2_clusters()
+    _msa_section_s1_clusters()
