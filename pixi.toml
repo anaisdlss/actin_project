@@ -1,0 +1,34 @@
+[workspace]
+channels = ["conda-forge"]
+name = "actin_projet"
+platforms = [
+  "osx-arm64",
+  "osx-64",
+  "linux-64",
+  "linux-aarch64"
+]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+python = "3.12.*"
+streamlit = ">=1.55.0,<2"
+lxml = ">=6.0.2,<7"
+beautifulsoup4 = ">=4.14.3,<5"
+jupyterlab = ">=4.5.5,<5"
+ipykernel = ">=7.2.0,<8"
+networkx = ">=3.6.1,<4"
+pyvis = ">=0.3.2,<1"
+matplotlib = ">=3.10.8,<4"
+scipy = ">=1.15.0,<2"
+biopython = ">=1.87,<2"
+pandas = ">=2.0,<3"
+numpy = ">=1.26,<3"
+pymol-open-source = "*"
+py3dmol = "*"
+seaborn = ">=0.13.2,<0.14"
+mafft = "*"
+
+[pypi-dependencies]
+streamlit-agraph = ">=0.0.45"

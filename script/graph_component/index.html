@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body { margin: 0; padding: 0; overflow: hidden; background: transparent; }
+  #network { width: 100%; }
+</style>
+</head>
+<body>
+<div id="network"></div>
+<script src="https://unpkg.com/vis-network@9.1.9/standalone/umd/vis-network.min.js"></script>
+<script>
+var network = null;
+var nodesDS = null;
+var edgesDS = null;
+var currentNodeIds = "";
+
+function sendMsg(type, data) {
+    window.parent.postMessage(Object.assign({isStreamlitMessage: true, type: type}, data), "*");
+}
+
+function setupEvents() {
+    // Clic sur une arête
+    network.on("selectEdge", function(params) {
+        if (params.edges.length > 0 && params.nodes.length === 0) {
+            sendMsg("streamlit:setComponentValue", {
+                value: {type: "edge", id: String(params.edges[0])},
+                dataType: "json"
+            });
+        }
+    });
+    // Clic sur un nœud
+    network.on("selectNode", function(params) {
+        if (params.nodes.length > 0) {
+            sendMsg("streamlit:setComponentValue", {
+                value: {type: "node", id: String(params.nodes[0])},
+                dataType: "json"
+            });
+        }
+    });
+    // Clic sur le fond → désélection
+    network.on("click", function(params) {
+        if (params.nodes.length === 0 && params.edges.length === 0) {
+            sendMsg("streamlit:setComponentValue", {value: null, dataType: "json"});
+        }
+    });
+}
+
+function render(args) {
+    var nodesArr = (args.nodes || []).map(function(n) {
+        return {id: n.id, label: n.label, title: n.title,
+                color: {background: n.color, border: n.color,
+                        highlight: {background: "#FFFFFF", border: "#333333"}},
+                size: n.size || 15, font: {color: "#222222", size: 13}};
+    });
+    var edgesArr = (args.edges || []).map(function(e) {
+        return {id: e.id, from: e.source, to: e.target,
+                width: e.width || 1,
+                color: {color: e.color || "#aaaaaa", highlight: "#FFD700", hover: "#FFD700"},
+                smooth: false, hoverWidth: 2, selectionWidth: 3};
+    });
+
+    var height = args.height || 450;
+    document.getElementById("network").style.height = height + "px";
+
+    var newNodeIds = nodesArr.map(function(n) { return n.id; }).sort().join(",");
+
+    if (network && currentNodeIds === newNodeIds) {
+        // Même graphe : mise à jour sans recréer (préserve les positions)
+        nodesDS.update(nodesArr);
+        edgesDS.update(edgesArr);
+    } else {
+        // Nouveau graphe : reconstruction
+        currentNodeIds = newNodeIds;
+        if (network) { network.destroy(); }
+
+        nodesDS = new vis.DataSet(nodesArr);
+        edgesDS = new vis.DataSet(edgesArr);
+
+        var options = {
+            physics: false,
+            interaction: {hover: true, selectConnectedEdges: false, tooltipDelay: 100, zoomView: false},
+            layout: {randomSeed: 42}
+        };
+        network = new vis.Network(
+            document.getElementById("network"),
+            {nodes: nodesDS, edges: edgesDS},
+            options
+        );
+        setupEvents();
+    }
+
+    sendMsg("streamlit:setFrameHeight", {height: height});
+}
+
+window.addEventListener("message", function(event) {
+    if (event.data.type === "streamlit:render") {
+        render(event.data.args);
+    }
+});
+
+sendMsg("streamlit:componentReady", {apiVersion: 1});
+</script>
+</body>
+</html>
