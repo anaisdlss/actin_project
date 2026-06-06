@@ -543,8 +543,12 @@ if os.path.exists(pdb_filt_path):
                             str(_nr["chain"])).split("_")[-1]
                         _chain_is_actin[_letter] = bool(_nr["is_actin"])
 
-                # chain_colors : dict chain_letter → couleur (None = pas de sélection)
-                chain_colors = None
+                # chain_colors : par défaut orange=actine / vert=ABP
+                # (appliqué même quand rien n'est sélectionné)
+                chain_colors = {
+                    _letter: ("#E67E22" if _is_actin else "#2ECC71")
+                    for _letter, _is_actin in _chain_is_actin.items()
+                }
 
                 if sel_inter and sel_inter in int_ids:
                     # Cas 1 : arête sélectionnée — A jaune, B vert
@@ -810,8 +814,15 @@ else:
     # --- S1 Binding Site ---
     with tab_s1:
         if os.path.exists(_all_data_path) and os.path.exists(_summary_path):
+            _use_super = st.toggle(
+                "Regrouper les sites actine en super-clusters",
+                value=False, key="global_graph_superclusters",
+                help="Fusionne les sites de liaison actine dont les résidus "
+                     "canoniques se chevauchent (colonnes s1/s2_supercluster) "
+                     "en un seul nœud représentant.",
+            )
             st.components.v1.html(_build_global_graph_html(
-                _all_data_path, _summary_path), height=780)
+                _all_data_path, _summary_path, _use_super), height=780)
             st.divider()
         if os.path.exists(PATCHES_S1_CSV):
 
@@ -1075,11 +1086,13 @@ if os.path.exists(proteins_path):
     _label_order = {"-": 0, "-2": 1, "-3": 2, "side": 3, "+3": 4, "+2": 5, "+": 6}
 
     def _simplify_label(l):
-        if l in ("+", "+2", "+3"):
+        # seuls les bouts terminaux stricts comptent comme +/- ;
+        # +2,+3,-2,-3 et side sont regroupés en latéral ("side")
+        if l == "+":
             return "+"
-        if l in ("-", "-2", "-3"):
+        if l == "-":
             return "-"
-        return l
+        return "side"
 
     def _fmt_fil_labels(pairs):
         """pairs : série de (pdb_id, actin_chain) tuples — retourne les combinaisons par PDB"""
@@ -1873,12 +1886,15 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
             if _filt_path.exists():
                 _df_filt_sc = pd.read_csv(_filt_path, low_memory=False,
                                           usecols=["cluster_data_70", "s1_supercluster"])
-                _c70_to_sc = (
-                    _df_filt_sc.dropna(subset=["s1_supercluster"])
-                    .groupby("cluster_data_70")["s1_supercluster"]
-                    .agg(lambda x: x.mode()[0] if len(x) > 0 else "")
-                    .to_dict()
-                )
+                # s1_supercluster liste désormais les super-clusters séparés par ';'
+                # (multi-appartenance) : on découpe avant de prendre le dominant.
+                _c70_to_sc = {}
+                for _c70, _grp in _df_filt_sc.dropna(
+                        subset=["s1_supercluster"]).groupby("cluster_data_70"):
+                    _cnt = _Counter()
+                    for _v in _grp["s1_supercluster"]:
+                        _cnt.update(s for s in str(_v).split(";") if s)
+                    _c70_to_sc[_c70] = _cnt.most_common(1)[0][0] if _cnt else ""
                 def _get_superfamille(r):
                     sc1 = _c70_to_sc.get(str(r["patch_1"]), "")
                     sc2 = _c70_to_sc.get(str(r["patch_2"]), "") if pd.notna(r.get("patch_2")) else ""

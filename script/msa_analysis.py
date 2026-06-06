@@ -2021,6 +2021,20 @@ def _msa_section_full(group_label, group_key, filter_fn, rigor_pdbs=None, note=N
             _html_a   = _msa_render_actin_contacts(_abp_rows_a, _aa_at_a, _col_col_a, 9999, _label_map_s1)
             _height_a = min(len(_abp_rows_a) * 18 + 80, 6000)
             st.components.v1.html(_html_a, height=_height_a, scrolling=True)
+            # Téléchargement : vue S1 en HTML autonome (ouvrable dans un navigateur)
+            _html_a_full = (
+                '<!DOCTYPE html><html><head><meta charset="utf-8">'
+                f'<title>Actine — positions canoniques (S1) — {group_key}</title></head>'
+                '<body style="background:#161b22;margin:0;padding:16px">'
+                + _html_a + '</body></html>'
+            )
+            st.download_button(
+                "⬇ Télécharger la vue S1 (HTML)",
+                _html_a_full.encode("utf-8"),
+                file_name=f"{group_key}_actine_S1_positions_canoniques.html",
+                mime="text/html",
+                key=f"msa_{group_key}_s1_dl",
+            )
 
         # ── Analyse des contacts ABP–actine (onglets A + B C D E) ──
         st.divider()

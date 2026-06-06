@@ -29,6 +29,7 @@ pymol-open-source = "*"
 py3dmol = "*"
 seaborn = ">=0.13.2,<0.14"
 mafft = "*"
+adjusttext = ">=1.3.0,<2"
 
 [pypi-dependencies]
 streamlit-agraph = ">=0.0.45"

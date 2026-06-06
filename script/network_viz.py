@@ -1699,7 +1699,8 @@ def _build_tripartite_graph_html(all_data_path: str) -> str:
 
 
 @st.cache_data(show_spinner="Génération du graphe global…")
-def _build_global_graph_html(all_data_path: str, summary_path: str) -> str:
+def _build_global_graph_html(all_data_path: str, summary_path: str,
+                             use_superclusters: bool = False) -> str:
     import networkx as nx
     from pyvis.network import Network
     df_all = pd.read_csv(all_data_path)
@@ -1709,6 +1710,30 @@ def _build_global_graph_html(all_data_path: str, summary_path: str) -> str:
         df_summary[df_summary["Expect value"] == 0]["Result protein"].unique())
 
     col_s1, col_s2 = "s1_binding_site_cluster_data_70", "s2_binding_site_cluster_data_70"
+
+    # Mapping site de liaison actine → super-cluster(s) — optionnel.
+    # Les colonnes s1/s2_supercluster (générées par le notebook
+    # binding_site_superclusters) listent, séparés par ';', tous les
+    # super-clusters maximaux qui contiennent le site à 100% (multi-appartenance).
+    super_map: dict = {}
+    if use_superclusters:
+        for _bs_col, _sc_col in (
+            (col_s1, "s1_supercluster"),
+            (col_s2, "s2_supercluster"),
+        ):
+            if _bs_col in df_all.columns and _sc_col in df_all.columns:
+                _sub = df_all[[_bs_col, _sc_col]].dropna()
+                for _bs, _sc in zip(_sub[_bs_col], _sub[_sc_col]):
+                    if _bs not in super_map:
+                        super_map[_bs] = [s for s in str(_sc).split(";") if s]
+
+    def _node_ids(bs):
+        """Liste des nœuds clusters pour un site : lui-même, ou ses
+        super-clusters en mode super-cluster (multi-appartenance)."""
+        if use_superclusters:
+            return super_map.get(bs) or [bs]
+        return [bs]
+
     G = nx.Graph()
     edge_c70s: dict = {}  # (u,v) → {c70: count}
     for _, row in df_all.iterrows():
@@ -1716,73 +1741,113 @@ def _build_global_graph_html(all_data_path: str, summary_path: str) -> str:
         s2_title = row.get("subunit_2_title")
         if pd.isna(patch) or pd.isna(s2_title):
             continue
-        if not G.has_node(patch):
-            G.add_node(patch, side="cluster", count=0)
-        G.nodes[patch]["count"] += 1
+        patch_ids = _node_ids(patch)
+
         if s2_title in real_actin:
             s2_cluster = row[col_s2]
             if pd.isna(s2_cluster):
                 continue
-            if not G.has_node(s2_cluster):
-                G.add_node(s2_cluster, side="cluster", count=0)
-            G.nodes[s2_cluster]["count"] += 1
-            target = s2_cluster
+            target_ids = _node_ids(s2_cluster)
+            target_side = "cluster"
         else:
-            if not G.has_node(s2_title):
-                G.add_node(s2_title, side="protein", count=0)
-            G.nodes[s2_title]["count"] += 1
-            target = s2_title
-        if G.has_edge(patch, target):
-            G[patch][target]["weight"] += 1
-        else:
-            G.add_edge(patch, target, weight=1)
+            target_ids = [s2_title]
+            target_side = "protein"
+
         c70 = row.get("cluster_data_70")
-        if pd.notna(c70):
-            d = edge_c70s.setdefault((patch, target), {})
-            d[str(c70)] = d.get(str(c70), 0) + 1
+        # Produit cartésien : chaque (super-)cluster du site S1 vers chaque cible
+        for p in patch_ids:
+            if not G.has_node(p):
+                G.add_node(p, side="cluster", count=0)
+            G.nodes[p]["count"] += 1
+            for target in target_ids:
+                if not G.has_node(target):
+                    G.add_node(target, side=target_side, count=0)
+                G.nodes[target]["count"] += 1
+                if G.has_edge(p, target):
+                    G[p][target]["weight"] += 1
+                else:
+                    G.add_edge(p, target, weight=1)
+                if pd.notna(c70):
+                    d = edge_c70s.setdefault((p, target), {})
+                    d[str(c70)] = d.get(str(c70), 0) + 1
 
     counts_all = [d["count"] for _, d in G.nodes(data=True)]
     min_c, max_c = min(counts_all), max(counts_all)
 
     net = Network(height="900px", width="100%", bgcolor="#ffffff")
-    net.set_options("""{
-      "layout": { "randomSeed": 42 },
-      "physics": {
+    # Layout « hub & spokes » : forceAtlas2 étale les nœuds autour de leurs
+    # hubs au lieu de tout agglutiner en boule (barnesHut). En mode
+    # super-clusters il y a moins de nœuds → on écarte encore plus (ressorts
+    # plus longs, répulsion plus forte) pour bien séparer chaque hub.
+    if use_superclusters:
+        # barnesHut + forte répulsion + avoidOverlap : étale les hubs en étoiles
+        # bien séparées sur tout le canevas (rendu « hub & spokes » lisible).
+        _physics = '''
+        "solver": "barnesHut",
         "barnesHut": {
-          "gravitationalConstant": -8000,
-          "centralGravity": 0.3,
-          "springLength": 120,
-          "springConstant": 0.04,
+          "gravitationalConstant": -16000,
+          "centralGravity": 0.15,
+          "springLength": 150,
+          "springConstant": 0.03,
           "damping": 0.6,
           "avoidOverlap": 1
-        },
-        "stabilization": { "enabled": true, "iterations": 1000, "fit": true },
+        }'''
+    else:
+        _physics = '''
+        "solver": "forceAtlas2Based",
+        "forceAtlas2Based": {
+          "gravitationalConstant": -120,
+          "centralGravity": 0.01,
+          "springLength": 200,
+          "springConstant": 0.08,
+          "damping": 0.6,
+          "avoidOverlap": 1
+        }'''
+    net.set_options('''{
+      "layout": { "randomSeed": 42 },
+      "physics": {''' + _physics + ''',
+        "stabilization": { "enabled": true, "iterations": 1500, "fit": true },
         "minVelocity": 0.1
       },
       "edges": { "smooth": false }
-    }""")
+    }''')
 
+    # Taille ∝ nombre d'interactions (sollicitations) du (méga-)cluster.
+    _MAIN = {"6685_1", "6685_2", "6685_3", "6685_4"}
     for n, d in G.nodes(data=True):
         is_cluster = d["side"] == "cluster"
         size = 20 + 110 * (d["count"] - min_c) / \
             (max_c - min_c) if max_c > min_c else 50
         color = "#e05252" if is_cluster else "#52e07a"
         label = n
-        font = {"size": 0} if is_cluster else {
-            "size": 12, "background": "white", "strokeWidth": 0}
+        # Labels clusters : en super-cluster, seules les 4 familles principales
+        # (6685_1-4) affichent leur nom ; les autres méga-clusters restent muets.
+        if is_cluster:
+            if use_superclusters and n in _MAIN:
+                font = {"size": 20, "background": "white", "strokeWidth": 3}
+            else:
+                font = {"size": 0}
+        else:
+            font = {"size": 12, "background": "white", "strokeWidth": 0}
         net.add_node(n, label=label, color=color, size=size,
                      title=f"{n} - {d['count']} interactions", font=font)
+    # Arêtes fines mais visibles (gris) en mode super-cluster
+    _edge_col = "#9aa0a6" if use_superclusters else "#000000FF"
+    _edge_w = 1.0 if use_superclusters else 2
     for u, v in G.edges():
         c70_counts = edge_c70s.get((u, v)) or edge_c70s.get((v, u)) or {}
         lines = "\n".join(
             f"- {c70} ({n})" for c70, n in sorted(c70_counts.items(), key=lambda x: -x[1])
         ) if c70_counts else "—"
         title = f"{lines}\n({G[u][v]['weight']} interactions)"
-        net.add_edge(u, v, color="#000000FF", width=2, title=title)
+        net.add_edge(u, v, color=_edge_col, width=_edge_w, title=title)
 
     # ── Arêtes pointillées vertes : protéines de la même famille ─────────────
+    # Affichées dans les deux modes (regroupe les ABP par famille).
     import re as _re
     from collections import defaultdict as _dd
+
+    _draw_family = True
 
     _GENERIC = {
         "protein", "actin", "like", "type", "associated", "binding",
@@ -1806,7 +1871,7 @@ def _build_global_graph_html(all_data_path: str, summary_path: str) -> str:
             _word_to_p[_w].add(_pn)
 
     _family_done: set = set()
-    for _word, _proteins in _word_to_p.items():
+    for _word, _proteins in (_word_to_p.items() if _draw_family else []):
         if len(_proteins) < 2:
             continue
         _proteins = sorted(_proteins)
