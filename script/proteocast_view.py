@@ -107,6 +107,24 @@ def result_images(slug):
                   if f.lower().endswith((".png", ".jpg", ".jpeg")))
 
 
+def folder_zip(slug):
+    """Zippe le dossier de résultats ProteoCast complet (tout ce que le vrai
+    proteocast.ijm.fr a renvoyé : MSA, PDB, images, sous-dossiers…).
+    Renvoie (nom_fichier, octets) ou None si le dossier n'existe pas."""
+    import io
+    import zipfile
+    d = _result_dir_or_csv(slug)
+    if d is None:
+        return None
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
+        for root, _dirs, files in os.walk(d):
+            for f in files:
+                fp = os.path.join(root, f)
+                z.write(fp, os.path.relpath(fp, os.path.dirname(d)))
+    return f"proteocast_{slug}.zip", buf.getvalue()
+
+
 @st.cache_data(show_spinner="Domaines InterPro…")
 def fetch_domains(uniprot):
     """Domaines d'un UniProt via l'API InterPro : liste {name, db, acc, spans}.

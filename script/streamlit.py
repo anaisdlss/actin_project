@@ -2287,6 +2287,15 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
                 with st.expander("ProteoCast figures (results folder)"):
                     for _im in _imgs:
                         st.image(_im, use_container_width=True)
+            _pc_zip = proteocast_view.folder_zip(_pc_slug)
+            if _pc_zip is not None:
+                _pc_zip_name, _pc_zip_bytes = _pc_zip
+                st.download_button(
+                    "Download the full ProteoCast folder (.zip)",
+                    data=_pc_zip_bytes, file_name=_pc_zip_name,
+                    mime="application/zip", key=f"pc_dl_folder_{_pc_slug}",
+                    help="Everything proteocast.ijm.fr returned for this ABP: "
+                         "MSA, structures, images and sub-folders.")
         with _pc_tab2:
             st.caption("ABP structure coloured by mutational sensitivity "
                        "(or AlphaFold pLDDT until ProteoCast is provided).")
