@@ -32,7 +32,7 @@ def _bip_mtimes():
     return tuple(os.path.getmtime(f) if os.path.exists(f) else 0.0 for f in _BIPARTITE_FILES)
 
 
-@st.cache_data(show_spinner="Chargement données réseau…")
+@st.cache_data(show_spinner="Loading network data…")
 def _load_bipartite_base(_v, *_mtimes):
     """Load & pre-process all data for S1 bipartite networks (cached per file state)."""
     import re as _re
@@ -151,7 +151,7 @@ def _load_bipartite_base(_v, *_mtimes):
 
     df_res = pd.concat([s1r, s2r], ignore_index=True)
     df_res["buried_ASA_percent"] = pd.to_numeric(
-        df_res["buried_ASA_percent"], errors="coerce")
+        df_res["buried_ASA_percent"].astype(str).str.replace("%", "", regex=False), errors="coerce")
 
     def _parse(s):
         s = _re.sub(r"np\.int64\((\d+)\)", r"\1", str(s))
@@ -214,7 +214,7 @@ def _load_bipartite_base(_v, *_mtimes):
     return df_res, df_int_meta, id_to_c70, dict(p2c)
 
 
-@st.cache_data(show_spinner="Génération du réseau…")
+@st.cache_data(show_spinner="Generating the network…")
 def _build_bipartite_html(patch, _v, *_mtimes):
     """Build PyVis interactive network HTML for one S1 patch (physics layout, white bg).
 
@@ -251,14 +251,14 @@ def _build_bipartite_html(patch, _v, *_mtimes):
         m = df_int_meta.loc[iid]
         s2t = m.get("subunit_2_title")
         s2a = bool(m.get("s2_actine", False))
-        partner_map[iid] = "Actine" if s2a else (
+        partner_map[iid] = "Actin" if s2a else (
             str(s2t) if pd.notna(s2t) else None)
 
     sub["is_s1_res"] = sub["chain"].str.lower() == sub["s1_chain"].str.lower()
     sub["partner"] = np.where(
         sub["is_s1_res"],
         sub["interaction_id"].map(partner_map),
-        "Actine",
+        "Actin",
     )
     sub = sub[sub["partner"].notna()].copy()
     if sub.empty:
@@ -313,7 +313,7 @@ def _build_bipartite_html(patch, _v, *_mtimes):
     abp_colors = {}
     cidx = 0
     for p in all_proteins:
-        if p != "Actine":
+        if p != "Actin":
             abp_colors[p] = _ABP_PALETTE_NET[cidx % len(_ABP_PALETTE_NET)]
             cidx += 1
 
@@ -338,7 +338,7 @@ def _build_bipartite_html(patch, _v, *_mtimes):
     res_max = res_freq.max() if res_freq.max() > 0 else 1
     prot_max = prot_freq.max() if prot_freq.max() > 0 else 1
 
-    # Distribution des acides aminés par position canonique
+    # Distribution des acides aminés par position canonical
     # Pour les clusters homo, is_s1_res peut être False pour tous → on prend tout sub
     # (S1 et S2 sont les deux actin, même séquence, mêmes AA aux mêmes positions)
     _s1_sub_aa = sub.drop_duplicates(["interaction_id", "canon"])
@@ -371,8 +371,10 @@ def _build_bipartite_html(patch, _v, *_mtimes):
             for _, r in _pos_aa.iterrows()
         ) if not _pos_aa.empty else ""
 
+        # Label = POSITION seule (l'aa varie selon l'organisme/l'ABP ; le détail
+        # des aa observés est dans l'infobulle).
         net.add_node(
-            f"r{pos}", label=f"{_top_letter}{pos}",
+            f"r{pos}", label=f"{pos}",
             color={"background": bg, "border": "#888",
                    "highlight": {"background": bg, "border": "#E05000"},
                    "hover":     {"background": bg, "border": "#E05000"}},
@@ -380,9 +382,9 @@ def _build_bipartite_html(patch, _v, *_mtimes):
             widthConstraint={"minimum": sz, "maximum": sz},
             font={"color": tc, "multi": False},
             title=(
-                f"{_top_letter}{pos}\n"
-                f"ASA buried : {asa_v:.1f} % · {freq} interactions"
-                + (f"\nAA : {_aa_tip}" if _aa_tip and len(_pos_aa) > 1 else "")
+                f"Canonical position {pos}\n"
+                f"ASA buried: {asa_v:.1f} % · {freq} interactions"
+                + (f"\nobserved aa (actin): {_aa_tip}" if _aa_tip else "")
             ),
             borderWidth=1.5, borderWidthSelected=2.5,
         )
@@ -392,7 +394,7 @@ def _build_bipartite_html(patch, _v, *_mtimes):
     PROT_H = 40
     prot_degree = edge_df.groupby("partner")["canon"].nunique()
     for prot in all_proteins:
-        col = "#E03030" if prot == "Actine" else abp_colors.get(prot, "#888")
+        col = "#E03030" if prot == "Actin" else abp_colors.get(prot, "#888")
         freq = int(prot_freq.get(prot, 1))
         net.add_node(
             f"p_{prot}", label=prot,
@@ -403,7 +405,7 @@ def _build_bipartite_html(patch, _v, *_mtimes):
             widthConstraint={"minimum": PROT_W},
             heightConstraint={"minimum": PROT_H},
             font={"color": "#ffffff"},
-            title=f"{prot} — {freq} interactions · {int(prot_degree.get(prot, 0))} résidus connectés",
+            title=f"{prot} — {freq} interactions · {int(prot_degree.get(prot, 0))} residues connected",
             borderWidth=1.5, borderWidthSelected=2.5,
         )
 
@@ -462,16 +464,16 @@ def _build_bipartite_html(patch, _v, *_mtimes):
 
     html = net.generate_html()
 
-    # Légende — Actine uniquement si présente (interactions homo)
+    # Légende — Actin uniquement si présente (interactions homo)
     legend_rows = []
-    if "Actine" in all_proteins:
+    if "Actin" in all_proteins:
         legend_rows.append(
             '<div style="margin:4px 0;display:flex;align-items:center">'
             '<span style="display:inline-block;width:14px;height:14px;background:#E03030;'
-            'border-radius:3px;margin-right:8px;flex-shrink:0"></span>Actine</div>'
+            'border-radius:3px;margin-right:8px;flex-shrink:0"></span>Actin</div>'
         )
     for p in all_proteins:
-        if p == "Actine":
+        if p == "Actin":
             continue
         col = abp_colors.get(p, "#888")
         legend_rows.append(
@@ -485,9 +487,9 @@ def _build_bipartite_html(patch, _v, *_mtimes):
         'padding:12px 14px;font-family:\'Segoe UI\',sans-serif;font-size:11px;color:#333;'
         'z-index:999;max-width:240px;max-height:82vh;overflow-y:auto;'
         'box-shadow:0 2px 12px rgba(0,0,0,0.10);">'
-        '<div style="font-weight:700;color:#555;margin-bottom:8px;font-size:12px">Partenaires</div>'
+        '<div style="font-weight:700;color:#555;margin-bottom:8px;font-size:12px">Partners</div>'
         + "".join(legend_rows)
-        + '<div style="margin-top:12px;font-weight:700;color:#555;font-size:11px">Résidus — ASA buried</div>'
+        + '<div style="margin-top:12px;font-weight:700;color:#555;font-size:11px">Residues — ASA buried</div>'
         '<div style="background:linear-gradient(to right,#FFFFCC,#FD8D3C,#800026);'
         'height:10px;border-radius:4px;margin:5px 0 2px"></div>'
         '<div style="display:flex;justify-content:space-between;font-size:9px;color:#999">'
@@ -515,7 +517,7 @@ def _build_bipartite_html(patch, _v, *_mtimes):
     return html, n_res, n_prot, n_total
 
 
-@st.cache_data(show_spinner="Chargement contacts inter-résidus…")
+@st.cache_data(show_spinner="Loading inter-residue contacts…")
 def _load_res4(_v, *_mtimes):
     """Charge et pre-traite 4.inter-residue_contacts.csv une seule fois."""
     p = _BIPARTITE_FILES[6]
@@ -545,9 +547,9 @@ _AA_RESTYPE_HEX = {
 }
 
 
-@st.cache_data(show_spinner="Génération réseau C70…")
+@st.cache_data(show_spinner="Generating C70 network…")
 def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
-    """Réseau bipartite interactif pour un patch C70 : résidus actine (S1) ↔ résidus ABP (S2)."""
+    """Réseau bipartite interactif pour un patch C70 : résidus actin (S1) ↔ résidus ABP (S2)."""
     import matplotlib.colors as _mc
     import matplotlib as _mpl_c70
     import re as _re_c70
@@ -695,7 +697,7 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
         if iid not in meta.index:
             return None
         r = meta.loc[iid]
-        return "Actine" if r["s2_actine"] else (
+        return "Actin" if r["s2_actine"] else (
             str(r["subunit_2_title"]) if pd.notna(r["subunit_2_title"]) else None)
 
     _AA3TO1 = {
@@ -938,7 +940,7 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
         r, g, b, _ = cmap_s2(norm_s2(float(ca_val)))
         return "#{:02x}{:02x}{:02x}".format(int(r * 255), int(g * 255), int(b * 255))
 
-    # Gradient S2 homo actine : rose (blanc rosé → rose vif → rose foncé)
+    # Gradient S2 homo actin : rose (blanc rosé → rose vif → rose foncé)
     cmap_s2_homo = _mpl_c70.colors.LinearSegmentedColormap.from_list(
         "pink_grad", ["#FFF0F5", "#FF69B4", "#C71585"])
     norm_s2_homo = _mc.Normalize(vmin=0, vmax=s2_ca_max)
@@ -1009,7 +1011,7 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
             shape="circle",
             widthConstraint={"minimum": diam, "maximum": diam},
             font={"color": tc},
-            title=f"résidu {_s1_aa}{pos} · ASA buried : {asa_v:.1f} % · {_n_iids_s1} interactions · {_n_c_s1}/{n_couples_total} couples{_s1_dist_str}",
+            title=f"residue {_s1_aa}{pos} · ASA buried: {asa_v:.1f} % · {_n_iids_s1} interactions · {_n_c_s1}/{n_couples_total} pairs{_s1_dist_str}",
             borderWidth=1.5, borderWidthSelected=2.5,
             **kwargs,
         )
@@ -1030,7 +1032,7 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
                 _s2_aa_key, "#AAAAAA"), _t_s2)
             _bord_h = "#555555"
             tc_s2 = "#fff" if (_s2_aa_key != "C" and _t_s2 > 0.45) else "#222"
-        elif partner == "Actine":
+        elif partner == "Actin":
             col = _hex_s2_homo(ca_val)
             _bord_h = "#880044"
             tc_s2 = "#222"
@@ -1054,7 +1056,7 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
             shape="circle",
             widthConstraint={"minimum": diam_s2, "maximum": diam_s2},
             font={"color": tc_s2},
-            title=f"{partner} — résidu {label} · % ASA moy : {ca_val:.1f} % · {_n_iids_s2} interactions · {_n_c_s2}/{n_couples_total} couples{_variants}",
+            title=f"{partner} — residue {label} · mean % ASA: {ca_val:.1f} % · {_n_iids_s2} interactions · {_n_c_s2}/{n_couples_total} pairs{_variants}",
             borderWidth=1.5,
             **kwargs,
         )
@@ -1076,7 +1078,7 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
             f"s1_{int(row['s1_canon'])}", f"s2_{row['s2_node']}",
             width=6.0 if nc == n_couples_with_data else 0.5,
             color={"color": ecol, "highlight": "#FF4400", "hover": "#FF4400"},
-            title=f"{nc}/{n_couples_with_data} couples avec données · {row['contact_type']}",
+            title=f"{nc}/{n_couples_with_data} pairs with data · {row['contact_type']}",
             smooth={"enabled": False} if bipartite else {
                 "enabled": True, "type": "dynamic"},
         )
@@ -1126,8 +1128,8 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
     html = net.generate_html()
 
     # Légende
-    s2_partner_names = [p for p in all_partners if p != "Actine"]
-    _has_homo = "Actine" in all_partners
+    s2_partner_names = [p for p in all_partners if p != "Actin"]
+    _has_homo = "Actin" in all_partners
     _has_hetero = bool(s2_partner_names)
     _leg_pos = "top:6px;right:6px;" if bipartite else "top:10px;left:10px;"
     _fs_h = "10px" if bipartite else "12px"
@@ -1143,7 +1145,7 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
         f'z-index:999;max-width:{_mw};max-height:80vh;overflow-y:auto;'
         f'box-shadow:0 2px 8px rgba(0,0,0,0.08);">'
         f'<div style="font-weight:700;color:#555;margin-bottom:4px;font-size:{_fs_h}">'
-        'S1 (actine) — % ASA buried</div>'
+        'S1 (actin) — % ASA buried</div>'
         f'<div style="background:linear-gradient(to right,#FFFFCC,#FD8D3C,#800026);'
         f'height:{_bar_h};border-radius:3px;margin:3px 0 2px"></div>'
         f'<div style="display:flex;justify-content:space-between;font-size:8px;color:#999;'
@@ -1152,7 +1154,7 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
     if _has_homo:
         _leg += (
             f'<div style="font-weight:700;color:#555;margin-bottom:4px;font-size:{_fs_h}">'
-            'S2 (actine homo) — % ASA buried</div>'
+            'S2 (actin homo) — % ASA buried</div>'
             f'<div style="background:linear-gradient(to right,#FFF0F5,#FF69B4,#C71585);'
             f'height:{_bar_h};border-radius:3px;margin:3px 0 2px"></div>'
             f'<div style="display:flex;justify-content:space-between;font-size:8px;color:#999;'
@@ -1274,7 +1276,7 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
             _sc_s1 = "residue_B_structure" if _is_sw3d else "residue_A_structure"
             _sc_s2 = "residue_A_structure" if _is_sw3d else "residue_B_structure"
 
-            _is_homo3d = _partner(_rep_iid3d) == "Actine"
+            _is_homo3d = _partner(_rep_iid3d) == "Actin"
 
             _pdb_id_3d = _df8_3d.loc[_df8_3d["interaction_id"] == _rep_iid3d,
                                      "pdb_id"].iat[0]
@@ -1342,8 +1344,7 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
             _s2_cols = (["#FFF0F5", "#FFD6E0", "#FFB6C1", "#FF85A1",
                          "#FF69B4", "#FF1493", "#C71585"]
                         if _is_homo3d else
-                        ["#FFFFCC", "#D9F0A3", "#ADDD8E", "#78C679",
-                         "#41AB5D", "#238443", "#006837"])
+                        ["#9CE699", "#41AB5D", "#238443", "#006837"])
             _s2_sch = {"prop": "b", "gradient": "linear",
                        "colors": _s2_cols, "min": 0, "max": _s2_bfac_max}
 
@@ -1368,7 +1369,7 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
 _BFACTOR_CLUSTER_DIR = "data/filtered/details/structures_files/bfactor_cluster"
 
 
-@st.cache_data(show_spinner="Génération interface 3D S1…")
+@st.cache_data(show_spinner="Generating S1 3D interface…")
 def _build_s1_3d_html(patch_s1, _v, *_mtimes):
     """Vue 3D pour un patch S1 binding site.
 
@@ -1422,7 +1423,7 @@ def _build_s1_3d_html(patch_s1, _v, *_mtimes):
         return None
 
 
-@st.cache_data(show_spinner="Chargement réseau binding sites…")
+@st.cache_data(show_spinner="Loading binding-site network…")
 def _build_tripartite_graph_html(all_data_path: str) -> str:
     from pyvis.network import Network
     df_all = pd.read_csv(all_data_path)
@@ -1441,7 +1442,7 @@ def _build_tripartite_graph_html(all_data_path: str) -> str:
     df["s2_actine"] = df["s2_actine"].fillna(False).astype(bool)
 
     # Nœuds :
-    #   S1 (rouge) = binding sites actine (S1 + S2 des interactions homo)
+    #   S1 (rouge) = binding sites actin (S1 + S2 des interactions homo)
     #   C70 (violet) = clusters d'interface
     #   S2 (vert) = binding sites partenaire (S2 des interactions hétéro seulement)
     s1_counts: dict = {}
@@ -1451,7 +1452,7 @@ def _build_tripartite_graph_html(all_data_path: str) -> str:
     s2_seq_cluster: dict = {}  # s2_binding_site_cluster → s2_sequence_cluster_70
     s1_c70: dict = {}        # (s1_cluster, c70) → weight
     c70_s2_hetero: dict = {}  # (c70, s2_cluster) → weight  (hétéro uniquement)
-    # (c70, s2_actin_cluster) → weight (homo : S2 = actine)
+    # (c70, s2_actin_cluster) → weight (homo : S2 = actin)
     c70_s2_homo: dict = {}
     # c70 → list of (s1, s2, is_homo, w) pour le tooltip
     c70_pairs: dict = {}
@@ -1471,7 +1472,7 @@ def _build_tripartite_graph_html(all_data_path: str) -> str:
         c70_pairs.setdefault(c70, {}).setdefault(pair_key, 0)
         c70_pairs[c70][pair_key] += 1
         if is_homo:
-            # S2 est aussi de l'actine → même pool de nœuds rouges
+            # S2 est aussi de l'actin → même pool de nœuds rouges
             s1_counts[s2] = s1_counts.get(s2, 0) + 1
             c70_s2_homo[(c70, s2)] = c70_s2_homo.get((c70, s2), 0) + 1
         else:
@@ -1512,7 +1513,7 @@ def _build_tripartite_graph_html(all_data_path: str) -> str:
       "edges": { "smooth": false }
     }""")
 
-    # S1 / S2-actine → nœuds rouges (tous les binding sites actine)
+    # S1 / S2-actin → nœuds rouges (tous les binding sites actin)
     for nd, cnt in s1_counts.items():
         net.add_node(f"s1_{nd}", label=nd, color="#e05252",
                      size=node_size(cnt),
@@ -1526,13 +1527,13 @@ def _build_tripartite_graph_html(all_data_path: str) -> str:
         sorted_pairs = sorted(pairs.items(), key=lambda x: -x[1])
         lines = []
         for (s1, s2, is_homo), w in sorted_pairs[:20]:
-            tag = "🔴↔🔴" if is_homo else "🔴→🟢"
+            tag = "↔" if is_homo else "→"
             lines.append(f"  {tag}  {s1} ↔ {s2}  ({w}×)")
         tooltip = f"Cluster C70 : {nd}\n{cnt} interactions · {len(pairs)} paires uniques"
         if lines:
             tooltip += "\n\nInteractions :\n" + "\n".join(lines)
             if len(sorted_pairs) > 20:
-                tooltip += f"\n  … +{len(sorted_pairs)-20} autres paires"
+                tooltip += f"\n  … +{len(sorted_pairs)-20} more pairs"
         net.add_node(f"c70_{nd}", label=nd, color="#7B52E0", shape="square",
                      size=node_size(cnt),
                      title=tooltip,
@@ -1552,7 +1553,7 @@ def _build_tripartite_graph_html(all_data_path: str) -> str:
             display_label = nd
         prot_str = "\n".join(f"  • {p}" for p in prots[:10])
         if len(prots) > 10:
-            prot_str += f"\n  … +{len(prots)-10} autres"
+            prot_str += f"\n  … +{len(prots)-10} more"
         tooltip = f"S2 cluster: {nd}\n{cnt} interactions"
         if prot_str:
             tooltip += f"\n{prot_str}"
@@ -1574,11 +1575,11 @@ def _build_tripartite_graph_html(all_data_path: str) -> str:
                      color="#52b788", width=1.5,
                      title=f"{w} interactions")
 
-    # Arêtes solides C70 ↔ S2-actine (homo — nœud rouge)
+    # Arêtes solides C70 ↔ S2-actin (homo — nœud rouge)
     for (c70, s2actin), w in c70_s2_homo.items():
         net.add_edge(f"c70_{c70}", f"s1_{s2actin}",
                      color="#e05252", width=1.5,
-                     title=f"{w} interactions actine-actine")
+                     title=f"{w} interactions actin-actin")
 
     # C70 avec plus de 3 paires uniques → connexion directe S1↔S2 en pointillé
     busy_c70 = {c70 for c70, pairs in c70_pairs.items() if len(pairs) >= 2}
@@ -1590,7 +1591,7 @@ def _build_tripartite_graph_html(all_data_path: str) -> str:
     for (s1, c70, s2, is_homo), w in triplet_w.items():
         if is_homo:
             dash_color = "#FF8C00"
-            tip = f"Actine↔Actine · C70: {c70} · {w} interactions"
+            tip = f"Actin↔Actin · C70: {c70} · {w} interactions"
             s2_node = f"s1_{s2}"
         else:
             dash_color = "#888888"
@@ -1638,7 +1639,7 @@ def _build_tripartite_graph_html(all_data_path: str) -> str:
                 if _k2 not in _s2_done:
                     _s2_done.add(_k2)
                     net.add_edge(_u2, _v2, color="#00aa44", width=2,
-                                 dashes=True, title=f"Même cluster de séquence S2 : {_seqcl}")
+                                 dashes=True, title=f"Same S2 sequence cluster: {_seqcl}")
 
     html = net.generate_html()
 
@@ -1658,7 +1659,7 @@ def _build_tripartite_graph_html(all_data_path: str) -> str:
         "  cont.style.position = 'relative';\n"
         "  var box = document.createElement('input');\n"
         "  box.type = 'text';\n"
-        "  box.placeholder = 'Rechercher n\\u0153ud ou prot\\u00e9ine...';\n"
+        "  box.placeholder = 'Search node or protein...';\n"
         "  box.style.cssText = 'position:absolute;top:10px;right:10px;z-index:9999;'\n"
         "    + 'padding:6px 12px;border:2px solid #aaa;border-radius:20px;'\n"
         "    + 'font-size:13px;width:240px;outline:none;background:white;';\n"
@@ -1698,7 +1699,7 @@ def _build_tripartite_graph_html(all_data_path: str) -> str:
     return html
 
 
-@st.cache_data(show_spinner="Génération du graphe global…")
+@st.cache_data(show_spinner="Generating the global graph…")
 def _build_global_graph_html(all_data_path: str, summary_path: str,
                              use_superclusters: bool = False) -> str:
     import networkx as nx
@@ -1711,7 +1712,7 @@ def _build_global_graph_html(all_data_path: str, summary_path: str,
 
     col_s1, col_s2 = "s1_binding_site_cluster_data_70", "s2_binding_site_cluster_data_70"
 
-    # Mapping site de liaison actine → super-cluster(s) — optionnel.
+    # Mapping site de liaison actin → super-cluster(s) — optionnel.
     # Les colonnes s1/s2_supercluster (générées par le notebook
     # binding_site_superclusters) listent, séparés par ';', tous les
     # super-clusters maximaux qui contiennent le site à 100% (multi-appartenance).
@@ -1771,9 +1772,6 @@ def _build_global_graph_html(all_data_path: str, summary_path: str,
                     d = edge_c70s.setdefault((p, target), {})
                     d[str(c70)] = d.get(str(c70), 0) + 1
 
-    counts_all = [d["count"] for _, d in G.nodes(data=True)]
-    min_c, max_c = min(counts_all), max(counts_all)
-
     net = Network(height="900px", width="100%", bgcolor="#ffffff")
     # Layout « hub & spokes » : forceAtlas2 étale les nœuds autour de leurs
     # hubs au lieu de tout agglutiner en boule (barnesHut). En mode
@@ -1793,14 +1791,16 @@ def _build_global_graph_html(all_data_path: str, summary_path: str,
           "avoidOverlap": 1
         }'''
     else:
+        # forceAtlas2 : forte répulsion + ressorts longs → les hubs (haut degré)
+        # repoussent leurs voisins et se détachent en étoiles bien séparées.
         _physics = '''
         "solver": "forceAtlas2Based",
         "forceAtlas2Based": {
-          "gravitationalConstant": -120,
-          "centralGravity": 0.01,
-          "springLength": 200,
-          "springConstant": 0.08,
-          "damping": 0.6,
+          "gravitationalConstant": -150,
+          "centralGravity": 0.02,
+          "springLength": 130,
+          "springConstant": 0.06,
+          "damping": 0.75,
           "avoidOverlap": 1
         }'''
     net.set_options('''{
@@ -1812,25 +1812,47 @@ def _build_global_graph_html(all_data_path: str, summary_path: str,
       "edges": { "smooth": false }
     }''')
 
-    # Taille ∝ nombre d'interactions (sollicitations) du (méga-)cluster.
+    # ── Taille / couleur / label ∝ DEGRÉ (un « hub » = nœud très connecté) ────
+    # On dimensionne par le nombre de connexions (degré) plutôt que par le brut
+    # d'interactions : c'est le degré qui fait qu'un nœud se détache en hub.
     _MAIN = {"6685_1", "6685_2", "6685_3", "6685_4"}
+    _deg = dict(G.degree())
+    # Taille ∝ NOMBRE D'INTERACTIONS (champ count) : les nœuds les plus sollicités
+    # ressortent. Les 4 clusters d'actine principaux (le plus d'interactions) sont
+    # donc les plus gros. Racine carrée pour étaler la distribution asymétrique.
+    _cnt = {n: d["count"] for n, d in G.nodes(data=True)}
+    _cv = [c ** 0.5 for c in _cnt.values()]
+    _cmin, _cmax = (min(_cv), max(_cv)) if _cv else (0.0, 1.0)
+
+    def _cnt_t(node):
+        return ((_cnt[node] ** 0.5 - _cmin) / (_cmax - _cmin)
+                if _cmax > _cmin else 0.5)
+
+    # Clusters à étiqueter = les 12 plus sollicités (par count) + les 4 principaux.
+    # Basé sur count (pas sur des IDs figés) → marche AUSSI en mode super-cluster.
+    _clusters_by_count = [n for n, d in sorted(
+        G.nodes(data=True), key=lambda x: -x[1]["count"]) if d["side"] == "cluster"]
+    _label_clusters = set(_clusters_by_count[:12]) | _MAIN
+
     for n, d in G.nodes(data=True):
         is_cluster = d["side"] == "cluster"
-        size = 20 + 110 * (d["count"] - min_c) / \
-            (max_c - min_c) if max_c > min_c else 50
-        color = "#e05252" if is_cluster else "#52e07a"
+        _is_main = n in _MAIN
+        # taille ∝ interactions, fort contraste pour que les gros ressortent bien
+        size = 14 + 54 * _cnt_t(n)
+        bg = "#e05252" if is_cluster else "#39b54a"
+        color = {"background": bg, "border": bg}   # couleurs pleines, AUCUN contour
         label = n
-        # Labels clusters : en super-cluster, seules les 4 familles principales
-        # (6685_1-4) affichent leur nom ; les autres méga-clusters restent muets.
+        # Labels : tous les ABP (vert) + les clusters les plus sollicités.
         if is_cluster:
-            if use_superclusters and n in _MAIN:
-                font = {"size": 20, "background": "white", "strokeWidth": 3}
-            else:
-                font = {"size": 0}
+            font = ({"size": 14, "background": "white", "strokeWidth": 3,
+                     "color": "#8a1414"} if n in _label_clusters else {"size": 0})
         else:
-            font = {"size": 12, "background": "white", "strokeWidth": 0}
-        net.add_node(n, label=label, color=color, size=size,
-                     title=f"{n} - {d['count']} interactions", font=font)
+            font = {"size": 13, "color": "#1f7a2e", "strokeWidth": 4,
+                    "background": "rgba(255,255,255,0)"}
+        net.add_node(n, label=label, color=color, size=size, borderWidth=0,
+                     title=(f"{n} — {d['count']} interactions · {_deg[n]} connexions"
+                            + (" · CLUSTER PRINCIPAL" if _is_main else "")),
+                     font=font)
     # Arêtes fines mais visibles (gris) en mode super-cluster
     _edge_col = "#9aa0a6" if use_superclusters else "#000000FF"
     _edge_w = 1.0 if use_superclusters else 2
@@ -1882,7 +1904,24 @@ def _build_global_graph_html(all_data_path: str, summary_path: str,
                 if _key not in _family_done:
                     _family_done.add(_key)
                     net.add_edge(_u, _v, color="#00aa44", width=2, dashes=True,
-                                 title=f"Même famille : {_word}")
+                                 title=f"Same family: {_word}")
+
+    # Légende (effectifs rouge = clusters de site · vert = ABP)
+    _n_clusters = sum(1 for _, _dd in G.nodes(data=True) if _dd["side"] == "cluster")
+    _n_proteins = sum(1 for _, _dd in G.nodes(data=True) if _dd["side"] == "protein")
+    # Ids des nœuds → clic : rouge (cluster) = section Patch S1 ; vert (ABP) = Détail par ABP
+    import json as _json
+    _cluster_ids_js = _json.dumps(
+        [str(n) for n, _dd in G.nodes(data=True) if _dd["side"] == "cluster"])
+    _protein_ids_js = _json.dumps(
+        [str(n) for n, _dd in G.nodes(data=True) if _dd["side"] == "protein"])
+    _dot = ("<span style=\"display:inline-block;width:12px;height:12px;"
+            "border-radius:50%;vertical-align:middle;margin:0 5px;background:__C__\"></span>")
+    legend_html = (
+        "<div style=\"margin-bottom:4px\"><b>" + str(_n_clusters) + "</b>"
+        + _dot.replace("__C__", "#e05252") + "Actin binding-site cluster</div>"
+        + "<div><b>" + str(_n_proteins) + "</b>" + _dot.replace("__C__", "#39b54a") + "ABP</div>"
+    )
 
     html = net.generate_html()
 
@@ -1890,16 +1929,53 @@ def _build_global_graph_html(all_data_path: str, summary_path: str,
         "function _freeze(){ network.setOptions({physics:{enabled:false}}); network.fit({offset:{x:-120,y:0},animation:{duration:600,easingFunction:'easeInOutQuad'}}); }\n"
         "network.once('stabilizationIterationsDone', _freeze);\n"
         "network.once('stabilized', _freeze);\n"
+        # Clic sur un nœud CLUSTER (rouge) → sélectionne ce cluster dans la
+        # section « Patch S1 binding site ». Le sandbox de l'iframe interdit la
+        # navigation, mais allow-same-origin autorise à cliquer, dans la page
+        # parente, le bouton Streamlit caché correspondant (clé st-key-__pt_<id>).
+        "var _clusterNodes = new Set(" + _cluster_ids_js + ");\n"
+        "var _proteinNodes = new Set(" + _protein_ids_js + ");\n"
+        "network.on('click', function(p){\n"
+        "  if(!(p.nodes && p.nodes.length)) return;\n"
+        "  var id = String(p.nodes[0]);\n"
+        "  try {\n"
+        "    var doc = window.top.document;\n"
+        "    if(_clusterNodes.has(id)){\n"                      # nœud rouge → cluster S1
+        "      var btn = doc.querySelector('.st-key-__pt_' + id + ' button');\n"
+        "      if(btn){ btn.click();\n"
+        "        var a1 = doc.getElementById('patchsel');\n"
+        "        if(a1) a1.scrollIntoView({behavior:'smooth', block:'start'});\n"
+        "      }\n"
+        "    } else if(_proteinNodes.has(id)){\n"               # nœud vert → Détail par ABP
+        "      var abtns = doc.querySelectorAll('[class*=\"st-key-__ab_\"] button');\n"
+        "      for(var i=0;i<abtns.length;i++){\n"
+        "        if((abtns[i].innerText||'').trim() === id){\n"
+        "          abtns[i].click();\n"
+        "          var a2 = doc.getElementById('abpsel');\n"
+        "          if(a2) a2.scrollIntoView({behavior:'smooth', block:'start'});\n"
+        "          break;\n"
+        "        }\n"
+        "      }\n"
+        "    }\n"
+        "  } catch(e){ console.log('graph click:', e); }\n"
+        "});\n"
         "(function(){\n"
         "  var cont = document.getElementById('mynetwork').parentElement;\n"
         "  cont.style.position = 'relative';\n"
         "  var box = document.createElement('input');\n"
         "  box.type = 'text';\n"
-        "  box.placeholder = 'Rechercher un n\\u0153ud...';\n"
+        "  box.placeholder = 'Search a node...';\n"
         "  box.style.cssText = 'position:absolute;top:10px;right:10px;z-index:9999;'\n"
         "    + 'padding:6px 12px;border:2px solid #aaa;border-radius:20px;'\n"
         "    + 'font-size:13px;width:210px;outline:none;background:white;';\n"
         "  cont.appendChild(box);\n"
+        "  var lg = document.createElement('div');\n"
+        "  lg.innerHTML = '" + legend_html.replace("'", "\\'") + "';\n"
+        "  lg.style.cssText = 'position:absolute;top:10px;left:10px;z-index:9999;'\n"
+        "    + 'background:rgba(255,255,255,0.92);padding:9px 13px;border-radius:8px;'\n"
+        "    + 'font:13px Helvetica,Arial,sans-serif;color:#222;'\n"
+        "    + 'box-shadow:0 1px 5px rgba(0,0,0,0.15);';\n"
+        "  cont.appendChild(lg);\n"
         "  var origColors = {};\n"
         "  network.body.data.nodes.get().forEach(function(n){ origColors[n.id] = n.color; });\n"
         "  box.addEventListener('input', function(){\n"

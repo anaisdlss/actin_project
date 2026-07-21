@@ -800,7 +800,8 @@ def process_interaction(task):
                 residue["residue_number_sequence"] = row_table["Residue no. in sequence"]
                 residue["residue_name"] = row_table["Residue name"]
                 residue["buried_ASA_Å²"] = row_table["Buried ASA, Å2"]
-                residue["buried_ASA_percent"] = row_table["Buried ASA, %"]
+                residue["buried_ASA_percent"] = (
+                    row_table["Buried ASA, %"].replace("%", "").strip())
 
                 interface_residues.append(residue)
 
@@ -1053,6 +1054,23 @@ def process_interaction(task):
                     structure["pymol_script_file"] = script_path
 
                 if "biounits" in href:
+                    # Déduplication : UN SEUL assemblage biologique par PDB (nommé
+                    # {pdb}.cif/.pdb), et non un par interaction. Toutes les
+                    # interactions d'un même PDB partagent le même fichier → ~99 %
+                    # d'espace en moins. Si l'assemblage du PDB est déjà présent,
+                    # on ne le re-télécharge même pas.
+                    pdb_id = interaction["pdb_id"]
+                    _ext = "cif" if "mmCIF" in href else (
+                        "pdb" if "pdb" in href else "")
+                    _cached = (os.path.join(assembly_dir, f"{pdb_id}.{_ext}")
+                               if _ext else "")
+                    if _cached and os.path.exists(_cached):
+                        if _ext == "cif":
+                            structure["biological_assembly_cif_file"] = _cached
+                        else:
+                            structure["biological_assembly_pdb_file"] = _cached
+                        continue
+
                     data = download_binary(session, href)
                     if data is None:
                         print(
@@ -1063,14 +1081,12 @@ def process_interaction(task):
                     content = gzip.decompress(data).decode()
 
                     if "mmCIF" in href or content.startswith("data_"):
-                        pdb_id = interaction["pdb_id"]
-                        filename = f"{safe_id}_{pdb_id}.cif"
+                        filename = f"{pdb_id}.cif"
                         cif_path = save_file(content, assembly_dir, filename)
                         structure["biological_assembly_cif_file"] = cif_path
 
                     if "pdb" in href:
-                        pdb_id = interaction["pdb_id"]
-                        filename = f"{safe_id}_{pdb_id}.pdb"
+                        filename = f"{pdb_id}.pdb"
                         pdb_path = save_file(content, assembly_dir, filename)
                         structure["biological_assembly_pdb_file"] = pdb_path
 
@@ -1278,6 +1294,11 @@ def main():
     total = len(summary)
     records = summary.to_dict("records")
 
+    # Garde-fou anti-boucle-infinie : au-delà de max_passes, les échecs restants
+    # sont considérés comme permanents (PPI3D n'a pas la donnée) et laissés dans
+    # failed.csv, au lieu de re-tenter indéfiniment (ce qui poussait à interrompre
+    # le pipeline → jeu partiel).
+    max_passes = 6
     current_pass = 1
 
     while True:
@@ -1392,6 +1413,10 @@ def main():
 
         if len(failed_ids) == 0:
             print("All interactions processed successfully.")
+            break
+        if current_pass >= max_passes:
+            print(f"Stopping after {max_passes} passes: {len(failed_ids)} interaction(s) "
+                  "definitively unavailable on PPI3D (kept in failed.csv).")
             break
         current_pass += 1
 

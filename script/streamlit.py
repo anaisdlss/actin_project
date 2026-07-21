@@ -1,4 +1,40 @@
 # streamlit run script/streamlit.py
+from abp_3d import (
+    _s1_abp_3d_options, _build_abp_actin_3d, _build_all_abp_pdb, _build_all_abp_3d, _ABP_MULTI_COLORS)
+from proteocast_abp import (
+    _abp_actin_focus, _crop_pdb_residues, _render_abp_proteocast, _render_abp_actin_conservation)
+from cluster_struct import (
+    _render_cluster_struct)
+from s1_heatmaps import (
+    _build_s1_global_heatmap, _render_s1_global_plotly, _build_s1_patch_detail, _render_s1_patch_plotly, _s1_position_detail, _render_s1_position_detail, _S1_GLOBAL_FILES)
+import pipeline_ui
+from st_io import (_load_pdb_file, read_csv)
+import warnings as _warnings
+import logging as _logging
+import re as _re_sd
+from msa_analysis import (
+    norm_chain_id, _cluster_protein_index,
+    _msa_section_full, _msa_section_s2_clusters, _msa_section_s1_clusters,
+    _MSA_ALN_DIR, _MSA_RIGOR_PDBS,
+    _s1_get_ch_maps, _msa_contact_analysis,
+    _msa_blast_celegans, _msa_s1_cluster_inline,
+)
+from data_analysis import (
+    _build_abp_heatmap_data, _build_c70_jaccard_edges,
+    _build_s1_superclusters, _S1_SUPER_FILES, _ABP_HM_FILES,
+)
+from residue_passport import build_passport, pp_mtimes
+import residue_explorer
+import folddisco_view
+import proteocast_view
+from network_viz import (
+    _bip_mtimes, _load_bipartite_base, _build_bipartite_html,
+    _load_res4, _build_bipartite_c70_html, _build_s1_3d_html,
+    _build_tripartite_graph_html, _build_global_graph_html,
+    _global_bfac_max, _BIP_CACHE_VERSION, _BIPARTITE_FILES,
+    _AA_RESTYPE_HEX,
+)
+import matplotlib.pyplot as plt
 import streamlit as st
 import pandas as pd
 import shutil
@@ -13,293 +49,73 @@ from collections import Counter as _Counter
 from pathlib import Path as _Path
 import matplotlib
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 
-from network_viz import (
-    _bip_mtimes, _load_bipartite_base, _build_bipartite_html,
-    _load_res4, _build_bipartite_c70_html, _build_s1_3d_html,
-    _build_tripartite_graph_html, _build_global_graph_html,
-    _global_bfac_max, _BIP_CACHE_VERSION, _BIPARTITE_FILES,
-    _AA_RESTYPE_HEX,
-)
-from data_analysis import (
-    _build_abp_heatmap_data, _build_c70_jaccard_edges,
-    _build_s1_superclusters, _S1_SUPER_FILES, _ABP_HM_FILES,
-)
-from msa_analysis import (
-    norm_chain_id, _cluster_protein_index,
-    _msa_section_full, _msa_section_s2_clusters, _msa_section_s1_clusters,
-    _MSA_ALN_DIR, _MSA_RIGOR_PDBS,
-    _s1_get_ch_maps, _msa_contact_analysis,
-)
+# ── Faire taire les avertissements au runtime ───────────────────────────────
+# FutureWarning pandas + dépréciations Streamlit (use_container_width,
+# st.components.v1.html) qui polluaient la console à chaque run.
+_warnings.filterwarnings("ignore", category=FutureWarning)
+_warnings.filterwarnings("ignore", category=DeprecationWarning)
+for _ln in ("streamlit", "streamlit.deprecation_util",
+            "streamlit.elements.lib.policies", "streamlit.elements"):
+    _logging.getLogger(_ln).setLevel(_logging.ERROR)
+
 
 _GRAPH_COMPONENT = st.components.v1.declare_component(
     "actin_graph",
     path=str(_Path(__file__).parent / "graph_component"),
 )
 
-st.set_page_config(layout="wide", page_title="Analyse actine-ABP - PPI3D")
+st.set_page_config(layout="wide", page_title="Actin-ABP analysis - PPI3D")
 
-st.title("Analyse des interactions actine-actine et actine-ABP - PPI3D")
+# Mode rapide : `FAST=1 streamlit run script/streamlit.py`
+# -> saute le rendu lourd (heatmap ABP, Détail par ABP, Filament PyMOL, MSA)
+#    et ne garde que les RÉSEAUX (compétition + coopération).
+_FAST = os.environ.get("FAST", "") == "1"
+
+st.title("Actin-actin and actin-ABP interaction analysis - PPI3D")
+st.caption("How actin is recognised by its partner proteins (ABPs): "
+           "which residues, which sites, what conservation. PPI3D data.")
+if _FAST:
+    st.info("FAST mode: only the networks are loaded (FAST=1).")
 
 with st.sidebar:
-    st.markdown("## Sommaire")
+    st.markdown("## Navigation")
     st.markdown("""
-- [Téléchargement des données](#telechargement-des-donnees)
-- [Données filtrées](#donnees-filtrees-s1-actine)
-- [Structures PDB valides](#structures-pdb-valides)
-- [Clusters d'interactions](#clusters-d-interactions)
-- [ABP](#abp)
-- [MSA — Protéines d'interface](#msa-proteines)
+**Essentials (biology)**
+- [Actin & its partners](#empreinte-abp)
+- [ABP overview](#abp)
+
+**Explore in detail**
+- [Clusters / binding sites](#clusters-d-interactions)
+- [Compare sequences, ABPs, pairs](#explorateur)
+- [Alignments (MSA)](#msa-proteines)
+
+**Technical (reproducibility)**
+- [Data download](#telechargement-des-donnees)
+- [Filtered data](#donnees-filtrees-s1-actin)
+- [Valid PDB structures](#structures-pdb-valides)
 """)
+    st.divider()
+    # Remède aux « anciennes données » : vide tous les caches (@st.cache_data /
+    # @st.cache_resource) et relit les fichiers depuis le disque.
+    if st.button("Clear cache and reload", width="stretch",
+                 help="Use after regenerating the data (pipeline) "
+                      "to force a re-read and avoid showing stale values."):
+        st.cache_data.clear()
+        st.cache_resource.clear()
+        for _k in ("viewer_key", "viewer_html"):
+            st.session_state.pop(_k, None)
+        st.rerun()
 
 # ---------------------------------------------------------------------------
 # Section téléchargement
 # ---------------------------------------------------------------------------
 
-st.header("Téléchargement des données")
-
-STEPS = {
-    "1/15":  "Téléchargement du summary PPI3D (BLAST)",
-    "2/15":  "Téléchargement des entrées PDB",
-    "3/15":  "Téléchargement de toutes les données (cluster table)",
-    "4/15":  "Filtrage des structures (≥ 4 actines connectées) - notebook",
-    "5/15":  "Téléchargement des interactions d'interface",
-    "6/15":  "Alignement MAFFT par cluster de séquences",
-    "7/15":  "Analyse des clusters d'interaction C70 - notebook",
-    "8/15":  "Calcul B-factors interface C70 par cluster",
-    "9/15":  "Génération script PyMOL surface complète C70",
-    "10/15": "Génération scripts PyMOL par site S1",
-    "11/15": "Analyse interface par cluster C70 - notebook",
-    "12/15": "Heatmap S1 binding site et références clusters - notebook",
-    "13/15": "Calcul B-factors S1 par cluster",
-    "14/15": "Analyse ABP — compétition et interfaces - notebook",
-    "15/15": "Sessions PyMOL filament par ABP",
-}
-
-# Fichier de sortie attendu pour chaque étape
-STEP_OUTPUT_FILES = {
-    "1/15":  "data/raw/ppi3d_actin_summary.csv",
-    "2/15":  "data/raw/pdb_entry_results.csv",
-    "3/15":  "data/raw/all_data.csv",
-    "4/15":  "data/filtered/filtered_pdb_entry.csv",
-    "5/15":  "data/filtered/details/1.interactions.csv",
-    "6/15":  "data/alignments/.done",
-    "7/15":  "data/filtered/patches_infos_cluster_data_70.csv",
-    "8/15":  "data/filtered/details/structures_files/bfactor_c70_interface",
-    "9/15":  "data/filtered/details/structures_files/bfactor_c70_interface/view_full_surface.pml",
-    "10/15": "data/filtered/details/structures_files/bfactor_c70_interface/by_s1_cluster",
-    "11/15": "data/visualisations/actin_c70_contacts",
-    "12/15": "data/visualisations/actin_s1_all_equitable_heatmap.png",
-    "13/15": "data/filtered/details/structures_files/bfactor_cluster",
-    "14/15": "data/visualisations/abp_analysis_done.flag",
-    "15/15": "data/filtered/details/structures_files/filament/by_abp",
-}
-
-STEP_KEYS = list(STEPS.keys())
-TOTAL = len(STEPS)
-
-SKIP_KEYWORDS = ["Nothing to do", "unchanged",
-                 "Using existing", "already up", "Déjà à jour",
-                 "No changes detected"]
-
-
-def step_md(key, label, state):
-    if state == "pending":
-        return f"⬜ **{key}** — {label}"
-    if state == "running":
-        return f"🔄 **{key}** — {label} *(en cours...)*"
-    if state == "done":
-        return f"✅ **{key}** — {label} — *données téléchargées*"
-    if state == "skipped":
-        return f"✅ **{key}** — {label} — *déjà à jour*"
-    if state == "error":
-        return f"❌ **{key}** — {label} — *erreur*"
-    return f"⬜ **{key}** — {label}"
-
-
-def initial_state(key):
-    path = STEP_OUTPUT_FILES.get(key)
-    if path and os.path.exists(path):
-        return "skipped"
-    return "pending"
-
-
-def parse_sub_progress(line):
-    """
-    Retourne (current, total, label) si la ligne contient une progression,
-    sinon None.
-    Patterns détectés :
-      - Étape 2 : "1/148 4A7F"          → PDB X/total
-      - Étape 5 : "Downloading 1/3"     → pass X/total
-      - Étape 6 : "200,000 lignes traitées (471 Mo en RAM)..."
-    """
-    # Étape 2 : "X/Y PDBID"
-    m = re.match(r"^(\d+)/(\d+)\s+\w+", line.strip())
-    if m:
-        return int(m.group(1)), int(m.group(2)), f"PDB {line.strip()}"
-
-    # Étape 5 : "Downloading X/Y"
-    m = re.search(r"Downloading\s+(\d+)/(\d+)", line)
-    if m:
-        return int(m.group(1)), int(m.group(2)), line.strip()
-
-    return None
-
-
-# Bouton en haut, étapes en dessous
-
-clicked = st.button("Lancer le téléchargement")
-
-progress_bar = st.empty()
-log_placeholder = st.empty()
-
-placeholders = {}
-for key, label in STEPS.items():
-    placeholders[key] = st.empty()
-    placeholders[key].markdown(step_md(key, label, initial_state(key)))
-
-sub_progress_bar = st.empty()
-sub_progress_text = st.empty()
-
-if "just_downloaded" not in st.session_state:
-    st.session_state.just_downloaded = False
-
-all_done = all(
-    initial_state(k) == "skipped"
-    for k in STEP_KEYS
-    if STEP_OUTPUT_FILES.get(k)  # ignorer les étapes sans fichier indicateur
-)
-if all_done and not st.session_state.just_downloaded:
-    st.write("✅ Données déjà téléchargées")
-
-
-if clicked:
-    st.session_state.just_downloaded = True
-
-    for key, label in STEPS.items():
-        init = initial_state(key)
-        placeholders[key].markdown(
-            step_md(key, label, init if init == "skipped" else "pending"))
-
-    pb = progress_bar.progress(0, text="Démarrage...")
-
-    current_idx = -1
-    step_had_skip = {}
-    log_lines = []
-    step_log_lines = []
-
-    cmd = [sys.executable, "-u", "-m", "script.data_extract.pipeline_data"]
-    if sys.platform == "darwin":
-        cmd = ["caffeinate", "-i"] + cmd
-    proc = subprocess.Popen(
-        cmd,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        text=True,
-    )
-
-    for line in proc.stdout:
-        line = line.rstrip()
-
-        # Détecter le début d'une nouvelle étape
-        for i, key in enumerate(STEP_KEYS):
-            if f"ETAPE : {key}" in line:
-                if current_idx >= 0:
-                    prev_key = STEP_KEYS[current_idx]
-                    state = "skipped" if step_had_skip.get(
-                        prev_key) else "done"
-                    placeholders[prev_key].markdown(
-                        step_md(prev_key, STEPS[prev_key], state))
-
-                current_idx = i
-                step_log_lines = []
-                placeholders[key].markdown(step_md(key, STEPS[key], "running"))
-                pb.progress(i / TOTAL, text=f"Étape {key} — {STEPS[key]}")
-                sub_progress_bar.empty()
-                sub_progress_text.empty()
-                log_placeholder.empty()
-                break
-
-        # Sous-progression de l'étape courante
-        result = parse_sub_progress(line)
-        if result is not None:
-            current, total, label = result
-            if current is not None and total is not None and total > 0:
-                sub_progress_bar.progress(current / total)
-                sub_progress_text.caption(label)
-            else:
-                sub_progress_text.caption(label)
-
-        # Suivre les mots-clés "skip"
-        if current_idx >= 0:
-            current_key = STEP_KEYS[current_idx]
-            if any(kw in line for kw in SKIP_KEYWORDS):
-                step_had_skip[current_key] = True
-
-        if line:
-            log_lines.append(line)
-            step_log_lines.append(line)
-            log_placeholder.text("\n".join(step_log_lines[-15:]))
-
-    proc.wait()
-
-    sub_progress_bar.empty()
-    sub_progress_text.empty()
-    log_placeholder.empty()
-
-    if current_idx >= 0:
-        last_key = STEP_KEYS[current_idx]
-        state = "skipped" if step_had_skip.get(last_key) else "done"
-        if proc.returncode != 0:
-            state = "error"
-        placeholders[last_key].markdown(
-            step_md(last_key, STEPS[last_key], state))
-
-    if proc.returncode == 0:
-        pb.progress(1.0, text="Téléchargement terminé ✓")
-    else:
-        pb.progress(1.0, text="Erreur — pipeline arrêté")
-        st.error("Pipeline arrêté — dernières lignes de log :")
-        st.code("\n".join(log_lines[-40:]), language=None)
-
-
-# ---------------------------------------------------------------------------
-# Section données filtrées
-# ---------------------------------------------------------------------------
-
+pipeline_ui.render()
 st.divider()
-st.header("Données filtrées (s1 actine)")
-
-
-@st.cache_data
-def _load_pdb_file(path, mtime=None):
-    with open(path) as f:
-        return f.read()
-
-
-def extract_chain(pdb_data: str, chain_letter: str) -> str:
-    lines = [l for l in pdb_data.splitlines()
-             if l.startswith('ATOM')
-             and len(l) > 21 and l[21] == chain_letter]
-    return "\n".join(lines)
-
-
-@st.cache_data
-def load_csv(path, mtime=None):
-    with open(path, newline="") as f:
-        sample = f.read(10000)
-    try:
-        sep = csv.Sniffer().sniff(sample, delimiters=";,\t").delimiter
-    except csv.Error:
-        sep = ","
-    return pd.read_csv(path, sep=sep)
-
-
-def read_csv(path):
-    """Charge un CSV en invalidant le cache si le fichier a changé."""
-    mtime = os.path.getmtime(path) if os.path.exists(path) else None
-    return load_csv(path, mtime=mtime)
+st.header("Filtered data", anchor="donnees-filtrees-s1-actin")
+st.caption("— Technical section. Structures kept after quality filtering and "
+           "identification of actin chains.")
 
 
 TABLES = {
@@ -319,17 +135,17 @@ TABLES = {
 available_tables = {t: p for t, p in TABLES.items() if os.path.exists(p)}
 
 if available_tables:
-    selected = st.selectbox("Choisir un tableau",
+    selected = st.selectbox("Choose a table",
                             list(available_tables.keys()))
     df = read_csv(available_tables[selected])
     hide_constant = st.checkbox(
-        "Masquer les colonnes sans variation", value=False)
+        "Hide columns without variation", value=False)
     if hide_constant:
         cols_to_show = [c for c in df.columns if df[c].nunique() > 1]
     else:
         cols_to_show = list(df.columns)
     st.caption(
-        f"{len(df):,} lignes · {len(cols_to_show)} colonnes affichées (sur {len(df.columns)} total)")
+        f"{len(df):,} rows · {len(cols_to_show)} columns shown (of {len(df.columns)} total)")
     st.dataframe(df[cols_to_show], width="stretch")
 
 # Métrique PDB
@@ -354,12 +170,44 @@ if all(os.path.exists(p) for p in METRICS_FILES.values()):
     )) if "Interface type" in df_pdb.columns else 0
 
     col1, col2, col3 = st.columns(3)
-    col1.metric("Structures PDB",
+    col1.metric("PDB structures",
                 f"{df_pdb['pdb_id'].nunique():,}".replace(',', ' '))
-    col2.metric("Interactions protéine-protéine",
+    col2.metric("Protein-protein interactions",
                 f"{len(df_int):,}".replace(',', ' '))
-    col3.metric("Protéines partenaires uniques (ABP)",
+    col3.metric("Unique partner proteins (ABPs)",
                 f"{df_prot[~df_prot['protein_name'].str.lower().str.contains('actin', na=False)]['protein_name'].nunique():,}".replace(',', ' '))
+
+    # Transparency funnel: how many structures PPI3D returned vs how many are kept
+    # after the "≥ 4 connected actin subunits" filter (makes the counts explicit,
+    # and explains why the total can go up or down between PPI3D snapshots).
+    _raw_summary = "data/raw/ppi3d_actin_summary.csv"
+    if os.path.exists(_raw_summary):
+        try:
+            _df_raw = read_csv(_raw_summary)
+            _raw_pdb = int(_df_raw["PDB ID"].astype(
+                str).str.upper().str.strip().nunique())
+            _kept_pdb = int(df_pdb["pdb_id"].nunique())
+            _n_int = f"{len(df_int):,}".replace(",", " ")
+            st.caption(
+                f"Data funnel — PPI3D returned **{_raw_pdb}** actin PDB structures → "
+                f"**{_kept_pdb}** kept after the *≥ 4 connected actin subunits* filter → "
+                f"**{_n_int}** interface interactions. The count reflects the current "
+                "PPI3D snapshot (full replace on each update), so it can go up or down.")
+            # Visible completeness check: a partial/interrupted details download
+            # leaves fewer interactions than the summary — warn instead of failing
+            # silently (the pipeline now auto-completes on the next run).
+            _fsum = "data/filtered/filtered_summary.csv"
+            if os.path.exists(_fsum):
+                _n_expected = int(read_csv(_fsum)["interaction_id"].nunique())
+                if len(df_int) < _n_expected:
+                    _got = f"{len(df_int):,}".replace(",", " ")
+                    _exp = f"{_n_expected:,}".replace(",", " ")
+                    st.warning(
+                        f"Interface details look incomplete: only {_got} of {_exp} "
+                        "interactions were downloaded (interrupted run?). Click "
+                        "**Run / update** — the pipeline will fetch the missing ones.")
+        except Exception:
+            pass
 
 
 # ---------------------------------------------------------------------------
@@ -369,7 +217,9 @@ if all(os.path.exists(p) for p in METRICS_FILES.values()):
 pdb_filt_path = "data/filtered/filtered_pdb_entry.csv"
 if os.path.exists(pdb_filt_path):
     st.divider()
-    st.header("Structures PDB valides")
+    st.header("Valid PDB structures", anchor="structures-pdb-valides")
+    st.caption("— Technical section. Explorer for the retained 3D structures "
+               "(chains, sequences, alignments per PDB).")
 
     df_entry = read_csv(pdb_filt_path)
     pdb_ids = sorted(df_entry["pdb_id"].str.upper().unique())
@@ -387,7 +237,7 @@ if os.path.exists(pdb_filt_path):
     col_sel, _ = st.columns([1, 1])
     with col_sel:
         selected_pdb = st.selectbox(
-            f"Choisir une structure ({len(pdb_ids)} PDB valides)",
+            f"Choose a structure ({len(pdb_ids)} valid PDBs)",
             pdb_ids,
             format_func=lambda x: f"{x} — {title_map[x]}" if x in title_map else x,
             key="pdb_selector",
@@ -426,7 +276,7 @@ if os.path.exists(pdb_filt_path):
 
     # ── Colonne gauche : réseau interactif ────────────────────────────────
     with col_net:
-        st.markdown(f"**Réseau d'interactions — {selected_pdb}**")
+        st.markdown(f"**Interaction network — {selected_pdb}**")
         if os.path.exists(pp_path) and sub_int1_g is not None:
             df_pp_g = read_csv(pp_path)
             sub_pp_g = df_pp_g[df_pp_g["pdb_id"].str.upper()
@@ -506,7 +356,7 @@ if os.path.exists(pdb_filt_path):
 
     # ── Colonne droite : viewer 3D ────────────────────────────────────────
     with col_3d:
-        st.markdown("**Visualisation 3D — contacts d'interface**")
+        st.markdown("**3D visualisation — interface contacts**")
         if os.path.exists(struct_csv) and os.path.exists(cont_csv):
             df_struct8 = read_csv(struct_csv)
             sub_s8 = df_struct8[df_struct8["pdb_id"].str.upper()
@@ -543,7 +393,7 @@ if os.path.exists(pdb_filt_path):
                             str(_nr["chain"])).split("_")[-1]
                         _chain_is_actin[_letter] = bool(_nr["is_actin"])
 
-                # chain_colors : par défaut orange=actine / vert=ABP
+                # chain_colors : par défaut orange=actin / vert=ABP
                 # (appliqué même quand rien n'est sélectionné)
                 chain_colors = {
                     _letter: ("#E67E22" if _is_actin else "#2ECC71")
@@ -560,7 +410,7 @@ if os.path.exists(pdb_filt_path):
                     }
                 elif sel_node:
                     # Cas 2 : nœud sélectionné — sélection en jaune,
-                    # autres : orange=actine, vert=ABP
+                    # autres : orange=actin, vert=ABP
                     sel_letter = sel_node.split("_")[-1]
                     chain_colors = {}
                     for _letter, _is_actin in _chain_is_actin.items():
@@ -569,6 +419,33 @@ if os.path.exists(pdb_filt_path):
                         else:
                             chain_colors[_letter] = (
                                 "#E67E22" if _is_actin else "#2ECC71")
+
+                # Résidus des chaînes voisines TOUCHÉS par la chaîne sélectionnée
+                # (jaune) → colorés en BLEU sur la surface.
+                _BLUE = "#2E86FF"
+                _touch: dict[str, set] = {}
+                _sel_letter = None
+                _rows_c = None
+                if sel_inter and sel_inter in int_ids:
+                    _sel_letter = str(sel_row["chain_A_id"]).split("_")[-1]
+                    _rows_c = df_cont4[df_cont4["interaction_id"] == sel_inter]
+                elif sel_node:
+                    _sel_letter = sel_node.split("_")[-1]
+                    _rows_c = df_cont4[df_cont4["interaction_id"].isin(
+                        int_ids)]
+                if _rows_c is not None and _sel_letter is not None:
+                    for _, _cr in _rows_c.iterrows():
+                        _la = str(_cr["chain_A_id"]).split("_")[-1]
+                        _lb = str(_cr["chain_B_id"]).split("_")[-1]
+                        try:
+                            if _la == _sel_letter and _lb != _sel_letter:
+                                _touch.setdefault(_lb, set()).add(
+                                    int(float(_cr["residue_B_structure"])))
+                            elif _lb == _sel_letter and _la != _sel_letter:
+                                _touch.setdefault(_la, set()).add(
+                                    int(float(_cr["residue_A_structure"])))
+                        except (ValueError, TypeError):
+                            pass
 
                 fmt = "cif" if pdb_file.endswith(".cif") else "pdb"
                 pdb_data = _load_pdb_file(
@@ -582,13 +459,16 @@ if os.path.exists(pdb_filt_path):
                     view.setStyle({}, {})
                     if chain_colors:
                         for chain, col in chain_colors.items():
+                            # chaîne voisine ENTIÈRE touchée par la sélection → bleu
+                            if chain in _touch and chain != _sel_letter:
+                                col = _BLUE
                             view.addSurface(py3Dmol.SES,
                                             {"opacity": 1.0, "color": col},
                                             {"chain": chain})
                     else:
                         view.addSurface(py3Dmol.SES,
-                                        {"opacity": 0.9, "color": "white"}, {})
-                    view.setBackgroundColor("#1e1e1e")
+                                        {"opacity": 0.9, "color": "#cccccc"}, {})
+                    view.setBackgroundColor("#ffffff")
                     view.zoomTo()
                     st.session_state["viewer_html"] = view._make_html()
                     st.session_state["viewer_key"] = viewer_key
@@ -596,7 +476,7 @@ if os.path.exists(pdb_filt_path):
                 st.components.v1.html(
                     st.session_state["viewer_html"], height=470, scrolling=False)
             else:
-                st.info("Fichier PDB non disponible.")
+                st.info("PDB file not available.")
 
     # ── Tableau interactions du PDB ───────────────────────────────────────
     all_data_path_pdb = "data/filtered/filtered_all_data.csv"
@@ -611,7 +491,7 @@ if os.path.exists(pdb_filt_path):
             "s2_binding_site_cluster_data_70",
         ] if c in sub_all_pdb.columns]
         if not sub_all_pdb.empty and cols_to_show:
-            st.markdown("**Clusters d'interaction par paire**")
+            st.markdown("**Interaction clusters per pair**")
             st.dataframe(
                 sub_all_pdb[cols_to_show].reset_index(drop=True),
                 hide_index=True,
@@ -664,7 +544,7 @@ if os.path.exists(pdb_filt_path):
                 (df_all_g["subunit_2"].str.lower() == cb_l)
             ]
             if rseq.empty:
-                st.info("Séquences non disponibles pour cette interaction.")
+                st.info("Sequences not available for this interaction.")
                 return
             s1 = str(rseq.iloc[0].get("s1_sequence", ""))
             s2 = str(rseq.iloc[0].get("s2_sequence", ""))
@@ -695,7 +575,7 @@ if os.path.exists(pdb_filt_path):
             for widget, (cid, title, seq, iface, col) in zip([sc1, sc2], pairs):
                 with widget:
                     st.markdown(
-                        f"**{title}** · `{cid}` · {len(seq)} aa · {len(iface)} résidus d'interface"
+                        f"**{title}** · `{cid}` · {len(seq)} aa · {len(iface)} interface residues"
                     )
                     if seq and seq != "nan":
                         st.markdown(seq_html(seq, iface, col),
@@ -710,7 +590,7 @@ if os.path.exists(pdb_filt_path):
             if not row_i.empty:
                 ca = str(row_i.iloc[0]["chain_A_id"])
                 cb = str(row_i.iloc[0]["chain_B_id"])
-                st.markdown("#### Séquences — résidus d'interface")
+                st.markdown("#### Sequences — interface residues")
                 render_pair(ca, cb, seq_inter, df_all_g, df_r3)
 
         # ── Nœud sélectionné : toutes ses interactions ───────────────────
@@ -723,7 +603,7 @@ if os.path.exists(pdb_filt_path):
             if not node_rows.empty:
                 n = len(node_rows)
                 st.markdown(
-                    f"#### Séquences — `{seq_node.split('_')[-1].upper()}` "
+                    f"#### Sequences — `{seq_node.split('_')[-1].upper()}` "
                     f"({n} interaction{'s' if n > 1 else ''})"
                 )
                 for _, row in node_rows.iterrows():
@@ -744,44 +624,66 @@ if os.path.exists(pdb_filt_path):
     # ── Protéines impliquées ──────────────────────────────────────────────
     proteins_path = "data/filtered/proteins_per_pdb.csv"
     if os.path.exists(proteins_path):
-        st.markdown("**Protéines impliquées**")
+        st.markdown("**Proteins involved**")
         df_pp = read_csv(proteins_path)
         sub_pp = df_pp[df_pp["pdb_id"].str.upper() == selected_pdb]
 
         nb_actin = int(sub_pp["is_actin"].sum())
         nb_abp = int((~sub_pp["is_actin"]).sum())
         c1, c2, _ = st.columns([1, 1, 3])
-        c1.metric("Actines", nb_actin)
+        c1.metric("Actins", nb_actin)
         c2.metric("ABP", nb_abp)
 
         counts = (
             sub_pp.groupby(["protein"])
             .agg(
-                Nombre=("chain", "count"),
-                Chaînes=("chain", lambda x: ", ".join(
+                Count=("chain", "count"),
+                Chains=("chain", lambda x: ", ".join(
                     sorted(s.split("_")[-1].upper() for s in x)
                 )),
             )
             .reset_index()
-            .rename(columns={"protein": "Protéine"})
-            .sort_values("Nombre", ascending=False)
+            .rename(columns={"protein": "Protein"})
+            .sort_values("Count", ascending=False)
             .reset_index(drop=True)
         )
-        max_len = counts["Protéine"].str.len().max() if len(counts) else 0
+        max_len = counts["Protein"].str.len().max() if len(counts) else 0
         col_width = "large" if max_len > 40 else "medium" if max_len > 20 else "small"
         st.dataframe(counts, width="stretch", hide_index=True, column_config={
-            "Protéine": st.column_config.TextColumn(width=col_width),
-            "Chaînes": st.column_config.TextColumn(width="medium"),
-            "Nombre": st.column_config.NumberColumn(width="small"),
+            "Protein": st.column_config.TextColumn(width=col_width),
+            "Chains": st.column_config.TextColumn(width="medium"),
+            "Count": st.column_config.NumberColumn(width="small"),
         })
     else:
-        st.info("Relancer le notebook `graphe_filter.ipynb` pour générer les données.")
+        st.info("Run the pipeline (`graphe_filter.py`) to generate the data.")
 
 
+# ── Récap structural par cluster (Foldseek / TM-align / InterPro) ──────────────
+
+
+# ── ProteoCast par ABP (paysage mutationnel + empreinte d'interface) ───────────
 
 
 st.divider()
-st.header("Clusters d'intéractions")
+
+# ── Empreinte ABP sur l'actin : grand actin coloré par nb d'ABP + clic résidu ──
+if not _FAST:
+    st.header("ABP footprint on actin", anchor="empreinte-abp")
+    st.caption("**The flagship view.** The whole actin, coloured by how many "
+               "partners (ABPs) contact each residue. Click a residue to "
+               "see which ABPs use it, at what %, and whether it is conserved.")
+    _pp_ov = build_passport(pp_mtimes())
+    if _pp_ov is None:
+        st.info("Residue-passport data unavailable "
+                "(run the pipeline to generate them).")
+    else:
+        residue_explorer.render_actin_overview(_pp_ov)
+    st.divider()
+
+st.header("Interaction clusters", anchor="clusters-d-interactions")
+st.caption("Actin's **binding sites**, grouped: which regions of "
+           "actin are used, by which partners, and how. Choose a "
+           "cluster to see its contact network and 3D structure.")
 
 PATCHES_S1_CSV = "data/filtered/patches_infos_s1_binding_site.csv"
 PATCHES_C70_CSV = "data/filtered/patches_infos_cluster_data_70.csv"
@@ -803,8 +705,12 @@ S1_INTERFACE_CLUSTER_BY_C70_DIR = "data/visualisations/actin_s1_clusters_by_c70"
 BFACTOR_CLUSTER_DIR = "data/filtered/details/structures_files/bfactor_cluster"
 
 
+# Longueur de l'actin canonical : les positions au-delà sont des artefacts
+# d'alignement (insertions MSA) et ne sont pas affichées sur l'axe des positions.
+
+
 if not os.path.exists(PATCHES_C70_CSV):
-    st.info("Lancer le pipeline pour générer l'analyse des clusters.")
+    st.info("Run the pipeline to generate the cluster analysis.")
 else:
     _all_data_path = "data/filtered/filtered_all_data.csv"
     _summary_path = "data/filtered/filtered_summary.csv"
@@ -815,11 +721,11 @@ else:
     with tab_s1:
         if os.path.exists(_all_data_path) and os.path.exists(_summary_path):
             _use_super = st.toggle(
-                "Regrouper les sites actine en super-clusters",
+                "Group actin sites into super-clusters",
                 value=False, key="global_graph_superclusters",
-                help="Fusionne les sites de liaison actine dont les résidus "
-                     "canoniques se chevauchent (colonnes s1/s2_supercluster) "
-                     "en un seul nœud représentant.",
+                help="Merges actin binding sites whose residues "
+                     "canonical se chevauchent (colonnes s1/s2_supercluster) "
+                     "into a single representative node.",
             )
             st.components.v1.html(_build_global_graph_html(
                 _all_data_path, _summary_path, _use_super), height=780)
@@ -862,40 +768,70 @@ else:
             df_s1_display.index = range(1, len(df_s1_display) + 1)
             st.dataframe(df_s1_display, width="stretch")
 
-            # --- Heatmap global homo + hétéro ---
-            st.subheader(
-                "Heatmap — positions canoniques actin à l'interface S1")
-            if not os.path.exists(S1_INTERFACE_FREQ_CSV):
-                st.info(
-                    "Lancer le notebook `notebooks/interface_analysis_s1.ipynb` pour générer les données.")
-            else:
-                heatmap_mode = st.selectbox(
-                    "Normalisation",
-                    ["Relative (max cluster = 1)", "Absolue (max = 100 %)"],
-                    key="heatmap_norm_mode",
-                )
-                if heatmap_mode == "Relative (max cluster = 1)":
-                    st.caption(
-                        "Chaque ligne normalisée par son propre max — compare les motifs d'interface entre clusters.")
-                    if os.path.exists(S1_HEATMAP_EQUITABLE):
-                        st.image(S1_HEATMAP_EQUITABLE, width='content')
-                    else:
-                        st.info(
-                            "Relancer le notebook `interface_analysis_s1.ipynb`.")
+            # --- Heatmap global homo + hétéro (repliée : prend de la place) ---
+            with st.expander(
+                    "Heatmap — canonical actin positions at the S1 interface",
+                    expanded=False):
+                _s1g_data = _build_s1_global_heatmap(
+                    tuple(os.path.getmtime(f) if os.path.exists(f) else 0.0
+                          for f in _S1_GLOBAL_FILES))
+                if _s1g_data is None:
+                    st.info(
+                        "Data unavailable (run the pipeline / "
+                        "`notebooks/interface_analysis_s1.py`).")
                 else:
+                    heatmap_mode = st.selectbox(
+                        "Normalisation",
+                        ["Relative (max cluster = 1)",
+                         "Absolute (max = 100 %)"],
+                        index=1,   # défaut : valeurs absolues (% ASA)
+                        key="heatmap_norm_mode",
+                    )
+                    _rel = heatmap_mode == "Relative (max cluster = 1)"
                     st.caption(
-                        "Valeurs absolues en % buried ASA — compare l'intensité d'enfouissement entre clusters.")
-                    if os.path.exists(S1_HEATMAP_ABSOLUTE):
-                        st.image(S1_HEATMAP_ABSOLUTE, width='content')
-                    else:
-                        st.info(
-                            "Relancer le notebook `interface_analysis_s1.ipynb` (cellule 6 — heatmap absolu).")
+                        "Each row normalised by its own max — compares the "
+                        "interface motifs across clusters."
+                        if _rel else
+                        "Absolute values in % buried ASA — compares burial "
+                        "intensity across clusters.")
+                    st.caption(
+                        "Columns at their true canonical position (gaps included); "
+                        "bottom band = number of clusters touching each position; "
+                        "hover = value to 2 decimals. "
+                        "**White** = position never at the interface (gap); "
+                        "**very pale yellow** = position contacted but value ≈ 0. "
+                        "**Click a coloured cell** to open the detail of this "
+                        "cluster (the page scrolls automatically).")
+                    _render_s1_global_plotly(
+                        _s1g_data, _rel,
+                        valid_clusters=set(df_s1["patch"].astype(str)))
 
             st.divider()
 
             # --- Cluster sélectionné ---
             all_s1 = df_s1.sort_values("n_interactions", ascending=False)[
                 "patch"].astype(str).tolist()
+
+            # Navigation depuis le graphe : un clic sur un nœud rouge clique (en
+            # JS, via window.top) le bouton caché du cluster ci-dessous, qui
+            # présélectionne ce cluster. On masque ces boutons (classe st-key-__pt_*).
+            st.markdown(
+                "<div id='patchsel'></div>"
+                "<style>[class*='st-key-__pt_']{position:absolute!important;"
+                "left:-9999px!important;top:auto!important;margin:0!important}</style>",
+                unsafe_allow_html=True,
+            )
+            # Défilement auto vers le détail après un clic sur la heatmap globale
+            if st.session_state.pop("_scroll_to_s1", False):
+                st.components.v1.html(
+                    "<script>const d=window.parent.document;"
+                    "const el=d.getElementById('patchsel');"
+                    "if(el){el.scrollIntoView({behavior:'smooth',block:'start'});}"
+                    "</script>", height=0)
+            for _cid in all_s1:
+                if st.button(_cid, key=f"__pt_{_cid}"):
+                    st.session_state["sel_s1"] = _cid
+
             sel_s1 = st.selectbox("Patch S1 binding site", all_s1, key="sel_s1",
                                   format_func=lambda p: f"{p} — {int(df_s1[df_s1['patch'].astype(str) == p]['n_interactions'].values[0])} interactions")
 
@@ -906,60 +842,95 @@ else:
 
             with col_net_s1:
                 st.markdown(
-                    "**Réseau interactif — résidus actine ↔ partenaires**")
+                    "**Interactive network — actin residues ↔ partners**")
                 _bip_ok = all(os.path.exists(f) for f in _BIPARTITE_FILES)
                 if _bip_ok:
                     _html_bip, _n_r, _n_p, _n_t = _build_bipartite_html(
                         sel_s1, _BIP_CACHE_VERSION, *_bip_mtimes())
                     if _html_bip:
                         st.caption(
-                            f"{_n_r} résidus actine · {_n_p} protéines partenaires"
+                            f"{_n_r} actin residues · {_n_p} partner proteins"
                             f" · n={_n_t} interactions")
                         st.components.v1.html(
                             _html_bip, height=540, scrolling=False)
                     else:
-                        st.info("Réseau non disponible pour ce cluster.")
+                        st.info("Network not available for this cluster.")
                 else:
-                    st.info("Lancer le pipeline pour générer les données réseau.")
+                    st.info("Run the pipeline to generate the network data.")
 
             with col_3d_s1:
-                st.markdown("**Interface 3D — couple représentatif**")
-                if _bip_ok:
-                    _s1_3d = _build_s1_3d_html(
+                # ── Interface 3D interactive : choisir un ABP, ou « tout ensemble » ──
+                st.markdown("**Interface 3D — actin ↔ ABP**")
+                _abp3d = _s1_abp_3d_options(
+                    sel_s1, os.path.getmtime("data/filtered/filtered_all_data.csv"))
+                _opts = [{"label": "cluster sur actin", "mode": "none"}]
+                if _abp3d:
+                    _opts.append({"label": "— All together —", "mode": "all"})
+                    _opts += [dict(o, mode="one") for o in _abp3d]
+                _sel3d = st.selectbox("Afficher", _opts,
+                                      format_func=lambda o: o["label"], key=f"abp3d_v2_{sel_s1}")
+                _mode3d = _sel3d.get("mode", "none")
+                if _mode3d == "none":
+                    _s1solo = _build_s1_3d_html(
                         sel_s1, _BIP_CACHE_VERSION, *_bip_mtimes())
-                    if _s1_3d:
-                        _html_3d_s1, _s1_max, _s2_max, _s1_is_homo = _s1_3d
-                        st.components.v1.html(
-                            _html_3d_s1, height=470, scrolling=False)
-                        if _s1_is_homo:
-                            st.caption(
-                                f"S1 (actine) : beige → rouge · % ASA buried (0 → 100 %) · max observé : {_s1_max:.1f} %"
-                            )
-                        else:
-                            st.caption(
-                                f"S1 (actine) : beige → rouge · % ASA buried (0 → 100 %) · max : {_s1_max:.1f} % "
-                                f"· S2 (ABP) : vert · % ASA, max {_s2_max:.1f} %"
-                            )
+                    if _s1solo:
+                        _hs, _smax = _s1solo[0], _s1solo[1]
+                        st.components.v1.html(_hs, height=490, scrolling=False)
+                        st.caption(
+                            f"Actin only — yellow→red = buried % ASA (max {_smax:.1f}%). "
+                            "Choose an ABP — or “All together” — to add the partner(s).")
                     else:
-                        st.info("Vue 3D non disponible pour ce patch.")
+                        st.caption(
+                            "Choose an ABP — or “All together” — from the menu.")
+                elif _mode3d == "all":
+                    _paths = tuple(o["pdb"] for o in _abp3d)
+                    _labs = tuple(o["label"] for o in _abp3d)
+                    _pdb_c, _ac, _cmap = _build_all_abp_pdb(_paths, _labs)
+                    if _cmap:
+                        _h3d, _bm = _build_all_abp_3d(_pdb_c, _ac, _cmap)
+                        st.components.v1.html(
+                            _h3d, height=490, scrolling=False)
+                        _leg = " · ".join(
+                            f"<span style='color:{_ABP_MULTI_COLORS[i % len(_ABP_MULTI_COLORS)]};"
+                            f"font-size:16px'>■</span> {l}"
+                            for i, (c, l) in enumerate(_cmap.items()))
+                        st.caption(
+                            "Actin: yellow→red surface (% buried ASA). Superimposed ABPs:")
+                        st.markdown(_leg, unsafe_allow_html=True)
+                    else:
+                        st.info("Superposition not possible for this site.")
                 else:
-                    st.info("Lancer le pipeline pour générer les données réseau.")
+                    _r3d = _build_abp_actin_3d(_sel3d["pdb"])
+                    if _r3d:
+                        _h3d, _amax, _bmax = _r3d
+                        st.components.v1.html(
+                            _h3d, height=490, scrolling=False)
+                        st.caption(
+                            f"Actin: yellow→red = buried % ASA (max {_amax:.0f}%) · "
+                            f"ABP: white→green = contact intensity (max {_bmax:.0f}%).")
+                    else:
+                        st.info("3D structure unreadable for this ABP.")
 
-            # Heatmap 1 ligne pour ce cluster
-            s1_cluster_img = os.path.join(
-                S1_INTERFACE_CLUSTER_DIR, f"{sel_s1}.png")
-            if os.path.exists(s1_cluster_img):
-                st.image(s1_cluster_img, width='content')
-            elif os.path.exists(S1_INTERFACE_FREQ_CSV):
-                st.info("Heatmap non généré pour ce cluster (seuil non atteint).")
+            # ── Détail par position : aa d'actin par organisme + aa d'ABP ──
+            _posdet = _s1_position_detail(
+                sel_s1, tuple(os.path.getmtime(f) if os.path.exists(f) else 0.0
+                              for f in _S1_GLOBAL_FILES))
+            if _posdet is not None:
+                _render_s1_position_detail(_posdet, sel_s1)
 
-            # Heatmap séparé par sous-cluster C70
-            s1_by_c70_img = os.path.join(
-                S1_INTERFACE_CLUSTER_BY_C70_DIR, f"{sel_s1}.png")
-            if os.path.exists(s1_by_c70_img):
+            # Profils interactifs du cluster (positions à leur place + %ASA au
+            # survol). Recalculés depuis les données -> la décomposition inclut
+            # TOUS les sous-clusters C70 et se met à jour au re-téléchargement.
+            _pdetail = _build_s1_patch_detail(
+                sel_s1, tuple(os.path.getmtime(f) if os.path.exists(f) else 0.0
+                              for f in _S1_GLOBAL_FILES))
+            if _pdetail is None:
+                st.info("Profile unavailable for this cluster.")
+            else:
                 st.caption(
-                    "Profil par sous-cluster d'interaction C70 (chaque ligne = 1 cluster d'interface)")
-                st.image(s1_by_c70_img, width='content')
+                    "S1 interface profile then breakdown by C70 sub-cluster "
+                    "(each row = 1 C70 cluster) — hover = position + %ASA.")
+                _render_s1_patch_plotly(_pdetail, sel_s1)
 
             # Téléchargement du script PyMOL pour ce cluster S1
             _pml_path = os.path.join(
@@ -968,33 +939,49 @@ else:
             if os.path.exists(_pml_path):
                 with open(_pml_path, "rb") as _pml_f:
                     st.download_button(
-                        label="⬇ Télécharger le script PyMOL de ce cluster",
+                        label="Download the PyMOL script for this cluster",
                         data=_pml_f,
                         file_name=f"{sel_s1}.pml",
                         mime="text/plain",
-                        help="Ouvrir dans PyMOL : File > Run Script…  ou  @/chemin/vers/le/fichier.pml",
+                        help="Open in PyMOL: File > Run Script…  or  @/path/to/the/file.pml",
                     )
 
-            # ── Analyse des contacts ABP–actine (B–E) ────────────────────────
+            # ── Analyse des contacts ABP–actin ──────────────────────────────
+            # « MSA du cluster » et « Comparaison structurale » sont des onglets
+            # supplémentaires insérés juste avant « Spécificité ».
             st.divider()
-            st.markdown("##### 📊 Analyse des contacts ABP–actine")
+            st.markdown("##### ABP–actin contact analysis")
             _ch2seq_s1, _ch2title_s1 = _s1_get_ch_maps(sel_s1)
             if _ch2seq_s1:
+                def _tab_msa_cluster(_c=sel_s1):
+                    st.markdown(
+                        "**Cluster MSA** — alignment of this cluster's sequences")
+                    _msa_s1_cluster_inline(_c, include_contacts=False)
+
+                def _tab_struct(_c=sel_s1):
+                    st.markdown(
+                        "**Structural comparison of this site's ABPs**")
+                    _render_cluster_struct(_c)
+
                 _msa_contact_analysis(
                     None, f"s1c_{sel_s1}",
                     _ch2seq=_ch2seq_s1, _ch2title=_ch2title_s1,
-                    tabs=["B", "C", "D", "E"],
+                    tabs=["C", "D", "E"],
+                    extra_tabs=[
+                        ("MSA du cluster", _tab_msa_cluster),
+                        ("Comparaison structurale", _tab_struct),
+                    ],
                 )
             else:
-                st.info("Aucune donnée de contact disponible pour ce cluster.")
+                st.info("No contact data available for this cluster.")
 
     # --- Cluster Data 70 ---
     with tab_c70:
         if os.path.exists(_all_data_path):
             st.caption(
-                "Rouge : binding sites actine (S1 + S2 homo) · Violet : clusters C70 · "
-                "Vert : binding sites partenaire (hétéro) · "
-                "Pointillé gris : interaction actine↔partenaire · Pointillé orange : interaction actine↔actine"
+                "Red: actin binding sites (S1 + S2 homo) · Purple: C70 clusters · "
+                "Green: partner binding sites (hetero) · "
+                "Grey dashed: actin↔partner interaction · Orange dashed: actin↔actin interaction"
             )
             st.components.v1.html(_build_tripartite_graph_html(
                 _all_data_path), height=900)
@@ -1033,39 +1020,43 @@ else:
             )
 
             st.markdown(
-                "**Réseau interactif — résidus actine ↔ résidus ABP**")
+                "**Interactive network — actin residues ↔ ABP residues**")
             _bip_ok = all(os.path.exists(f) for f in _BIPARTITE_FILES)
             if _bip_ok:
                 _color_mode = "restype" if st.toggle(
-                    "Coloration physicochimique (hydrophobe/polaire/chargé…)",
+                    "Physicochemical colouring (hydrophobic/polar/charged…)",
                     value=False, key=f"restype_toggle_{sel_c70}"
                 ) else "bfactor"
                 _html_c70, _n_s1, _n_s2, _n_tot, _html_3d_c70 = _build_bipartite_c70_html(
                     sel_c70, True, _color_mode, _BIP_CACHE_VERSION, *_bip_mtimes())
                 if _html_c70:
                     st.caption(
-                        f"{_n_s1} résidus actine (S1) · {_n_s2} résidus partenaire (S2)"
+                        f"{_n_s1} actin residues (S1) · {_n_s2} partner residues (S2)"
                         f" · n={_n_tot} interactions")
                     _net_height = 650
                     st.components.v1.html(
                         _html_c70, height=_net_height, scrolling=False)
                     if _html_3d_c70:
-                        st.markdown("**Interface 3D — couple représentatif**")
+                        st.markdown("**3D interface — representative pair**")
                         st.components.v1.html(
                             _html_3d_c70, height=450, scrolling=False)
                 else:
-                    st.info("Réseau non disponible pour ce cluster.")
+                    st.info("Network not available for this cluster.")
             else:
-                st.info("Lancer le pipeline pour générer les données réseau.")
+                st.info("Run the pipeline to generate the network data.")
 
 st.divider()
 st.header("ABP")
+st.caption("Actin's **partner proteins**: overview (who contacts "
+           "what), which ABPs **compete** or **coexist** on actin "
+           "(networks), then the **detail of a chosen ABP** (its sites, its "
+           "conservation, its footprint).")
 
-# Vue globale des protéines non-actines
+# Vue globale des protéines non-actins
 proteins_path = "data/filtered/proteins_per_pdb.csv"
 _all_data_path = "data/filtered/filtered_all_data.csv"
 if os.path.exists(proteins_path):
-    st.subheader("Protéines non-actines (ABP) — global")
+    st.subheader("Non-actin proteins (ABPs) — overview")
     df_pp_all = read_csv(proteins_path)
     df_abp = df_pp_all[~df_pp_all["is_actin"]]
 
@@ -1074,16 +1065,18 @@ if os.path.exists(proteins_path):
                       for v in series.dropna() if str(v) not in ("nan", "")))
         return ", ".join(vals)
 
-    # Labels de position filament pour les actines
+    # Labels de position filament pour les actins
     _fil_pos_path = "data/filtered/actin_filament_positions.csv"
     _fil_label_map = {}
     if os.path.exists(_fil_pos_path):
-        _fp = read_csv(_fil_pos_path)[["pdb_id", "chain", "label", "component_size"]]
+        _fp = read_csv(_fil_pos_path)[
+            ["pdb_id", "chain", "label", "component_size"]]
         for _, _r in _fp.iterrows():
             if _r["component_size"] > 3:
                 _fil_label_map[(_r["pdb_id"], _r["chain"])] = _r["label"]
 
-    _label_order = {"-": 0, "-2": 1, "-3": 2, "side": 3, "+3": 4, "+2": 5, "+": 6}
+    _label_order = {"-": 0, "-2": 1, "-3": 2,
+                    "side": 3, "+3": 4, "+2": 5, "+": 6}
 
     def _simplify_label(l):
         # seuls les bouts terminaux stricts comptent comme +/- ;
@@ -1161,8 +1154,8 @@ if os.path.exists(proteins_path):
                 **{"Localisation filament": ("_actin_key", _fmt_fil_labels)},
             )
             .reset_index()
-            .rename(columns={"protein": "Protéine", "Nb_noeuds": "Nb nœuds"})
-            .sort_values("Nb nœuds", ascending=False)
+            .rename(columns={"protein": "Protein", "Nb_noeuds": "# nodes"})
+            .sort_values("# nodes", ascending=False)
             .reset_index(drop=True)
         )
     else:
@@ -1173,16 +1166,16 @@ if os.path.exists(proteins_path):
                 PDB=("pdb_id", lambda x: ", ".join(sorted(x.unique()))),
             )
             .reset_index()
-            .rename(columns={"protein": "Protéine", "Nb_noeuds": "Nb nœuds"})
-            .sort_values("Nb nœuds", ascending=False)
+            .rename(columns={"protein": "Protein", "Nb_noeuds": "# nodes"})
+            .sort_values("# nodes", ascending=False)
             .reset_index(drop=True)
         )
 
-    max_len = abp_global["Protéine"].str.len().max() if len(abp_global) else 0
+    max_len = abp_global["Protein"].str.len().max() if len(abp_global) else 0
     col_width = "large" if max_len > 40 else "medium" if max_len > 20 else "small"
     st.dataframe(abp_global, width="stretch", hide_index=True, column_config={
-        "Protéine": st.column_config.TextColumn(width=col_width),
-        "Nb nœuds": st.column_config.NumberColumn(width="small"),
+        "Protein": st.column_config.TextColumn(width=col_width),
+        "# nodes": st.column_config.NumberColumn(width="small"),
         "PDB": st.column_config.TextColumn(width="large"),
         "Binding site S1": st.column_config.TextColumn(width="medium"),
         "Cluster C70": st.column_config.TextColumn(width="medium"),
@@ -1190,77 +1183,127 @@ if os.path.exists(proteins_path):
     })
 
 # ── Heatmap ABP × résidus actin ──────────────────────────────────────────────
-st.subheader("Heatmap — résidus actin contactés par les ABP")
+st.subheader("Heatmap — actin residues contacted by ABPs")
 st.caption(
-    "Chaque cellule = % ASA buried moyen équitable du résidu actin (position canonique). "
-    "Moyenne en deux étapes : d'abord par cluster C70 (0% si pas de contact), "
-    "puis moyenne équitable entre clusters C70."
+    "Each cell = fair mean buried %ASA of the actin residue (canonical position). "
+    "Two-step mean: first per C70 cluster (0% if no contact), "
+    "then a fair mean across C70 clusters."
 )
 
 
-if all(os.path.exists(f) for f in _ABP_HM_FILES):
+if not _FAST and all(os.path.exists(f) for f in _ABP_HM_FILES):
     _hm_mtimes = tuple(
         os.path.getmtime(f) if os.path.exists(f) else 0.0
         for f in _ABP_HM_FILES
     )
     _hm_res = _build_abp_heatmap_data(*_hm_mtimes)
-    if _hm_res is not None:
+    _hm_ok = (_hm_res is not None and _hm_res[0] is not None
+              and not _hm_res[0].empty and _hm_res[0].shape[1] > 0)
+    if _hm_res is not None and not _hm_ok:
+        st.info("No ABP–actin contact data to display — the derived analyses are "
+                "out of date vs the current interactions. Re-run **Run / update** "
+                "to regenerate them.")
+    if _hm_ok:
         _pivot_full_hm, _abp_freq_hm, _ = _hm_res
 
         _pivot_hm = _pivot_full_hm.copy()
 
-        import seaborn as sns
         from scipy.cluster.hierarchy import linkage, leaves_list
         from scipy.spatial.distance import pdist
+        import plotly.graph_objects as go
+        from plotly.subplots import make_subplots
 
         _n_rows = len(_pivot_hm)
-        _n_cols = len(_pivot_hm.columns)
-        _fig_w = max(14, _n_cols * 0.35 + 4)
-        _fig_h = max(6, _n_rows * 0.45 + 2)
 
-        # Clustering hiérarchique sur les lignes (ABP) uniquement
+        # Clustering hiérarchique sur les lignes (ABP) — seulement si ≥ 2 lignes,
+        # sinon pdist plante ("empty distance matrix"). En cas de jeu vide, on
+        # affiche un message plutôt que de crasher.
         _mat = _pivot_hm.fillna(0).values.astype(float)
-        _row_order = leaves_list(
-            linkage(pdist(_mat, metric="cosine"), method="average"))
-        _pivot_clustered = _pivot_hm.iloc[_row_order].fillna(0)
+        if _n_rows >= 2:
+            _row_order = leaves_list(
+                linkage(pdist(_mat, metric="cosine"), method="average"))
+            _pivot_hm = _pivot_hm.iloc[_row_order]
 
-        # Labels Y avec n interactions (après réordonnancement)
-        _ylabels = [
-            f"{r}  ({_abp_freq_hm.get(r, 0)})"
-            for r in _pivot_clustered.index
-        ]
+        # Colonnes à leur VRAIE position canonical : on comble les trous
+        # (positions non contactées) pour que l'axe X reflète la séquence d'actin.
+        _cols_int = [int(c) for c in _pivot_hm.columns]
+        _full_cols = list(range(min(_cols_int), max(_cols_int) + 1))
+        _piv_ord = _pivot_hm.copy()
+        _piv_ord.columns = _cols_int
+        _piv_ord = _piv_ord.reindex(columns=_full_cols)  # NaN = pas de contact
 
-        _fig_hm, _ax_hm = plt.subplots(figsize=(_fig_w, _fig_h))
-        sns.heatmap(
-            _pivot_clustered,
-            ax=_ax_hm,
-            cmap="YlOrRd",
-            vmin=0, vmax=100,
-            xticklabels=True,
-            yticklabels=_ylabels,
-            linewidths=0,
-            cbar_kws={
-                "label": "% ASA buried moy (0 si absent)", "shrink": 0.6},
+        # Bande actin : nb d'ABP qui touchent chaque position (empreinte globale)
+        _nabp_pos = (_pivot_hm.notna().sum(axis=0))
+        _nabp_pos.index = _cols_int
+        _nabp_pos = _nabp_pos.reindex(_full_cols, fill_value=0)
+
+        # Labels Y avec n interactions
+        _ylabels = [f"{r}  ({_abp_freq_hm.get(r, 0)})" for r in _piv_ord.index]
+
+        _fig_hm = make_subplots(
+            rows=2, cols=1, shared_xaxes=True,
+            row_heights=[0.86, 0.14], vertical_spacing=0.02,
         )
-        _ax_hm.set_xlabel("Position canonique (MAFFT)",
-                          fontsize=11, labelpad=6)
-        _ax_hm.set_ylabel("")
-        _ax_hm.set_xticklabels(_ax_hm.get_xticklabels(),
-                               rotation=90, fontsize=8)
-        _ax_hm.set_yticklabels(_ax_hm.get_yticklabels(),
-                               rotation=0, fontsize=22)
-        _ax_hm.set_title(
-            f"% ASA buried moyen — résidus actin × ABP  ({_n_rows} ABP, {_n_cols} résidus)",
-            fontsize=11, pad=8,
+        _fig_hm.add_trace(go.Heatmap(
+            z=_piv_ord.values, x=_full_cols, y=_ylabels,
+            colorscale="YlOrRd", zmin=0, zmax=100,
+            colorbar=dict(title="% ASA moy", thickness=12, len=0.86, y=0.57),
+            hovertemplate=("ABP : %{y}<br>Position : %{x}"
+                           "<br>%ASA moy : %{z:.2f}<extra></extra>"),
+            hoverongaps=False,
+        ), row=1, col=1)
+        _fig_hm.add_trace(go.Bar(
+            x=_full_cols, y=_nabp_pos.values,
+            marker=dict(color=_nabp_pos.values, colorscale="Blues",
+                        cmin=0, showscale=False),
+            hovertemplate=("Position: %{x}<br>ABPs touching it: %{y}"
+                           "<extra></extra>"),
+        ), row=2, col=1)
+        _fig_hm.update_layout(
+            height=max(520, _n_rows * 15 + 200),
+            margin=dict(l=4, r=4, t=28, b=44), bargap=0,
+            title=dict(text=f"mean buried % ASA — actin residues × ABP  "
+                       f"({_n_rows} ABPs, {len(_cols_int)} contacted positions)",
+                       font=dict(size=13)),
         )
-        plt.tight_layout()
-        st.pyplot(_fig_hm)
-        plt.close(_fig_hm)
+        _fig_hm.update_yaxes(autorange="reversed", tickfont=dict(size=9),
+                             row=1, col=1)
+        _fig_hm.update_yaxes(title_text="n ABP", title_font=dict(size=10),
+                             row=2, col=1)
+        _fig_hm.update_xaxes(dtick=25, row=2, col=1,
+                             title_text="Position canonical de l'actin (MAFFT)",
+                             title_font=dict(size=11))
+        st.plotly_chart(_fig_hm, use_container_width=True)
 
-# ── Réseau de compétition ABP ─────────────────────────────────────────────────
+# ── Réseaux ABP : compétition OU coopération (deux réseaux indépendants, au choix) ──
+_net_view = None
+_coop_pairs = {}
+_coop_set = set()
 if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
         and len(abp_global) > 0 and "Binding site S1" in abp_global.columns):
-    st.subheader("Réseau de compétition ABP")
+    st.subheader("ABP networks")
+    _net_view = st.radio(
+        "Network to display", ["Competition", "Cooperation"],
+        horizontal=True, key="net_view",
+        help="Competition = ABPs fighting over the same site (overlapping footprints). "
+             "Cooperation = ABPs co-present in the same PDB (coexist on actin).",
+    )
+    # Paires coopérantes (co-présence dans un même PDB) — servent aux deux vues
+    from itertools import combinations as _comb_coop
+    _abp_pp_co = df_pp_all[~df_pp_all["is_actin"]]
+    _pdb_to_abps = _abp_pp_co.groupby("pdb_id")["protein"].apply(
+        lambda s: sorted(set(s.dropna())))
+    for _prots_co in _pdb_to_abps:
+        for _a_co, _b_co in _comb_coop(_prots_co, 2):
+            _kk = frozenset((_a_co, _b_co))
+            _coop_pairs[_kk] = _coop_pairs.get(_kk, 0) + 1
+    _coop_set = set(_coop_pairs)
+
+
+# ── Réseau de compétition ABP ─────────────────────────────────────────────────
+if (_net_view == "Competition" and os.path.exists(proteins_path)
+        and os.path.exists(_all_data_path)
+        and len(abp_global) > 0 and "Binding site S1" in abp_global.columns):
     _jac_thresh = st.select_slider(
         "Seuil de recouvrement C70",
         options=[0.25, 0.30, 0.40, 0.50, 0.60,
@@ -1269,7 +1312,8 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
         format_func=lambda x: f"{int(x*100)}%",
     )
     _min_edge_w = 1
-    # Dataset étendu : actine peut être S1 ou S2 (toutes données hétéro)
+    _show_coop = False   # la coopération est une vue séparée (choix ci-dessus)
+    # Dataset étendu : actin peut être S1 ou S2 (toutes données hétéro)
     _df_s1_act = df_all_g[
         df_all_g["s1_actine"].fillna(False).astype(bool) &
         ~df_all_g["s2_actine"].fillna(False).astype(bool)
@@ -1296,7 +1340,6 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
         .to_dict()
     )
 
-
     _sc_mtimes = tuple(
         os.path.getmtime(f) if os.path.exists(f) else 0.0
         for f in _S1_SUPER_FILES
@@ -1319,9 +1362,13 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
     _n_before = len(_edge_wts)
     _edge_wts_filtered: dict = {}
     _abp_c70_comp_count_filtered: dict = {}  # recalculé après filtre position
-    _abp_c70_valid: dict = {}                # ABP → set de C70 valides (Jaccard + position)
+    # ABP → set de C70 valides (Jaccard + position)
+    _abp_c70_valid: dict = {}
     for (_a, _b) in _edge_wts:
         # Recompter uniquement les paires C70 qui passent Jaccard ET position
+        # Paire coopérante (même PDB) : on garde l'arête (dessinée en vert) mais on
+        # ne compte PAS ses C70 comme "contestés" -> couleur du nœud = vraie compétition.
+        _pair_coop = _show_coop and frozenset((_a, _b)) in _coop_set
         _n_valid = 0
         for _ca in _abp_to_c70s_da.get(_a, set()):
             _fa = _c70_footprint.get(_ca)
@@ -1336,8 +1383,9 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
                 if _mn > 0 and len(_fa & _fb) / _mn >= _jac_thresh:
                     if _pos_a & _c70_fil_pos.get(_cb, set()):
                         _n_valid += 1
-                        _abp_c70_valid.setdefault(_a, set()).add(_ca)
-                        _abp_c70_valid.setdefault(_b, set()).add(_cb)
+                        if not _pair_coop:
+                            _abp_c70_valid.setdefault(_a, set()).add(_ca)
+                            _abp_c70_valid.setdefault(_b, set()).add(_cb)
         if _n_valid > 0:
             _edge_wts_filtered[(_a, _b)] = _n_valid
     _n_filtered = _n_before - len(_edge_wts_filtered)
@@ -1350,7 +1398,8 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
     for _, _r in merged.iterrows():
         _lbl = _fil_label_map.get(_r["_actin_key"])
         if _lbl:
-            _abp_fil_pos_net.setdefault(_r["protein"], set()).add(_simplify_label(_lbl))
+            _abp_fil_pos_net.setdefault(
+                _r["protein"], set()).add(_simplify_label(_lbl))
 
     def _pos_border_color(pos_set: set) -> str:
         """Orange = barbée (+ avec ou sans side) ; bleu = pointée (− avec ou sans side) ;
@@ -1364,25 +1413,30 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
         return "#888888"       # gris   — side seul, barbée+pointée, ou inconnu
 
     st.caption(
-        f"Seuil de recouvrement {int(_jac_thresh*100)}% — deux ABPs sont liés si au moins "
-        f"un de leurs clusters C70 couvre ≥{int(_jac_thresh*100)}% de la plus petite interface. "
-        f"{len(_edge_wts)} paires en compétition "
-        f"({_n_filtered} exclues car localisations filament disjointes)."
+        f"Overlap threshold {int(_jac_thresh*100)}% — two ABPs are linked if at least "
+        f"one of their C70 clusters covers ≥{int(_jac_thresh*100)}% of the smaller interface. "
+        f"{len(_edge_wts)} competing pairs "
+        f"({_n_filtered} excluded due to disjoint filament locations)."
     )
 
     # Tous les ABPs connus (y compris isolés)
     _all_abp_net = set(_merged_net["protein"].dropna().unique())
 
     if True:  # toujours entrer (même sans arêtes, afficher les nœuds isolés)
-        # Nombre de compétiteurs uniques (voisins distincts) par ABP
+        # Nombre de compétiteurs uniques (voisins distincts) par ABP.
+        # Si le mode coopération est actif, les paires co-présentes dans un même PDB
+        # ne sont PAS des compétiteurs -> exclues du décompte (donc nœud + petit).
         _abp_neighbors_c: dict = {}
         for (_a_c, _b_c) in _edge_wts:
+            if _show_coop and frozenset((_a_c, _b_c)) in _coop_set:
+                continue
             _abp_neighbors_c.setdefault(_a_c, set()).add(_b_c)
             _abp_neighbors_c.setdefault(_b_c, set()).add(_a_c)
         _abp_n_competitors: dict = {k: len(v)
                                     for k, v in _abp_neighbors_c.items()}
 
-        _max_comp_c = max(_abp_n_competitors.values()) if _abp_n_competitors else 1
+        _max_comp_c = max(_abp_n_competitors.values()
+                          ) if _abp_n_competitors else 1
 
         # Cluster de séquence par ABP → couleur (deux directions)
         _df_s2lnk = _merged_net.dropna(subset=["_seqcl"]).copy()
@@ -1409,6 +1463,90 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
             return out
         _s2c_color = dict(zip(_s2c_all, _golden_pal(_n_cls)))
 
+        # ── Famille biologique par ABP (même définition que le barplot) ──────────
+        import re as _re_fam
+        _FAMILIES_NET = [
+            ('Cofilin', r'cofilin|destrin'),
+            ('Tropomodulin', r'tropomodulin|leiomodin'), ('Tropomyosin', r'tropomyosin'),
+            ('Myosin', r'myosin'),
+            ('CAP', r'cyclase-associated'), ('Cortactin', r'cortactin'),
+            ('Capping (CapZ)', r'capping protein|f-actin-capping|capz'),
+            ('Cross-linkers', r'spectrin|filamin|plastin|fimbrin|actinin|epididymis secretory protein li 37'),
+            ('Utrophin/Dystrophin', r'utrophin|dystrophin'),
+            ('Coronin', r'coronin'), ('Vinculin/Catenin/Talin',
+                                      r'vinculin|catenin|talin'),
+            ('Bacterial toxins', r'sipa|vop|exoy|tccc'), ('Profilin', r'profilin'),
+            ('Gelsolin/Villin', r'gelsolin|villin|severin'), ('Formin',
+                                                              r'formin|mdia|daam|diaphanous'),
+            ('Troponin', r'troponin'), ('Adducin', r'adducin'),
+            ('Arp2/3 (ARPC)', r'arpc|complex subunit'),
+            ('Arp (Arp2/Arp3)', r'actin-related protein 2|actin-related protein 3|arp2|arp3'),
+            ('Dematin', r'dematin'), ('AIP1/WD-repeat', r'wd repeat|aip1'),
+            ('Kinase', r'kinase'), ('Afadin',
+                                    r'afadin'), ('Thymosin/WH2', r'thymosin|wh2|ciboulot'),
+        ]
+
+        def _fam_net(t: str) -> str:
+            t = str(t).lower()
+            for _n, _pat in _FAMILIES_NET:
+                if _re_fam.search(_pat, t):
+                    return _n
+            return 'Other'
+        _fam_of = {_n: _fam_net(_n) for _n in _all_abp_net}
+        _fams_present = sorted(set(_fam_of.values()) - {'Other'})
+        # palette qualitative à fort contraste (couleurs maximalement distinctes)
+        _DISTINCT = [
+            "#e6194B", "#3cb44b", "#4363d8", "#f58231", "#911eb4", "#42d4f4",
+            "#f032e6", "#bfef45", "#fabed4", "#469990", "#dcbeff", "#9A6324",
+            "#800000", "#aaffc3", "#808000", "#000075", "#ffd8b1", "#000000",
+            "#a9a9a9", "#ffe119", "#e6beff", "#fffac8", "#aed4e6", "#ff7f50",
+        ]
+        _fam_pal = {_f: _DISTINCT[_i % len(_DISTINCT)]
+                    for _i, _f in enumerate(_fams_present)}
+        _fam_pal['Autre'] = '#cccccc'
+
+        # Noms courts affichés (le nom complet reste l'id du nœud -> survol/recherche)
+        _DISP_NAMES = {
+            'Actin-related protein 2': 'Arp2',
+            'Actin-related protein 3': 'Arp3',
+            'Actin-related protein 2/3 complex subunit 1': 'ARPC1',
+            'Actin-related protein 2/3 complex subunit 1B': 'ARPC1B',
+            'Actin-related protein 2/3 complex subunit 2': 'ARPC2',
+            'Actin-related protein 2/3 complex subunit 3': 'ARPC3',
+            'Actin-related protein 2/3 complex subunit 4': 'ARPC4',
+            'Actin-related protein 2/3 complex subunit 5': 'ARPC5',
+            'Actin-related protein 2/3 complex subunit 5-like protein': 'ARPC5L',
+            'Coronin-1B,Methylated-DNA--protein-cysteine methyltransferase': 'Coronin-1B',
+            'WD repeat-containing protein 1,Methylated-DNA--protein-cysteine methyltransferase': 'WDR1 (AIP1)',
+            'Maltose/maltodextrin-binding periplasmic protein,Adenylate cyclase ExoY': 'ExoY',
+            'Maltose/maltodextrin-binding periplasmic protein,TccC3': 'TccC3',
+            'Cell invasion protein SipA': 'SipA',
+            'Vibrio VopV': 'VopV (Vibrio)',
+            'Adenylyl cyclase-associated protein 1': 'CAP1',
+            'Epididymis secretory protein Li 37': 'L-plastin',
+            'Alpha-catenin-like protein hmp-1': 'α-catenin (hmp-1)',
+            'Catenin alpha-1': 'α-catenin-1',
+            'Dematin actin binding protein': 'Dematin',
+            'Src substrate cortactin': 'Cortactin',
+            'Inositol-trisphosphate 3-kinase A': 'IP3 3-kinase A',
+            'Protein diaphanous homolog 1': 'Diaphanous-1',
+            'Isoform A2 of Troponin T, cardiac muscle': 'Troponin T (A2)',
+            'Troponin T2, cardiac type': 'Troponin T2',
+            'F-actin-capping protein subunit alpha-1': 'Capping α1',
+            'F-actin-capping protein subunit beta': 'Capping β',
+            'Isoform 2 of F-actin-capping protein subunit beta': 'Capping β (iso2)',
+            'Myosin-14,Alpha-actinin A': 'Myosin-14',
+            'Unconventional myosin-Ib': 'Myosin-Ib',
+            'beta-cardiac myosin II': 'β-cardiac myosin',
+            'Myosin heavy chain 4': 'MyHC-4',
+            'Spectrin beta chain': 'Spectrin β',
+            'Tropomyosin alpha-1 chain': 'Tropomyosin α1',
+            'Tropomyosin beta chain': 'Tropomyosin β',
+        }
+
+        def _disp_name(_x):
+            return _DISP_NAMES.get(_x, _x)
+
         def _wrap_lbl(name: str, max_ch: int = 18) -> str:
             words, lines, cur = name.split(), [], ""
             for w in words:
@@ -1423,15 +1561,12 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
 
         # Physique forceAtlas2 : stabilisation auto → groupes visibles, pas de flottement
         from pyvis.network import Network
-        _net_c = Network(height="980px", width="100%", bgcolor="#ffffff",
-                         font_color="#111")
+        # NB : pas de font_color= au constructeur -> il ECRASE le font par-nœud
+        # (taille, gras multi:html, halo strokeWidth). Couleur par défaut via set_options.
+        _net_c = Network(height="980px", width="100%", bgcolor="#ffffff")
         _net_c.set_options(
-            '{"physics": {"enabled": true, "solver": "barnesHut",'
-            '  "barnesHut": {"gravitationalConstant": -8000,'
-            '    "centralGravity": 1, "springLength": 100,'
-            '    "springConstant": 0.05, "damping": 0.2, "avoidOverlap": 1.0},'
-            '  "stabilization": {"enabled": true, "iterations": 2000, "fit": true}},'
-            ' "nodes": {"shape": "dot", "font": {"size": 7}},'
+            '{"physics": {"enabled": false},'
+            ' "nodes": {"shape": "dot", "font": {"size": 14, "color": "#111", "multi": "html"}},'
             ' "edges": {"smooth": false},'
             ' "interaction": {"hover": true, "tooltipDelay": 100, "hideEdgesOnDrag": false}}'
         )
@@ -1449,51 +1584,237 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
             if n_total == 0:
                 return "#cccccc"
             pct = n_comp / n_total
-            t = (pct - _pct_min) / (_pct_max - _pct_min) if _pct_max > _pct_min else 1.0
+            t = (pct - _pct_min) / (_pct_max -
+                                    _pct_min) if _pct_max > _pct_min else 1.0
             # jaune (#ffff00) → rouge (#cc0000)
             r = int(255 + (204 - 255) * t)
             g = int(255 * (1 - t))
             b = 0
             return f"#{r:02x}{g:02x}{b:02x}"
 
+        # ── Layout spring regroupé par FAMILLE (arêtes virtuelles intra-famille) ──
+        import networkx as _nxg
+        _Glay = _nxg.Graph()
+        _Glay.add_nodes_from(_all_abp_net)
+        for (_ea, _eb), _ew in _edge_wts.items():
+            if _ea in _all_abp_net and _eb in _all_abp_net:
+                _Glay.add_edge(_ea, _eb, weight=min(_ew, 3))
+        _cl_mem_lay: dict = {}
+        for _nc in _all_abp_net:
+            _cl = _fam_of.get(_nc)
+            if _cl and _cl != 'Autre':
+                _cl_mem_lay.setdefault(_cl, []).append(_nc)
+        for _cl, _mem in _cl_mem_lay.items():
+            for _i in range(len(_mem)):
+                for _j in range(_i + 1, len(_mem)):
+                    if _Glay.has_edge(_mem[_i], _mem[_j]):
+                        _Glay[_mem[_i]][_mem[_j]]["weight"] += 20.0
+                    else:
+                        _Glay.add_edge(_mem[_i], _mem[_j], weight=20.0)
+        # TOXINES épinglées au centre -> le réseau se construit autour
+        _tox_lay = sorted({_n for _n in _all_abp_net
+                           if _fam_of.get(_n) == 'Bacterial toxins'})
+        _init_pos = {}
+        for _ti, _tn in enumerate(_tox_lay):
+            _a = 2 * 3.14159265 * _ti / max(len(_tox_lay), 1)
+            _init_pos[_tn] = (0.13 * np.cos(_a), 0.13 * np.sin(_a))
+        if _tox_lay:
+            _layout_pos = _nxg.spring_layout(_Glay, weight="weight", k=0.62,
+                                             iterations=600, seed=3,
+                                             pos=_init_pos, fixed=_tox_lay)
+        else:
+            _layout_pos = _nxg.spring_layout(_Glay, weight="weight", k=0.62,
+                                             iterations=600, seed=3)
+        # Normalisation robuste : recentre + ramène les nœuds isolés (ex. Profilin
+        # à seuil élevé) vers le cœur, pour que vis.js ne dézoome pas et que le
+        # réseau reste lisible à TOUS les seuils (sans changer le look organique).
+        _parr = np.array(list(_layout_pos.values()), dtype=float)
+        _cxl, _cyl = _parr[:, 0].mean(), _parr[:, 1].mean()
+        _dl = np.hypot(_parr[:, 0] - _cxl, _parr[:, 1] - _cyl)
+        # rayon du cœur (ignore les isolés)
+        _rref = float(np.percentile(_dl, 82)) or 1.0
+        # rayon max autorisé (rapproche fort les isolés)
+        _RMAX = _rref * 1.05
+
+        def _normp(_p):
+            _dx, _dy = _p[0] - _cxl, _p[1] - _cyl
+            _r = (_dx ** 2 + _dy ** 2) ** 0.5
+            if _r > _RMAX:
+                _f = _RMAX / _r
+                _dx, _dy = _dx * _f, _dy * _f
+            return (_dx / _rref, _dy / _rref)
+        _layout_pos = {_k: _normp(_v) for _k, _v in _layout_pos.items()}
+        _SCALE = 600.0   # rayon du cœur ~1 après normalisation
+
         _label_thresh = 3
         for _nc in sorted(_all_abp_net):
             _n_c70_total = _abp_c70_count.get(_nc, 0)
             _n_c70_comp = _abp_c70_comp_count.get(_nc, 0)
             _n_comp_nc = _abp_n_competitors.get(_nc, 0)
-            _sz = 5 + 18 * (_n_comp_nc / _max_comp_c) ** 1.5 if _n_comp_nc > 0 else 5
             _pct_val = round(_n_c70_comp / _n_c70_total *
                              100) if _n_c70_total else 0
-            _col = _pct_color(_n_c70_comp, _n_c70_total)
+            # TAILLE = proportion de sites de liaison en conflit (% C70 contestés)
+            _sz = 4 + 0.16 * _pct_val
+            # COULEUR = famille biologique de l'ABP
+            _fam_nc = _fam_of.get(_nc, 'Autre')
+            _col = _fam_pal.get(_fam_nc, '#bbbbbb')
             _show_lbl = _n_comp_nc >= _label_thresh
-            _c70_line = (f"C70 en compétition : {_n_c70_comp} / {_n_c70_total} ({_pct_val}%)"
-                         if _n_c70_comp else f"C70 total : {_n_c70_total} (0%)")
+            _c70_line = (f"Competing C70: {_n_c70_comp} / {_n_c70_total} ({_pct_val}%)"
+                         if _n_c70_comp else f"Total C70: {_n_c70_total} (0%)")
             _pos_set = _abp_fil_pos_net.get(_nc, set())
             _pos_str = ", ".join(
-                sorted(_pos_set, key=lambda x: {"-": 0, "side": 1, "+": 2}.get(x, 99))
+                sorted(_pos_set, key=lambda x: {
+                       "-": 0, "side": 1, "+": 2}.get(x, 99))
             ) if _pos_set else "?"
-            _border_col = _pos_border_color(_pos_set)
+            # extrémité du filament : "+" / "−" seulement si l'ABP n'est PAS aussi à
+            # l'autre extrémité ; rien si les deux (±), latéral, ou inconnu.
+            _has_p, _has_m = ("+" in _pos_set), ("-" in _pos_set)
+            _sign = ("+" if (_has_p and not _has_m)
+                     else "−" if (_has_m and not _has_p) else "")
+            # contour neutre (plus de barbé/pointé/latéral)
+            _border_col = "#555555"
+            _xy = _layout_pos.get(_nc, (0.0, 0.0))
             _net_c.add_node(
                 _nc,
-                label=_wrap_lbl(_nc) if _show_lbl else "",
+                label=("<b>" + _wrap_lbl(_disp_name(_nc)).replace("\n", "<br>") + "</b>"
+                       if _show_lbl else ""),
                 title=(f"{_nc}\n"
+                       f"Famille : {_fam_nc}\n"
                        f"Position filament : {_pos_str}\n"
                        f"{_c70_line}\n"
                        f"Partenaires ABP uniques en concurrence : {_n_comp_nc}"),
                 size=_sz,
                 color={"background": _col, "border": _border_col},
                 borderWidth=1,
-                font={"size": 3, "face": "Arial", "color": "#111111"},
+                font={"size": 26, "face": "Arial",
+                      "color": "#111111", "multi": "html"},
+                x=float(_xy[0]) * _SCALE, y=float(_xy[1]) * _SCALE,
+                physics=False,
             )
+            # signe d'extrémité À L'INTÉRIEUR du nœud (nœud-texte superposé au centre),
+            # texte blanc + halo (stroke) sombre -> lisible sur N'IMPORTE quelle
+            # couleur de nœud (clair OU foncé). Sur fond clair, on inverse (texte
+            # noir + halo blanc) pour garder le contraste.
+            if _sign:
+                _hh = str(_col).lstrip('#')
+                _lum = (0.299 * int(_hh[0:2], 16) + 0.587 * int(_hh[2:4], 16)
+                        + 0.114 * int(_hh[4:6], 16)) if len(_hh) == 6 else 0
+                _light = _lum > 160
+                _net_c.add_node(
+                    f"{_nc}__sign", label=_sign, shape="text",
+                    font={"size": int(max(22, _sz * 1.8)), "face": "Arial",
+                          "color": "#000000" if _light else "#ffffff",
+                          "strokeWidth": 5,
+                          "strokeColor": "#ffffff" if _light else "#000000"},
+                    x=float(_xy[0]) * _SCALE, y=float(_xy[1]) * _SCALE,
+                    physics=False,
+                )
         _filtered_edges = {k: v for k,
                            v in _edge_wts.items() if v >= _min_edge_w}
+        _n_coop_shown = 0
+        # nœuds de la famille "Toxines bactériennes" -> leurs arêtes en NOIR (fines)
+        _tox_nodes = {_n for _n in _all_abp_net
+                      if _fam_of.get(_n) == 'Bacterial toxins'}
         for (_a_c, _b_c), _w_c in sorted(_filtered_edges.items(),
                                          key=lambda x: x[1], reverse=True):
-            _net_c.add_edge(
-                _a_c, _b_c,
-                width=1,
-                title=f"{_w_c} paire(s) C70 partagée(s)",
-                color={"color": "#505050", "opacity": 0.2},
+            _is_coop = _show_coop and frozenset((_a_c, _b_c)) in _coop_set
+            _is_tox = (_a_c in _tox_nodes) or (_b_c in _tox_nodes)
+            if _is_coop:
+                _n_coop_shown += 1
+                _npdb = _coop_pairs[frozenset((_a_c, _b_c))]
+                _net_c.add_edge(
+                    _a_c, _b_c, width=2,
+                    title=f"Cooperate — co-present in {_npdb} PDBs",
+                    color={"color": "#1f9e3a", "opacity": 0.65},
+                )
+            elif _is_tox:
+                _net_c.add_edge(
+                    _a_c, _b_c, width=0.8,
+                    title=f"Toxin — {_w_c} shared C70 pair(s)",
+                    color={"color": "#000000", "opacity": 0.7},
+                )
+            else:
+                _net_c.add_edge(
+                    _a_c, _b_c, width=1.8,
+                    title=f"{_w_c} shared C70 pair(s)",
+                    color={"color": "#000000", "opacity": 0.25},
+                )
+
+        # ── Export PAGE WEB autonome : réseau filtré à ≥50% de compétition ────────
+        # Réutilise les calculs ci-dessus. N'affiche que les ABP dont ≥50% des sites
+        # C70 sont contestés. Mêmes styles (arêtes noires, +/− dans les nœuds, gras).
+        _WEB_THRESH = 0.50
+        _q_web = {
+            _nw for _nw in _all_abp_net
+            if _abp_c70_count.get(_nw, 0) > 0
+            and _abp_c70_comp_count.get(_nw, 0) / _abp_c70_count[_nw] >= _WEB_THRESH
+        }
+        # pas de font_color= au constructeur (écraserait le font par-nœud)
+        _net_web = Network(height="1000px", width="100%", bgcolor="#ffffff")
+        _net_web.set_options(
+            '{"physics": {"enabled": false},'
+            ' "nodes": {"shape": "dot", "font": {"size": 14, "color": "#111", "multi": "html"}},'
+            ' "edges": {"smooth": false},'
+            ' "interaction": {"hover": true}}'
+        )
+        for _nw in sorted(_q_web):
+            _totw = _abp_c70_count.get(_nw, 0)
+            _cmpw = _abp_c70_comp_count.get(_nw, 0)
+            _pvw = round(_cmpw / _totw * 100) if _totw else 0
+            _szw = 6 + 0.18 * _pvw
+            _colw = _fam_pal.get(_fam_of.get(_nw, 'Autre'), '#bbbbbb')
+            _psetw = _abp_fil_pos_net.get(_nw, set())
+            _hpw, _hmw = ("+" in _psetw), ("-" in _psetw)
+            _sgnw = "+" if (_hpw and not _hmw) else ("−" if (_hmw and not _hpw) else "")
+            _xw, _yw = _layout_pos.get(_nw, (0.0, 0.0))
+            _net_web.add_node(
+                _nw,
+                label="<b>" + _wrap_lbl(_disp_name(_nw)
+                                        ).replace("\n", "<br>") + "</b>",
+                title=f"{_disp_name(_nw)}\nContested C70: {_cmpw}/{_totw} ({_pvw}%)",
+                size=_szw, color={"background": _colw, "border": "#555555"}, borderWidth=1,
+                font={"size": 26, "face": "Arial",
+                      "color": "#111111", "multi": "html"},
+                x=float(_xw) * _SCALE, y=float(_yw) * _SCALE, physics=False,
+            )
+            if _sgnw:
+                _hhw = str(_colw).lstrip('#')
+                _lmw = (0.299 * int(_hhw[0:2], 16) + 0.587 * int(_hhw[2:4], 16)
+                        + 0.114 * int(_hhw[4:6], 16)) if len(_hhw) == 6 else 0
+                _lightw = _lmw > 160
+                _net_web.add_node(
+                    f"{_nw}__sign", label=_sgnw, shape="text",
+                    font={"size": int(max(22, _szw * 1.8)), "face": "Arial",
+                          "color": "#000000" if _lightw else "#ffffff",
+                          "strokeWidth": 5,
+                          "strokeColor": "#ffffff" if _lightw else "#000000"},
+                    x=float(_xw) * _SCALE, y=float(_yw) * _SCALE, physics=False,
+                )
+        for (_aw, _bw) in _edge_wts:
+            if _aw in _q_web and _bw in _q_web:
+                if (_aw in _tox_nodes) or (_bw in _tox_nodes):
+                    _net_web.add_edge(_aw, _bw, width=0.8,
+                                      color={"color": "#000000", "opacity": 0.7})
+                else:
+                    _net_web.add_edge(_aw, _bw, width=1.8,
+                                      color={"color": "#000000", "opacity": 0.3})
+        _web_out = "data/visualisations/competition_network_50.html"
+        os.makedirs(os.path.dirname(_web_out), exist_ok=True)
+        _net_web.save_graph(_web_out)
+        with open(_web_out, "rb") as _wf:
+            st.download_button(
+                "Standalone web page — competition network (≥50%)",
+                data=_wf, file_name="competition_network_50.html",
+                mime="text/html", key="dl_compet_web",
+            )
+        st.caption(f"Standalone web page saved: `{_web_out}` — "
+                   f"{len(_q_web)} ABPs at ≥50% competition.")
+
+        if _show_coop and _n_coop_shown:
+            st.caption(
+                f"{_n_coop_shown} green edge(s) = pairs whose footprints "
+                "overlap BUT that co-occur in the same PDB → they cooperate "
+                "(not true competition)."
             )
         _net_html = _net_c.generate_html()
         # Désactiver la physique dès que la stabilisation est terminée
@@ -1504,7 +1825,8 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
             if _pat_c in _net_html:
                 _net_html = _net_html.replace(
                     _pat_c,
-                    _pat_c + "\n  network.once('stabilizationIterationsDone', function(){"
+                    _pat_c +
+                    "\n  network.once('stabilizationIterationsDone', function(){"
                     "\n    network.setOptions({physics:{enabled:false}});"
                     "\n  });",
                 )
@@ -1520,7 +1842,7 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
             "  cont.style.position = 'relative';\n"
             "  var box = document.createElement('input');\n"
             "  box.type = 'text';\n"
-            "  box.placeholder = 'Rechercher un ABP…';\n"
+            "  box.placeholder = 'Search an ABP…';\n"
             "  box.style.cssText = 'position:absolute;top:10px;right:10px;z-index:9999;'\n"
             "    + 'padding:6px 12px;border:2px solid #aaa;border-radius:20px;'\n"
             "    + 'font-size:13px;width:240px;outline:none;background:white;';\n"
@@ -1549,41 +1871,140 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
             "  });\n"
             "})();\n"
         )
-        _net_html = _net_html.replace("</body>", "<script>" + _inject_search_abp + "</script>\n</body>")
+        _net_html = _net_html.replace(
+            "</body>", "<script>" + _inject_search_abp + "</script>\n</body>")
         st.components.v1.html(_net_html, height=880, scrolling=False)
         st.caption(
-            "Remplissage : jaune = % min de clusters C70 en compétition → rouge = % max   ·   "
-            "Taille : nombre de partenaires en compétition   ·   "
-            "Survol : position filament de l'ABP"
+            "Remplissage : **couleur = famille d'ABP**   ·   "
+            "Size: **proportion of binding sites in conflict** (% of contested C70 clusters)   ·   "
+            "Hover: family, filament position, competitors"
         )
-        # Légende des couleurs de contour
-        _legend_html = (
-            "<div style='display:flex;flex-wrap:wrap;gap:14px;align-items:center;"
-            "font-size:12px;margin-top:4px;'>"
-            "<b>Contour = position filament :</b>"
+        # Légende COULEUR = famille (uniquement les familles présentes dans le réseau)
+        _fams_in_net = sorted({_fam_of[_n] for _n in _all_abp_net})
+        _fam_items = "".join(
             "<span style='display:flex;align-items:center;gap:5px;'>"
-            "<span style='width:14px;height:14px;border-radius:50%;border:2px solid #e67300;"
-            "background:#eee;display:inline-block'></span> barbée (+ ou + side)</span>"
-            "<span style='display:flex;align-items:center;gap:5px;'>"
-            "<span style='width:14px;height:14px;border-radius:50%;border:2px solid #0077cc;"
-            "background:#eee;display:inline-block'></span> pointée (− ou − side)</span>"
-            "<span style='display:flex;align-items:center;gap:5px;'>"
-            "<span style='width:14px;height:14px;border-radius:50%;border:2px solid #888888;"
-            "background:#eee;display:inline-block'></span> latéral / mixte</span>"
-            "</div>"
+            f"<span style='width:13px;height:13px;border-radius:50%;background:{_fam_pal.get(_f, '#bbb')};"
+            "display:inline-block;border:1px solid #999'></span> " + _f + "</span>"
+            for _f in _fams_in_net
         )
-        st.markdown(_legend_html, unsafe_allow_html=True)
+        _legend_fam = (
+            "<div style='display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;"
+            "font-size:11px;margin-top:4px;'><b>Couleur = famille :</b>" + _fam_items + "</div>"
+        )
+        st.markdown(_legend_fam, unsafe_allow_html=True)
 
     st.divider()
+
+# ── Réseau de coopération ABP ─────────────────────────────────────────────────
+if (_net_view == "Cooperation" and os.path.exists(proteins_path)
+        and os.path.exists(_all_data_path)
+        and len(abp_global) > 0 and "Binding site S1" in abp_global.columns
+        and _coop_pairs):
+    st.subheader("ABP cooperation network")
+    st.caption(
+        "Two ABPs are linked if they appear **together in the same PDB** "
+        "(co-present on actin → they cooperate). Width = number of shared PDBs "
+        "· size = number of cooperating partners · outline = filament position."
+    )
+    import networkx as _nx_coop
+    from pyvis.network import Network as _Net_coop
+    _Gco = _nx_coop.Graph()
+    for _pr_co, _np_co in _coop_pairs.items():
+        _a_n, _b_n = tuple(_pr_co)
+        _Gco.add_edge(_a_n, _b_n, weight=_np_co)
+    _coop_nodes = list(_Gco.nodes())
+    _deg_co = dict(_Gco.degree())
+    _maxdeg_co = max(_deg_co.values()) if _deg_co else 1
+    # Disposition EN TUILES : chaque module (composant connexe) dans sa propre case,
+    # étalé et normalisé -> pas de chevauchement (le spring global tassait tout).
+    import math as _math_co
+    _comps_co = sorted(_nx_coop.connected_components(_Gco),
+                       key=len, reverse=True)
+    _node_compsize = {}
+    for _comp in _comps_co:
+        for _n in _comp:
+            _node_compsize[_n] = len(_comp)
+    _cols_co = max(1, int(_math_co.ceil(_math_co.sqrt(len(_comps_co)))))
+    _CELL_CO = 2.8
+    _pos_co = {}
+    for _i_co, _comp in enumerate(_comps_co):
+        _sub = _Gco.subgraph(_comp)
+        if len(_comp) == 1:
+            _sp = {next(iter(_comp)): (0.0, 0.0)}
+        else:
+            _sp = _nx_coop.spring_layout(_sub, k=1.3, iterations=400, seed=3)
+        _xs = [p[0] for p in _sp.values()]
+        _ys = [p[1] for p in _sp.values()]
+        _cx = (max(_xs) + min(_xs)) / 2
+        _cy = (max(_ys) + min(_ys)) / 2
+        _rx = (max(_xs) - min(_xs)) or 1.0
+        _ry = (max(_ys) - min(_ys)) or 1.0
+        _rad = 0.45 + 0.12 * len(_comp)
+        _gx = (_i_co % _cols_co) * _CELL_CO
+        _gy = -(_i_co // _cols_co) * _CELL_CO
+        for _n, (x, y) in _sp.items():
+            _pos_co[_n] = (_gx + (x - _cx) / _rx * _rad,
+                           _gy + (y - _cy) / _ry * _rad)
+    _SCALE_CO = 760.0
+    _net_co = _Net_coop(height="820px", width="100%", bgcolor="#ffffff",
+                        font_color="#111")
+    _net_co.set_options('{"physics": {"enabled": false}}')
+    for _nc_co in _coop_nodes:
+        _dg = _deg_co.get(_nc_co, 0)
+        _sz_co = 6 + 20 * (_dg / _maxdeg_co) ** 0.7
+        _pset_co = _abp_fil_pos_net.get(_nc_co, set())
+        _bcol_co = _pos_border_color(_pset_co)
+        _xy_co = _pos_co.get(_nc_co, (0.0, 0.0))
+        # étiquette si nœud connecté (>=2 partenaires) ou petit module (<=4 membres)
+        _show_lbl_co = (_dg >= 2) or (_node_compsize.get(_nc_co, 1) <= 4)
+        _net_co.add_node(
+            _nc_co, label=_wrap_lbl(_nc_co) if _show_lbl_co else "",
+            title=f"{_nc_co}\nCooperating partners: {_dg}",
+            size=_sz_co, color={"background": "#7ec98f", "border": _bcol_co},
+            borderWidth=2, font={"size": 4, "face": "Arial", "color": "#111"},
+            x=float(_xy_co[0]) * _SCALE_CO, y=float(_xy_co[1]) * _SCALE_CO,
+            physics=False,
+        )
+    for _a_e, _b_e, _d_e in _Gco.edges(data=True):
+        _w_e = _d_e.get("weight", 1)
+        _net_co.add_edge(
+            _a_e, _b_e, width=1 + 1.5 * _w_e,
+            title=f"co-present in {_w_e} PDBs",
+            color={"color": "#1f9e3a", "opacity": 0.5},
+        )
+    st.components.v1.html(_net_co.generate_html(), height=780, scrolling=False)
+    st.caption(
+        f"{len(_coop_nodes)} cooperating ABPs · {_Gco.number_of_edges()} pairs "
+        "co-present in the same PDB (modules: disassembly, spectrin-actin "
+        "skeleton, thin filament, Arp2/3 complex…)."
+    )
+    st.divider()
+
+# Mode FAST : on s'arrête après les réseaux (saute Détail/Filament PyMOL/MSA)
+if _FAST:
+    st.stop()
 
 # ── Détail par ABP ─────────────────────────────────────────────────────────────
 if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
         and len(abp_global) > 0 and "Binding site S1" in abp_global.columns):
-    st.subheader("Détail par ABP")
+    st.subheader("Per-ABP detail")
 
-    _NO_ABP_LABEL = "— PDB sans ABP —"
-    abp_names = [_NO_ABP_LABEL] + abp_global["Protéine"].tolist()
-    sel_abp = st.selectbox("Sélectionner un ABP",
+    _NO_ABP_LABEL = "— PDBs without ABP —"
+    abp_names = [_NO_ABP_LABEL] + abp_global["Protein"].tolist()
+
+    # Navigation depuis le graphe : un clic sur un nœud vert (ABP) clique (en JS,
+    # via window.top) le bouton caché du même nom → sélectionne cet ABP ici.
+    st.markdown(
+        "<div id='abpsel'></div>"
+        "<style>[class*='st-key-__ab_']{position:absolute!important;"
+        "left:-9999px!important;top:auto!important;margin:0!important}</style>",
+        unsafe_allow_html=True,
+    )
+    for _i, _abpn in enumerate(abp_global["Protein"].tolist()):
+        if st.button(_abpn, key=f"__ab_{_i}"):
+            st.session_state["sel_abp_detail"] = _abpn
+
+    sel_abp = st.selectbox("Select an ABP",
                            abp_names, key="sel_abp_detail")
     _is_no_abp = (sel_abp == _NO_ABP_LABEL)
 
@@ -1597,7 +2018,7 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
 
     if not _is_no_abp:
         # ── Clusters actin–ABP (interactions hétéro) ─────────────────────────
-        st.markdown("#### Clusters d'interaction actine–ABP")
+        st.markdown("#### Clusters d'interaction actin–ABP")
         _abp_subunits = set(merged[merged["protein"] == sel_abp]["_abp_chain"])
         _df_hetero = df_all_g.copy()
         _df_hetero["_pdb_h"] = _df_hetero["subunit_1"].str.split("_").str[0]
@@ -1616,7 +2037,7 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
         ].copy()
 
         if abp_int.empty:
-            st.info("Aucune interaction hétéro trouvée pour cet ABP.")
+            st.info("No hetero interaction found for this ABP.")
         else:
             def _most_freq_pair(grp):
                 """Paire (subunit_1, subunit_2) la plus fréquente dans le groupe."""
@@ -1648,15 +2069,15 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
             abp_clust["% PDB"] = (
                 abp_clust["nb_pdb"] / max(len(abp_pdbs), 1) * 100
             ).round(1)
-            abp_clust["% interactions ABP-actine"] = (
+            abp_clust["% ABP-actin interactions"] = (
                 abp_clust["nb_inter"] / _total_abp_inter * 100
             ).round(1)
             st.caption(
-                f"{len(abp_pdbs)} PDB contenant cet ABP · "
-                f"{len(abp_int)} interactions hétéro actine–ABP · "
+                f"{len(abp_pdbs)} PDBs containing this ABP · "
+                f"{len(abp_int)} hetero actin–ABP interactions · "
                 f"{abp_clust.shape[0]} clusters C70"
             )
-            abp_clust["Site liaison"] = (
+            abp_clust["Binding site"] = (
                 abp_clust["s1_binding_site_cluster_data_70"].astype(str)
                 + " × "
                 + abp_clust["s2_binding_site_cluster_data_70"].astype(str)
@@ -1664,10 +2085,10 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
             st.dataframe(
                 abp_clust.rename(columns={
                     "cluster_data_70": "Cluster C70",
-                    "nb_inter": "Nb interactions",
-                    "nb_pdb": "Nb PDB",
-                })[["Cluster C70", "Site liaison",
-                    "Nb interactions", "% interactions ABP-actine", "Nb PDB", "% PDB"]],
+                    "nb_inter": "# interactions",
+                    "nb_pdb": "# PDBs",
+                })[["Cluster C70", "Binding site",
+                    "# interactions", "% ABP-actin interactions", "# PDBs", "% PDB"]],
                 hide_index=True,
                 use_container_width=True,
             )
@@ -1681,15 +2102,15 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
             ]
             if not _valid_rows:
                 st.caption(
-                    "Aucun fichier PDB C70 disponible pour ces clusters.")
+                    "No C70 PDB file available for these clusters.")
             else:
                 _ylord3d = ["#FFFFCC", "#FFF0A9", "#FEE186", "#FECA65", "#FDAA48",
                             "#FC8C3B", "#FC5A2D", "#EC2D21", "#D30F20", "#800026"]
                 _grn3d = ["#FFFFCC", "#D9F0A3", "#ADDD8E", "#78C679",
                           "#41AB5D", "#238443", "#006837"]
                 st.caption(
-                    "Jaune→rouge = actine (% ASA enfouie) · "
-                    "Jaune→vert = ABP · blanc = hors interface"
+                    "Yellow→red = actin (buried % ASA) · "
+                    "Yellow→green = ABP · white = outside interface"
                 )
                 for _i3d in range(0, len(_valid_rows), 2):
                     _pair = _valid_rows[_i3d:_i3d + 2]
@@ -1732,10 +2153,10 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
 
         st.divider()
 
-    # ── Interactions actine-actine (homo) ─────────────────────────────────────
-    _homo_label = ("PDB sans ABP" if _is_no_abp
-                   else f"les mêmes PDB que {sel_abp[:30]}")
-    st.markdown(f"#### Interactions actine-actine (homo) — {_homo_label}")
+    # ── Interactions actin-actin (homo) ─────────────────────────────────────
+    _homo_label = ("PDBs without ABP" if _is_no_abp
+                   else f"the same PDBs as {sel_abp[:30]}")
+    st.markdown(f"#### Interactions actin-actin (homo) — {_homo_label}")
     _df_homo = df_all_g.copy()
     _df_homo["_pdb"] = _df_homo["subunit_1"].str.split("_").str[0]
     homo_cooc = _df_homo[
@@ -1746,7 +2167,7 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
     ][["_pdb", "cluster_data_70",
        "s1_binding_site_cluster_data_70", "s2_binding_site_cluster_data_70"]].copy()
 
-    # Fusionner S1 et S2 en une paire canonique (triée, S1/S2 non distingués)
+    # Fusionner S1 et S2 en une paire canonical (triée, S1/S2 non distingués)
     homo_cooc["Binding sites"] = homo_cooc.apply(
         lambda r: " × ".join(sorted([
             str(r["s1_binding_site_cluster_data_70"]),
@@ -1757,10 +2178,10 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
     total_homo = len(homo_cooc)
     st.caption(
         f"{len(abp_pdbs)} PDB · "
-        f"{total_homo} interactions homo actine-actine"
+        f"{total_homo} interactions homo actin-actin"
     )
     if homo_cooc.empty:
-        st.info("Aucune interaction homo actine-actine dans ces PDB.")
+        st.info("No homo actin-actin interaction in these PDBs.")
     else:
         homo_summary = (
             homo_cooc.groupby(
@@ -1772,250 +2193,181 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
         homo_summary["% PDB"] = (
             homo_summary["nb_pdb"] / len(abp_pdbs) * 100
         ).round(1)
-        homo_summary["% interactions homo"] = (
+        homo_summary["% homo interactions"] = (
             homo_summary["nb_inter"] / total_homo * 100
         ).round(1)
         homo_summary = homo_summary.rename(columns={
             "cluster_data_70": "Cluster C70",
-            "nb_pdb": "Nb PDB",
-            "nb_inter": "Nb interactions homo",
+            "nb_pdb": "# PDBs",
+            "nb_inter": "# homo interactions",
         })[["Cluster C70", "Binding sites",
-            "Nb PDB", "% PDB", "Nb interactions homo", "% interactions homo"]]
+            "# PDBs", "% PDB", "# homo interactions", "% homo interactions"]]
         st.dataframe(homo_summary, hide_index=True, use_container_width=True)
 
-    # ── Filament actine 10 sous-unités ────────────────────────────────────
-    st.subheader("Filament actine — 10 sous-unités (PyMOL)")
+    # ── Découverte PDB : motif d'interface cherché dans tout le PDB ───────────
+    if not _is_no_abp:
+        folddisco_view.render_discovery(sel_abp)
 
-    _by_abp_dir = _Path(
-        "data/filtered/details/structures_files/filament/by_abp"
-    )
-    _global_base_pdb = _Path(
-        "data/filtered/details/structures_files/filament/filament_global_base.pdb"
-    )
-
-    if not _is_no_abp and _by_abp_dir.exists():
-        import re as _re
-        _abp_sname = _re.sub(r"[^a-zA-Z0-9]+", "_", sel_abp).strip("_")[:60]
-        _abp_pml = _by_abp_dir / f"{_abp_sname}.pml"
-        _abp_pdb = _by_abp_dir / f"{_abp_sname}_abp.pdb"
-
-        # Lire patches_by_abp.csv pour savoir si même filament que base
-        _patches_csv = _by_abp_dir / "patches_by_abp.csv"
-        _same_as_base = False
-        _abp_patch1 = _abp_patch2 = None
-        if _patches_csv.exists():
-            _df_patches_abp = pd.read_csv(_patches_csv)
-            _row_abp = _df_patches_abp[_df_patches_abp["abp_sname"] == _abp_sname]
-            if not _row_abp.empty:
-                _same_as_base = bool(_row_abp.iloc[0]["same_as_base"])
-                _abp_patch1 = _row_abp.iloc[0]["patch_1"]
-                _abp_patch2 = _row_abp.iloc[0]["patch_2"]
-
-        if _same_as_base:
-            st.info(
-                f"Le filament de {sel_abp} utilise les **memes clusters d'interface que le filament de reference** "
-                f"({_abp_patch1} + {_abp_patch2}). "
-                "La session PyMOL contient uniquement le filament global (identique)."
-            )
-        else:
-            _p_str = ""
-            if _abp_patch1:
-                _p_str = f"{_abp_patch1}" + (f" + {_abp_patch2}" if pd.notna(_abp_patch2) else "")
-            st.caption(
-                "Session PyMOL avec 2 filaments : "
-                "**filament_base** (clusters globaux 0_7797_0 + 0_7797_1, blanc→rouge) et "
-                f"**filament_abp** (clusters {_p_str}, blanc→orange). "
-                "B-factor = somme % ASA buried des sites de liaison S1."
-            )
-
-        _fc1, _fc2, _fc3 = st.columns(3)
-        if _abp_pml.exists():
-            # Lire le PML et remplacer les chemins par des chemins absolus résolus sur cette machine
-            _pml_text = _abp_pml.read_text()
-            _fc1.download_button(
-                "Session PyMOL (.pml)",
-                _pml_text.encode(),
-                file_name=f"{_abp_sname}.pml",
-                mime="text/plain",
-                key=f"dl_pml_{_abp_sname}",
-            )
-        else:
-            _fc1.info("Session PML non disponible.")
-        if _global_base_pdb.exists():
-            with open(_global_base_pdb, "rb") as _f:
-                _fc2.download_button(
-                    "PDB filament base (.pdb)",
-                    _f,
-                    file_name="filament_global_base.pdb",
-                    mime="chemical/x-pdb",
-                    key=f"dl_base_{_abp_sname}",
-                )
-        if not _same_as_base and _abp_pdb.exists():
-            with open(_abp_pdb, "rb") as _f:
-                _fc3.download_button(
-                    f"PDB filament {sel_abp[:20]} (.pdb)",
-                    _f,
-                    file_name=f"{_abp_sname}_abp.pdb",
-                    mime="chemical/x-pdb",
-                    key=f"dl_abp_{_abp_sname}",
-                )
+    # ── ProteoCast de l'ABP : paysage mutationnel + empreinte + 3D ────────────
+    st.subheader("ProteoCast de l'ABP — paysage mutationnel + structure 3D")
+    _pc_mt = os.path.getmtime("data/proteocast/abp_inputs/manifest.csv") \
+        if os.path.exists("data/proteocast/abp_inputs/manifest.csv") else 0.0
+    _pc_status = proteocast_view.load_status(_pc_mt)
+    _pc_miss = int((~_pc_status["fait"]).sum()
+                   ) if _pc_status is not None else 0
+    if _pc_miss:
+        if st.button(f"Compute all missing ProteoCast ({_pc_miss})",
+                     key="pc_run_all_missing"):
+            with st.status(f"Computing {_pc_miss} ProteoCast via "
+                           "proteocast.ijm.fr (sequential, a few min/ABP)…",
+                           expanded=True) as _pcall:
+                _pclog = st.empty()
+                _proc = subprocess.Popen(
+                    [sys.executable, "-u", "script/proteocast_submit_abp.py"],
+                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+                _buf = []
+                for _l in _proc.stdout:
+                    _buf.append(_l.rstrip())
+                    _pclog.code("\n".join(_buf[-20:]))
+                _proc.wait()
+                _pcall.update(label="ProteoCast campaign finished.",
+                              state="complete")
+            st.cache_data.clear()
+            st.rerun()
+    if _is_no_abp:
+        st.caption("Select an ABP to see its ProteoCast.")
     else:
-        # Filament générique (PDB sans ABP ou fichiers ABP non disponibles)
-        st.caption(
-            "Filament reconstruit depuis les structures pairwise 8iah (chaînes A→J). "
-            "B-factor = somme % ASA buried des 4 clusters homo principaux (6685_1+2+3+4). "
-            "Spectre blanc → rouge : zones les plus contactées dans les interactions homo actine-actine."
-        )
+        _pc_row = None
+        if _pc_status is not None:
+            _m = _pc_status[_pc_status["abp_title"] == sel_abp]
+            if len(_m):
+                _pc_row = _m.iloc[0]
+        _pc_slug = (_pc_row["slug"] if _pc_row is not None
+                    else _re_sd.sub(r"[^a-zA-Z0-9]+", "_", str(sel_abp)).strip("_")[:60])
+        _pc_uni = _pc_row["uniprot"] if _pc_row is not None else None
+        if _pc_row is not None and not _pc_row["fait"]:
+            st.warning(
+                f"**Not computed.** Automatic launch possible below "
+                f"(UniProt **{_pc_uni}**, via proteocast.ijm.fr)."
+                + ("  \n_(Fusion chimera ABP: ProteoCast not very relevant.)_"
+                   if _pc_row.get("fusion") else ""))
+            if st.button("Compute the ProteoCast of this ABP",
+                         key=f"pc_run_{_pc_slug}", type="primary"):
+                with st.status("Submitting to proteocast.ijm.fr…",
+                               expanded=True) as _pc_st:
+                    _ok, _msg = proteocast_view.run_proteocast_job(
+                        _pc_uni, _pc_slug, log=_pc_st.write)
+                    if _ok:
+                        _pc_st.update(label="ProteoCast computed and fetched.",
+                                      state="complete")
+                        st.cache_data.clear()
+                        st.rerun()
+                    else:
+                        _pc_st.update(label=f"Failed: {_msg}", state="error")
 
-        # Tableau récapitulatif : quels ABPs ont le même filament que la base ?
-        _patches_csv_noabp = _Path(
-            "data/filtered/details/structures_files/filament/by_abp/patches_by_abp.csv"
-        )
-        if _patches_csv_noabp.exists():
-            _df_abp_patches = pd.read_csv(_patches_csv_noabp)
-            _df_abp_patches = _df_abp_patches[_df_abp_patches["patch_1"].notna()].copy()
-            _df_abp_patches["Filament"] = _df_abp_patches["same_as_base"].map(
-                {True: "Identique a la reference", False: "Specifique a l'ABP"}
-            )
-            _df_abp_patches["Clusters utilises"] = _df_abp_patches.apply(
-                lambda r: str(r["patch_1"]) + (
-                    f" + {r['patch_2']}" if pd.notna(r["patch_2"]) else ""), axis=1
-            )
-            # Mapping C70 → S1 supercluster
-            _filt_path = _Path("data/filtered/filtered_all_data.csv")
-            if _filt_path.exists():
-                _df_filt_sc = pd.read_csv(_filt_path, low_memory=False,
-                                          usecols=["cluster_data_70", "s1_supercluster"])
-                # s1_supercluster liste désormais les super-clusters séparés par ';'
-                # (multi-appartenance) : on découpe avant de prendre le dominant.
-                _c70_to_sc = {}
-                for _c70, _grp in _df_filt_sc.dropna(
-                        subset=["s1_supercluster"]).groupby("cluster_data_70"):
-                    _cnt = _Counter()
-                    for _v in _grp["s1_supercluster"]:
-                        _cnt.update(s for s in str(_v).split(";") if s)
-                    _c70_to_sc[_c70] = _cnt.most_common(1)[0][0] if _cnt else ""
-                def _get_superfamille(r):
-                    sc1 = _c70_to_sc.get(str(r["patch_1"]), "")
-                    sc2 = _c70_to_sc.get(str(r["patch_2"]), "") if pd.notna(r.get("patch_2")) else ""
-                    parts = sorted({s for s in [sc1, sc2] if s})
-                    return " + ".join(parts) if parts else "—"
-                _df_abp_patches["Superfamille S1"] = _df_abp_patches.apply(_get_superfamille, axis=1)
-                _cols = ["abp_title", "Clusters utilises", "Superfamille S1", "Filament"]
-            else:
-                _cols = ["abp_title", "Clusters utilises", "Filament"]
-            _df_display = _df_abp_patches[_cols].rename(columns={"abp_title": "ABP"})
-            st.markdown("**Filament par ABP — comparaison avec la reference sans ABP**")
-            st.dataframe(
-                _df_display.sort_values("Filament"),
-                hide_index=True,
-                use_container_width=True,
-                column_config={
-                    "Filament": st.column_config.TextColumn("Filament", width="medium"),
-                    "Superfamille S1": st.column_config.TextColumn("Superfamille S1", width="medium"),
-                },
-            )
-        # Session PyMOL avec tous les filaments spécifiques — générée à la volée
-        _by_abp_dir2 = _Path("data/filtered/details/structures_files/filament/by_abp")
-        _global_base2 = _Path("data/filtered/details/structures_files/filament/filament_global_base.pdb")
-        _patches_csv2 = _by_abp_dir2 / "patches_by_abp.csv"
-        if _patches_csv2.exists() and _global_base2.exists():
-            import re as _re2
-            _df_p2 = pd.read_csv(_patches_csv2)
-            _diff2 = _df_p2[_df_p2["same_as_base"] == False].dropna(subset=["patch_1"])
-            _pml_lines2 = [
-                "# PyMOL — Tous les filaments actine uniques (base + ABPs specifiques)",
-                "# ABPs charges mais caches : faire 'show surface, NomObjet' pour les afficher",
-                "",
-                f"load {_global_base2.resolve().as_posix()}, filament_base",
-                "hide everything, filament_base",
-                "show surface, filament_base",
-                "spectrum b, white_red, filament_base, minimum=0",
-                "",
-            ]
-            for _, _rec2 in _diff2.iterrows():
-                _pdb2 = _by_abp_dir2 / f"{_rec2['abp_sname']}_abp.pdb"
-                if not _pdb2.exists():
-                    continue
-                _obj2 = _re2.sub(r"[^a-zA-Z0-9]+", "_", str(_rec2["abp_title"]))[:30].strip("_")
-                _pml_lines2 += [
-                    f"# {_rec2['abp_title']} — faire 'show surface, {_obj2}' pour afficher",
-                    f"load {_pdb2.resolve().as_posix()}, {_obj2}",
-                    f"hide everything, {_obj2}",
-                    f"spectrum b, white_red, {_obj2}, minimum=0",
-                    "",
-                ]
-            _pml_lines2 += ["set surface_quality, 0", "bg_color white", "zoom filament_base"]
-            _pml_content2 = "\n".join(_pml_lines2).encode()
-            st.download_button(
-                "Session PyMOL — tous les filaments specifiques (.pml)",
-                _pml_content2,
-                file_name="all_specific_filaments.pml",
-                mime="text/plain",
-                key="dl_all_filaments",
-            )
+        _pc_tab1, _pc_tab2 = st.tabs(
+            ["Paysage mutationnel", "Visualisation 3D"])
+        with _pc_tab1:
             st.caption(
-                "Contient le filament de reference + les ABPs dont le filament "
-                "differe de la base. Chemins absolus generes depuis cette machine."
-            )
+                "Evolutionary conservation of the ABP (ProteoCast, 20 substitutions/"
+                "position); below, the positions that contact actin → "
+                "is the interface conserved?")
+            _render_abp_proteocast(sel_abp, _abp_subunits)
+            st.markdown(
+                "**Actin side — conservation of the residues targeted by this ABP**")
+            _render_abp_actin_conservation(sel_abp)
+            _imgs = proteocast_view.result_images(_pc_slug)
+            if _imgs:
+                with st.expander("ProteoCast figures (results folder)"):
+                    for _im in _imgs:
+                        st.image(_im, use_container_width=True)
+        with _pc_tab2:
+            st.caption("ABP structure coloured by mutational sensitivity "
+                       "(or AlphaFold pLDDT until ProteoCast is provided).")
+            _pc_style = st.radio("Display", ["Surface", "Cartoon"],
+                                 horizontal=True, key=f"pc_view_{_pc_slug}")
+            # gros ABP : restreindre la 3D à la zone qui touche l'actin (ABD)
+            _pc_focus = None
+            _pc_fz = _abp_actin_focus(sel_abp, _pc_slug)
+            if _pc_fz:
+                _pflo, _pfhi, _pql = _pc_fz
+                if not st.toggle(
+                        f"Whole protein ({_pql} aa) — otherwise actin-binding "
+                        f"region (~{_pflo}–{_pfhi})",
+                        value=False, key=f"pc3d_whole_{_pc_slug}",
+                        help="Restricts the structure to the domain that contacts "
+                             "actin (the rest of this large ABP is off-topic)."):
+                    _pc_focus = (_pflo, _pfhi)
+            _pc_struct = proteocast_view.structure_for(
+                _pc_slug, _pc_uni, _pc_mt)
+            if _pc_struct is None:
+                st.info("Structure unavailable (AlphaFold not found for this "
+                        "UniProt, or no result provided).")
+            else:
+                import py3Dmol
+                _pc_pdb = (_crop_pdb_residues(_pc_struct["pdb"], *_pc_focus)
+                           if _pc_focus else _pc_struct["pdb"])
+                _grad = (["#2166ac", "#f7f7f7", "#b2182b"] if _pc_struct["metric"]
+                         else ["#ff7f00", "#ffff99", "#1f78b4"])
+                _v = py3Dmol.view(width="100%", height=500)
+                _v.addModel(_pc_pdb, "pdb")
+                _scheme = {"prop": "b", "gradient": "linear", "colors": _grad,
+                           "min": _pc_struct["vmin"], "max": _pc_struct["vmax"]}
+                if _pc_style == "Surface":
+                    _v.setStyle({}, {})
+                    _v.addSurface(
+                        py3Dmol.SES, {"opacity": 1.0, "colorscheme": _scheme})
+                else:
+                    _v.setStyle({}, {"cartoon": {"colorscheme": _scheme}})
+                _v.zoomTo()
+                _v.setBackgroundColor("white")
+                st.components.v1.html(
+                    _v._make_html(), height=510, scrolling=False)
+                st.caption(f"Coloured by: **{_pc_struct['by']}**.")
 
-        _filament_pml = _Path(
-            "data/filtered/details/structures_files/filament/actin_filament_10.pml"
-        )
-        _filament_pdb = _Path(
-            "data/filtered/details/structures_files/filament/actin_filament_10.pdb"
-        )
-        _col_pml, _col_pdb = st.columns(2)
-        if _filament_pml.exists():
-            with open(_filament_pml, "rb") as _f:
-                _col_pml.download_button(
-                    "Télécharger le script PyMOL (.pml)",
-                    _f,
-                    file_name="actin_filament_10.pml",
-                    mime="text/plain",
-                )
-        else:
-            _col_pml.info("Script PyMOL non disponible.")
-        if _filament_pdb.exists():
-            with open(_filament_pdb, "rb") as _f:
-                _col_pdb.download_button(
-                    "Télécharger le PDB filament (.pdb)",
-                    _f,
-                    file_name="actin_filament_10.pdb",
-                    mime="chemical/x-pdb",
-                )
+# ── Explorateur interactif : séquence query / cluster / ABP / paire d'ABP ─────
+if not _FAST:
+    st.header("Interactive explorer", anchor="explorateur")
+    _pp = build_passport(pp_mtimes())
+    if _pp is None:
+        st.info("Residue-passport data unavailable "
+                "(run the pipeline to generate them).")
+    else:
+        residue_explorer.render_explorer(_pp)
 
 # ── MSA — Protéines d'interface ───────────────────────────────────────────────
 
-st.header("MSA — Protéines d'interface", anchor="msa-proteines")
+st.header("MSA — Interface proteins", anchor="msa-proteines")
+st.caption("Sequence alignments of interface proteins (actin and ABP) — "
+           "advanced view to spot conserved vs variable residues at the interface.")
 
 
 if not _Path("data/filtered/filtered_all_data.csv").exists():
-    st.warning("filtered_all_data.csv non trouvé — lancer d'abord les étapes de filtrage.")
+    st.warning(
+        "filtered_all_data.csv not found — run the filtering steps first.")
 else:
     _MSA_ALN_DIR.mkdir(parents=True, exist_ok=True)
 
     st.caption(
-        "3 familles + clusters : MSA séquence complète ABP (S2) et Actine (S1) — "
-        "🟢 vert = majorité en interaction (aa conservé) · "
-        "🟣 violet = majorité en interaction (aa variable) · "
-        "🔴 rouge = minorité en interaction"
+        "3 families + clusters: full-sequence MSA of ABP (S2) and Actin (S1) — "
+        "green = majority in interaction (conserved aa) · "
+        "purple = majority in interaction (variable aa) · "
+        "red = minority in interaction"
     )
 
     _msa_section_full(
-        "Myosines (rigor — sans ADP)", "myosin",
+        "Myosins", "myosin",
         lambda t: "myosin" in t.lower() and "tropomyosin" not in t.lower(),
-        rigor_pdbs=_MSA_RIGOR_PDBS,
-        note="Restreint aux 9 structures rigor (sans ADP sur la chaîne myosine).",
+        note="All myosin structures (rigor + ADP), including beta-cardiac.",
     )
     _msa_section_full(
-        "Tropomyosines", "tropomyosin",
+        "Tropomyosins", "tropomyosin",
         lambda t: "tropomyosin" in t.lower(),
     )
     _msa_section_full(
-        "Plastin et apparentés", "plastin",
-        lambda t: any(x in t.lower() for x in ["plastin", "spectrin beta", "filamin", "utrophin"]),
+        "Plastin and related", "plastin",
+        lambda t: any(x in t.lower()
+                      for x in ["plastin", "spectrin beta", "filamin", "utrophin"]),
         note="Plastin-3, Spectrin beta chain, Filamin-A, Utrophin.",
     )
     _msa_section_s2_clusters()
-    _msa_section_s1_clusters()

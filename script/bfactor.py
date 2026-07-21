@@ -31,7 +31,7 @@ df_ref = pd.read_csv(REF_CSV)
 df_c70 = pd.read_csv(C70_CSV)
 
 df3["buried_ASA_percent"] = pd.to_numeric(
-    df3["buried_ASA_percent"].str.replace("%", "", regex=False),
+    df3["buried_ASA_percent"].astype(str).str.replace("%", "", regex=False),
     errors="coerce").fillna(0)
 
 # Mapping interaction_id → C70 patch

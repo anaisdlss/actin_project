@@ -166,7 +166,7 @@ def _msa_extract_interface_seqs(filter_fn, rigor_pdbs=None):
 def _msa_run_mafft(fasta_path: _Path, aln_path: _Path):
     mafft_bin = shutil.which("mafft")
     if mafft_bin is None:
-        return False, "mafft introuvable dans le PATH"
+        return False, "mafft not found in PATH"
     try:
         with open(aln_path, "w") as out:
             res = subprocess.run(
@@ -326,11 +326,11 @@ def _msa_render_full(alignment, core_by_seqlow: dict, var_by_seqlow: dict,
     parts.append(
         '<div style="margin-top:14px;font-size:10px;color:#666">'
         '<span style="background:#27ae60;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">'
-        '&#9632; Majorité en interaction (aa conservé)</span>'
+        '&#9632; Majority in interaction (conserved aa)</span>'
         '<span style="background:#8e44ad;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">'
-        '&#9632; Majorité en interaction (aa variable)</span>'
+        '&#9632; Majority in interaction (variable aa)</span>'
         '<span style="background:#e74c3c;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">'
-        '&#9632; Minorité en interaction</span>'
+        '&#9632; Minority in interaction</span>'
         '<span style="color:#ccc;margin-right:6px">&#9632; Non-interface</span>'
         '</div></div>'
     )
@@ -413,7 +413,7 @@ def _msa_load_interface_g(filter_fn, rigor_pdbs=None):
 
 def _msa_actin_contacts_from_pairs(df_pairs, df1, df3):
     """
-    Calcule, pour chaque séquence ABP unique (S2), les positions canoniques actine (S1) contactées.
+    Calcule, pour chaque séquence ABP unique (S2), les positions canonical actin (S1) contactées.
 
     df_pairs : DataFrame avec colonnes subunit_1, subunit_2, subunit_2_title, s2_sequence, s2_taxonomy_id
     df1      : 1.interactions.csv (déjà chargé)
@@ -446,7 +446,7 @@ def _msa_actin_contacts_from_pairs(df_pairs, df1, df3):
         .str.lower()
     )
 
-    # Résidus S1 (actine) avec position canonique
+    # Résidus S1 (actin) avec position canonical
     df3_rel = df3[
         df3["interaction_id"].isin(valid_iids) &
         df3["residue_number_canon_mafft"].notna()
@@ -462,7 +462,7 @@ def _msa_actin_contacts_from_pairs(df_pairs, df1, df3):
     # iid → set(canon_pos)
     iid_to_canon: dict = df3_s1.groupby("interaction_id")["canon"].apply(set).to_dict()
 
-    # AA actine à chaque position canonique (groupe filtré — pour col_color)
+    # AA actin à chaque position canonical (groupe filtré — pour col_color)
     _VALID_AA = set("ACDEFGHIKLMNPQRSTVWY")
     df3_s1["aa1"] = df3_s1["residue_name"].str.strip().str.upper()
     df3_s1_v = df3_s1[df3_s1["aa1"].isin(_VALID_AA)]
@@ -471,7 +471,7 @@ def _msa_actin_contacts_from_pairs(df_pairs, df1, df3):
         aa_counter[row["canon"]][row["aa1"]] += 1
     aa_at_canon = {pos: cnt.most_common(1)[0][0] for pos, cnt in aa_counter.items() if cnt}
 
-    # Séquence canonique complète : toutes les interactions S1 (pas juste le groupe filtré)
+    # Séquence canonical complète : toutes les interactions S1 (pas juste le groupe filtré)
     _iid_to_s1_all = df1.set_index("interaction_id")["chain_A_id"].str.lower()
     _df3_full = df3[pd.to_numeric(df3["residue_number_canon_mafft"], errors="coerce").notna()].copy()
     _df3_full["canon_f"] = pd.to_numeric(_df3_full["residue_number_canon_mafft"], errors="coerce").astype(int)
@@ -517,7 +517,7 @@ def _msa_actin_contacts_from_pairs(df_pairs, df1, df3):
     if not abp_rows:
         return [], {}, {}
 
-    # Couleur par position canonique
+    # Couleur par position canonical
     n_abp = len(abp_rows)
     col_color: dict = {}
     for pos in aa_at_canon:
@@ -558,8 +558,8 @@ def _msa_actin_contacts_per_abp(filter_fn, rigor_pdbs=None):
 
 def _msa_render_actin_contacts(abp_rows, aa_at_canon, col_color, cols_per_line=60, label_map=None):
     """
-    Affiche les contacts actine-ABP : lignes = séquences ABP, colonnes = positions canoniques actine.
-    L'AA actine est affiché à chaque position, coloré si cette séquence ABP la contacte.
+    Affiche les contacts actin-ABP : lignes = séquences ABP, colonnes = positions canonical actin.
+    L'AA actin est affiché à chaque position, coloré si cette séquence ABP la contacte.
     """
     all_positions = sorted(aa_at_canon.keys())
     if not all_positions or not abp_rows:
@@ -581,7 +581,7 @@ def _msa_render_actin_contacts(abp_rows, aa_at_canon, col_color, cols_per_line=6
         pos_slice = all_positions[c0:c1]
         parts.append(
             f'<div style="color:#aaa;font-size:10px;margin:{("14px" if li else "0")} 0 2px 0">'
-            f'Positions actine canoniques {pos_slice[0]}–{pos_slice[-1]}</div>'
+            f'Positions actin canonical {pos_slice[0]}–{pos_slice[-1]}</div>'
         )
         parts.append('<table style="border-collapse:collapse;">')
         for row in abp_rows:
@@ -606,10 +606,10 @@ def _msa_render_actin_contacts(abp_rows, aa_at_canon, col_color, cols_per_line=6
         parts.append("</table>")
     parts.append(
         '<div style="margin-top:14px;font-size:10px;color:#666">'
-        '<span style="background:#27ae60;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">&#9632; Majorité en interaction (aa actine conservé)</span>'
-        '<span style="background:#8e44ad;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">&#9632; Majorité en interaction (aa actine variable)</span>'
-        '<span style="background:#e74c3c;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">&#9632; Minorité en interaction</span>'
-        '<span style="color:#ccc;margin-right:6px">AA Non-contacté</span>'
+        '<span style="background:#27ae60;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">&#9632; Majority in interaction (conserved actin aa)</span>'
+        '<span style="background:#8e44ad;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">&#9632; Majority in interaction (variable actin aa)</span>'
+        '<span style="background:#e74c3c;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">&#9632; Minority in interaction</span>'
+        '<span style="color:#ccc;margin-right:6px">AA Not contacted</span>'
         '</div></div>'
     )
     return "".join(parts)
@@ -693,21 +693,104 @@ def _msa_render_projected(full_seqs_by_id, aln_iface, iface_pos_by_id, cols_per_
         parts.append("</table>")
     parts.append(
         '<div style="margin-top:14px;font-size:10px;color:#666">'
-        '<span style="background:#27ae60;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">&#9632; Majorité en interaction (aa conservé)</span>'
-        '<span style="background:#8e44ad;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">&#9632; Majorité en interaction (aa variable)</span>'
-        '<span style="background:#e74c3c;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">&#9632; Minorité en interaction</span>'
+        '<span style="background:#27ae60;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">&#9632; Majority in interaction (conserved aa)</span>'
+        '<span style="background:#8e44ad;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">&#9632; Majority in interaction (variable aa)</span>'
+        '<span style="background:#e74c3c;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">&#9632; Minority in interaction</span>'
         '<span style="color:#ccc;margin-right:6px">&#9632; Non-interface</span>'
         '</div></div>'
     )
     return "".join(parts)
 
 
-def _msa_contact_analysis(filter_fn, group_key, rigor_pdbs=None,
-                           _ch2seq=None, _ch2title=None, tabs=None):
+@st.cache_data(show_spinner=False)
+def _buried_asa_lookup():
+    """ASA enfouie ABSOLUE (Å²) par résidu, depuis 3.interface_residues.
+    Clé = (interaction_id, chain, residue_number_structure) → Å²."""
+    p = _Path("data/filtered/details/3.interface_residues.csv")
+    if not p.exists():
+        return {}
+    i3 = pd.read_csv(p, usecols=["interaction_id", "chain",
+                                 "residue_number_structure", "buried_ASA_Å²"])
+    i3["ba"] = pd.to_numeric(
+        i3["buried_ASA_Å²"].astype(str).str.replace("<", "", regex=False), errors="coerce")
+    i3["rn"] = pd.to_numeric(i3["residue_number_structure"], errors="coerce")
+    i3 = i3.dropna(subset=["rn"])
+    return {(int(a), b, int(c)): d
+            for a, b, c, d in zip(i3.interaction_id, i3.chain, i3.rn, i3.ba)}
+
+
+# Classes physicochimiques de résidus (code 1 lettre) pour dériver des
+# propriétés de contact que contact_type ne fournit pas.
+_HYDROPHOBIC = set("AVLIMFWP")   # apolaires
+_AROMATIC    = set("FWY")        # cycles aromatiques (empilement π)
+_CATIONIC    = set("KR")         # chargés +
+
+
+def _contact_props(aa_a, aa_b, contact_type):
+    """Booléens des propriétés d'un contact (Series alignées).
+    Retourne un dict de masques booléens."""
+    ct = contact_type.fillna("").astype(str)
+    a = aa_a.astype(str).str.strip().str.upper()
+    b = aa_b.astype(str).str.strip().str.upper()
+    a_hy, b_hy = a.isin(_HYDROPHOBIC), b.isin(_HYDROPHOBIC)
+    a_ar, b_ar = a.isin(_AROMATIC), b.isin(_AROMATIC)
+    a_ca, b_ca = a.isin(_CATIONIC), b.isin(_CATIONIC)
+    return {
+        "salt":  ct.str.contains("Salt bridge"),
+        "hbond": ct.str.contains("H-bond"),
+        "vdw":   (ct == ""),
+        "hydro": a_hy & b_hy,                                   # 2 apolaires
+        "arom":  (a_ar & b_ar) | (a_ar & b_ca) | (a_ca & b_ar),  # π-π ou π-cation
+    }
+
+
+@st.cache_data(show_spinner=False)
+def _s1_cluster_contact_type_profiles():
+    """Profil physicochimique des contacts pour CHAQUE cluster S1 de site de
+    liaison (s1_binding_site_cluster_data_70), normalisé sur ses propres contacts.
+
+    Colonnes : pct_salt, pct_hbond, pct_vdw, pct_hydro, pct_arom, n.
+    - salt/hbond/vdw : d'après contact_type
+    - hydro : 2 résidus apolaires · arom : empilement π (π-π ou π-cation)
     """
-    Heatmaps interactives (survol = tooltip) + classification AA des contacts ABP–actine.
-      A – Heatmap ABP    : séquences × positions canoniques ABP, couleur = aire de contact
-      B – Heatmap Actine : séquences × positions canoniques actine, couleur = aire de contact
+    _cols = ["pct_salt", "pct_hbond", "pct_vdw", "pct_hydro", "pct_arom", "n"]
+    c4 = _Path("data/filtered/details/4.inter-residue_contacts.csv")
+    cf = _Path("data/filtered/filtered_all_data.csv")
+    if not c4.exists() or not cf.exists():
+        return pd.DataFrame(columns=_cols)
+    df = pd.read_csv(c4, usecols=["chain_B_id", "contact_type",
+                                  "residue_A_name", "residue_B_name"])
+    fmap = pd.read_csv(cf, low_memory=False,
+                       usecols=["subunit_2", "s1_binding_site_cluster_data_70"])
+    fmap = fmap.dropna(subset=["s1_binding_site_cluster_data_70"]).copy()
+    fmap["s1_binding_site_cluster_data_70"] = fmap["s1_binding_site_cluster_data_70"].astype(str)
+    fmap = fmap.drop_duplicates(["subunit_2", "s1_binding_site_cluster_data_70"])
+    m = df.merge(fmap, left_on="chain_B_id", right_on="subunit_2", how="inner")
+    if m.empty:
+        return pd.DataFrame(columns=_cols)
+    _p = _contact_props(m["residue_A_name"], m["residue_B_name"], m["contact_type"])
+    for k, v in _p.items():
+        m[f"_{k}"] = v
+    g = m.groupby("s1_binding_site_cluster_data_70")
+    out = pd.DataFrame({
+        "n":         g.size(),
+        "pct_salt":  g["_salt"].mean() * 100,
+        "pct_hbond": g["_hbond"].mean() * 100,
+        "pct_vdw":   g["_vdw"].mean() * 100,
+        "pct_hydro": g["_hydro"].mean() * 100,
+        "pct_arom":  g["_arom"].mean() * 100,
+    })
+    out.index.name = "s1_cluster"
+    return out[out["n"] > 0]
+
+
+def _msa_contact_analysis(filter_fn, group_key, rigor_pdbs=None,
+                           _ch2seq=None, _ch2title=None, tabs=None,
+                           extra_tabs=None):
+    """
+    Heatmaps interactives (survol = tooltip) + classification AA des contacts ABP–actin.
+      A – Heatmap ABP    : séquences × positions canonical ABP, couleur = aire de contact
+      B – Heatmap Actin : séquences × positions canonical actin, couleur = aire de contact
       C – Classification : répartition des AA de contact par famille physicochimique
 
     _ch2seq / _ch2title : mappings chain_id → seq_low / titre, fournis directement
@@ -718,7 +801,7 @@ def _msa_contact_analysis(filter_fn, group_key, rigor_pdbs=None,
 
     int4_path = _Path("data/filtered/details/4.inter-residue_contacts.csv")
     if not int4_path.exists():
-        st.warning("Fichier 4.inter-residue_contacts.csv manquant.")
+        st.warning("Missing 4.inter-residue_contacts.csv file.")
         return
 
     if _ch2seq is not None and _ch2title is not None:
@@ -727,7 +810,7 @@ def _msa_contact_analysis(filter_fn, group_key, rigor_pdbs=None,
     else:
         filt_path = _Path("data/filtered/filtered_all_data.csv")
         if not filt_path.exists():
-            st.warning("filtered_all_data.csv manquant.")
+            st.warning("filtered_all_data.csv missing.")
             return
         df_filt = pd.read_csv(filt_path, low_memory=False)
         if rigor_pdbs:
@@ -735,7 +818,7 @@ def _msa_contact_analysis(filter_fn, group_key, rigor_pdbs=None,
         mask = df_filt["subunit_2_title"].apply(lambda t: filter_fn(str(t)))
         df_grp = df_filt[mask][["subunit_2", "subunit_2_title", "s2_sequence"]].drop_duplicates("subunit_2")
         if df_grp.empty:
-            st.info("Aucune séquence correspondante.")
+            st.info("No matching sequence.")
             return
         ch2seq   = {r["subunit_2"]: str(r["s2_sequence"]).strip().lower() for _, r in df_grp.iterrows()}
         ch2title = {r["subunit_2"]: str(r["subunit_2_title"]) for _, r in df_grp.iterrows()}
@@ -743,7 +826,7 @@ def _msa_contact_analysis(filter_fn, group_key, rigor_pdbs=None,
     df4 = pd.read_csv(int4_path)
     df4 = df4[df4["chain_B_id"].isin(ch2seq)].copy()
     if df4.empty:
-        st.info("Aucun contact trouvé pour ce groupe.")
+        st.info("No contact found for this group.")
         return
 
     df4["area_f"]  = pd.to_numeric(
@@ -753,7 +836,7 @@ def _msa_contact_analysis(filter_fn, group_key, rigor_pdbs=None,
     df4["canon_b"] = pd.to_numeric(df4["residue_B_canon_mafft"], errors="coerce")
     df4["canon_a"] = pd.to_numeric(df4["residue_A_canon_mafft"], errors="coerce")
     df4["aa_b"]    = df4["residue_B_name"].str.strip().str.upper()   # résidu ABP
-    df4["aa_a"]    = df4["residue_A_name"].str.strip().str.upper()   # résidu actine
+    df4["aa_a"]    = df4["residue_A_name"].str.strip().str.upper()   # résidu actin
     df4["seq_low"] = df4["chain_B_id"].map(ch2seq)
     df4["title"]   = df4["chain_B_id"].map(ch2title)
     df4 = df4.dropna(subset=["canon_b", "canon_a", "seq_low"])
@@ -803,7 +886,7 @@ def _msa_contact_analysis(filter_fn, group_key, rigor_pdbs=None,
         lambda r: r["corr_mean"] / _tot_b.get(r["seq_low"], 1) * 100, axis=1
     )
 
-    # Actine : idem pour canon_a
+    # Actin : idem pour canon_a
     _ps_a = df4.groupby(["seq_low", "label", "chain_B_id", "canon_a"])["area_f"].sum().reset_index()
     corr_a = _ps_a.groupby(["seq_low", "label", "canon_a"])["area_f"].sum().reset_index()
     corr_a["corr_mean"] = corr_a["area_f"] / corr_a["seq_low"].map(n_struct_map)
@@ -829,7 +912,7 @@ def _msa_contact_analysis(filter_fn, group_key, rigor_pdbs=None,
     agg_b = agg_b_aa.rename(columns={"area_f": "mean_area"}).copy()
     agg_a = agg_a_aa.rename(columns={"area_f": "mean_area"}).copy()
 
-    # AA actine majoritaire à chaque position canonique ABP (tous ABPs confondus)
+    # AA actin majoritaire à chaque position canonical ABP (tous ABPs confondus)
     aa_maj_actin_for_abp: dict = (
         df4.groupby("canon_b")["aa_a"]
         .agg(lambda x: x.value_counts().index[0] if len(x) > 0 else "?")
@@ -928,30 +1011,48 @@ document.querySelectorAll('[data-tt]').forEach(function(el){
 
     _ALL_TAB_KEYS  = ["A", "B", "C", "D", "E"]
     _ALL_TAB_NAMES = [
-        "A — Heatmap ABP",
-        "B — Heatmap Actine",
-        "C — Classification AA",
-        "D — Paires AA",
-        "E — Spécificité",
+        "Heatmap ABP",
+        "Heatmap Actin",
+        "AA classification",
+        "AA pairs",
+        "Specificity",
     ]
     _show_tabs  = set(tabs) if tabs else set(_ALL_TAB_KEYS)
-    _tab_labels = [n for k, n in zip(_ALL_TAB_KEYS, _ALL_TAB_NAMES) if k in _show_tabs]
-    _tab_objs   = st.tabs(_tab_labels)
-    _tab_map: dict = {}
-    _idx = 0
-    for _k in _ALL_TAB_KEYS:
-        if _k in _show_tabs:
-            _tab_map[_k] = _tab_objs[_idx]
-            _idx += 1
+    _extra = list(extra_tabs or [])   # [(label, render_fn), …] insérés avant Spécificité (E)
 
-    # ── TAB A : Heatmap ABP (positions canoniques ABP) ────────────────────────
+    # Ordre des onglets : A B C D … extra_tabs … E (Spécificité en dernier).
+    _ordered = []   # (kind, id, label) ; kind ∈ {"key","extra"}
+    for _k, _n in zip(_ALL_TAB_KEYS, _ALL_TAB_NAMES):
+        if _k not in _show_tabs:
+            continue
+        if _k == "E":
+            for _ei, (_elabel, _efn) in enumerate(_extra):
+                _ordered.append(("extra", _ei, _elabel))
+        _ordered.append(("key", _k, _n))
+    if "E" not in _show_tabs:   # pas de Spécificité → extras à la fin
+        for _ei, (_elabel, _efn) in enumerate(_extra):
+            _ordered.append(("extra", _ei, _elabel))
+
+    _tab_objs = st.tabs([_lbl for _, _, _lbl in _ordered])
+    _tab_map: dict = {}
+    _extra_objs: dict = {}
+    for _obj, (_kind, _kid, _lbl) in zip(_tab_objs, _ordered):
+        (_tab_map if _kind == "key" else _extra_objs)[_kid] = _obj
+
+    # Rendu des onglets supplémentaires (callbacks fournis par l'appelant)
+    for _ei, (_elabel, _efn) in enumerate(_extra):
+        if _ei in _extra_objs:
+            with _extra_objs[_ei]:
+                _efn()
+
+    # ── TAB A : Heatmap ABP (positions canonical ABP) ────────────────────────
     if "A" in _tab_map:
         with _tab_map["A"]:
             st.caption(
-                "Lignes = séquences ABP · Colonnes = positions canoniques ABP (MAFFT) · "
-                "Couleur = **% de l'interface totale** de cette séquence · "
-                "Moyenne corrigée (zéros inclus pour les structures sans contact) · "
-                "**Survolez** une case pour les détails."
+                "Rows = ABP sequences · Columns = canonical ABP positions (MAFFT) · "
+                "Colour = **% of the total interface** of this sequence · "
+                "Corrected mean (zeros included for structures with no contact) · "
+                "**Hover** a cell for details."
             )
             _corr_b_aa = corr_b.merge(
                 agg_b_aa[["seq_low", "canon_b", "aa_b"]], on=["seq_low", "canon_b"], how="left"
@@ -974,31 +1075,31 @@ document.querySelectorAll('[data-tt]').forEach(function(el){
                 aa  = aa_b_lut.get((rl, cb), "?")
                 aaa = aa_maj_actin_for_abp.get(cb, "?")
                 if pd.isna(v) or v == 0:
-                    return f"Pos ABP: {cb}\nAucun contact"
+                    return f"ABP pos: {cb}\nNo contact"
                 cm = cm_b_lut.get((rl, cb), 0.0)
                 return (
                     f"Pos ABP : {cb}\n"
-                    f"Résidu ABP ({rl[:22]}) : {aa}\n"
-                    f"Résidu actine fréq.  : {aaa}\n"
+                    f"ABP residue ({rl[:22]}): {aa}\n"
+                    f"Actin residue freq.  : {aaa}\n"
                     f"% interface          : {v:.2f}%\n"
-                    f"Aire moy. corrigée   : {cm:.1f} Å²"
+                    f"Mean corrected area  : {cm:.1f} Å²"
                 )
 
             _h_a = _html_interactive_heatmap(
                 pivot_b, row_labels_b, col_labels_b, max_pct_b, _tt_b,
-                "Contacts ABP–actine — côté ABP",
-                f"{len(row_labels_b)} séquences · {len(col_labels_b)} positions · "
-                f"valeur = % de l'interface totale par séquence · max {max_pct_b:.2f}%",
+                "ABP–actin contacts — ABP side",
+                f"{len(row_labels_b)} sequences · {len(col_labels_b)} positions · "
+                f"value = % of the total interface per sequence · max {max_pct_b:.2f}%",
             )
             st.components.v1.html(_h_a, height=max(len(row_labels_b) * 16 + 180, 300), scrolling=True)
 
-    # ── TAB B : Heatmap Actine (positions canoniques actine) ──────────────────
+    # ── TAB B : Heatmap Actin (positions canonical actin) ──────────────────
     if "B" in _tab_map:
         with _tab_map["B"]:
             st.caption(
-                "Lignes = séquences ABP · Colonnes = positions canoniques actine (MAFFT) · "
-                "Couleur = **% de l'interface totale** de cette séquence · "
-                "Moyenne corrigée (zéros inclus) · **Survolez** une case pour les détails."
+                "Rows = ABP sequences · Columns = canonical actin positions (MAFFT) · "
+                "Colour = **% of the total interface** of this sequence · "
+                "Corrected mean (zeros included) · **Hover** a cell for details."
             )
             _corr_a_aa = corr_a.merge(
                 agg_a_aa[["seq_low", "canon_a", "aa_a"]], on=["seq_low", "canon_a"], how="left"
@@ -1022,21 +1123,21 @@ document.querySelectorAll('[data-tt]').forEach(function(el){
                 sl        = next((s for s, lb in title_to_label.items() if lb == rl), None)
                 aa_b_spec = aa_b_specific.get((sl, ca), "?") if sl else "?"
                 if pd.isna(v) or v == 0:
-                    return f"Pos actine: {ca}\nAucun contact"
+                    return f"Actin pos: {ca}\nNo contact"
                 cm = cm_a_lut.get((rl, ca), 0.0)
                 return (
-                    f"Pos actine : {ca}\n"
-                    f"Résidu actine        : {aa_a_val}\n"
-                    f"Résidu ABP ({rl[:18]}) : {aa_b_spec}\n"
+                    f"Pos actin : {ca}\n"
+                    f"Actin residue        : {aa_a_val}\n"
+                    f"ABP residue ({rl[:18]}): {aa_b_spec}\n"
                     f"% interface          : {v:.2f}%\n"
-                    f"Aire moy. corrigée   : {cm:.1f} Å²"
+                    f"Mean corrected area  : {cm:.1f} Å²"
                 )
 
             _h_b = _html_interactive_heatmap(
                 pivot_a, row_labels_a, col_labels_a, max_pct_a, _tt_a,
-                "Contacts ABP–actine — côté actine",
-                f"{len(row_labels_a)} séquences · {len(col_labels_a)} positions · "
-                f"valeur = % de l'interface totale par séquence · max {max_pct_a:.2f}%",
+                "ABP–actin contacts — actin side",
+                f"{len(row_labels_a)} sequences · {len(col_labels_a)} positions · "
+                f"value = % of the total interface per sequence · max {max_pct_a:.2f}%",
             )
             st.components.v1.html(_h_b, height=max(len(row_labels_a) * 16 + 180, 300), scrolling=True)
 
@@ -1044,16 +1145,16 @@ document.querySelectorAll('[data-tt]').forEach(function(el){
     if "C" in _tab_map:
         with _tab_map["C"]:
             _CLASSES = {
-                "Hydrophobe":      set("AVILMFWP"),
-                "Polaire (neutre)": set("STCYNQ"),
-                "Chargé (+)":      set("KRH"),
-                "Chargé (−)":      set("DE"),
+                "Hydrophobic":      set("AVILMFWP"),
+                "Polar (neutral)": set("STCYNQ"),
+                "Charged (+)":      set("KRH"),
+                "Charged (−)":      set("DE"),
             }
             _CLASS_COL = {
-                "Hydrophobe":       "#66bb6a",
-                "Polaire (neutre)": "#42a5f5",
-                "Chargé (+)":       "#ef5350",
-                "Chargé (−)":       "#ab47bc",
+                "Hydrophobic":       "#66bb6a",
+                "Polar (neutral)": "#42a5f5",
+                "Charged (+)":       "#ef5350",
+                "Charged (−)":       "#ab47bc",
             }
             def _cls(aa):
                 for c, s in _CLASSES.items():
@@ -1068,7 +1169,7 @@ document.querySelectorAll('[data-tt]').forEach(function(el){
 
             for side, corr_s, aa_s, aa_col, lbl in [
                 ("ABP",    corr_b, agg_b_aa, "aa_b", col_left),
-                ("Actine", corr_a, agg_a_aa, "aa_a", col_right),
+                ("Actin", corr_a, agg_a_aa, "aa_a", col_right),
             ]:
                 cls_data = corr_s.merge(aa_s[["seq_low", aa_col.replace("aa_","canon_"), aa_col]],
                                         on=["seq_low", aa_col.replace("aa_","canon_")], how="left")
@@ -1088,18 +1189,18 @@ document.querySelectorAll('[data-tt]').forEach(function(el){
                 aa_sum["pct"] = aa_sum["corr_mean"] / tot_corr * 100
                 aa_sum = aa_sum.sort_values("pct", ascending=True)
                 with lbl:
-                    st.markdown(f"**Résidus {side} en contact**")
+                    st.markdown(f"**{side} residues in contact**")
                     fig_c, axes = plt.subplots(1, 2, figsize=(6, 3))
                     colors_c = [_CLASS_COL.get(c, "#aaa") for c in cls_sum["class"]]
                     axes[0].barh(cls_sum["class"], cls_sum["pct"], color=colors_c)
-                    axes[0].set_xlabel("% de l'interface totale", fontsize=8)
+                    axes[0].set_xlabel("% of total interface", fontsize=8)
                     axes[0].tick_params(labelsize=8)
-                    axes[0].set_title("Par famille", fontsize=9)
+                    axes[0].set_title("By family", fontsize=9)
                     colors_aa = [_CLASS_COL.get(c, "#aaa") for c in aa_sum["class"]]
                     axes[1].barh(aa_sum[aa_col], aa_sum["pct"], color=colors_aa)
-                    axes[1].set_xlabel("% de l'interface totale", fontsize=8)
+                    axes[1].set_xlabel("% of total interface", fontsize=8)
                     axes[1].tick_params(labelsize=8)
-                    axes[1].set_title("Par AA", fontsize=9)
+                    axes[1].set_title("By AA", fontsize=9)
                     from matplotlib.patches import Patch
                     legend_els = [Patch(facecolor=c, label=n) for n, c in _CLASS_COL.items()]
                     axes[1].legend(handles=legend_els, fontsize=6, loc="lower right")
@@ -1108,56 +1209,21 @@ document.querySelectorAll('[data-tt]').forEach(function(el){
                     plt.close(fig_c)
                     st.dataframe(
                         cls_sum[["class","pct","n_contacts"]].rename(
-                            columns={"class":"Famille","pct":"% interface","n_contacts":"Contacts"}
+                            columns={"class":"Family","pct":"% interface","n_contacts":"Contacts"}
                         ).assign(**{"% interface": lambda d: d["% interface"].round(1)}),
                         use_container_width=True, hide_index=True,
                     )
 
-    # ── TAB D : Paires AA spécifiques ABP ↔ Actine ───────────────────────────
+    # ── TAB D : Paires AA spécifiques ABP ↔ Actin ───────────────────────────
     if "D" in _tab_map:
         with _tab_map["D"]:
             st.caption(
-                "**Matrice AA-AA** : quels acides aminés ABP interagissent avec quels AA actine. "
-                "**Table par séquence** : choisir un ABP pour voir tous ses contacts spécifiques."
+                "**AA-AA matrix**: which ABP amino acids interact with which actin AA. "
+                "**Per-sequence table**: choose an ABP to see all its specific contacts."
             )
 
             _AA_ORDER = list("ACDEFGHIKLMNPQRSTVWY")
-            pair_agg = (
-                df4.groupby(["aa_b", "aa_a"])
-                .agg(aire_tot=("area_f", "sum"), n=("area_f", "count"))
-                .reset_index()
-            )
-            pair_agg = pair_agg[
-                pair_agg["aa_b"].isin(_AA_ORDER) & pair_agg["aa_a"].isin(_AA_ORDER)
-            ]
 
-            pivot_aa_raw = pair_agg.pivot_table(
-                index="aa_a", columns="aa_b", values="aire_tot", aggfunc="sum", fill_value=0
-            ).reindex(index=_AA_ORDER, columns=_AA_ORDER, fill_value=0)
-
-            _total_aa = float(pivot_aa_raw.values.sum()) or 1.0
-            pivot_aa  = pivot_aa_raw / _total_aa * 100
-
-            max_aa = float(pivot_aa.values.max()) if pivot_aa.values.max() > 0 else 1.0
-
-            pivot_n = pair_agg.pivot_table(
-                index="aa_a", columns="aa_b", values="n", aggfunc="sum", fill_value=0
-            ).reindex(index=_AA_ORDER, columns=_AA_ORDER, fill_value=0)
-
-            def _bg_aa(v):
-                if v == 0:
-                    return "background:#f5f5f5"
-                t = min(1.0, v / max_aa)
-                r  = int(255 - (255 - 139) * t)
-                gc = int(255 * (1 - t))
-                bc = int(255 * (1 - t))
-                return f"background:rgb({max(0,r)},{max(0,gc)},{max(0,bc)})"
-
-            grad_aa = "".join(
-                f'<span style="background:rgb({max(0,int(255-(255-139)*(i/11)))},{max(0,int(255*((11-i)/11)))},{max(0,int(255*((11-i)/11)))});'
-                f'width:16px;height:11px;display:inline-block;border:1px solid #eee"></span>'
-                for i in range(12)
-            )
             js_aa = """
 <div id="htt2" style="position:fixed;background:rgba(20,20,20,0.88);color:#fff;
 padding:7px 11px;border-radius:7px;font-size:11px;line-height:1.6;
@@ -1179,103 +1245,170 @@ document.querySelectorAll('[data-tt2]').forEach(function(el){
 })();
 </script>"""
 
-            CELL = 22
-            parts_aa = [
-                '<div style="font-family:\'Helvetica Neue\',Arial,sans-serif;font-size:11px;'
-                'background:#fff;padding:12px;overflow-x:auto;">',
-                '<div style="font-weight:600;font-size:12px;margin-bottom:3px">'
-                'Matrice AA ABP × AA Actine — % de l\'aire de contact totale</div>',
-                '<div style="font-size:10px;color:#888;margin-bottom:6px">'
-                'Lignes = AA actine · Colonnes = AA ABP · Valeur = % de l\'interface totale · Survol = détail</div>',
-                '<div style="display:flex;align-items:center;gap:3px;margin-bottom:10px;font-size:10px;color:#666">',
-                '<span style="margin-right:3px">0%</span>', grad_aa,
-                f'<span style="margin-left:3px">{max_aa:.1f}%</span></div>',
-                js_aa,
-                '<table style="border-collapse:collapse"><thead><tr>',
-                f'<th style="width:28px;font-size:9px;color:#999;text-align:right;padding-right:4px">Actine↓ ABP→</th>',
-            ]
-            for ab in _AA_ORDER:
-                parts_aa.append(
-                    f'<th style="width:{CELL}px;font-size:9px;color:#555;text-align:center;padding:1px">{ab}</th>'
+            def _aa_pct_grid(_dfm):
+                """Grille des % d'interface (part de l'aire de contact) pour une matrice."""
+                _pa = (_dfm.groupby(["aa_b", "aa_a"])
+                       .agg(aire_tot=("area_f", "sum"), n=("area_f", "count")).reset_index())
+                _pa = _pa[_pa["aa_b"].isin(_AA_ORDER) & _pa["aa_a"].isin(_AA_ORDER)]
+                _praw = _pa.pivot_table(index="aa_a", columns="aa_b", values="aire_tot",
+                                        aggfunc="sum", fill_value=0).reindex(index=_AA_ORDER, columns=_AA_ORDER, fill_value=0)
+                _tot = float(_praw.values.sum()) or 1.0
+                _pn = _pa.pivot_table(index="aa_a", columns="aa_b", values="n",
+                                      aggfunc="sum", fill_value=0).reindex(index=_AA_ORDER, columns=_AA_ORDER, fill_value=0)
+                return _praw, _praw / _tot * 100, _pn
+
+            def _aa_matrix_html(_dfm, _sub, _fixed_mx=None):
+                _praw, _pct, _pn = _aa_pct_grid(_dfm)
+                # Barème de couleur : max ABSOLU partagé entre les 2 matrices si fourni
+                # (sinon max propre à cette matrice) → mêmes couleurs = mêmes %.
+                _mx = float(_fixed_mx) if _fixed_mx else (
+                    float(_pct.values.max()) if _pct.values.max() > 0 else 1.0)
+                def _bg(v):
+                    if v == 0: return "background:#f5f5f5"
+                    t = min(1.0, v / _mx); r = int(255-(255-139)*t); gc = int(255*(1-t)); bc = int(255*(1-t))
+                    return f"background:rgb({max(0,r)},{max(0,gc)},{max(0,bc)})"
+                _grad = "".join(
+                    f'<span style="background:rgb({max(0,int(255-(255-139)*(i/11)))},{max(0,int(255*((11-i)/11)))},{max(0,int(255*((11-i)/11)))});'
+                    f'width:14px;height:11px;display:inline-block;border:1px solid #eee"></span>' for i in range(12))
+                CELL = 19
+                P = ['<div style="font-family:\'Helvetica Neue\',Arial,sans-serif;font-size:11px;background:#fff;padding:10px;overflow-x:auto;">',
+                     f'<div style="font-weight:600;font-size:12px;margin-bottom:2px">{_sub}</div>',
+                     '<div style="font-size:10px;color:#888;margin-bottom:6px">Rows = actin AA · Columns = ABP AA · % interface · hover = detail</div>',
+                     '<div style="display:flex;align-items:center;gap:3px;margin-bottom:8px;font-size:10px;color:#666"><span>0%</span>', _grad, f'<span>{_mx:.1f}%</span></div>',
+                     js_aa, '<table style="border-collapse:collapse"><thead><tr><th style="width:24px;font-size:9px;color:#999;text-align:right;padding-right:4px">A&#8595; B&#8594;</th>']
+                for ab in _AA_ORDER:
+                    P.append(f'<th style="width:{CELL}px;font-size:9px;color:#555;text-align:center;padding:1px">{ab}</th>')
+                P.append('</tr></thead><tbody>')
+                for ar in _AA_ORDER:
+                    P.append(f'<tr><td style="font-size:9px;color:#555;text-align:right;padding-right:4px;font-weight:600">{ar}</td>')
+                    for ac in _AA_ORDER:
+                        v = _pct.at[ar, ac]; n = int(_pn.at[ar, ac]); bg = _bg(v); fg = "#fff" if v/_mx > 0.45 else "#333"
+                        if v > 0:
+                            raw = _praw.at[ar, ac]
+                            tt = (f"ABP: {ac} &#8596; Actin: {ar}\\n% interface: {v:.2f}%\\nAire: {raw:.0f} A2\\nNb contacts: {n}").replace('"', '&quot;')
+                            P.append(f'<td style="width:{CELL}px;height:{CELL}px;{bg};color:{fg};text-align:center;font-size:8px;cursor:default;font-weight:600" data-tt2="{tt}">{v:.1f}%</td>')
+                        else:
+                            P.append(f'<td style="width:{CELL}px;height:{CELL}px;background:#f8f8f8;color:#ddd;text-align:center;font-size:8px">&middot;</td>')
+                    P.append('</tr>')
+                P.append('</tbody></table></div>')
+                return "".join(P), CELL
+
+            # Seuil d'ASA enfouie ABSOLUE : aire enfouie par résidu (Å²) rapportée
+            # au MAX de ce cluster (max absolu du cluster = 100 %). Une seule
+            # heatmap, filtrée par le seuil (0 % = tous les contacts).
+            _ba_map = _buried_asa_lookup()
+            _rnA = pd.to_numeric(df4["residue_A_structure"], errors="coerce")
+            _rnB = pd.to_numeric(df4["residue_B_structure"], errors="coerce")
+            _absA = pd.to_numeric(pd.Series(
+                [_ba_map.get((int(_i), _c, int(_r))) if pd.notna(_r) else None
+                 for _i, _c, _r in zip(df4.interaction_id, df4.chain_A_id, _rnA)],
+                index=df4.index), errors="coerce")
+            _absB = pd.to_numeric(pd.Series(
+                [_ba_map.get((int(_i), _c, int(_r))) if pd.notna(_r) else None
+                 for _i, _c, _r in zip(df4.interaction_id, df4.chain_B_id, _rnB)],
+                index=df4.index), errors="coerce")
+            # max des 2 résidus par contact, puis max du cluster = 100 % du seuil
+            _gmax = float(pd.concat([_absA, _absB], axis=1).max(axis=1).max() or 1.0)
+            _asaA = _absA / _gmax * 100
+            _asaB = _absB / _gmax * 100
+            _asa_thr = st.slider(
+                "Buried ASA threshold (at least one of the 2 residues ≥, "
+                f"in % of the cluster's absolute max = {_gmax:.0f} Å²)",
+                min_value=0, max_value=100, value=0, step=5,
+                key=f"d_asa_thr_abs_{group_key}", format="%d%%",
+            )
+            _spec_df = df4[(_asaA >= _asa_thr) | (_asaB >= _asa_thr)].copy()
+            _title = ("All contacts" if _asa_thr == 0
+                      else f"Contacts with ≥1 residue ≥ {_asa_thr}% of the buried max")
+            # échelle de couleur ABSOLUE (0 → 100 % interface), pas relative au max
+            _h_spec, _cB = _aa_matrix_html(
+                _spec_df, f"{_title} ({len(_spec_df)} contacts)", _fixed_mx=100.0)
+            st.components.v1.html(_h_spec, height=20 * _cB + 170, scrolling=True)
+
+            # ── Résumé physicochimique des contacts de l'interface ──────────────────
+            if "contact_type" in df4.columns:
+                _ntot = len(df4) or 1
+                _pr = _contact_props(df4["residue_A_name"], df4["residue_B_name"],
+                                     df4["contact_type"])
+                # (clé, libellé, nb, % de ce cluster, colonne du profil par cluster)
+                _defs = [
+                    ("salt",  "Salt bridges",             int(_pr["salt"].sum()),  "pct_salt"),
+                    ("hbond", "H-bonds",               int(_pr["hbond"].sum()), "pct_hbond"),
+                    ("hydro", "Hydrophobic (2 apolar)", int(_pr["hydro"].sum()), "pct_hydro"),
+                    ("arom",  "Aromatic (π)",           int(_pr["arom"].sum()),  "pct_arom"),
+                    ("vdw",   "van der Waals",            int(_pr["vdw"].sum()),   "pct_vdw"),
+                ]
+                st.markdown("**Physicochemical properties of the contacts**")
+                _mcols = st.columns(len(_defs))
+                for _mc, (_k, _lbl, _nb, _col) in zip(_mcols, _defs):
+                    _mc.metric(_lbl, f"{_nb}", help=f"{100*_nb/_ntot:.1f}% of contacts")
+                st.caption(
+                    "**Salt bridges / H-bonds** = from contact_type (electrostatic / "
+                    "directional). **Hydrophobic** = 2 apolar residues. **Aromatic (π)** = "
+                    "π-π or π-cation stacking. **van der Waals** = non-specific contacts (the rest). "
+                    "A contact can fall into several categories."
                 )
-            parts_aa.append('</tr></thead><tbody>')
 
-            for aa_row in _AA_ORDER:
-                parts_aa.append(f'<tr><td style="font-size:9px;color:#555;text-align:right;padding-right:4px;font-weight:600">{aa_row}</td>')
-                for aa_col_aa in _AA_ORDER:
-                    v = pivot_aa.at[aa_row, aa_col_aa] if (aa_row in pivot_aa.index and aa_col_aa in pivot_aa.columns) else 0
-                    n = int(pivot_n.at[aa_row, aa_col_aa]) if (aa_row in pivot_n.index and aa_col_aa in pivot_n.columns) else 0
-                    bg = _bg_aa(v)
-                    fg = "#fff" if v / max_aa > 0.45 else "#333"
-                    if v > 0:
-                        raw_area = pivot_aa_raw.at[aa_row, aa_col_aa] if (aa_row in pivot_aa_raw.index and aa_col_aa in pivot_aa_raw.columns) else 0
-                        tt = f"ABP: {aa_col_aa} ↔ Actine: {aa_row}\\n% interface: {v:.2f}%\\nAire totale: {raw_area:.0f} Å²\\nNb contacts: {n}"
-                        tt_esc = tt.replace('"', '&quot;')
-                        parts_aa.append(
-                            f'<td style="width:{CELL}px;height:{CELL}px;{bg};color:{fg};'
-                            f'text-align:center;font-size:8px;cursor:default;font-weight:600" '
-                            f'data-tt2="{tt_esc}">{v:.1f}%</td>'
-                        )
-                    else:
-                        parts_aa.append(
-                            f'<td style="width:{CELL}px;height:{CELL}px;background:#f8f8f8;'
-                            f'color:#ddd;text-align:center;font-size:8px">·</td>'
-                        )
-                parts_aa.append('</tr>')
-            parts_aa.append('</tbody></table></div>')
-
-            st.components.v1.html("".join(parts_aa), height=20 * CELL + 180, scrolling=False)
-
-            st.markdown("---")
-            st.markdown("**Contacts spécifiques par séquence ABP**")
-            st.caption("Chaque ligne = une paire de résidus en contact direct (ABP ↔ actine).")
-
-            seq_options = sorted(title_to_label.values())
-            if not seq_options:
-                st.info("Aucune séquence disponible.")
-            else:
-                sel_label = st.selectbox(
-                    "Séquence ABP :", seq_options,
-                    key=f"d_seq_sel_{group_key}",
-                )
-                sel_sl = next((sl for sl, lb in title_to_label.items() if lb == sel_label), None)
-                if sel_sl:
-                    df4_sel = df4[df4["seq_low"] == sel_sl].copy()
-                    pairs_sel = (
-                        df4_sel.groupby(["canon_b", "aa_b", "canon_a", "aa_a"])
-                        .agg(aire_moy=("area_f", "mean"), n=("area_f", "count"))
-                        .reset_index()
-                        .sort_values("aire_moy", ascending=False)
-                    )
-                    pairs_sel.columns = [
-                        "Pos ABP", "AA ABP", "Pos Actine", "AA Actine",
-                        "Aire moy. (Å²)", "N contacts",
-                    ]
-                    pairs_sel["Aire moy. (Å²)"] = pairs_sel["Aire moy. (Å²)"].round(1)
-                    pairs_sel["Paire"] = (
-                        pairs_sel["AA ABP"] + pairs_sel["Pos ABP"].astype(str)
-                        + " ↔ "
-                        + pairs_sel["AA Actine"] + pairs_sel["Pos Actine"].astype(str)
-                    )
-                    cols_order = ["Paire", "Pos ABP", "AA ABP", "Pos Actine", "AA Actine",
-                                  "Aire moy. (Å²)", "N contacts"]
-                    st.dataframe(
-                        pairs_sel[cols_order].reset_index(drop=True),
-                        use_container_width=True, hide_index=True,
-                    )
+                # ── Comparaison de CE cluster vs TOUS les autres clusters S1 ──────
+                # (chaque cluster normalisé sur ses propres contacts d'interface)
+                _prof = _s1_cluster_contact_type_profiles()
+                _cur_cid = group_key[4:] if str(group_key).startswith("s1c_") else None
+                _others = _prof.drop(index=_cur_cid, errors="ignore") if _cur_cid else _prof
+                if len(_others) >= 2:
+                    st.markdown("**This cluster vs the other S1 clusters (interfaces)**")
+                    _cats = [(_lbl, 100 * _nb / _ntot, _others[_col])
+                             for _k, _lbl, _nb, _col in _defs]
+                    fig_cmp, _axes = plt.subplots(
+                        len(_cats), 1, figsize=(7.2, 0.92 * len(_cats) + 0.5))
+                    for _ax, (_lbl, _here, _dist) in zip(_axes, _cats):
+                        _vals = _dist.values.astype(float)
+                        _vals = _vals[~np.isnan(_vals)]
+                        _ax.boxplot(
+                            _vals, vert=False, widths=0.55, positions=[1], patch_artist=True,
+                            boxprops=dict(facecolor="#ececec", edgecolor="#c4c4c4"),
+                            medianprops=dict(color="#888", lw=1.4),
+                            whiskerprops=dict(color="#c4c4c4"), capprops=dict(color="#c4c4c4"),
+                            flierprops=dict(marker="o", ms=2.5, mfc="#dcdcdc", mec="none"))
+                        _ax.scatter([_here], [1], s=90, color="#c0392b", zorder=5,
+                                    edgecolors="white", linewidths=1.1)
+                        _med = float(np.median(_vals))
+                        _rank = float((_vals < _here).mean() * 100)
+                        _d = _here - _med
+                        _lo = min(float(_vals.min()), _here)
+                        _hi = max(float(_vals.max()), _here)
+                        _pad = (_hi - _lo) * 0.12 + 0.4
+                        _ax.set_xlim(_lo - _pad, _hi + _pad)
+                        _ax.set_ylim(0.4, 1.6)
+                        _ax.set_yticks([])
+                        _ax.set_ylabel(_lbl, rotation=0, ha="right", va="center", fontsize=8.5)
+                        _ax.text(0.995, 0.9,
+                                 f"{_here:.1f}%  ·  higher than {_rank:.0f}% of clusters  ·  "
+                                 f"{'+' if _d >= 0 else ''}{_d:.1f} pts vs median",
+                                 transform=_ax.transAxes, ha="right", va="top",
+                                 fontsize=7.5, color="#c0392b", fontweight="bold")
+                        _ax.tick_params(axis="x", labelsize=7)
+                        _ax.grid(axis="x", color="#f2f2f2", lw=0.6)
+                        for _s in ("top", "right", "left"):
+                            _ax.spines[_s].set_visible(False)
+                    _axes[-1].set_xlabel("% of the cluster's interface contacts (scale specific to each row)",
+                                         fontsize=7.5)
+                    plt.tight_layout()
+                    st.pyplot(fig_cmp, use_container_width=True)
+                    plt.close(fig_cmp)
                     st.caption(
-                        f"{len(pairs_sel)} paires de résidus · "
-                        f"{pairs_sel['Pos ABP'].nunique()} positions ABP · "
-                        f"{pairs_sel['Pos Actine'].nunique()} positions actine"
+                        f"Red dot = this cluster · grey box = distribution of the {len(_others)} "
+                        "other S1 clusters (line = median, whiskers = range). Each row has "
+                        "its own scale. “higher than X % of clusters” = percentile rank."
                     )
 
     # ── TAB E : Spécificité ───────────────────────────────────────────────────
     if "E" in _tab_map:
         with _tab_map["E"]:
+            _merged_slot = st.container()   # la vue fusionnée est rendue ici, tout en haut
             st.caption(
-                "Pour chaque position canonique ABP en contact, on compare l'AA de chaque séquence. "
-                "Un résidu est **unique** s'il n'apparaît que dans une seule séquence à cette position. "
-                "Ces résidus sont candidats pour expliquer la spécificité d'interaction avec l'actine."
+                "For each contacting canonical ABP position, we compare the AA of each sequence. "
+                "A residue is **unique** if it appears in only one sequence at this position. "
+                "These residues are candidates to explain the interaction specificity with actin."
             )
 
             pos_aa = (
@@ -1294,14 +1427,15 @@ document.querySelectorAll('[data-tt2]').forEach(function(el){
 
             pos_to_actin: dict = (
                 df4.groupby(["label", "canon_b"])
-                .apply(lambda g: sorted(g["canon_a"].unique().astype(int).tolist()))
+                .apply(lambda g: sorted(g["canon_a"].unique().astype(int).tolist()),
+                       include_groups=False)
                 .to_dict()
             )
             pos_to_actin_aa: dict = (
                 df4.groupby(["label", "canon_b"])
                 .apply(lambda g: g.groupby("canon_a")["aa_a"].agg(
                     lambda x: x.value_counts().index[0]
-                ).to_dict())
+                ).to_dict(), include_groups=False)
                 .to_dict()
             )
 
@@ -1356,15 +1490,15 @@ document.querySelectorAll('[data-sp]').forEach(function(el){
                 '<div style="font-family:\'Helvetica Neue\',Arial,sans-serif;font-size:11px;'
                 'background:#fff;padding:12px;overflow-x:auto;">',
                 '<div style="font-weight:600;font-size:12px;margin-bottom:3px">'
-                'Spécificité des résidus ABP aux positions de contact</div>',
+                'Specificity of ABP residues at contact positions</div>',
                 '<div style="font-size:10px;color:#888;margin-bottom:6px">'
-                'Lignes = séquences · Colonnes = positions canoniques ABP en contact avec l\'actine · '
-                'Survol = acide aminé + positions actine contactées</div>',
+                'Rows = sequences · Columns = canonical ABP positions in contact with actin · '
+                'Hover = amino acid + contacted actin positions</div>',
                 '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:10px">',
                 '<span style="background:#e74c3c;color:#fff;padding:1px 7px;border-radius:3px">Unique (1/n)</span>',
                 '<span style="background:#e67e22;color:#fff;padding:1px 7px;border-radius:3px">Rare (2/n)</span>',
-                '<span style="background:#f1c40f;color:#333;padding:1px 7px;border-radius:3px">Minorité</span>',
-                '<span style="background:#95a5a6;color:#fff;padding:1px 7px;border-radius:3px">Majoritaire</span>',
+                '<span style="background:#f1c40f;color:#333;padding:1px 7px;border-radius:3px">Minority</span>',
+                '<span style="background:#95a5a6;color:#fff;padding:1px 7px;border-radius:3px">Majority</span>',
                 '<span style="background:#f5f5f5;color:#ccc;padding:1px 7px;border-radius:3px">Absent</span>',
                 '</div>',
                 js_sp,
@@ -1413,18 +1547,18 @@ document.querySelectorAll('[data-sp]').forEach(function(el){
                         uniq_lbl = (
                             "UNIQUE" if c_aa == 1
                             else f"rare ({c_aa}/{n_seqs})" if c_aa <= 2
-                            else f"minorité ({c_aa}/{n_seqs})" if c_aa <= n_seqs // 2
-                            else f"majoritaire ({c_aa}/{n_seqs})"
+                            else f"minority ({c_aa}/{n_seqs})" if c_aa <= n_seqs // 2
+                            else f"majority ({c_aa}/{n_seqs})"
                         )
                         tt = (
                             f"Pos ABP: {p} | {lb[:28]}\n"
                             f"AA ABP: {aa} — {uniq_lbl}\n"
-                            f"Contact actine: {actin_str if actin_str else '?'}"
+                            f"Contact actin: {actin_str if actin_str else '?'}"
                         )
                         others = [f"{al}:{col_aa_counts[p].get(al,'–')}"
                                   for al in all_labels if al != lb and col_aa_counts[p].get(al)]
                         if others:
-                            tt += "\nAutres: " + ", ".join(others[:4])
+                            tt += "\nOthers: " + ", ".join(others[:4])
                             if len(others) > 4:
                                 tt += f" (+{len(others)-4})"
                         tt_esc = tt.replace('"', '&quot;')
@@ -1442,38 +1576,17 @@ document.querySelectorAll('[data-sp]').forEach(function(el){
                 parts_sp.append('</tr>')
             parts_sp.append('</tbody></table>')
 
-            uniq_rows = []
-            for p in all_pos:
-                for lb, aa in col_aa_counts[p].items():
-                    if aa and not pd.isna(aa) and col_freq[p].get(aa, 0) == 1:
-                        ap_list = pos_to_actin.get((lb, p), [])
-                        ap_aa   = pos_to_actin_aa.get((lb, p), {})
-                        actin_s = ", ".join(f"{ap_aa.get(a,'?')}{a}" for a in ap_list[:5])
-                        uniq_rows.append({
-                            "Séquence ABP": lb,
-                            "Pos ABP": p,
-                            "AA ABP unique": aa,
-                            "Contacte actine (AA+pos)": actin_s,
-                        })
-
             parts_sp.append('</div>')
             _ht_sp = max(n_seqs * CELL_SP + 120, 250)
             st.components.v1.html("".join(parts_sp), height=_ht_sp, scrolling=True)
 
-            if uniq_rows:
-                st.markdown(f"**{len(uniq_rows)} résidus ABP uniques** (AA absent de toutes les autres séquences à cette position)")
-                df_uniq = pd.DataFrame(uniq_rows).sort_values(["Séquence ABP", "Pos ABP"])
-                st.dataframe(df_uniq.reset_index(drop=True), use_container_width=True, hide_index=True)
-            else:
-                st.info("Aucun résidu ABP strictement unique — tous les AA de contact sont partagés par ≥2 séquences.")
-
             st.divider()
-            st.markdown("#### Côté actine — positions canoniques contactées spécifiquement")
+            st.markdown("#### Actin side — canonical positions specifically contacted")
             st.caption(
-                "Lignes = séquences ABP · Colonnes = positions canoniques actine · "
-                "Lettre = AA actine à cette position · "
-                "Couleur = nombre de séquences qui contactent cette position : "
-                "**rouge** = unique (1 seule myosine), orange = rare, jaune = minorité, gris = partagé."
+                "Rows = ABP sequences · Columns = canonical actin positions · "
+                "Letter = actin AA at this position · "
+                "Colour = number of sequences contacting this position: "
+                "**red** = unique (1 myosin only), orange = rare, yellow = minority, grey = shared."
             )
 
             actin_aa_specific: dict = (
@@ -1550,12 +1663,12 @@ document.querySelectorAll('[data-sp]').forEach(function(el){
                         uniq_lbl = (
                             "UNIQUE" if n_c == 1
                             else f"rare ({n_c}/{n_seqs})" if n_c <= 2
-                            else f"minorité ({n_c}/{n_seqs})" if n_c <= n_seqs // 2
-                            else f"partagé ({n_c}/{n_seqs})"
+                            else f"minority ({n_c}/{n_seqs})" if n_c <= n_seqs // 2
+                            else f"shared ({n_c}/{n_seqs})"
                         )
                         tt = (
-                            f"Pos actine : {p}\n"
-                            f"AA actine  : {aa_act}\n"
+                            f"Pos actin : {p}\n"
+                            f"AA actin  : {aa_act}\n"
                             f"Contact    : {lb[:28]} — {uniq_lbl}"
                         )
                         if others:
@@ -1578,29 +1691,204 @@ document.querySelectorAll('[data-sp]').forEach(function(el){
             _html_spa = "".join(parts_spa).replace("data-sp\"", "data-spa\"")
             st.components.v1.html(_html_spa, height=max(n_seqs * CELL_SP + 120, 250), scrolling=True)
 
-            uniq_rows_a = []
+            # ── Vue fusionnée : résidus ABP alignés sur l'interface actin ────────
+            # (calcul ici ; l'affichage est redirigé vers _merged_slot, en haut de l'onglet)
+            # (label, canon_a) → résidu ABP dominant (somme area_f max)
+            abp_at_actin_aa = (
+                df4.groupby(["label", "canon_a", "aa_b"])["area_f"]
+                .sum().reset_index()
+                .sort_values("area_f", ascending=False)
+                .drop_duplicates(["label", "canon_a"])
+            )
+            abp_aa_at_actin: dict = {
+                (r["label"], int(r["canon_a"])): r["aa_b"]
+                for _, r in abp_at_actin_aa.iterrows()
+            }
+
+            # par colonne actin : fréquence des AA ABP et des AA actin
+            col_abp_aa: dict = {}
+            col_abp_freq: dict = {}
+            col_act_aa: dict = {}
+            col_act_freq: dict = {}
+            actin_consensus: dict = {}
             for p in all_pos_a:
-                if contact_count_a.get(p, 0) == 1:
-                    lb = abp_per_actin[p][0]
-                    aa_act = actin_aa_specific.get((lb, p), "?")
-                    aa_abp_here = df4[(df4["label"] == lb) & (df4["canon_a"] == p)]["aa_b"].value_counts()
-                    aa_abp_str = ", ".join(f"{aa}({cnt})" for aa, cnt in list(aa_abp_here.items())[:3])
-                    uniq_rows_a.append({
-                        "Pos actine": p,
-                        "AA actine": aa_act,
-                        "Contactée uniquement par": lb,
-                        "AA ABP correspondants": aa_abp_str,
-                    })
+                ab_vals = [(lb, abp_aa_at_actin.get((lb, int(p)))) for lb in all_labels]
+                ab_c, ab_fr = _uniq_score(ab_vals)
+                col_abp_aa[p] = ab_c
+                col_abp_freq[p] = ab_fr
+                ac_vals = [(lb, actin_aa_specific.get((lb, p)) if pres_dict.get((lb, int(p)), False) else None)
+                           for lb in all_labels]
+                ac_c, ac_fr = _uniq_score(ac_vals)
+                col_act_aa[p] = ac_c
+                col_act_freq[p] = ac_fr
+                if ac_c:
+                    actin_consensus[p] = _Counter(ac_c.values()).most_common(1)[0][0]
+                else:
+                    actin_consensus[p] = "?"
 
-            if uniq_rows_a:
-                st.markdown(f"**{len(uniq_rows_a)} positions actine contactées par 1 seule séquence ABP**")
-                df_uniq_a = pd.DataFrame(uniq_rows_a).sort_values("Pos actine")
-                st.dataframe(df_uniq_a.reset_index(drop=True), use_container_width=True, hide_index=True)
-            else:
-                st.info("Toutes les positions actine sont contactées par ≥2 séquences ABP.")
+            js_spm = js_sp.replace("htt3", "htt5").replace("data-sp", "data-spm")
+            parts_spm = [
+                '<div style="font-family:\'Helvetica Neue\',Arial,sans-serif;font-size:11px;'
+                'background:#fff;padding:12px;overflow-x:auto;">',
+                js_spm,
+                '<table style="border-collapse:collapse;table-layout:fixed"><thead><tr>',
+                f'<th style="width:{LABEL_SP}px;min-width:{LABEL_SP}px"></th>',
+            ]
+            for j, p in enumerate(all_pos_a):
+                lbl_p = str(p)
+                parts_spm.append(
+                    f'<th style="width:{CELL_SP}px;min-width:{CELL_SP}px;font-size:7px;font-weight:normal;'
+                    f'color:#888;writing-mode:vertical-rl;text-align:left;padding:0;'
+                    f'height:32px;vertical-align:bottom">{lbl_p}</th>'
+                )
+            parts_spm.append('</tr></thead><tbody>')
+
+            # lignes ABP : résidu ABP coloré par spécificité ABP
+            for lb in all_labels:
+                short = (lb[:28] + "…") if len(lb) > 29 else lb
+                parts_spm.append('<tr>')
+                parts_spm.append(
+                    f'<td style="width:{LABEL_SP}px;max-width:{LABEL_SP}px;overflow:hidden;'
+                    f'white-space:nowrap;text-overflow:ellipsis;font-size:9px;color:#444;'
+                    f'padding:1px 6px 1px 0;text-align:right" title="{lb}">{short}</td>'
+                )
+                for p in all_pos_a:
+                    aa = col_abp_aa[p].get(lb)
+                    if aa and not pd.isna(aa):
+                        fr = col_abp_freq[p]
+                        bg, fg = _spec_bg(aa, fr, n_seqs)
+                        c_aa = fr.get(aa, 0)
+                        uniq_lbl = (
+                            "UNIQUE" if c_aa == 1
+                            else f"rare ({c_aa}/{n_seqs})" if c_aa <= 2
+                            else f"minority ({c_aa}/{n_seqs})" if c_aa <= n_seqs // 2
+                            else f"majority ({c_aa}/{n_seqs})"
+                        )
+                        others = [f"{al}:{col_abp_aa[p].get(al)}"
+                                  for al in all_labels if al != lb and col_abp_aa[p].get(al)]
+                        tt = (
+                            f"Actin pos: {p} ({actin_consensus[p]})\n"
+                            f"{lb[:28]}\n"
+                            f"ABP residue: {aa} — {uniq_lbl}"
+                        )
+                        if others:
+                            tt += "\nOther ABPs: " + ", ".join(others[:4])
+                            if len(others) > 4:
+                                tt += f" (+{len(others)-4})"
+                        tt_esc = tt.replace('"', '&quot;')
+                        parts_spm.append(
+                            f'<td style="width:{CELL_SP}px;min-width:{CELL_SP}px;height:{CELL_SP}px;'
+                            f'{bg};color:{fg};text-align:center;font-size:8px;font-weight:600;'
+                            f'cursor:default;padding:0" data-spm="{tt_esc}">{aa}</td>'
+                        )
+                    else:
+                        parts_spm.append(
+                            f'<td style="width:{CELL_SP}px;min-width:{CELL_SP}px;height:{CELL_SP}px;'
+                            f'background:#f5f5f5;color:#ddd;text-align:center;font-size:8px;'
+                            f'padding:0">·</td>'
+                        )
+                parts_spm.append('</tr>')
+
+            # séparateur
+            parts_spm.append(
+                f'<tr><td colspan="{len(all_pos_a)+1}" style="height:6px;padding:0"></td></tr>'
+            )
+
+            # ligne de référence actin (consensus), colorée par nb de myosins contactant
+            # dégradé violet distinct du reste : gris pâle (toutes) → violet vif (spécifique)
+            def _ref_grad(nc, nt):
+                if nc <= 0:
+                    return "background:#eef2f3", "#bbb"
+                t = (nc - 1) / (nt - 1) if nt > 1 else 1.0   # 1 seul→0 (pâle), tous→1 (vif)
+                t = max(0.0, min(1.0, t))
+                pale = (223, 230, 233); vivid = (108, 0, 163)
+                rgb = tuple(round(pale[i] + (vivid[i] - pale[i]) * t) for i in range(3))
+                return f"background:rgb({rgb[0]},{rgb[1]},{rgb[2]})", ("#fff" if t > 0.45 else "#333")
+
+            parts_spm.append('<tr>')
+            parts_spm.append(
+                f'<td style="width:{LABEL_SP}px;max-width:{LABEL_SP}px;font-size:9px;'
+                f'font-weight:700;color:#16607a;padding:1px 6px 1px 0;text-align:right">Actin (ref)</td>'
+            )
+            for p in all_pos_a:
+                aa_ref = actin_consensus.get(p, "?")
+                n_c = contact_count_a.get(p, 0)
+                bg_a, fg_a = _ref_grad(n_c, n_seqs)
+                parts_spm.append(
+                    f'<td style="width:{CELL_SP}px;min-width:{CELL_SP}px;height:{CELL_SP}px;'
+                    f'{bg_a};color:{fg_a};text-align:center;font-size:8px;font-weight:700;'
+                    f'border-top:2px solid #16607a;cursor:default;padding:0" '
+                    f'data-spm="Actin pos: {p}&#10;Reference actin residue: {aa_ref}'
+                    f'&#10;Contacted by {n_c}/{n_seqs} myosins">{aa_ref}</td>'
+                )
+            parts_spm.append('</tr>')
+
+            # lignes de variation actin : une par myosin qui diffère du consensus
+            variant_labels = [
+                lb for lb in all_labels
+                if any(pres_dict.get((lb, int(p)), False)
+                       and actin_aa_specific.get((lb, p)) not in (None, actin_consensus.get(p))
+                       and not pd.isna(actin_aa_specific.get((lb, p)))
+                       for p in all_pos_a)
+            ]
+            for lb in variant_labels:
+                short = (lb[:26] + "…") if len(lb) > 27 else lb
+                parts_spm.append('<tr>')
+                parts_spm.append(
+                    f'<td style="width:{LABEL_SP}px;max-width:{LABEL_SP}px;overflow:hidden;'
+                    f'white-space:nowrap;text-overflow:ellipsis;font-size:8px;color:#999;font-style:italic;'
+                    f'padding:1px 6px 1px 0;text-align:right" title="{lb}">↳ {short}</td>'
+                )
+                for p in all_pos_a:
+                    aa_v = actin_aa_specific.get((lb, p))
+                    if (pres_dict.get((lb, int(p)), False) and aa_v and not pd.isna(aa_v)
+                            and aa_v != actin_consensus.get(p)):
+                        bg, fg = _spec_bg(aa_v, col_act_freq[p], n_seqs)
+                        c_v = col_act_freq[p].get(aa_v, 0)
+                        tt = (
+                            f"Pos actin : {p}\n"
+                            f"Ref: {actin_consensus.get(p)} → variation {aa_v}\n"
+                            f"Chez : {lb[:28]} ({c_v}/{n_seqs})"
+                        )
+                        tt_esc = tt.replace('"', '&quot;')
+                        parts_spm.append(
+                            f'<td style="width:{CELL_SP}px;min-width:{CELL_SP}px;height:{CELL_SP}px;'
+                            f'{bg};color:{fg};text-align:center;font-size:8px;font-weight:600;'
+                            f'cursor:default;padding:0" data-spm="{tt_esc}">{aa_v}</td>'
+                        )
+                    else:
+                        parts_spm.append(
+                            f'<td style="width:{CELL_SP}px;min-width:{CELL_SP}px;height:{CELL_SP}px;'
+                            f'background:#fafafa;color:#eee;text-align:center;font-size:8px;'
+                            f'padding:0">·</td>'
+                        )
+                parts_spm.append('</tr>')
+
+            parts_spm.append('</tbody></table></div>')
+            _n_rows_spm = n_seqs + len(variant_labels)
+            with _merged_slot:
+                st.markdown("#### Merged view — ABP residues projected onto the actin interface")
+                st.caption(
+                    "Columns = canonical **actin** positions in contact · "
+                    "each cell = the **ABP** residue (the most involved, max surface) contacting this actin position · "
+                    "colour = **ABP residue specificity** among the myosins at this column "
+                    "(**red** = unique, orange = rare, yellow = minority, grey = majority). "
+                    "Bottom row **Actin (ref)** = reference actin residue, coloured in "
+                    "a **purple gradient** by the number of myosins contacting this position "
+                    "(bright purple = contacted by all, pale grey = specific, contacted by only one); "
+                    "the actin variations are listed below with the myosin concerned."
+                )
+                st.components.v1.html(
+                    "".join(parts_spm),
+                    height=max(_n_rows_spm * CELL_SP + 140, 250),
+                    scrolling=True,
+                )
+                if not variant_labels:
+                    st.caption("No actin-residue variation between the myosins at these contact positions.")
+                st.divider()
 
 
-# ── Comparaison C. elegans myosines ───────────────────────────────────────────
+# ── Comparaison C. elegans myosins ───────────────────────────────────────────
 
 def _s1_get_ch_maps(cid: str):
     """Retourne (ch2seqlow, ch2title) pour un cluster S1 donné.
@@ -1623,11 +1911,167 @@ def _s1_get_ch_maps(cid: str):
     return ch2seqlow, ch2title
 
 
+def _msa_blast_celegans():
+    """BLAST + identite d'interface des myosins du jeu de donnees contre TOUTE la
+    famille myosin de C. elegans (myosin/*.fasta). Un seul tableau combine."""
+    import subprocess, tempfile, glob
+    from Bio import SeqIO
+
+    _ce_fa = glob.glob("myosin/*.fasta")
+    _aln_fa = _MSA_ALN_DIR / "myosin_celegans_msa.fasta"
+    if not _ce_fa or not _aln_fa.exists():
+        st.info("BLAST C. elegans: myosin/*.fasta file or alignment missing.")
+        return
+    _ce_fa = _ce_fa[0]
+
+    @st.cache_data(show_spinner="BLAST + alignement vs C. elegans (28 myosins)...")
+    def _compute(ce_path, aln_path, _mt1, _mt2):
+        import re as _re
+        # ----- 1) sequences : nos myosins (degappees) + 28 C. elegans -----
+        ours = [r for r in SeqIO.parse(aln_path, "fasta") if "CAEEL" not in r.id]
+        if not ours:
+            return None
+        ce_recs = list(SeqIO.parse(ce_path, "fasta"))
+        def _gname(desc, rid):
+            m = _re.search(r"GN=(\S+)", desc)
+            return m.group(1) if m else rid.split("|")[-1].replace("_CAEEL", "")
+        _tmp = _Path(tempfile.mkdtemp())
+        # fichier requete + base BLAST
+        qp = _tmp / "q.fasta"
+        with open(qp, "w") as f:
+            for r in ours:
+                f.write(f">{r.id}\n{str(r.seq).replace('-','')}\n")
+        db = _tmp / "db"
+        try:
+            subprocess.run(["makeblastdb", "-in", ce_path, "-dbtype", "prot",
+                            "-out", str(db)], capture_output=True, check=True)
+            out = _tmp / "r.tsv"
+            subprocess.run(["blastp", "-query", str(qp), "-db", str(db),
+                            "-outfmt", "6 qseqid sseqid pident evalue",
+                            "-max_target_seqs", "1", "-out", str(out)],
+                           capture_output=True, check=True)
+        except Exception as _e:
+            return ("error", str(_e))
+        if not out.exists() or out.stat().st_size == 0:
+            return None
+        bl = pd.read_csv(out, sep="\t", names=["q", "s", "pid", "e"])
+        bl = bl.sort_values("pid", ascending=False).drop_duplicates("q")
+        _id2desc = {r.id: r.description for r in ce_recs}
+        def _ce_of(s):
+            for i, d in _id2desc.items():
+                if s.split("|")[-1] in i:
+                    return _gname(d, i)
+            return s.split("|")[-1]
+        bl["blast_match"] = bl["s"].map(_ce_of)
+        blmap = bl.set_index("q")[["blast_match", "pid", "e"]].to_dict("index")
+
+        # ----- 2) alignement combine (10 + 28) via MAFFT pour l'interface -----
+        comb = _tmp / "comb.fasta"
+        with open(comb, "w") as f:
+            for r in ours:
+                f.write(f">{r.id}\n{str(r.seq).replace('-','')}\n")
+            for r in ce_recs:
+                f.write(f">CE_{_gname(r.description, r.id)}\n{str(r.seq)}\n")
+        combaln = _tmp / "comb_aln.fasta"
+        try:
+            with open(combaln, "w") as fo:
+                subprocess.run(["mafft", "--quiet", "--auto", str(comb)],
+                               stdout=fo, stderr=subprocess.DEVNULL, check=True)
+        except Exception:
+            combaln = None
+
+        iface_rows = {}
+        if combaln and combaln.exists():
+            al = {r.id: str(r.seq) for r in SeqIO.parse(combaln, "fasta")}
+            ceA = [i for i in al if i.startswith("CE_")]
+            dsA = [i for i in al if not i.startswith("CE_")]
+            # positions d'interface reelles -> colonnes
+            _da = pd.read_csv("data/filtered/filtered_all_data.csv", low_memory=False)
+            _d3 = pd.read_csv("data/filtered/details/3.interface_residues.csv")
+            def _ismyo(t):
+                t = str(t).lower(); return ("myosin" in t) and ("tropomyosin" not in t)
+            _rw = _da[_da["subunit_2_title"].apply(_ismyo)][["subunit_2", "s2_sequence"]].drop_duplicates("subunit_2")
+            _c2s = {r["subunit_2"]: str(r["s2_sequence"]).strip().lower() for _, r in _rw.iterrows()}
+            _r3 = _d3[_d3["chain"].isin(_c2s)][["chain", "residue_number_sequence"]].dropna()
+            _s2p = {}
+            for _, r in _r3.iterrows():
+                _sl = _c2s.get(r["chain"])
+                if _sl:
+                    _s2p.setdefault(_sl, set()).add(int(r["residue_number_sequence"]))
+            def _cols(s, pos):
+                m = {}; sp = 0
+                for c, a in enumerate(s):
+                    if a != "-":
+                        sp += 1; m[sp] = c
+                return {m[p] for p in pos if p in m}
+            # NOYAU : colonnes contactees par la majorite (>=70%) des myosins
+            from collections import Counter as _Ctr
+            _cc = _Ctr(); _non = 0
+            for d in dsA:
+                sl = al[d].replace("-", "").lower()
+                if sl in _s2p:
+                    _non += 1
+                    for _col in _cols(al[d], _s2p[sl]):
+                        _cc[_col] += 1
+            iface = {c for c, n in _cc.items() if n >= 0.7 * max(_non, 1)}
+            allc = list(range(len(next(iter(al.values())))))
+            def _idc(a, b, cset):
+                m = p = 0
+                for x in cset:
+                    u, v = a[x], b[x]
+                    if u != "-" and v != "-":
+                        p += 1; m += (u.upper() == v.upper())
+                return m / p * 100 if p else float("nan")
+            for d in dsA:
+                sims = sorted([(_idc(al[c], al[d], iface), c.replace("CE_", "")) for c in ceA], reverse=True)
+                whole = sorted([(_idc(al[c], al[d], allc), c.replace("CE_", "")) for c in ceA], reverse=True)
+                iface_rows[d] = {"iface_id": sims[0][0], "iface_match": sims[0][1],
+                                 "whole_top": whole[0][0]}
+        return {"blast": blmap, "iface": iface_rows}
+
+    _mt1 = os.path.getmtime(_ce_fa) if os.path.exists(_ce_fa) else 0
+    _mt2 = os.path.getmtime(_aln_fa) if _aln_fa.exists() else 0
+    _res = _compute(_ce_fa, str(_aln_fa), _mt1, _mt2)
+    if _res is None:
+        st.info("BLAST: no result."); return
+    if isinstance(_res, tuple) and _res[0] == "error":
+        st.error(f"BLAST/MAFFT indisponible ({_res[1][:120]})."); return
+
+    _G1 = ("heavy_chain_4", "Myosin_6", "Myosin_7", "beta_cardiac")
+    _grp = lambda q: "G1" if any(g in q for g in _G1) else "G2"
+    _clean = lambda q: q.replace("_motor_84-785", "").replace("_", " ").strip()
+    _blast, _iface = _res["blast"], _res["iface"]
+    _rows = []
+    for q in _blast:
+        b = _blast[q]; f = _iface.get(q, {})
+        _rows.append({
+            "Groupe": _grp(q),
+            "Myosin (dataset)": _clean(q),
+            "Identite interface (%)": (round(f["iface_id"], 1) if f and f.get("iface_id")==f.get("iface_id") else None),
+            "Match interface (C. elegans)": f.get("iface_match", "-") if f else "-",
+            "Identite sequence BLAST (%)": round(b["pid"], 1),
+            "Match BLAST (C. elegans)": b["blast_match"],
+            "E-value BLAST": f"{b['e']:.0e}",
+        })
+    _df = pd.DataFrame(_rows).sort_values(["Groupe", "Identite interface (%)"],
+                                          ascending=[True, False])
+    st.markdown("**Myosins from the dataset vs _C. elegans_ myosin family (28 sequences):**")
+    st.dataframe(_df.reset_index(drop=True), use_container_width=True, hide_index=True)
+    st.caption(
+        "For each myosin: its closest C. elegans homolog, by **whole-sequence** identity "
+        "(BLAST, over the 28) and by **interface** identity "
+        "(CORE: residues contacting actin in >=70% of the myosins, combined MAFFT alignment). "
+        "G1 (muscle) -> muscle myosins (myo-3/unc-54/myo-2), conserved interface; "
+        "G2 (divergent) -> Myosin-14 toward nmy-1 (non-muscle), Plasmodium Myosin-A "
+        "the most distant. No prior alignment needed for BLAST."
+    )
+
+
 def _msa_celegans_comparison():
-    """Affiche la comparaison des myosines C. elegans (myo-1/2/3) avec les séquences du dataset."""
+    """Affiche la comparaison des myosins C. elegans (myo-1/2/3) avec les séquences du dataset."""
     ALN_PATH = _MSA_ALN_DIR / "myosin_celegans_msa.aln"
     if not ALN_PATH.exists():
-        st.info("Fichier myosin_celegans_msa.aln manquant — relancer MAFFT avec les séquences C. elegans.")
+        st.info("Missing myosin_celegans_msa.aln file — re-run MAFFT with the C. elegans sequences.")
         return
 
     try:
@@ -1636,7 +2080,7 @@ def _msa_celegans_comparison():
         st.error(f"Erreur lecture alignement C. elegans : {_e}")
         return
 
-    # Colonnes de liaison actine calculées à partir de MYO1_CAEEL (pos UniProt 660-682 et 764-778)
+    # Colonnes de liaison actin calculées à partir de MYO1_CAEEL (pos UniProt 660-682 et 764-778)
     # ↔ domaine moteur résidus 577-599 et 681-695 → colonnes alignement 735-757 et 841-858
     _AB_COLS: set = set(range(735, 758)) | set(range(841, 859))
 
@@ -1645,7 +2089,7 @@ def _msa_celegans_comparison():
     all_recs      = celegans_recs + other_recs
 
     # ── Tableau de similarité ─────────────────────────────────────────────────
-    st.markdown("**Identité de séquence — domaine moteur (%) :**")
+    st.markdown("**Sequence identity — motor domain (%):**")
     _CLEAN = lambda s: (s.replace("_motor_84-785", "")
                          .replace("_CAEEL", "")
                          .replace("_", " ")
@@ -1662,15 +2106,15 @@ def _msa_celegans_comparison():
             row[_CLEAN(orec.id)] = f"{pct:.1f}%"
             if pct > best_val:
                 best_val, best_name = pct, _CLEAN(orec.id)
-        row["→ Plus proche"] = f"{best_name} ({best_val:.1f}%)"
+        row["→ Closest"] = f"{best_name} ({best_val:.1f}%)"
         sim_rows.append(row)
     df_sim = pd.DataFrame(sim_rows).set_index("C. elegans")
     st.dataframe(df_sim, use_container_width=True)
 
     # ── MSA HTML ─────────────────────────────────────────────────────────────
     st.markdown(
-        "**Alignement — zones de liaison actine en gris** "
-        "(UniProt myo-1 : résidus 660–682 et 764–778) :"
+        "**Alignment — actin binding zones in grey** "
+        "(UniProt myo-1: residues 660–682 and 764–778):"
     )
     aln_len = aln.get_alignment_length()
     label_w = min(max(len(_CLEAN(r.id)) for r in all_recs), 38)
@@ -1750,12 +2194,12 @@ def _msa_celegans_comparison():
 # ── UI MSA ────────────────────────────────────────────────────────────────────
 
 def _msa_section_full(group_label, group_key, filter_fn, rigor_pdbs=None, note=None):
-    """Section MSA séquence COMPLÈTE — ABP (S2) et Actine (S1) en colonnes parallèles."""
+    """Section MSA séquence COMPLÈTE — ABP (S2) et Actin (S1) en colonnes parallèles."""
     with st.expander(f"**{group_label}**", expanded=(group_key == "myosin")):
         if note:
             st.caption(note)
 
-        # Calcul des contacts actine et chargement des séquences ABP en avance.
+        # Calcul des contacts actin et chargement des séquences ABP en avance.
         # Ordre partagé : S2 trié par titre, S1 trié par rang de la séquence dans S2.
         _abp_rows_a, _aa_at_a, _col_col_a = _msa_actin_contacts_per_abp(filter_fn, rigor_pdbs)
 
@@ -1805,16 +2249,16 @@ def _msa_section_full(group_label, group_key, filter_fn, rigor_pdbs=None, note=N
             _abp_rows_a = sorted(_abp_rows_a, key=lambda r: r["title"])
 
         # ── S2 : ABP — séquence complète ──────────────────────────────────────
-        st.markdown("##### 🔵 ABP — séquence complète (S2)")
+        st.markdown("##### ABP — full sequence (S2)")
         if df_seqs.empty:
-            st.info("Aucune séquence trouvée.")
+            st.info("No sequence found.")
         else:
             st.caption(
-                f"**{len(df_seqs)} séquences uniques** "
+                f"**{len(df_seqs)} unique sequences** "
                 f"({df_seqs['length'].min()}–{df_seqs['length'].max()} aa)"
             )
             if len(df_seqs) < 2:
-                st.info("Moins de 2 séquences — alignement impossible.")
+                st.info("Fewer than 2 sequences — alignment impossible.")
             else:
                 fasta_path = _MSA_ALN_DIR / f"{group_key}_msa.fasta"
                 aln_path   = _MSA_ALN_DIR / f"{group_key}_msa.aln"
@@ -1830,7 +2274,7 @@ def _msa_section_full(group_label, group_key, filter_fn, rigor_pdbs=None, note=N
                              for _, r in df_seqs.iterrows()],
                             fasta_path, "fasta",
                         )
-                        with st.spinner(f"MAFFT sur {len(df_seqs)} séquences…"):
+                        with st.spinner(f"MAFFT on {len(df_seqs)} sequences…"):
                             _ok, _err = _msa_run_mafft(fasta_path, aln_path)
                         if not _ok:
                             st.error(f"Erreur MAFFT : {_err}")
@@ -1838,7 +2282,7 @@ def _msa_section_full(group_label, group_key, filter_fn, rigor_pdbs=None, note=N
                     if aln_path.exists():
                         try:
                             _aln = AlignIO.read(str(aln_path), "fasta")
-                            # Pour myosine : utiliser l'alignement avec C. elegans si disponible
+                            # Pour myosin : utiliser l'alignement avec C. elegans si disponible
                             if group_key == "myosin":
                                 _ce_path = _MSA_ALN_DIR / "myosin_celegans_msa.aln"
                                 if _ce_path.exists():
@@ -1901,11 +2345,11 @@ def _msa_section_full(group_label, group_key, filter_fn, rigor_pdbs=None, note=N
                                     except Exception:
                                         pass
                         except Exception as _e:
-                            st.error(f"Impossible de lire l'alignement : {_e}")
+                            st.error(f"Could not read the alignment: {_e}")
                         else:
                             _nseqs = len(_aln)
                             _alen  = _aln.get_alignment_length()
-                            st.success(f"**{_nseqs} séq. × {_alen} col.**")
+                            st.success(f"**{_nseqs} seq. × {_alen} col.**")
                             # Re-trier S1 selon l'ordre réel de cet alignement
                             _s2seq_rank_fresh = {
                                 _sid_to_seq[rec.id]: i
@@ -1920,13 +2364,13 @@ def _msa_section_full(group_label, group_key, filter_fn, rigor_pdbs=None, note=N
                             _core, _var = _msa_load_interface_g(filter_fn, rigor_pdbs)
                             _n_core = sum(len(v) for v in _core.values())
                             _n_var  = sum(len(v) for v in _var.values())
-                            st.caption(f"{_n_core} résidus core · {_n_var} variables")
+                            st.caption(f"{_n_core} core residues · {_n_var} variable")
                             _html   = _msa_render_full(_aln, _core, _var, 9999, _label_map)
                             _height = min(_nseqs * 18 + 80, 6000)
                             st.components.v1.html(_html, height=_height, scrolling=True)
                             with open(aln_path, "rb") as _f:
                                 st.download_button(
-                                    f"Télécharger {group_key}_msa.aln", _f,
+                                    f"Download {group_key}_msa.aln", _f,
                                     file_name=f"{group_key}_msa.aln", mime="text/plain",
                                     key=f"msa_{group_key}_dl",
                                 )
@@ -1963,7 +2407,7 @@ def _msa_section_full(group_label, group_key, filter_fn, rigor_pdbs=None, note=N
                                         }
                                         if not _iface_cols:
                                             continue
-                                        _row = {"Séquence": _label_map.get(_rec.id, _rec.id)}
+                                        _row = {"Sequence": _label_map.get(_rec.id, _rec.id)}
                                         for _ce_id, _ce_seq in _caeel_recs.items():
                                             _matches = _pairs = 0
                                             for _col in _iface_cols:
@@ -1979,31 +2423,62 @@ def _msa_section_full(group_label, group_key, filter_fn, rigor_pdbs=None, note=N
                                     if _pid_rows:
                                         st.divider()
                                         st.markdown(
-                                            "##### 🪱 Identité sur résidus d'interface — vs *C. elegans*"
+                                            "##### Identity on interface residues — vs *C. elegans*"
                                         )
                                         st.caption(
-                                            "% d'acides aminés identiques uniquement sur les colonnes "
-                                            "colorées (résidus en contact avec l'actine)."
+                                            "% of identical amino acids only on the coloured "
+                                            "columns (residues in contact with actin)."
                                         )
                                         st.dataframe(
-                                            pd.DataFrame(_pid_rows).set_index("Séquence"),
+                                            pd.DataFrame(_pid_rows).set_index("Sequence"),
                                             use_container_width=True,
                                         )
 
-        # ── S1 : Actine — positions canoniques ────────────────────────────────
+                                    # Tableau %id sur SÉQUENCE ENTIÈRE (toutes colonnes alignées)
+                                    _fid_rows = []
+                                    for _rec in _aln:
+                                        if "CAEEL" in _rec.id:
+                                            continue
+                                        _ss = str(_rec.seq)
+                                        _r2 = {"Sequence": _label_map.get(_rec.id, _rec.id)}
+                                        for _ce_id, _ce_seq in _caeel_recs.items():
+                                            _m = _p = 0
+                                            for _a, _b in zip(_ss, _ce_seq):
+                                                if _a != "-" and _b != "-":
+                                                    _p += 1
+                                                    if _a.upper() == _b.upper():
+                                                        _m += 1
+                                            _r2[_label_map.get(_ce_id, _ce_id)] = (
+                                                f"{_m / _p * 100:.1f}%" if _p > 0 else "N/A")
+                                        _fid_rows.append(_r2)
+                                    if _fid_rows:
+                                        st.divider()
+                                        st.markdown(
+                                            "##### Identity on the whole sequence — vs *C. elegans*"
+                                        )
+                                        st.caption(
+                                            "% of identical amino acids over all aligned columns "
+                                            "(whole motor domain, not just the interface)."
+                                        )
+                                        st.dataframe(
+                                            pd.DataFrame(_fid_rows).set_index("Sequence"),
+                                            use_container_width=True,
+                                        )
+
+        # ── S1 : Actin — positions canonical ────────────────────────────────
         st.divider()
-        st.markdown("##### 🔴 Actine — positions canoniques (S1)")
+        st.markdown("##### Actin — positions canonical (S1)")
         st.caption(
-            "Même ordre de lignes que S2. "
-            "Colonnes = positions canoniques actine. "
-            "Scroll horizontal pour voir toute la séquence."
+            "Same row order as S2. "
+            "Columns = canonical actin positions. "
+            "Horizontal scroll to see the whole sequence."
         )
         if not _abp_rows_a:
-            st.info("Aucune donnée d'interface actine trouvée.")
+            st.info("No actin interface data found.")
         else:
             st.caption(
-                f"**{len(_abp_rows_a)} séquences ABP** · "
-                f"{len(_aa_at_a)} positions canoniques"
+                f"**{len(_abp_rows_a)} ABP sequences** · "
+                f"{len(_aa_at_a)} positions canonical"
             )
             # Label map S1 : même noms propres que S2
             from collections import Counter as _Ctr3
@@ -2024,22 +2499,22 @@ def _msa_section_full(group_label, group_key, filter_fn, rigor_pdbs=None, note=N
             # Téléchargement : vue S1 en HTML autonome (ouvrable dans un navigateur)
             _html_a_full = (
                 '<!DOCTYPE html><html><head><meta charset="utf-8">'
-                f'<title>Actine — positions canoniques (S1) — {group_key}</title></head>'
+                f'<title>Actin — positions canonical (S1) — {group_key}</title></head>'
                 '<body style="background:#161b22;margin:0;padding:16px">'
                 + _html_a + '</body></html>'
             )
             st.download_button(
-                "⬇ Télécharger la vue S1 (HTML)",
+                "Download the S1 view (HTML)",
                 _html_a_full.encode("utf-8"),
                 file_name=f"{group_key}_actine_S1_positions_canoniques.html",
                 mime="text/html",
                 key=f"msa_{group_key}_s1_dl",
             )
 
-        # ── Analyse des contacts ABP–actine (onglets A + B C D E) ──
+        # ── Analyse des contacts ABP–actin (onglets A + B C D E) ──
         st.divider()
-        st.markdown("##### 📊 Analyse des contacts ABP–actine")
-        _msa_contact_analysis(filter_fn, group_key, rigor_pdbs, tabs=["A", "B", "C", "D", "E"])
+        st.markdown("##### ABP–actin contact analysis")
+        _msa_contact_analysis(filter_fn, group_key, rigor_pdbs, tabs=["C", "D", "E"])
 
 
 def _msa_section_s2_clusters():
@@ -2057,13 +2532,13 @@ def _msa_section_s2_clusters():
             and "actin-depolymerizing" not in t.lower())
     )
 
-    with st.expander("**Autres clusters de protéines — séquence complète**"):
-        st.caption("MAFFT sur séquence complète, résidus d'interface colorés (s2_sequence_cluster_70).")
+    with st.expander("**Other protein clusters — full sequence**"):
+        st.caption("MAFFT on the full sequence, interface residues coloured (s2_sequence_cluster_70).")
 
         filt_path = _Path("data/filtered/filtered_all_data.csv")
         int3_path = _Path("data/filtered/details/3.interface_residues.csv")
         if not filt_path.exists() or not int3_path.exists():
-            st.warning("Données manquantes.")
+            st.warning("Missing data.")
             return
 
         from collections import defaultdict
@@ -2134,7 +2609,7 @@ def _msa_section_s2_clusters():
             if len(uniq) < 2:
                 continue
 
-            # Actine S1 pour ce cluster
+            # Actin S1 pour ce cluster
             rows_act = df_other[df_other["s2_sequence_cluster_70"] == cid][
                 ["subunit_1", "subunit_1_title", "s1_sequence", "s1_taxonomy_id"]
             ].drop_duplicates(subset=["subunit_1"])
@@ -2166,7 +2641,7 @@ def _msa_section_s2_clusters():
                     bid   = (chain_to_title_act[ch][:20].replace(" ", "_").replace(",", "") + "_" + org)[:40]
                     uniq_act.append({"seq_id": bid, "seq": chain_to_full_act[ch]})
 
-            # Calcul contacts actine pour ce cluster (avant les colonnes, pour trier)
+            # Calcul contacts actin pour ce cluster (avant les colonnes, pour trier)
             _df_pairs_c2 = df_other[df_other["s2_sequence_cluster_70"] == cid][
                 ["subunit_1", "subunit_2", "subunit_2_title", "s2_sequence", "s2_taxonomy_id"]
             ].copy()
@@ -2179,8 +2654,8 @@ def _msa_section_s2_clusters():
                                   key=lambda r: _seq_rank_c2.get(r.get("s2seq", ""), 9999))
 
             clabel = crow["titles"][:60]
-            with st.expander(f"Cluster {cid} — {clabel} ({len(uniq)} séq.)"):
-                st.markdown("##### 🔵 ABP — séquence complète (S2)")
+            with st.expander(f"Cluster {cid} — {clabel} ({len(uniq)} seq.)"):
+                st.markdown("##### ABP — full sequence (S2)")
                 fasta_path = _MSA_ALN_DIR / f"{ckey}_msa.fasta"
                 aln_path   = _MSA_ALN_DIR / f"{ckey}_msa.aln"
                 _bc, _fc = st.columns([1, 2])
@@ -2194,7 +2669,7 @@ def _msa_section_s2_clusters():
                             [SeqRecord(Seq(s["seq"]), id=s["seq_id"][:50], description="") for s in uniq],
                             fasta_path, "fasta",
                         )
-                        with st.spinner(f"MAFFT ({len(uniq)} séq.)…"):
+                        with st.spinner(f"MAFFT ({len(uniq)} seq.)…"):
                             _ok2, _err2 = _msa_run_mafft(fasta_path, aln_path)
                         if not _ok2:
                             st.error(f"Erreur MAFFT : {_err2}")
@@ -2203,46 +2678,252 @@ def _msa_section_s2_clusters():
                         try:
                             _aln2 = AlignIO.read(str(aln_path), "fasta")
                         except Exception as _e2:
-                            st.error(f"Impossible de lire l'alignement : {_e2}")
+                            st.error(f"Could not read the alignment: {_e2}")
                         else:
                             _ns2 = len(_aln2); _al2 = _aln2.get_alignment_length()
-                            st.success(f"**{_ns2} séq. × {_al2} col.**")
+                            st.success(f"**{_ns2} seq. × {_al2} col.**")
                             _html2 = _msa_render_full(_aln2, core_c, var_c, 9999)
                             _height2 = min(_ns2 * 18 + 80, 6000)
                             st.components.v1.html(_html2, height=_height2, scrolling=True)
 
                 st.divider()
-                st.markdown("##### 🔴 Actine — positions canoniques (S1)")
-                st.caption("Même ordre de lignes que S2 (tri par titre). Scroll horizontal.")
+                st.markdown("##### Actin — positions canonical (S1)")
+                st.caption("Same row order as S2 (sorted by title). Horizontal scroll.")
                 if not _abp_rows_c2:
-                    st.info("Aucune donnée d'interface actine pour ce cluster.")
+                    st.info("No actin interface data for this cluster.")
                 else:
-                    st.caption(f"**{len(_abp_rows_c2)} séq. ABP** · {len(_aa_at_c2)} positions canoniques")
+                    st.caption(f"**{len(_abp_rows_c2)} ABP seq.** · {len(_aa_at_c2)} canonical positions")
                     _html_a2   = _msa_render_actin_contacts(_abp_rows_c2, _aa_at_c2, _col_col_c2, 9999)
                     _height_a2 = min(len(_abp_rows_c2) * 18 + 80, 6000)
                     st.components.v1.html(_html_a2, height=_height_a2, scrolling=True)
 
+                st.divider()
+                st.markdown("##### ABP–actin contact analysis")
+                _msa_contact_analysis(
+                    None, ckey,
+                    _ch2seq=chain_to_seqlow, _ch2title=chain_to_title,
+                    tabs=["C", "D", "E"],
+                )
+
+
+def _msa_one_s1_cluster(cid, df_h, _df1_s1, _df3_s1, partners="",
+                        include_contacts=True, as_expander=False,
+                        expander_title=None, widget_prefix=None):
+    """
+    Rend le MSA d'UN cluster S1 (interface ABP MAFFT + positions canonical actin).
+
+    Réutilisé par la section globale (as_expander=True) et par la partie "Clusters"
+    du dashboard (as_expander=False, include_contacts=False car l'analyse C/D/E y est
+    déjà affichée). Renvoie True si quelque chose a été rendu, False sinon.
+    """
+    from collections import defaultdict as _ddc
+    from contextlib import nullcontext as _nullcontext
+
+    cid  = str(cid)
+    ckey = f"s1c_{cid}"                       # clé de fichiers .aln/.fasta (partagée)
+    wkey = widget_prefix or ckey             # clé de widgets (distincte selon le contexte)
+
+    df_pairs_s1 = df_h[df_h["s1_binding_site_cluster_data_70"] == cid][
+        ["subunit_1", "subunit_2", "subunit_2_title", "s2_sequence", "s2_taxonomy_id"]
+    ].copy()
+
+    abp_rows_s1, aa_at_s1, col_col_s1 = _msa_actin_contacts_from_pairs(
+        df_pairs_s1, _df1_s1, _df3_s1
+    )
+    if not abp_rows_s1:
+        return False
+
+    # ── Séquences ABP (S2) + positions d'interface pour MAFFT ──────────
+    rows_s2 = df_pairs_s1[
+        ["subunit_2", "subunit_2_title", "s2_sequence", "s2_taxonomy_id"]
+    ].drop_duplicates("subunit_2")
+    ch2full   = {r["subunit_2"]: str(r["s2_sequence"]).strip()  for _, r in rows_s2.iterrows()}
+    ch2seqlow = {ch: s.lower() for ch, s in ch2full.items()}
+    ch2title  = {r["subunit_2"]: str(r["subunit_2_title"])       for _, r in rows_s2.iterrows()}
+    ch2taxid  = {r["subunit_2"]: r["s2_taxonomy_id"]             for _, r in rows_s2.iterrows()}
+
+    res_s2 = _df3_s1[_df3_s1["chain"].isin(ch2full)][
+        ["chain", "residue_number_sequence"]
+    ].dropna()
+    seq_iface: dict = _ddc(dict)
+    for _, rrow in res_s2.iterrows():
+        sl = ch2seqlow.get(rrow["chain"])
+        if sl:
+            seq_iface[sl].setdefault(rrow["chain"], set()).add(
+                int(rrow["residue_number_sequence"])
+            )
+
+    # Séquence COMPLÈTE de chaque ABP pour MAFFT ; positions d'interface conservées
+    # à part (core/variable) pour la coloration — cf. _msa_load_interface_g / _msa_section_full.
+    seen2: set = set(); uniq_s2: list = []
+    core_by_seqlow: dict = {}; var_by_seqlow: dict = {}
+    for ch, sl in ch2seqlow.items():
+        if sl not in seen2 and sl in seq_iface:
+            seen2.add(sl)
+            taxid = ch2taxid[ch]
+            org   = _MSA_TAX.get(int(taxid), f"taxid:{int(taxid)}") if pd.notna(taxid) else "unk"
+            title = ch2title[ch]
+            bid   = (title[:20].replace(" ", "_").replace(",", "") + "_" + org)[:40]
+            all_sets = list(seq_iface[sl].values())
+            union_pos: set = set().union(*all_sets)
+            if len(all_sets) == 1:
+                core_by_seqlow[sl], var_by_seqlow[sl] = all_sets[0].copy(), set()
+            else:
+                inter = set(all_sets[0])
+                for s in all_sets[1:]:
+                    inter &= s
+                core_by_seqlow[sl], var_by_seqlow[sl] = inter, union_pos - inter
+            uniq_s2.append({"seq_id": bid, "seq": ch2full[ch], "seqlow": sl,
+                            "n_iface": len(union_pos)})
+
+    _aln_path_s1c = _MSA_ALN_DIR / f"{ckey}_full.aln"
+    _sid2seqlow   = {u["seq_id"][:50]: u["seqlow"] for u in uniq_s2}
+    if _aln_path_s1c.exists() and _sid2seqlow:
+        try:
+            _aln_ord_s1c = AlignIO.read(str(_aln_path_s1c), "fasta")
+            _rank_s1c    = {
+                _sid2seqlow[rec.id]: i
+                for i, rec in enumerate(_aln_ord_s1c)
+                if rec.id in _sid2seqlow
+            }
+            abp_rows_s1 = sorted(abp_rows_s1,
+                                 key=lambda r: _rank_s1c.get(r.get("s2seq", ""), 9999))
+        except Exception:
+            pass
+
+    if expander_title is None:
+        expander_title = f"**{cid}** — {partners[:70]} ({len(abp_rows_s1)} ABP seq.)"
+    _ctx = st.expander(expander_title) if as_expander else _nullcontext()
+    with _ctx:
+        # ── S2 : MAFFT séquence complète ABP, interface mise en évidence ───────
+        st.markdown("##### ABP — full sequence (interface highlighted) (S2)")
+        if len(uniq_s2) < 2:
+            st.info("Fewer than 2 ABP sequences — alignment impossible.")
+        else:
+            fasta_path_s1c = _MSA_ALN_DIR / f"{ckey}_full.fasta"
+            _bc1, _fc1 = st.columns([1, 2])
+            _run_s1c   = _bc1.button("Lancer MAFFT", key=f"msa_{wkey}_btn")
+            _force_s1c = _fc1.checkbox("Forcer recalcul", key=f"msa_{wkey}_force")
+
+            if _run_s1c or _aln_path_s1c.exists():
+                if _run_s1c or not _aln_path_s1c.exists() or _force_s1c:
+                    _MSA_ALN_DIR.mkdir(parents=True, exist_ok=True)
+                    SeqIO.write(
+                        [SeqRecord(Seq(u["seq"]), id=u["seq_id"][:50], description="")
+                         for u in uniq_s2],
+                        fasta_path_s1c, "fasta",
+                    )
+                    with st.spinner(f"MAFFT ({len(uniq_s2)} seq.)…"):
+                        _ok_s1c, _err_s1c = _msa_run_mafft(fasta_path_s1c, _aln_path_s1c)
+                    if not _ok_s1c:
+                        st.error(f"Erreur MAFFT : {_err_s1c}")
+
+                if _aln_path_s1c.exists():
+                    try:
+                        _aln_s1c = AlignIO.read(str(_aln_path_s1c), "fasta")
+                    except Exception as _es1c:
+                        st.error(f"Could not read the alignment: {_es1c}")
+                    else:
+                        _ns1c = len(_aln_s1c); _als1c = _aln_s1c.get_alignment_length()
+                        st.success(f"**{_ns1c} seq. × {_als1c} col.**")
+                        _rank_fresh = {
+                            _sid2seqlow[rec.id]: i
+                            for i, rec in enumerate(_aln_s1c)
+                            if rec.id in _sid2seqlow
+                        }
+                        if _rank_fresh:
+                            abp_rows_s1 = sorted(
+                                abp_rows_s1,
+                                key=lambda r: _rank_fresh.get(r.get("s2seq", ""), 9999),
+                            )
+                        n_iface_total = sum(u["n_iface"] for u in uniq_s2)
+                        st.caption(
+                            f"Full aligned sequence — interface highlighted "
+                            f"(avg. {n_iface_total // max(len(uniq_s2), 1)} interface residues/seq.) · "
+                            "conserved · variable · grey = outside interface"
+                        )
+                        _html_s2c = _msa_render_full(_aln_s1c, core_by_seqlow, var_by_seqlow, 9999)
+                        _h_s2c    = min(_ns1c * 18 + 80, 6000)
+                        st.components.v1.html(_html_s2c, height=_h_s2c, scrolling=True)
+
+        # ── S1 : positions canonical actin ──────────────────────────
+        st.divider()
+        st.markdown("##### Actin — positions canonical (S1)")
+        st.caption(
+            f"**{len(abp_rows_s1)} ABP sequences** — "
+            f"{len(aa_at_s1)} positions canonical actin"
+        )
+        _html_s1   = _msa_render_actin_contacts(abp_rows_s1, aa_at_s1, col_col_s1, 9999)
+        _height_s1 = min(len(abp_rows_s1) * 18 + 80, 6000)
+        st.components.v1.html(_html_s1, height=_height_s1, scrolling=True)
+
+        if include_contacts:
+            st.divider()
+            st.markdown("##### ABP–actin contact analysis")
+            _msa_contact_analysis(
+                None, ckey,
+                _ch2seq=ch2seqlow, _ch2title=ch2title,
+                tabs=["C", "D", "E"],
+            )
+    return True
+
+
+def _msa_s1_cluster_data():
+    """Charge (df_h, df1, df3) pour les MSA de clusters S1. Renvoie None si données absentes."""
+    filt_path = _Path("data/filtered/filtered_all_data.csv")
+    int1_path = _Path("data/filtered/details/1.interactions.csv")
+    int3_path = _Path("data/filtered/details/3.interface_residues.csv")
+    if not (filt_path.exists() and int1_path.exists() and int3_path.exists()):
+        return None
+
+    def _is_actin(t):
+        t = t.lower()
+        return t.startswith("actin") and "actin-related" not in t and "actin-depolymerizing" not in t
+
+    df_filt = pd.read_csv(filt_path, low_memory=False)
+    _df1    = pd.read_csv(int1_path)
+    _df3    = pd.read_csv(int3_path)
+    _df3["residue_number_canon_mafft"] = pd.to_numeric(
+        _df3["residue_number_canon_mafft"], errors="coerce")
+    _df3["chain_lower"] = _df3["chain"].str.lower()
+    df_h = df_filt[~df_filt["subunit_2_title"].apply(lambda t: _is_actin(str(t)))]
+    return df_h, _df1, _df3
+
+
+def _msa_s1_cluster_inline(cid, include_contacts=False):
+    """MSA propre à un cluster S1, rendu inline (pour la partie 'Clusters' du dashboard)."""
+    data = _msa_s1_cluster_data()
+    if data is None:
+        st.info("MSA data unavailable (run the filtering pipeline).")
+        return
+    df_h, _df1, _df3 = data
+    ok = _msa_one_s1_cluster(cid, df_h, _df1, _df3,
+                             include_contacts=include_contacts, as_expander=False,
+                             widget_prefix=f"clust_s1c_{cid}")  # namespace distinct de la section globale
+    if not ok:
+        st.info("No usable ABP sequences for this cluster.")
+
 
 def _msa_section_s1_clusters():
     """
-    Clusters S1 binding site — lignes = séquences ABP, colonnes = positions canoniques actine.
+    Clusters S1 binding site — lignes = séquences ABP, colonnes = positions canonical actin.
     """
     def _is_actin(t):
         t = t.lower()
         return t.startswith("actin") and "actin-related" not in t and "actin-depolymerizing" not in t
 
-    with st.expander("**Clusters S1 — site de liaison actine**"):
+    with st.expander("**S1 clusters — actin binding site**"):
         st.caption(
-            "Chaque cluster regroupe les interactions partageant le même site de liaison sur l'actine. "
-            "Chaque ligne = une séquence ABP. "
-            "Les colonnes sont les positions canoniques actine contactées par au moins un ABP du cluster."
+            "Each cluster groups the interactions sharing the same binding site on actin. "
+            "Each row = one ABP sequence. "
+            "The columns are the canonical actin positions contacted by at least one ABP of the cluster."
         )
 
         filt_path = _Path("data/filtered/filtered_all_data.csv")
         int1_path = _Path("data/filtered/details/1.interactions.csv")
         int3_path = _Path("data/filtered/details/3.interface_residues.csv")
         if not filt_path.exists() or not int1_path.exists() or not int3_path.exists():
-            st.warning("Données manquantes.")
+            st.warning("Missing data.")
             return
 
         df_filt   = pd.read_csv(filt_path, low_memory=False)
@@ -2263,153 +2944,11 @@ def _msa_section_s1_clusters():
         clusters_s1.columns = ["cluster_id", "partners"]
         clusters_s1 = clusters_s1.sort_values("cluster_id")
 
-        from collections import defaultdict as _ddc
-
         for _, crow in clusters_s1.iterrows():
-            cid  = str(crow["cluster_id"])
-            ckey = f"s1c_{cid}"
-
-            df_pairs_s1 = df_h[df_h["s1_binding_site_cluster_data_70"] == cid][
-                ["subunit_1", "subunit_2", "subunit_2_title", "s2_sequence", "s2_taxonomy_id"]
-            ].copy()
-
-            abp_rows_s1, aa_at_s1, col_col_s1 = _msa_actin_contacts_from_pairs(
-                df_pairs_s1, _df1_s1, _df3_s1
+            cid = str(crow["cluster_id"])
+            _msa_one_s1_cluster(
+                cid, df_h, _df1_s1, _df3_s1,
+                partners=crow["partners"], include_contacts=True,
+                as_expander=True,
             )
-            if not abp_rows_s1:
-                continue
-
-            # ── Séquences ABP (S2) + positions d'interface pour MAFFT ──────────
-            rows_s2 = df_pairs_s1[
-                ["subunit_2", "subunit_2_title", "s2_sequence", "s2_taxonomy_id"]
-            ].drop_duplicates("subunit_2")
-            ch2full   = {r["subunit_2"]: str(r["s2_sequence"]).strip()  for _, r in rows_s2.iterrows()}
-            ch2seqlow = {ch: s.lower() for ch, s in ch2full.items()}
-            ch2title  = {r["subunit_2"]: str(r["subunit_2_title"])       for _, r in rows_s2.iterrows()}
-            ch2taxid  = {r["subunit_2"]: r["s2_taxonomy_id"]             for _, r in rows_s2.iterrows()}
-
-            res_s2 = _df3_s1[_df3_s1["chain"].isin(ch2full)][
-                ["chain", "residue_number_sequence"]
-            ].dropna()
-            seq_iface: dict = _ddc(dict)
-            for _, rrow in res_s2.iterrows():
-                sl = ch2seqlow.get(rrow["chain"])
-                if sl:
-                    seq_iface[sl].setdefault(rrow["chain"], set()).add(
-                        int(rrow["residue_number_sequence"])
-                    )
-
-            # Sous-séquence d'interface : seulement les résidus qui contactent l'actine
-            seen2: set = set(); uniq_s2: list = []
-            core_iface: dict = {}  # iface_seq.lower() → toutes positions (pour _msa_render_full)
-            for ch, sl in ch2seqlow.items():
-                if sl not in seen2 and sl in seq_iface:
-                    seen2.add(sl)
-                    taxid = ch2taxid[ch]
-                    org   = _MSA_TAX.get(int(taxid), f"taxid:{int(taxid)}") if pd.notna(taxid) else "unk"
-                    title = ch2title[ch]
-                    bid   = (title[:20].replace(" ", "_").replace(",", "") + "_" + org)[:40]
-                    # Union de toutes les positions d'interface pour cette séquence
-                    union_pos: set = set()
-                    for pos_set in seq_iface[sl].values():
-                        union_pos |= pos_set
-                    full_seq = ch2full[ch]
-                    iface_seq = "".join(
-                        full_seq[p - 1] if 0 < p <= len(full_seq) else "X"
-                        for p in sorted(union_pos)
-                    )
-                    uniq_s2.append({"seq_id": bid, "seq": iface_seq, "seqlow": sl,
-                                    "n_iface": len(union_pos)})
-                    core_iface[iface_seq.lower()] = set(range(1, len(iface_seq) + 1))
-
-            # Trier S1 selon l'ordre du .aln s'il existe déjà
-            _aln_path_s1c = _MSA_ALN_DIR / f"{ckey}_msa.aln"
-            _sid2seqlow   = {u["seq_id"][:50]: u["seqlow"] for u in uniq_s2}
-            if _aln_path_s1c.exists() and _sid2seqlow:
-                try:
-                    _aln_ord_s1c = AlignIO.read(str(_aln_path_s1c), "fasta")
-                    _rank_s1c    = {
-                        _sid2seqlow[rec.id]: i
-                        for i, rec in enumerate(_aln_ord_s1c)
-                        if rec.id in _sid2seqlow
-                    }
-                    abp_rows_s1 = sorted(abp_rows_s1,
-                                         key=lambda r: _rank_s1c.get(r.get("s2seq", ""), 9999))
-                except Exception:
-                    pass
-
-            partners = crow["partners"][:70]
-            with st.expander(f"**{cid}** — {partners} ({len(abp_rows_s1)} séq. ABP)"):
-
-                # ── S2 : MAFFT interface ABP ───────────────────────────────────
-                st.markdown("##### 🔵 ABP — interface avec l'actine (S2)")
-                if len(uniq_s2) < 2:
-                    st.info("Moins de 2 séquences ABP — alignement impossible.")
-                else:
-                    fasta_path_s1c = _MSA_ALN_DIR / f"{ckey}_msa.fasta"
-                    _bc1, _fc1 = st.columns([1, 2])
-                    _run_s1c   = _bc1.button("Lancer MAFFT", key=f"msa_{ckey}_btn")
-                    _force_s1c = _fc1.checkbox("Forcer recalcul", key=f"msa_{ckey}_force")
-
-                    if _run_s1c or _aln_path_s1c.exists():
-                        if _run_s1c or not _aln_path_s1c.exists() or _force_s1c:
-                            _MSA_ALN_DIR.mkdir(parents=True, exist_ok=True)
-                            SeqIO.write(
-                                [SeqRecord(Seq(u["seq"]), id=u["seq_id"][:50], description="")
-                                 for u in uniq_s2],
-                                fasta_path_s1c, "fasta",
-                            )
-                            with st.spinner(f"MAFFT ({len(uniq_s2)} séq.)…"):
-                                _ok_s1c, _err_s1c = _msa_run_mafft(fasta_path_s1c, _aln_path_s1c)
-                            if not _ok_s1c:
-                                st.error(f"Erreur MAFFT : {_err_s1c}")
-
-                        if _aln_path_s1c.exists():
-                            try:
-                                _aln_s1c = AlignIO.read(str(_aln_path_s1c), "fasta")
-                            except Exception as _es1c:
-                                st.error(f"Impossible de lire l'alignement : {_es1c}")
-                            else:
-                                _ns1c = len(_aln_s1c); _als1c = _aln_s1c.get_alignment_length()
-                                st.success(f"**{_ns1c} séq. × {_als1c} col.**")
-                                # Re-trier S1 selon l'ordre réel du nouvel alignement
-                                _rank_fresh = {
-                                    _sid2seqlow[rec.id]: i
-                                    for i, rec in enumerate(_aln_s1c)
-                                    if rec.id in _sid2seqlow
-                                }
-                                if _rank_fresh:
-                                    abp_rows_s1 = sorted(
-                                        abp_rows_s1,
-                                        key=lambda r: _rank_fresh.get(r.get("s2seq", ""), 9999),
-                                    )
-                                n_iface_total = sum(u["n_iface"] for u in uniq_s2)
-                                st.caption(
-                                    f"Sous-séquences d'interface — "
-                                    f"moy. {n_iface_total // max(len(uniq_s2), 1)} résidus/séq."
-                                )
-                                _html_s2c = _msa_render_full(_aln_s1c, core_iface, {}, 9999)
-                                _h_s2c    = min(_ns1c * 18 + 80, 6000)
-                                st.components.v1.html(_html_s2c, height=_h_s2c, scrolling=True)
-
-                # ── S1 : positions canoniques actine ──────────────────────────
-                st.divider()
-                st.markdown("##### 🔴 Actine — positions canoniques (S1)")
-                st.caption(
-                    f"**{len(abp_rows_s1)} séquences ABP** — "
-                    f"{len(aa_at_s1)} positions canoniques actine"
-                )
-                _html_s1   = _msa_render_actin_contacts(abp_rows_s1, aa_at_s1, col_col_s1, 9999)
-                _height_s1 = min(len(abp_rows_s1) * 18 + 80, 6000)
-                st.components.v1.html(_html_s1, height=_height_s1, scrolling=True)
-
-                # ── Analyse des contacts (B–E déplacés dans la section Binding Site) ──
-                st.divider()
-                st.markdown("##### 📊 Heatmap ABP — contacts avec l'actine")
-                _msa_contact_analysis(
-                    None, ckey,
-                    _ch2seq=ch2seqlow,
-                    _ch2title=ch2title,
-                    tabs=["A"],
-                )
 

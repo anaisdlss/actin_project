@@ -99,16 +99,6 @@ def main():
 
     current_job_id = get_current_job_id()
 
-    if dataset_is_valid(
-        meta_path,
-        current_job_id,
-        summary_dir,
-        output_files
-    ):
-        print("PDB entries dataset unchanged")
-        print("Nothing to do")
-        return
-
     summary = pd.read_csv(SUMMARY_PATH, sep=";")
 
     if "PDB ID" not in summary.columns:
@@ -122,13 +112,52 @@ def main():
         .str.upper()
         .unique()
     )
+    wanted = set(pdb_ids)
 
-    print("Unique PDB:", len(pdb_ids))
+    # ── Téléchargement INCRÉMENTAL ────────────────────────────────────────────
+    # On garde les PDB déjà présents dans pdb_entry_results.csv et on ne
+    # re-télécharge que les PDB NOUVEAUX du summary. Les PDB retirés du summary
+    # sont supprimés. (Hypothèse : la table d'un PDB déjà connu ne change pas —
+    # acceptable pour gagner du temps ; un job PPI3D entièrement nouveau force de
+    # toute façon le re-téléchargement des PDB qu'il ne connaissait pas.)
+    existing = None
+    have = set()
+    if os.path.exists(output_path):
+        try:
+            existing = pd.read_csv(output_path, sep=";")
+            if "pdb_id" in existing.columns:
+                have = set(existing["pdb_id"].astype(str).str.strip().str.upper())
+        except Exception:
+            existing = None
+            have = set()
 
+    to_fetch = [p for p in pdb_ids if p not in have]
+    obsolete = have - wanted
+
+    # Rien à faire seulement si le job est inchangé ET le fichier contient déjà
+    # TOUS les PDB voulus (auto-réparation : un run partiel sera complété).
+    if (dataset_is_valid(meta_path, current_job_id, summary_dir, output_files)
+            and not to_fetch and not obsolete):
+        print("PDB entries dataset unchanged and complete")
+        print("Nothing to do")
+        return
+
+    print(f"Incremental PDB: {len(have & wanted)} en cache, "
+          f"{len(to_fetch)} a telecharger, {len(obsolete)} obsoletes retires "
+          f"(voulu: {len(wanted)})")
+
+    # Garder les lignes des PDB toujours voulus (retire les obsolètes)
     results = []
+    if existing is not None and "pdb_id" in existing.columns:
+        kept = existing[
+            existing["pdb_id"].astype(str).str.strip().str.upper().isin(wanted)
+        ]
+        if len(kept):
+            results.append(kept)
 
-    for i, pdb in enumerate(pdb_ids):
-        print(f"\n{i+1}/{len(pdb_ids)} {pdb}")
+    # Ne télécharger QUE les PDB nouveaux
+    for i, pdb in enumerate(to_fetch):
+        print(f"\n{i+1}/{len(to_fetch)} {pdb}")
 
         try:
             table = fetch_pdb_table(pdb)
@@ -147,7 +176,7 @@ def main():
         df = pd.concat(results, ignore_index=True)
         df.to_csv(output_path, sep=";", index=False)
 
-        print("\nSaved:", output_path)
+        print(f"\nSaved: {output_path} ({len(df)} lignes)")
 
         save_dataset_metadata(
             meta_path,

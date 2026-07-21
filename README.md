@@ -1,89 +1,109 @@
-# Pipeline d'analyse des interactions actine–ABP
+# Actin–ABP interaction analysis pipeline
 
-Analyse structurale automatisée des interactions entre l'actine et ses protéines de liaison (ABP) extraites de la base de données [PPI3D](https://bioinformatics.lt/ppi3d) (entrée UniProt **P60709**, Actin cytoplasmic 1).
+Automated structural analysis of the interactions between actin and its
+actin-binding proteins (ABPs), extracted from the
+[PPI3D](https://bioinformatics.lt/ppi3d) database
+(UniProt entry **P60709**, Actin cytoplasmic 1).
 
-Le pipeline récupère l'ensemble des co-structures 3D disponibles, filtre les assemblages contenant au moins quatre sous-unités d'actine connectées, regroupe les résidus d'interface à 70 % de similarité (C70), calcule la surface enfouie à l'interface (encodée en B-factor), et produit des visualisations interactives via une interface web Streamlit et des scripts de session PyMOL.
+The pipeline retrieves every available 3D co-structure, keeps the assemblies
+that contain at least four connected actin subunits, clusters interface
+residues at 70 % similarity (C70), computes the buried surface area at each
+interface (encoded as a B-factor), and produces interactive visualisations
+through a Streamlit web interface and PyMOL session scripts.
 
 ---
 
 ## Installation
 
-> **Systèmes supportés :** macOS (Intel et Apple Silicon) et Linux. Windows n'est pas supporté en raison d'une dépendance (MAFFT) non disponible sur cette plateforme.
-> S'asurrer que **pixi** est installée sur l'ordinateur
+> **Supported systems:** macOS (Intel and Apple Silicon) and Linux.
+> Windows is not supported because one dependency (MAFFT) is unavailable on
+> that platform.
+> Make sure **pixi** is installed on your machine (see
+> [pixi.sh](https://pixi.sh)).
 
-### 0 — Ouvrir un terminal
+### 0 — Open a terminal
 
-Toutes les commandes ci-dessous s'exécutent dans un terminal :
+Every command below is run in a terminal:
 
-- **macOS** : `Cmd + Espace` → taper `Terminal` → Entrée
-- **Linux** : `Ctrl + Alt + T`
+- **macOS:** `Cmd + Space` → type `Terminal` → Enter
+- **Linux:** `Ctrl + Alt + T`
 
-### 1 — Cloner le dépôt
+### 1 — Clone the repository
 
 ```bash
-cd
-cd Desktop/
+cd ~/Desktop
 git clone https://github.com/anaisdlss/actin_project.git
 cd actin_project
 ```
 
-### 2 — Installer l'environnement
+### 2 — Install the environment
 
 ```bash
 pixi install
 ```
 
-Quelques minutes peuvent être nécessaires lors de la première exécution.
+The first run can take a few minutes.
 
-### 3 — Lancer l'interface web
+### 3 — Launch the web interface
 
 ```bash
 pixi run streamlit run script/streamlit.py
 ```
 
-Une page s'ouvre automatiquement dans le navigateur (sinon, aller sur `http://localhost:8501`).
+A page opens automatically in your browser (otherwise, go to
+`http://localhost:8501`).
 
 ---
 
-## Générer les données
+## Generating the data
 
-Une fois l'interface ouverte, se rendre dans la section **Téléchargement des données** et cliquer sur **Lancer le téléchargement**.
+The repository ships **code only** — the `data/` folder is not included
+(it is git-ignored) because everything can be regenerated locally.
 
-Le pipeline s'exécute entièrement depuis l'interface — aucune commande supplémentaire n'est nécessaire. La durée est de **30 à 60 minutes** selon la vitesse de connexion. Les étapes déjà réalisées sont automatiquement ignorées lors des exécutions suivantes.
+Once the interface is open, go to the **Data download** section and click
+**Run / update**. The pipeline runs entirely from the interface — no extra
+command is needed. It takes **30 to 60 minutes** depending on your connection.
+Steps that are already done are skipped automatically on later runs.
 
 ---
 
-## Visualisations PyMOL
+## PyMOL visualisations
 
-Les scripts sont générés automatiquement par le pipeline dans :
+The scripts are generated automatically by the pipeline in:
 
 ```
 data/filtered/details/structures_files/bfactor_c70_interface/
 ```
 
-**Vue globale** — tous les représentants de clusters C70 superposés sur l'actine de référence (8iah chaîne L) :
+**Global view** — every C70 cluster representative superimposed on the
+reference actin (8iah chain L):
 
 ```
 view_full_surface.pml
 ```
 
-**Vue par site de liaison** — un script par cluster de site de liaison S1 (nœuds rouges dans le réseau Streamlit) :
+**Per binding-site view** — one script per S1 binding-site cluster (red nodes
+in the Streamlit network):
 
 ```
-by_s1_cluster/<nom_du_cluster>.pml
+by_s1_cluster/<cluster_name>.pml
 ```
 
-Pour exécuter un script, utiliser `File > Run Script…` dans PyMOL, ou taper dans la console PyMOL :
+To run a script, use `File > Run Script…` in PyMOL, or type in the PyMOL
+console:
 
 ```
-@/chemin/vers/le/script.pml
+@/path/to/the/script.pml
 ```
 
-**Code couleur :** dégradé vert = partenaire ABP (interaction hétérologue) · dégradé rose = partenaire actine (interaction homologue) · l'intensité encode le pourcentage de surface accessible enfouie à l'interface.
+**Colour code:** green gradient = ABP partner (heterologous interaction) ·
+pink gradient = actin partner (homologous interaction) · intensity encodes
+the percentage of buried accessible surface at the interface.
 
 ---
 
-## Installer PyMOL
+## Installing PyMOL
 
-PyMOL est nécessaire uniquement pour les visualisations 3D. Le télécharger sur [pymol.org](https://pymol.org) et suivre les instructions d'installation selon le système d'exploitation.
-
+PyMOL is only required for the 3D visualisations. Download it from
+[pymol.org](https://pymol.org) and follow the installation instructions for
+your operating system.

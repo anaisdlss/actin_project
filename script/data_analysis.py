@@ -114,10 +114,10 @@ def _build_abp_heatmap_data(*_):
     return pivot, abp_freq, res_freq
 
 
-@st.cache_data(show_spinner="Calcul compétition C70 (recouvrement)…")
+@st.cache_data(show_spinner="Computing C70 competition (overlap)…")
 def _build_c70_jaccard_edges(jaccard_threshold: float, *_mtimes):
     """
-    Pour chaque cluster C70, construit l'empreinte de résidus canoniques actin contactés.
+    Pour chaque cluster C70, construit l'empreinte de résidus canonical actin contactés.
     Deux ABPs sont en compétition si au moins une paire de leurs C70 a
     recouvrement ≥ seuil, où recouvrement = |A ∩ B| / min(|A|, |B|).
     Cela détecte le cas où une grande interface contient totalement une petite.
@@ -161,7 +161,7 @@ def _build_c70_jaccard_edges(jaccard_threshold: float, *_mtimes):
         how="inner",
     )
 
-    # Empreinte par cluster C70 : ensemble de résidus canoniques actin
+    # Empreinte par cluster C70 : ensemble de résidus canonical actin
     merged_c70_df3 = hetero_c70.merge(df3, on="interaction_id", how="inner")
     merged_c70_df3 = merged_c70_df3[
         merged_c70_df3["chain"] == merged_c70_df3["actin_chain"]
@@ -210,7 +210,7 @@ def _build_c70_jaccard_edges(jaccard_threshold: float, *_mtimes):
 @st.cache_data(show_spinner="Calcul super-clusters S1…")
 def _build_s1_superclusters(jaccard_threshold: float, *_mtimes):
     """
-    Regroupe les sites S1 dont les résidus canoniques actin se chevauchent
+    Regroupe les sites S1 dont les résidus canonical actin se chevauchent
     (Jaccard ≥ jaccard_threshold) en super-clusters.
 
     Retourne :
@@ -231,7 +231,7 @@ def _build_s1_superclusters(jaccard_threshold: float, *_mtimes):
     df_all_s["s1_actine"] = df_all_s["s1_actine"].fillna(False).astype(bool)
     df_all_s["s2_actine"] = df_all_s["s2_actine"].fillna(False).astype(bool)
 
-    # Interactions hétéro (actine = S1) — filtered_all_data n'a pas d'interaction_id
+    # Interactions hétéro (actin = S1) — filtered_all_data n'a pas d'interaction_id
     hetero_base = df_all_s[
         df_all_s["s1_actine"] & ~df_all_s["s2_actine"]
     ][["subunit_1", "subunit_2", "s1_binding_site_cluster_data_70"]].dropna(
@@ -255,7 +255,7 @@ def _build_s1_superclusters(jaccard_threshold: float, *_mtimes):
     merged_s = hetero_s.merge(df3_canon, on="interaction_id", how="inner")
     merged_s = merged_s[merged_s["chain"] == merged_s["actin_chain"]]
 
-    # Profil de chaque S1 = ensemble de positions canoniques contactées
+    # Profil de chaque S1 = ensemble de positions canonical contactées
     s1_profiles: dict[str, set] = {}
     for s1, grp in merged_s.groupby("s1_site"):
         s1_profiles[s1] = set(grp["residue_number_canon_mafft"].unique())

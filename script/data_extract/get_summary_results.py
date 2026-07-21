@@ -16,7 +16,7 @@ BASE_URL = "https://bioinformatics.lt/ppi3d"
 
 def get_with_retry(url, retries=5, delay=15):
     for attempt in range(retries):
-        response = session.get(url)
+        response = session.get(url, timeout=60)
         if response.status_code == 504:
             print(f"504 Gateway Timeout on {url}, retry {attempt + 1}/{retries} in {delay}s...")
             time.sleep(delay)
@@ -55,7 +55,7 @@ def file_hash(path):
 
 def get_ppi3d_update():
     try:
-        html = requests.get(BASE_URL).text
+        html = requests.get(BASE_URL, timeout=60).text
     except Exception:
         return "unknown"
     soup = BeautifulSoup(html, "html.parser")
@@ -261,7 +261,7 @@ if metadata is None:
         "submit": "Submit"
     }
 
-    response = session.post(SUBMIT_URL, data=data, allow_redirects=True)
+    response = session.post(SUBMIT_URL, data=data, allow_redirects=True, timeout=120)
 
     final_url = response.url
 
@@ -284,7 +284,7 @@ print("Waiting for BLAST results...")
 
 while True:
 
-    html = session.get(results_url).text
+    html = session.get(results_url, timeout=60).text
 
     if "Processing your query" not in html:
         break
@@ -351,7 +351,7 @@ if settings_form:
     target_path = form_data.get("to")
     form_data["clustering"] = "none"
 
-    response = session.post(settings_url, data=form_data, allow_redirects=True)
+    response = session.post(settings_url, data=form_data, allow_redirects=True, timeout=120)
 
     if target_path:
         if not target_path.startswith("http"):

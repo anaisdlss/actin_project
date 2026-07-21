@@ -100,30 +100,30 @@ for actin_site, s2_to_c70 in sorted(actin_to_s2.items()):
         s1_color = (f"spectrum b, white_red, base_actin, minimum=0, maximum={bmax_s1}"
                     if bmax_s1 > 1.0 else "color white, base_actin")
         ref_section = [
-            "# ── Actine S1 — gradient jaune→rouge (% ASA), semi-transparente ─────",
+            "# ── Actine S1 — gradient jaune→rouge (% ASA), opaque ────────────────",
             f"load {s1_bfac_pdb}, base_actin",
             "hide everything, base_actin",
             "show surface, base_actin",
             s1_color,
-            "set transparency, 0.5, base_actin",
+            "set transparency, 0.0, base_actin",
         ]
     else:
         ref_section = [
-            "# ── Actine S1 — grise semi-transparente (pas de B-factor) ───────────",
+            "# ── Actine S1 — grise opaque (pas de B-factor) ──────────────────────",
             f"load {ref_pdb_abs}, _ref_complex",
             "create base_actin, _ref_complex and chain A",
             "delete _ref_complex",
             "hide everything, base_actin",
             "show surface, base_actin",
             "color grey70, base_actin",
-            "set transparency, 0.5, base_actin",
+            "set transparency, 0.0, base_actin",
         ]
 
     lines = [
         f"# PyMOL — gradient B-factor — cluster actine S1 : {actin_site}",
         f"# {len(s2_sorted)} partenaires",
         "# Blanc→rouge = actine (% ASA enfouie) | Vert = ABP | Rose = actine homo",
-        "# Actine de base : semi-transparente à 50 %",
+        "# Actine de base : opaque",
         "",
     ] + ref_section + ["", "# ── Partenaires S2 ─────────────────────────────────────────────────────"]
 

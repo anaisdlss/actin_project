@@ -16,16 +16,23 @@ META_PATH = os.path.join(OUTPUT_DIR, "metadata_all_data.json")
 
 
 def get_ppi3d_update(session):
-    for url in [PPI3D_HOME_URL, BASE_URL]:
-        response = session.get(url, timeout=60)
-        response.raise_for_status()
-
-        match = re.search(
-            r"Protein Data Bank structures\s*\(([^)]+)\)",
-            response.text
-        )
-        if match:
-            return match.group(1).strip()
+    # IMPORTANT : extraire le TEXTE via BeautifulSoup (le regex sur le HTML brut
+    # échouait car des balises séparent « structures » de la date → 'unknown',
+    # ce qui faisait sauter à tort le re-téléchargement). Même logique que
+    # get_summary_results.get_ppi3d_update.
+    from bs4 import BeautifulSoup
+    for url in [PPI3D_HOME_URL, BASE_URL, "https://bioinformatics.lt/ppi3d"]:
+        try:
+            response = session.get(url, timeout=60)
+            response.raise_for_status()
+        except Exception:
+            continue
+        text = BeautifulSoup(response.text, "html.parser").get_text()
+        for line in text.split("\n"):
+            if "Protein Data Bank structures" in line:
+                match = re.search(r"\((.*?)\)", line)
+                if match:
+                    return match.group(1).strip()
 
     return "unknown"
 
