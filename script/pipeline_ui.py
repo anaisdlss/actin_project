@@ -14,30 +14,28 @@ def render():
                "actin”.")
 
     STEPS = {
-        "1/10":  "PPI3D download (summary + PDB + data)",
-        "2/10":  "Structure filtering + interface interactions",
-        "3/10":  "MAFFT alignment per sequence cluster",
-        "4/10":  "C70 interaction cluster analysis",
-        "5/10":  "Interface B-factor computation (C70 + S1)",
-        "6/10":  "PyMOL script generation per S1 cluster",
-        "7/10":  "Heatmaps S1 binding site",
-        "8/10":  "ABP analysis — competition and interfaces",
-        "9/10":  "ABP structural analyses (Foldseek / InterPro / TM / footprint / chemistry)",
-        "10/10": "Per-ABP ProteoCast (sequential submission to proteocast.ijm.fr)",
+        "1/9":  "PPI3D download (summary + PDB + data)",
+        "2/9":  "Structure filtering + interface interactions",
+        "3/9":  "MAFFT alignment per sequence cluster",
+        "4/9":  "C70 interaction cluster analysis",
+        "5/9":  "Interface B-factor computation (C70 + S1)",
+        "6/9":  "PyMOL script generation per S1 cluster",
+        "7/9":  "Heatmaps S1 binding site",
+        "8/9":  "ABP analysis — competition and interfaces",
+        "9/9":  "ABP structural analyses (Foldseek / InterPro / TM / footprint / chemistry)",
     }
 
     # Fichier de sortie attendu pour chaque étape (indicateur de complétion)
     STEP_OUTPUT_FILES = {
-        "1/10":  "data/raw/all_data.csv",
-        "2/10":  "data/filtered/details/1.interactions.csv",
-        "3/10":  "data/alignments/.done",
-        "4/10":  "data/filtered/patches_infos_cluster_data_70.csv",
-        "5/10":  "data/filtered/details/structures_files/bfactor_cluster",
-        "6/10":  "data/filtered/details/structures_files/bfactor_c70_interface/by_s1_gradient",
-        "7/10":  "data/visualisations/actin_s1_all_equitable_heatmap.png",
-        "8/10":  "data/visualisations/abp_analysis_done.flag",
-        "9/10":  "data/exports/abp_site_domain/familles.csv",
-        "10/10": "data/proteocast/abp_inputs/manifest.csv",
+        "1/9":  "data/raw/all_data.csv",
+        "2/9":  "data/filtered/details/1.interactions.csv",
+        "3/9":  "data/alignments/.done",
+        "4/9":  "data/filtered/patches_infos_cluster_data_70.csv",
+        "5/9":  "data/filtered/details/structures_files/bfactor_cluster",
+        "6/9":  "data/filtered/details/structures_files/bfactor_c70_interface/by_s1_gradient",
+        "7/9":  "data/visualisations/actin_s1_all_equitable_heatmap.png",
+        "8/9":  "data/visualisations/abp_analysis_done.flag",
+        "9/9":  "data/exports/abp_site_domain/familles.csv",
     }
 
     STEP_KEYS = list(STEPS.keys())
@@ -100,11 +98,11 @@ def render():
 
     # Regroupement logique des étapes (affichage)
     _STEP_CATEGORIES = {
-        "Data": ["1/10", "2/10"],
-        "Processing & clustering": ["3/10", "4/10"],
-        "Structures & PyMOL scripts": ["5/10", "6/10"],
-        "Visualisation": ["7/10"],
-        "ABP analyses": ["8/10", "9/10", "10/10"],
+        "Data": ["1/9", "2/9"],
+        "Processing & clustering": ["3/9", "4/9"],
+        "Structures & PyMOL scripts": ["5/9", "6/9"],
+        "Visualisation": ["7/9"],
+        "ABP analyses": ["8/9", "9/9"],
     }
 
     if "just_downloaded" not in st.session_state:

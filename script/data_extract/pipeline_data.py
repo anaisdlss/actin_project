@@ -80,28 +80,6 @@ def _details_complete() -> bool:
         return False
 
 
-def _proteocast_complete() -> bool:
-    """True si tous les ABP du manifest ProteoCast sont soit calculés, soit
-    marqués en échec définitif (data/proteocast/abp/_failed_slugs.txt). Évite de
-    re-soumettre en boucle et permet au pipeline de se terminer."""
-    try:
-        import pandas as pd
-        man = PROJECT_ROOT / "data/proteocast/abp_inputs/manifest.csv"
-        if not man.exists():
-            return False
-        m = pd.read_csv(man).dropna(subset=["uniprot"])
-        adir = PROJECT_ROOT / "data/proteocast/abp"
-        failed_f = adir / "_failed_slugs.txt"
-        failed = set(failed_f.read_text().split()) if failed_f.exists() else set()
-        for sl in m["slug"].astype(str):
-            done = (adir / sl / "4.query_ProteoCast.csv").exists() or \
-                   (adir / f"{sl}.csv").exists()
-            if not done and sl not in failed:
-                return False
-        return True
-    except Exception:
-        return False
-
 
 def run_step(label, command, input_text=None, cwd=None):
     print("\n" + "=" * 60)
@@ -158,11 +136,11 @@ def main():
         d.mkdir(parents=True, exist_ok=True)
 
     try:
-        # ══ 1/10 — Téléchargement PPI3D (summary + entrées PDB + données) ══════
+        # ══ 1/9 — Téléchargement PPI3D (summary + entrées PDB + données) ══════
         # On lance d'abord le summary : il interroge PPI3D et met à jour la date
         # de dernière mise à jour. Si cette date est INCHANGÉE et que le pipeline
         # est déjà complet, il n'y a rien à refaire → on arrête tout ici.
-        print("ETAPE : 1/10 — Téléchargement PPI3D (summary + PDB + données)")
+        print("ETAPE : 1/9 — Téléchargement PPI3D (summary + PDB + données)")
         _prev_update = _ppi3d_update()
         print("  - Summary PPI3D (BLAST)…")
         _exec([py, "-m", "script.data_extract.get_summary_results"])
@@ -184,8 +162,7 @@ def main():
             FILTERED / "filtered_all_data.csv")
         if (_prev_update and _prev_update not in ("unknown", None)
                 and _prev_update == _now_update and _last_output.exists()
-                and _data_coherent and _details_ok and _downstream_fresh
-                and _proteocast_complete()):
+                and _data_coherent and _details_ok and _downstream_fresh):
             print(f"  PPI3D inchangé (dernière mise à jour : {_now_update}), "
                   "jeu de données cohérent, détails complets et analyses à jour.")
             print("Aucune nouvelle donnée — rien à refaire.")
@@ -205,8 +182,8 @@ def main():
         print("  - Toutes les données (cluster table)…")
         _exec([py, "-m", "script.data_extract.get_cluster_table"])
 
-        # ══ 2/10 — Filtrage + interactions d'interface ════════════════════════
-        run_group("2/10 — Filtrage des structures + interactions d'interface", [
+        # ══ 2/9 — Filtrage + interactions d'interface ════════════════════════
+        run_group("2/9 — Filtrage des structures + interactions d'interface", [
             ("Filtrage (≥ 4 actines) [notebook]",
              is_up_to_date(FILTERED / "filtered_all_data.csv", RAW / "all_data.csv",
                            RAW / "pdb_entry_results.csv", FILTER_NOTEBOOK),
@@ -216,8 +193,8 @@ def main():
                            input_text="f\n"), None),
         ])
 
-        # ══ 3/10 — Alignement MAFFT ═══════════════════════════════════════════
-        run_group("3/10 — Alignement MAFFT par cluster de séquences", [
+        # ══ 3/9 — Alignement MAFFT ═══════════════════════════════════════════
+        run_group("3/9 — Alignement MAFFT par cluster de séquences", [
             ("MAFFT + asa_pct",
              is_up_to_date(ALIGNMENTS / ".done", FILTERED / "filtered_all_data.csv",
                            FILTERED / "filtered_summary.csv", DETAILS / "1.interactions.csv",
@@ -225,9 +202,9 @@ def main():
              lambda: _exec([py, "-m", "script.mafft_pipeline"]), None),
         ])
 
-        # ══ 4/10 — Super-clusters + analyse clusters d'interaction C70 ════════
+        # ══ 4/9 — Super-clusters + analyse clusters d'interaction C70 ════════
         _sc_flag = FILTERED / ".superclusters.done"
-        run_group("4/10 — Analyse des clusters d'interaction C70", [
+        run_group("4/9 — Analyse des clusters d'interaction C70", [
             ("Super-clusters de sites (ajout colonnes s1/s2_supercluster) [notebook]",
              _has_supercluster_cols() and is_up_to_date(
                  _sc_flag, ALIGNMENTS / ".done", SUPERCLUSTER_NOTEBOOK),
@@ -242,8 +219,8 @@ def main():
              lambda: _nb(C70_NOTEBOOK), VISUALISATIONS / "actin_c70_contacts"),
         ])
 
-        # ══ 5/10 — B-factors interface (C70 + S1) ═════════════════════════════
-        run_group("5/10 — Calcul des B-factors interface (C70 + S1)", [
+        # ══ 5/9 — B-factors interface (C70 + S1) ═════════════════════════════
+        run_group("5/9 — Calcul des B-factors interface (C70 + S1)", [
             ("B-factors interface C70",
              is_up_to_date(SF / "bfactor_c70_interface", FILTERED / "patches_infos_cluster_data_70.csv",
                            DETAILS / "4.inter-residue_contacts.csv", DETAILS / "8.structures.csv"),
@@ -254,8 +231,8 @@ def main():
              lambda: _exec([py, "-m", "script.bfactor"]), None),
         ])
 
-        # ══ 6/10 — Scripts PyMOL par cluster S1 (gradient) ════════════════════
-        run_group("6/10 — Génération des scripts PyMOL par cluster S1", [
+        # ══ 6/9 — Scripts PyMOL par cluster S1 (gradient) ════════════════════
+        run_group("6/9 — Génération des scripts PyMOL par cluster S1", [
             ("Scripts PyMOL par site S1",
              is_up_to_date(SF / "bfactor_c70_interface" / "by_s1_cluster",
                            FILTERED / "patches_infos_cluster_data_70.csv",
@@ -267,8 +244,8 @@ def main():
              lambda: _exec([py, "-m", "script.bfactor_c70_pymol_by_s1_gradient"]), None),
         ])
 
-        # ══ 7/10 — Heatmaps S1 binding site ═══════════════════════════════════
-        run_group("7/10 — Heatmaps S1 binding site", [
+        # ══ 7/9 — Heatmaps S1 binding site ═══════════════════════════════════
+        run_group("7/9 — Heatmaps S1 binding site", [
             ("Profils + CSV équitable C70 [notebook]",
              is_up_to_date(FILTERED / "actin_s1_canon_area_by_cluster.csv",
                            FILTERED / "patches_infos_cluster_data_70.csv",
@@ -281,10 +258,10 @@ def main():
                       _exec([py, str(RG / "regenerate_s1_global_heatmap.py")])), None),
         ])
 
-        # ══ 8/10 — Analyse ABP (compétition + interfaces) [notebook] ══════════
+        # ══ 8/9 — Analyse ABP (compétition + interfaces) [notebook] ══════════
         _flag = VISUALISATIONS / "abp_analysis_done.flag"
         _flag.parent.mkdir(parents=True, exist_ok=True)
-        run_group("8/10 — Analyse ABP — compétition et interfaces", [
+        run_group("8/9 — Analyse ABP — compétition et interfaces", [
             ("Compétition, interfaces, PDB sans ABP [notebook]",
              is_up_to_date(_flag, FILTERED / "filtered_all_data.csv",
                            FILTERED / "patches_infos_cluster_data_70.csv",
@@ -292,30 +269,13 @@ def main():
              lambda: _nb(ABP_NOTEBOOK), _flag),
         ])
 
-        # ══ 9/10 — Analyses structurales ABP (Foldseek / InterPro / TM / …) ════
-        run_group("9/10 — Analyses structurales ABP (convergence)", [
+        # ══ 9/9 — Analyses structurales ABP (Foldseek / InterPro / TM / …) ════
+        run_group("9/9 — Analyses structurales ABP (convergence)", [
             ("Foldseek + InterPro + TM + empreinte + SS + chimie",
              is_up_to_date(PROJECT_ROOT / "data/exports/abp_site_domain/familles.csv",
                            FILTERED / "filtered_all_data.csv", DETAILS / "3.interface_residues.csv",
                            DETAILS / "1.interactions.csv"),
              lambda: _exec([py, "-m", "script.abp_site_domain.run_all"]), None),
-        ])
-
-        # ══ 10/10 — ProteoCast par ABP (paysage mutationnel, séquentiel) ══════
-        # Régénère le manifest depuis abp_master, puis soumet chaque ABP UN PAR UN
-        # à proteocast.ijm.fr (reprenable : saute les déjà faits et les échecs
-        # définitifs). Tolérant : un souci réseau n'arrête pas le pipeline.
-        _pc_manifest = PROJECT_ROOT / "data/proteocast/abp_inputs/manifest.csv"
-        _abp_master = PROJECT_ROOT / "data/exports/abp_site_domain/abp_master.csv"
-        run_group("10/10 — ProteoCast par ABP (soumission séquentielle)", [
-            ("Manifest ABP (depuis abp_master)",
-             is_up_to_date(_pc_manifest, _abp_master),
-             lambda: _exec([py, "-m", "script.proteocast_prep_manifest"]), None),
-            ("Calcul ProteoCast (manquants uniquement, reprenable)",
-             _proteocast_complete(),
-             lambda: subprocess.run([py, "script/proteocast_submit_abp.py"],
-                                    cwd=PROJECT_ROOT),  # tolérant, pas de check=True
-             None),
         ])
 
         print("\nPipeline terminé avec succès.")

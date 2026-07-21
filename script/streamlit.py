@@ -73,8 +73,6 @@ st.set_page_config(layout="wide", page_title="Actin-ABP analysis - PPI3D")
 _FAST = os.environ.get("FAST", "") == "1"
 
 st.title("Actin-actin and actin-ABP interaction analysis - PPI3D")
-st.caption("How actin is recognised by its partner proteins (ABPs): "
-           "which residues, which sites, what conservation. PPI3D data.")
 if _FAST:
     st.info("FAST mode: only the networks are loaded (FAST=1).")
 
@@ -2209,31 +2207,39 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
         folddisco_view.render_discovery(sel_abp)
 
     # ── ProteoCast de l'ABP : paysage mutationnel + empreinte + 3D ────────────
-    st.subheader("ProteoCast de l'ABP — paysage mutationnel + structure 3D")
+    st.subheader("ABP ProteoCast — mutational landscape + 3D structure")
+    st.caption("Opt-in — computing ProteoCast for the ABPs is **not** part of "
+               "`Run / update` (it takes hours). The button below submits every "
+               "ABP one by one to proteocast.ijm.fr: it is **resumable** (skips the "
+               "ones already computed), records permanent failures, and downloads "
+               "all the visual results into `data/proteocast/abp/`.")
     _pc_mt = os.path.getmtime("data/proteocast/abp_inputs/manifest.csv") \
         if os.path.exists("data/proteocast/abp_inputs/manifest.csv") else 0.0
     _pc_status = proteocast_view.load_status(_pc_mt)
     _pc_miss = int((~_pc_status["fait"]).sum()
                    ) if _pc_status is not None else 0
-    if _pc_miss:
-        if st.button(f"Compute all missing ProteoCast ({_pc_miss})",
-                     key="pc_run_all_missing"):
-            with st.status(f"Computing {_pc_miss} ProteoCast via "
-                           "proteocast.ijm.fr (sequential, a few min/ABP)…",
-                           expanded=True) as _pcall:
-                _pclog = st.empty()
-                _proc = subprocess.Popen(
-                    [sys.executable, "-u", "script/proteocast_submit_abp.py"],
-                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-                _buf = []
-                for _l in _proc.stdout:
-                    _buf.append(_l.rstrip())
-                    _pclog.code("\n".join(_buf[-20:]))
-                _proc.wait()
-                _pcall.update(label="ProteoCast campaign finished.",
-                              state="complete")
-            st.cache_data.clear()
-            st.rerun()
+    _pc_label = (f"Compute all missing ProteoCast ({_pc_miss})" if _pc_miss
+                 else "Update ProteoCast (refresh ABP list + compute new)")
+    if st.button(_pc_label, key="pc_run_all_missing"):
+        with st.status("Computing ProteoCast via proteocast.ijm.fr "
+                       "(sequential, a few min/ABP)…", expanded=True) as _pcall:
+            _pclog = st.empty()
+            # 1) régénérer le manifest depuis abp_master (couvre les ABP actuels)
+            subprocess.run([sys.executable, "-m",
+                            "script.proteocast_prep_manifest"])
+            # 2) soumettre les manquants (séquentiel, reprenable)
+            _proc = subprocess.Popen(
+                [sys.executable, "-u", "script/proteocast_submit_abp.py"],
+                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+            _buf = []
+            for _l in _proc.stdout:
+                _buf.append(_l.rstrip())
+                _pclog.code("\n".join(_buf[-20:]))
+            _proc.wait()
+            _pcall.update(label="ProteoCast campaign finished.",
+                          state="complete")
+        st.cache_data.clear()
+        st.rerun()
     if _is_no_abp:
         st.caption("Select an ABP to see its ProteoCast.")
     else:

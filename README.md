@@ -62,8 +62,28 @@ The repository ships **code only** — the `data/` folder is not included
 
 Once the interface is open, go to the **Data download** section and click
 **Run / update**. The pipeline runs entirely from the interface — no extra
-command is needed. It takes **30 to 60 minutes** depending on your connection.
-Steps that are already done are skipped automatically on later runs.
+command is needed. It takes roughly **1 hour** on a fresh clone (9 steps:
+PPI3D download, filtering, MAFFT alignment, C70 clusters, interface B-factors,
+PyMOL scripts, S1 heatmaps, ABP analysis, structural analyses with
+FoldDisco / InterPro / TM-align).
+
+**Resumable:** each step is skipped when its output is already up to date, so
+if you quit and come back, **Run / update** picks up exactly where it left off
+and re-runs only what is missing or outdated — it does not restart from zero.
+
+### ProteoCast for the ABPs (optional, separate)
+
+Computing the per-ABP mutational landscape with **ProteoCast** is **not** part
+of `Run / update`, because each ABP is a separate job on
+[proteocast.ijm.fr](https://proteocast.ijm.fr) that takes a few minutes, and
+there are ~54 ABPs — so the full run takes **several hours**.
+
+It is a dedicated, opt-in action: in the **ABP** section → *ABP ProteoCast*,
+click **Compute all missing ProteoCast**. It submits the ABPs **one by one**
+(sequential), is **resumable** (skips the ones already computed and records
+permanent failures), and downloads every visual result into
+`data/proteocast/abp/`. You can leave it running (e.g. overnight) and it will
+continue from where it stopped on the next click.
 
 ---
 
