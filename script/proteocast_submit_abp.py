@@ -77,20 +77,17 @@ def submit(session, uniprot):
     return r.json().get("job_id")
 
 
-def wait(session, job_id):
-    """Poll le statut ; renvoie (status_final, message)."""
-    t0 = time.time()
-    while time.time() - t0 < POLL_MAX:
-        try:
-            j = session.get(f"{STATUS}?job_id={job_id}", timeout=60).json()
-        except Exception:
-            time.sleep(POLL_EVERY)
-            continue
-        s = j.get("status", "")
-        if s in ("finished", "error", "warning"):
-            return s, j.get("message") or j.get("warning_message", "")
-        time.sleep(POLL_EVERY)
-    return "timeout", ""
+def poll_once(session, job_id):
+    """Vérifie le statut UNE fois (non bloquant).
+    Renvoie (status, message) : status ∈ finished/error/warning/running/unknown."""
+    try:
+        j = session.get(f"{STATUS}?job_id={job_id}", timeout=60).json()
+    except Exception:
+        return "unknown", ""
+    s = j.get("status", "running")
+    if s in ("finished", "error", "warning"):
+        return s, j.get("message") or j.get("warning_message", "")
+    return "running", ""
 
 
 def download_extract(session, job_id, slug):
@@ -111,6 +108,8 @@ def main():
     ap.add_argument("--force", action="store_true", help="refaire même si présent")
     ap.add_argument("--retry-failed", action="store_true",
                     help="ré-essayer les ABP marqués en échec")
+    ap.add_argument("--jobs", type=int, default=4,
+                    help="nb de jobs en vol en parallèle (défaut 4)")
     args = ap.parse_args()
 
     man = pd.read_csv(MANIFEST).dropna(subset=["uniprot"])
@@ -121,40 +120,83 @@ def main():
             if args.force or (not is_done(r["slug"]) and r["slug"] not in failed)]
     if args.limit:
         todo = todo[:args.limit]
+    window = max(1, args.jobs)
     print(f"{len(todo)} ABP à soumettre (sur {len(man)} ; "
-          f"{len(failed)} en échec ignorés)")
+          f"{len(failed)} en échec ignorés) — {window} en parallèle")
 
     session = requests.Session()
     session.headers.update({"User-Agent": UA})
     ok = 0
+    done_n = 0
+    total = len(todo)
     new_failed = set(failed)
-    for i, r in enumerate(todo, 1):
-        slug, uni = r["slug"], r["uniprot"]
-        print(f"[{i}/{len(todo)}] {r['abp_title']} ({uni}) — soumission…", flush=True)
-        _err = None
-        try:
-            jid = submit(session, uni)
+    pending = list(todo)          # ABP pas encore soumis
+    inflight = {}                 # slug -> {jid, uni, title, t0}
+
+    def _fail(slug, msg):
+        print(f"    {slug} : {msg} — marqué en échec", flush=True)
+        new_failed.add(slug)
+
+    while pending or inflight:
+        # 1) remplir la fenêtre : soumettre jusqu'à `window` jobs en vol
+        while pending and len(inflight) < window:
+            r = pending.pop(0)
+            slug, uni = r["slug"], r["uniprot"]
+            try:
+                jid = submit(session, uni)
+            except Exception as e:
+                _fail(slug, f"ERREUR soumission: {e}")
+                continue
             if not jid:
-                _err = "pas de job_id"
+                _fail(slug, "pas de job_id")
+                continue
+            inflight[slug] = {"jid": jid, "uni": uni,
+                              "title": r["abp_title"], "t0": time.time()}
+            print(f"[soumis {len(inflight)}/{window} en vol] "
+                  f"{r['abp_title']} ({uni}) — job {jid}", flush=True)
+            time.sleep(1)         # court délai entre deux soumissions
+
+        # 2) sonder chaque job en vol UNE fois (non bloquant)
+        for slug in list(inflight):
+            info = inflight[slug]
+            status, msg = poll_once(session, info["jid"])
+            if status == "running":
+                if time.time() - info["t0"] > POLL_MAX:
+                    del inflight[slug]
+                    _fail(slug, "timeout")
+                    done_n += 1
+                continue
+            del inflight[slug]
+            done_n += 1
+            if status != "finished":
+                _fail(slug, f"{status} : {msg[:120]}")
+                continue
+            try:
+                got = download_extract(session, info["jid"], slug)
+            except Exception as e:
+                _fail(slug, f"ERREUR téléchargement: {e}")
+                continue
+            if got:
+                ok += 1
+                new_failed.discard(slug)
+                print(f"[{done_n}/{total}] OK -> data/proteocast/abp/{slug}/",
+                      flush=True)
             else:
-                print(f"    job {jid} — attente…", flush=True)
-                status, msg = wait(session, jid)
-                if status != "finished":
-                    _err = f"{status} : {msg[:120]}"
-                elif download_extract(session, jid, slug):
-                    ok += 1
-                    new_failed.discard(slug)
-                    print(f"    OK -> data/proteocast/abp/{slug}/", flush=True)
-                else:
-                    _err = "ZIP téléchargé mais fichier clé absent"
-        except Exception as e:
-            _err = f"ERREUR: {e}"
-        if _err:
-            print(f"    {_err} — marqué en échec", flush=True)
-            new_failed.add(slug)
-        time.sleep(3)
+                _fail(slug, "ZIP téléchargé mais fichier clé absent")
+
+        # 3) battement de cœur : montrer ce qui tourne + temps écoulé, puis
+        #    patienter avant le prochain tour (sinon l'UI a l'air figée).
+        if inflight:
+            _hb = ", ".join(
+                f"{v['title'][:22]} {int(time.time() - v['t0'])}s"
+                for v in inflight.values())
+            _left = len(pending) + len(inflight)
+            print(f"    … {len(inflight)} en cours ({_left} restants) : {_hb}",
+                  flush=True)
+            time.sleep(POLL_EVERY)
+
     _save_failed(new_failed)
-    print(f"\nterminé : {ok}/{len(todo)} ABP calculés")
+    print(f"\nterminé : {ok}/{total} ABP calculés")
 
 
 if __name__ == "__main__":

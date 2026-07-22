@@ -79,11 +79,12 @@ of `Run / update`, because each ABP is a separate job on
 there are ~54 ABPs — so the full run takes **several hours**.
 
 It is a dedicated, opt-in action: in the **ABP** section → *ABP ProteoCast*,
-click **Compute all missing ProteoCast**. It submits the ABPs **one by one**
-(sequential), is **resumable** (skips the ones already computed and records
-permanent failures), and downloads every visual result into
-`data/proteocast/abp/`. You can leave it running (e.g. overnight) and it will
-continue from where it stopped on the next click.
+click **Compute all missing ProteoCast**. It submits the ABPs **4 at a time**
+(they run in parallel on the server, so it is much faster than one by one), is
+**resumable** (skips the ones already computed and records permanent failures),
+and downloads every visual result into `data/proteocast/abp/`. You can leave it
+running (e.g. overnight) and it will continue from where it stopped on the next
+click.
 
 ---
 

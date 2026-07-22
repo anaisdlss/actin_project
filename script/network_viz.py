@@ -1778,29 +1778,31 @@ def _build_global_graph_html(all_data_path: str, summary_path: str,
     # super-clusters il y a moins de nœuds → on écarte encore plus (ressorts
     # plus longs, répulsion plus forte) pour bien séparer chaque hub.
     if use_superclusters:
-        # barnesHut + forte répulsion + avoidOverlap : étale les hubs en étoiles
-        # bien séparées sur tout le canevas (rendu « hub & spokes » lisible).
-        _physics = '''
-        "solver": "barnesHut",
-        "barnesHut": {
-          "gravitationalConstant": -16000,
-          "centralGravity": 0.15,
-          "springLength": 150,
-          "springConstant": 0.03,
-          "damping": 0.6,
-          "avoidOverlap": 1
-        }'''
-    else:
-        # forceAtlas2 : forte répulsion + ressorts longs → les hubs (haut degré)
-        # repoussent leurs voisins et se détachent en étoiles bien séparées.
+        # Même rendu « éparpillé » qu'en mode normal (forceAtlas2), mais répulsion
+        # et ressorts encore plus forts car il y a moins de nœuds → on évite la
+        # boule ronde centrale et on étale bien les hubs sur tout le canevas.
         _physics = '''
         "solver": "forceAtlas2Based",
         "forceAtlas2Based": {
-          "gravitationalConstant": -150,
-          "centralGravity": 0.02,
-          "springLength": 130,
-          "springConstant": 0.06,
-          "damping": 0.75,
+          "gravitationalConstant": -650,
+          "centralGravity": 0.004,
+          "springLength": 270,
+          "springConstant": 0.03,
+          "damping": 0.8,
+          "avoidOverlap": 1
+        }'''
+    else:
+        # Même physique que le mode super-cluster : forceAtlas2 très étalé (forte
+        # répulsion + ressorts longs + gravité centrale quasi nulle) → pas de
+        # boule ronde, hubs bien séparés en étoiles.
+        _physics = '''
+        "solver": "forceAtlas2Based",
+        "forceAtlas2Based": {
+          "gravitationalConstant": -650,
+          "centralGravity": 0.004,
+          "springLength": 270,
+          "springConstant": 0.03,
+          "damping": 0.8,
           "avoidOverlap": 1
         }'''
     net.set_options('''{
@@ -1812,14 +1814,13 @@ def _build_global_graph_html(all_data_path: str, summary_path: str,
       "edges": { "smooth": false }
     }''')
 
-    # ── Taille / couleur / label ∝ DEGRÉ (un « hub » = nœud très connecté) ────
-    # On dimensionne par le nombre de connexions (degré) plutôt que par le brut
-    # d'interactions : c'est le degré qui fait qu'un nœud se détache en hub.
+    # ── Taille ∝ NOMBRE D'INTERACTIONS (count) ───────────────────────────────
+    # Les nœuds les plus sollicités sont les plus gros (racine carrée pour étaler
+    # la distribution asymétrique). Les HUBS, eux, ressortent par le LAYOUT
+    # (physique éparpillée ci-dessus), pas par la taille — sinon les ABP très
+    # connectés (verts) gonfleraient sans être forcément les plus sollicités.
     _MAIN = {"6685_1", "6685_2", "6685_3", "6685_4"}
-    _deg = dict(G.degree())
-    # Taille ∝ NOMBRE D'INTERACTIONS (champ count) : les nœuds les plus sollicités
-    # ressortent. Les 4 clusters d'actine principaux (le plus d'interactions) sont
-    # donc les plus gros. Racine carrée pour étaler la distribution asymétrique.
+    _deg = dict(G.degree())   # utilisé seulement dans le tooltip
     _cnt = {n: d["count"] for n, d in G.nodes(data=True)}
     _cv = [c ** 0.5 for c in _cnt.values()]
     _cmin, _cmax = (min(_cv), max(_cv)) if _cv else (0.0, 1.0)
@@ -1837,8 +1838,10 @@ def _build_global_graph_html(all_data_path: str, summary_path: str,
     for n, d in G.nodes(data=True):
         is_cluster = d["side"] == "cluster"
         _is_main = n in _MAIN
-        # taille ∝ interactions, fort contraste pour que les gros ressortent bien
-        size = 14 + 54 * _cnt_t(n)
+        # taille ∝ interactions (count) ; les hubs se détachent par le layout.
+        # Base + amplitude relevées car le graphe est très étalé (le fit dézoome,
+        # donc il faut de plus gros nœuds pour rester lisibles).
+        size = 60 + 165 * _cnt_t(n)
         bg = "#e05252" if is_cluster else "#39b54a"
         color = {"background": bg, "border": bg}   # couleurs pleines, AUCUN contour
         label = n

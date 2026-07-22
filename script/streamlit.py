@@ -67,6 +67,20 @@ _GRAPH_COMPONENT = st.components.v1.declare_component(
 
 st.set_page_config(layout="wide", page_title="Actin-ABP analysis - PPI3D")
 
+# Style global : chaque GROS titre de section (st.header = h2) est SURLIGNÉ
+# (bandeau de fond + accent rouge à gauche) → on voit clairement le début de
+# chaque nouvelle partie, sans avoir besoin de traits séparateurs.
+st.markdown(
+    "<style>"
+    "h2{background:#eef0f2;border-left:6px solid #6b7280;"
+    "padding:8px 16px!important;border-radius:6px;margin-top:8px}"
+    # pas de surlignage dans la barre latérale (titre « Navigation »)
+    "[data-testid='stSidebar'] h2{background:none;border-left:none;"
+    "padding:0!important;border-radius:0}"
+    "</style>",
+    unsafe_allow_html=True,
+)
+
 # Mode rapide : `FAST=1 streamlit run script/streamlit.py`
 # -> saute le rendu lourd (heatmap ABP, Détail par ABP, Filament PyMOL, MSA)
 #    et ne garde que les RÉSEAUX (compétition + coopération).
@@ -110,6 +124,50 @@ with st.sidebar:
 # ---------------------------------------------------------------------------
 
 pipeline_ui.render()
+
+# ── ProteoCast (opt-in) — campagne de calcul pour TOUS les ABP ─────────────
+# Placé juste sous le téléchargement principal : c'est une campagne séparée du
+# Run/update (elle dure des heures ; 4 jobs en parallèle ; reprenable). Les
+# résultats par ABP s'affichent ensuite dans la section « Per-ABP detail ».
+_pc_mt = os.path.getmtime("data/proteocast/abp_inputs/manifest.csv") \
+    if os.path.exists("data/proteocast/abp_inputs/manifest.csv") else 0.0
+_pc_status = proteocast_view.load_status(_pc_mt)
+_pc_miss = int((~_pc_status["fait"]).sum()) if _pc_status is not None else 0
+st.markdown("**ABP ProteoCast — compute the mutational landscape for all ABPs**")
+st.caption("Opt-in, separate from `Run / update` — computing **all** ABPs "
+           "can take **several hours** (submitted 4 at a time). "
+           "Resumable: skips those already done.")
+_pc_label = (f"Compute all missing ProteoCast — {_pc_miss} remaining" if _pc_miss
+             else "Update ProteoCast (refresh ABP list + compute new)")
+# bouton rouge (comme le téléchargement) mais un peu plus transparent
+st.markdown(
+    "<style>[class*='st-key-pc_run_all_missing'] button{"
+    "background:rgba(224,82,82,0.75)!important;border-color:rgba(224,82,82,0.4)!important;"
+    "color:#fff!important}</style>",
+    unsafe_allow_html=True,
+)
+if st.button(_pc_label, key="pc_run_all_missing", type="primary"):
+    with st.status("Computing ProteoCast via proteocast.ijm.fr "
+                   "(4 jobs in parallel)…", expanded=True) as _pcall:
+        _pclog = st.empty()
+        _pclog.code("Preparing the ABP manifest…")
+        # 1) régénérer le manifest depuis abp_master (couvre les ABP actuels)
+        subprocess.run([sys.executable, "-m", "script.proteocast_prep_manifest"])
+        # 2) soumettre les manquants (4 en parallèle, reprenable)
+        #    bufsize=1 + readline : sortie ligne-par-ligne EN DIRECT (sinon le
+        #    buffer de lecture anticipée retient tout par blocs → rien à l'écran).
+        _proc = subprocess.Popen(
+            [sys.executable, "-u", "script/proteocast_submit_abp.py"],
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
+        _buf = []
+        for _l in iter(_proc.stdout.readline, ""):
+            _buf.append(_l.rstrip())
+            _pclog.code("\n".join(_buf[-20:]))
+        _proc.wait()
+        _pcall.update(label="ProteoCast campaign finished.", state="complete")
+    st.cache_data.clear()
+    st.rerun()
+
 st.divider()
 st.header("Filtered data", anchor="donnees-filtrees-s1-actin")
 st.caption("— Technical section. Structures kept after quality filtering and "
@@ -176,7 +234,7 @@ if all(os.path.exists(p) for p in METRICS_FILES.values()):
                 f"{df_prot[~df_prot['protein_name'].str.lower().str.contains('actin', na=False)]['protein_name'].nunique():,}".replace(',', ' '))
 
     # Transparency funnel: how many structures PPI3D returned vs how many are kept
-    # after the "≥ 4 connected actin subunits" filter (makes the counts explicit,
+    # after the "≥ 5 connected actin subunits" filter (makes the counts explicit,
     # and explains why the total can go up or down between PPI3D snapshots).
     _raw_summary = "data/raw/ppi3d_actin_summary.csv"
     if os.path.exists(_raw_summary):
@@ -188,7 +246,7 @@ if all(os.path.exists(p) for p in METRICS_FILES.values()):
             _n_int = f"{len(df_int):,}".replace(",", " ")
             st.caption(
                 f"Data funnel — PPI3D returned **{_raw_pdb}** actin PDB structures → "
-                f"**{_kept_pdb}** kept after the *≥ 4 connected actin subunits* filter → "
+                f"**{_kept_pdb}** kept after the *≥ 5 connected actin subunits* filter → "
                 f"**{_n_int}** interface interactions. The count reflects the current "
                 "PPI3D snapshot (full replace on each update), so it can go up or down.")
             # Visible completeness check: a partial/interrupted details download
@@ -467,7 +525,13 @@ if os.path.exists(pdb_filt_path):
                         view.addSurface(py3Dmol.SES,
                                         {"opacity": 0.9, "color": "#cccccc"}, {})
                     view.setBackgroundColor("#ffffff")
-                    view.zoomTo()
+                    # Centrer sur les seules chaînes affichées (pour une arête = les
+                    # 2 partenaires), sinon zoomTo() cadre tout l'assemblage et les
+                    # chaînes visibles se retrouvent décalées.
+                    if chain_colors:
+                        view.zoomTo({"chain": list(chain_colors.keys())})
+                    else:
+                        view.zoomTo()
                     st.session_state["viewer_html"] = view._make_html()
                     st.session_state["viewer_key"] = viewer_key
 
@@ -476,25 +540,41 @@ if os.path.exists(pdb_filt_path):
             else:
                 st.info("PDB file not available.")
 
-    # ── Tableau interactions du PDB ───────────────────────────────────────
-    all_data_path_pdb = "data/filtered/filtered_all_data.csv"
-    if os.path.exists(all_data_path_pdb):
-        df_all_pdb = read_csv(all_data_path_pdb)
-        sub_all_pdb = df_all_pdb[df_all_pdb["pdb_id"].str.upper(
-        ) == selected_pdb]
-        cols_to_show = [c for c in [
-            "subunit_1", "subunit_2",
-            "cluster_data_70",
-            "s1_binding_site_cluster_data_70",
-            "s2_binding_site_cluster_data_70",
-        ] if c in sub_all_pdb.columns]
-        if not sub_all_pdb.empty and cols_to_show:
-            st.markdown("**Interaction clusters per pair**")
-            st.dataframe(
-                sub_all_pdb[cols_to_show].reset_index(drop=True),
-                hide_index=True,
-                width="stretch",
+    # ── Protéines impliquées ──────────────────────────────────────────────
+    proteins_path = "data/filtered/proteins_per_pdb.csv"
+    if os.path.exists(proteins_path):
+        st.markdown("**Proteins involved**")
+        df_pp = read_csv(proteins_path)
+        sub_pp = df_pp[df_pp["pdb_id"].str.upper() == selected_pdb]
+
+        nb_actin = int(sub_pp["is_actin"].sum())
+        nb_abp = int((~sub_pp["is_actin"]).sum())
+        c1, c2, _ = st.columns([1, 1, 3])
+        c1.metric("Actins", nb_actin)
+        c2.metric("ABP", nb_abp)
+
+        counts = (
+            sub_pp.groupby(["protein"])
+            .agg(
+                Count=("chain", "count"),
+                Chains=("chain", lambda x: ", ".join(
+                    sorted(s.split("_")[-1].upper() for s in x)
+                )),
             )
+            .reset_index()
+            .rename(columns={"protein": "Protein"})
+            .sort_values("Count", ascending=False)
+            .reset_index(drop=True)
+        )
+        max_len = counts["Protein"].str.len().max() if len(counts) else 0
+        col_width = "large" if max_len > 40 else "medium" if max_len > 20 else "small"
+        st.dataframe(counts, width="stretch", hide_index=True, column_config={
+            "Protein": st.column_config.TextColumn(width=col_width),
+            "Chains": st.column_config.TextColumn(width="medium"),
+            "Count": st.column_config.NumberColumn(width="small"),
+        })
+    else:
+        st.info("Run the pipeline (`graphe_filter.py`) to generate the data.")
 
     # ── Séquences avec résidus d'interface colorés ───────────────────────
 
@@ -619,42 +699,25 @@ if os.path.exists(pdb_filt_path):
                                 col_a="#FFD700", col_b="#00E5FF",
                                 primary=seq_node)
 
-    # ── Protéines impliquées ──────────────────────────────────────────────
-    proteins_path = "data/filtered/proteins_per_pdb.csv"
-    if os.path.exists(proteins_path):
-        st.markdown("**Proteins involved**")
-        df_pp = read_csv(proteins_path)
-        sub_pp = df_pp[df_pp["pdb_id"].str.upper() == selected_pdb]
-
-        nb_actin = int(sub_pp["is_actin"].sum())
-        nb_abp = int((~sub_pp["is_actin"]).sum())
-        c1, c2, _ = st.columns([1, 1, 3])
-        c1.metric("Actins", nb_actin)
-        c2.metric("ABP", nb_abp)
-
-        counts = (
-            sub_pp.groupby(["protein"])
-            .agg(
-                Count=("chain", "count"),
-                Chains=("chain", lambda x: ", ".join(
-                    sorted(s.split("_")[-1].upper() for s in x)
-                )),
+    # ── Tableau interactions du PDB ───────────────────────────────────────
+    all_data_path_pdb = "data/filtered/filtered_all_data.csv"
+    if os.path.exists(all_data_path_pdb):
+        df_all_pdb = read_csv(all_data_path_pdb)
+        sub_all_pdb = df_all_pdb[df_all_pdb["pdb_id"].str.upper(
+        ) == selected_pdb]
+        cols_to_show = [c for c in [
+            "subunit_1", "subunit_2",
+            "cluster_data_70",
+            "s1_binding_site_cluster_data_70",
+            "s2_binding_site_cluster_data_70",
+        ] if c in sub_all_pdb.columns]
+        if not sub_all_pdb.empty and cols_to_show:
+            st.markdown("**Interaction clusters per pair**")
+            st.dataframe(
+                sub_all_pdb[cols_to_show].reset_index(drop=True),
+                hide_index=True,
+                width="stretch",
             )
-            .reset_index()
-            .rename(columns={"protein": "Protein"})
-            .sort_values("Count", ascending=False)
-            .reset_index(drop=True)
-        )
-        max_len = counts["Protein"].str.len().max() if len(counts) else 0
-        col_width = "large" if max_len > 40 else "medium" if max_len > 20 else "small"
-        st.dataframe(counts, width="stretch", hide_index=True, column_config={
-            "Protein": st.column_config.TextColumn(width=col_width),
-            "Chains": st.column_config.TextColumn(width="medium"),
-            "Count": st.column_config.NumberColumn(width="small"),
-        })
-    else:
-        st.info("Run the pipeline (`graphe_filter.py`) to generate the data.")
-
 
 # ── Récap structural par cluster (Foldseek / TM-align / InterPro) ──────────────
 
@@ -676,8 +739,8 @@ if not _FAST:
                 "(run the pipeline to generate them).")
     else:
         residue_explorer.render_actin_overview(_pp_ov)
-    st.divider()
 
+st.divider()
 st.header("Interaction clusters", anchor="clusters-d-interactions")
 st.caption("Actin's **binding sites**, grouped: which regions of "
            "actin are used, by which partners, and how. Choose a "
@@ -909,6 +972,20 @@ else:
                     else:
                         st.info("3D structure unreadable for this ABP.")
 
+                # Téléchargement du script PyMOL — placé sous la représentation 3D
+                _pml_path = os.path.join(
+                    "data/filtered/details/structures_files/bfactor_c70_interface/by_s1_gradient",
+                    f"{sel_s1}.pml")
+                if os.path.exists(_pml_path):
+                    with open(_pml_path, "rb") as _pml_f:
+                        st.download_button(
+                            label="Download the PyMOL script for this cluster",
+                            data=_pml_f,
+                            file_name=f"{sel_s1}.pml",
+                            mime="text/plain",
+                            help="Open in PyMOL: File > Run Script…  or  @/path/to/the/file.pml",
+                        )
+
             # ── Détail par position : aa d'actin par organisme + aa d'ABP ──
             _posdet = _s1_position_detail(
                 sel_s1, tuple(os.path.getmtime(f) if os.path.exists(f) else 0.0
@@ -930,25 +1007,10 @@ else:
                     "(each row = 1 C70 cluster) — hover = position + %ASA.")
                 _render_s1_patch_plotly(_pdetail, sel_s1)
 
-            # Téléchargement du script PyMOL pour ce cluster S1
-            _pml_path = os.path.join(
-                "data/filtered/details/structures_files/bfactor_c70_interface/by_s1_gradient",
-                f"{sel_s1}.pml")
-            if os.path.exists(_pml_path):
-                with open(_pml_path, "rb") as _pml_f:
-                    st.download_button(
-                        label="Download the PyMOL script for this cluster",
-                        data=_pml_f,
-                        file_name=f"{sel_s1}.pml",
-                        mime="text/plain",
-                        help="Open in PyMOL: File > Run Script…  or  @/path/to/the/file.pml",
-                    )
-
             # ── Analyse des contacts ABP–actin ──────────────────────────────
             # « MSA du cluster » et « Comparaison structurale » sont des onglets
             # supplémentaires insérés juste avant « Spécificité ».
-            st.divider()
-            st.markdown("##### ABP–actin contact analysis")
+            st.markdown("**ABP–actin contact analysis**")
             _ch2seq_s1, _ch2title_s1 = _s1_get_ch_maps(sel_s1)
             if _ch2seq_s1:
                 def _tab_msa_cluster(_c=sel_s1):
@@ -1674,7 +1736,8 @@ if (_net_view == "Competition" and os.path.exists(proteins_path)
             _xy = _layout_pos.get(_nc, (0.0, 0.0))
             _net_c.add_node(
                 _nc,
-                label=("<b>" + _wrap_lbl(_disp_name(_nc)).replace("\n", "<br>") + "</b>"
+                label=("<b>" + _wrap_lbl(_disp_name(_nc)).replace("\n", "<br>")
+                       + (f" ({_sign})" if _sign else "") + "</b>"
                        if _show_lbl else ""),
                 title=(f"{_nc}\n"
                        f"Famille : {_fam_nc}\n"
@@ -1689,24 +1752,8 @@ if (_net_view == "Competition" and os.path.exists(proteins_path)
                 x=float(_xy[0]) * _SCALE, y=float(_xy[1]) * _SCALE,
                 physics=False,
             )
-            # signe d'extrémité À L'INTÉRIEUR du nœud (nœud-texte superposé au centre),
-            # texte blanc + halo (stroke) sombre -> lisible sur N'IMPORTE quelle
-            # couleur de nœud (clair OU foncé). Sur fond clair, on inverse (texte
-            # noir + halo blanc) pour garder le contraste.
-            if _sign:
-                _hh = str(_col).lstrip('#')
-                _lum = (0.299 * int(_hh[0:2], 16) + 0.587 * int(_hh[2:4], 16)
-                        + 0.114 * int(_hh[4:6], 16)) if len(_hh) == 6 else 0
-                _light = _lum > 160
-                _net_c.add_node(
-                    f"{_nc}__sign", label=_sign, shape="text",
-                    font={"size": int(max(22, _sz * 1.8)), "face": "Arial",
-                          "color": "#000000" if _light else "#ffffff",
-                          "strokeWidth": 5,
-                          "strokeColor": "#ffffff" if _light else "#000000"},
-                    x=float(_xy[0]) * _SCALE, y=float(_xy[1]) * _SCALE,
-                    physics=False,
-                )
+            # (Le signe d'extrémité +/− est désormais mis dans le NOM entre
+            # parenthèses, plus de nœud-texte superposé au centre.)
         _filtered_edges = {k: v for k,
                            v in _edge_wts.items() if v >= _min_edge_w}
         _n_coop_shown = 0
@@ -1767,27 +1814,14 @@ if (_net_view == "Competition" and os.path.exists(proteins_path)
             _xw, _yw = _layout_pos.get(_nw, (0.0, 0.0))
             _net_web.add_node(
                 _nw,
-                label="<b>" + _wrap_lbl(_disp_name(_nw)
-                                        ).replace("\n", "<br>") + "</b>",
+                label="<b>" + _wrap_lbl(_disp_name(_nw)).replace("\n", "<br>")
+                      + (f" ({_sgnw})" if _sgnw else "") + "</b>",
                 title=f"{_disp_name(_nw)}\nContested C70: {_cmpw}/{_totw} ({_pvw}%)",
                 size=_szw, color={"background": _colw, "border": "#555555"}, borderWidth=1,
                 font={"size": 26, "face": "Arial",
                       "color": "#111111", "multi": "html"},
                 x=float(_xw) * _SCALE, y=float(_yw) * _SCALE, physics=False,
             )
-            if _sgnw:
-                _hhw = str(_colw).lstrip('#')
-                _lmw = (0.299 * int(_hhw[0:2], 16) + 0.587 * int(_hhw[2:4], 16)
-                        + 0.114 * int(_hhw[4:6], 16)) if len(_hhw) == 6 else 0
-                _lightw = _lmw > 160
-                _net_web.add_node(
-                    f"{_nw}__sign", label=_sgnw, shape="text",
-                    font={"size": int(max(22, _szw * 1.8)), "face": "Arial",
-                          "color": "#000000" if _lightw else "#ffffff",
-                          "strokeWidth": 5,
-                          "strokeColor": "#ffffff" if _lightw else "#000000"},
-                    x=float(_xw) * _SCALE, y=float(_yw) * _SCALE, physics=False,
-                )
         for (_aw, _bw) in _edge_wts:
             if _aw in _q_web and _bw in _q_web:
                 if (_aw in _tox_nodes) or (_bw in _tox_nodes):
@@ -2207,39 +2241,8 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
         folddisco_view.render_discovery(sel_abp)
 
     # ── ProteoCast de l'ABP : paysage mutationnel + empreinte + 3D ────────────
+    # (Le bouton de calcul global est remonté sous la section téléchargement.)
     st.subheader("ABP ProteoCast — mutational landscape + 3D structure")
-    st.caption("Opt-in — computing ProteoCast for the ABPs is **not** part of "
-               "`Run / update` (it takes hours). The button below submits every "
-               "ABP one by one to proteocast.ijm.fr: it is **resumable** (skips the "
-               "ones already computed), records permanent failures, and downloads "
-               "all the visual results into `data/proteocast/abp/`.")
-    _pc_mt = os.path.getmtime("data/proteocast/abp_inputs/manifest.csv") \
-        if os.path.exists("data/proteocast/abp_inputs/manifest.csv") else 0.0
-    _pc_status = proteocast_view.load_status(_pc_mt)
-    _pc_miss = int((~_pc_status["fait"]).sum()
-                   ) if _pc_status is not None else 0
-    _pc_label = (f"Compute all missing ProteoCast ({_pc_miss})" if _pc_miss
-                 else "Update ProteoCast (refresh ABP list + compute new)")
-    if st.button(_pc_label, key="pc_run_all_missing"):
-        with st.status("Computing ProteoCast via proteocast.ijm.fr "
-                       "(sequential, a few min/ABP)…", expanded=True) as _pcall:
-            _pclog = st.empty()
-            # 1) régénérer le manifest depuis abp_master (couvre les ABP actuels)
-            subprocess.run([sys.executable, "-m",
-                            "script.proteocast_prep_manifest"])
-            # 2) soumettre les manquants (séquentiel, reprenable)
-            _proc = subprocess.Popen(
-                [sys.executable, "-u", "script/proteocast_submit_abp.py"],
-                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-            _buf = []
-            for _l in _proc.stdout:
-                _buf.append(_l.rstrip())
-                _pclog.code("\n".join(_buf[-20:]))
-            _proc.wait()
-            _pcall.update(label="ProteoCast campaign finished.",
-                          state="complete")
-        st.cache_data.clear()
-        st.rerun()
     if _is_no_abp:
         st.caption("Select an ABP to see its ProteoCast.")
     else:

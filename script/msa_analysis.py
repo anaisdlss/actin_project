@@ -1265,10 +1265,12 @@ document.querySelectorAll('[data-tt2]').forEach(function(el){
                     float(_pct.values.max()) if _pct.values.max() > 0 else 1.0)
                 def _bg(v):
                     if v == 0: return "background:#f5f5f5"
-                    t = min(1.0, v / _mx); r = int(255-(255-139)*t); gc = int(255*(1-t)); bc = int(255*(1-t))
+                    # racine carrée : les valeurs sont très petites et resserrées,
+                    # on étale le contraste pour que la couleur soit bien visible.
+                    t = min(1.0, (v / _mx) ** 0.5); r = int(255-(255-139)*t); gc = int(255*(1-t)); bc = int(255*(1-t))
                     return f"background:rgb({max(0,r)},{max(0,gc)},{max(0,bc)})"
                 _grad = "".join(
-                    f'<span style="background:rgb({max(0,int(255-(255-139)*(i/11)))},{max(0,int(255*((11-i)/11)))},{max(0,int(255*((11-i)/11)))});'
+                    f'<span style="background:rgb({max(0,int(255-(255-139)*((i/11)**0.5)))},{max(0,int(255*(1-(i/11)**0.5)))},{max(0,int(255*(1-(i/11)**0.5)))});'
                     f'width:14px;height:11px;display:inline-block;border:1px solid #eee"></span>' for i in range(12))
                 CELL = 19
                 P = ['<div style="font-family:\'Helvetica Neue\',Arial,sans-serif;font-size:11px;background:#fff;padding:10px;overflow-x:auto;">',
@@ -1282,7 +1284,7 @@ document.querySelectorAll('[data-tt2]').forEach(function(el){
                 for ar in _AA_ORDER:
                     P.append(f'<tr><td style="font-size:9px;color:#555;text-align:right;padding-right:4px;font-weight:600">{ar}</td>')
                     for ac in _AA_ORDER:
-                        v = _pct.at[ar, ac]; n = int(_pn.at[ar, ac]); bg = _bg(v); fg = "#fff" if v/_mx > 0.45 else "#333"
+                        v = _pct.at[ar, ac]; n = int(_pn.at[ar, ac]); bg = _bg(v); fg = "#fff" if (v/_mx) ** 0.5 > 0.6 else "#333"
                         if v > 0:
                             raw = _praw.at[ar, ac]
                             tt = (f"ABP: {ac} &#8596; Actin: {ar}\\n% interface: {v:.2f}%\\nAire: {raw:.0f} A2\\nNb contacts: {n}").replace('"', '&quot;')
@@ -1293,36 +1295,24 @@ document.querySelectorAll('[data-tt2]').forEach(function(el){
                 P.append('</tbody></table></div>')
                 return "".join(P), CELL
 
-            # Seuil d'ASA enfouie ABSOLUE : aire enfouie par résidu (Å²) rapportée
-            # au MAX de ce cluster (max absolu du cluster = 100 %). Une seule
-            # heatmap, filtrée par le seuil (0 % = tous les contacts).
-            _ba_map = _buried_asa_lookup()
-            _rnA = pd.to_numeric(df4["residue_A_structure"], errors="coerce")
-            _rnB = pd.to_numeric(df4["residue_B_structure"], errors="coerce")
-            _absA = pd.to_numeric(pd.Series(
-                [_ba_map.get((int(_i), _c, int(_r))) if pd.notna(_r) else None
-                 for _i, _c, _r in zip(df4.interaction_id, df4.chain_A_id, _rnA)],
-                index=df4.index), errors="coerce")
-            _absB = pd.to_numeric(pd.Series(
-                [_ba_map.get((int(_i), _c, int(_r))) if pd.notna(_r) else None
-                 for _i, _c, _r in zip(df4.interaction_id, df4.chain_B_id, _rnB)],
-                index=df4.index), errors="coerce")
-            # max des 2 résidus par contact, puis max du cluster = 100 % du seuil
-            _gmax = float(pd.concat([_absA, _absB], axis=1).max(axis=1).max() or 1.0)
-            _asaA = _absA / _gmax * 100
-            _asaB = _absB / _gmax * 100
+            # Seuil d'ASA enfouie RELATIVE : buried ASA de chaque résidu rapportée
+            # à SA PROPRE surface (asa_pct_A/B, 0-100 %), pas à un max de cluster.
+            # Une seule heatmap, filtrée par le seuil (0 % = tous les contacts).
+            _asaA = pd.to_numeric(df4["asa_pct_A"], errors="coerce")
+            _asaB = pd.to_numeric(df4["asa_pct_B"], errors="coerce")
             _asa_thr = st.slider(
                 "Buried ASA threshold (at least one of the 2 residues ≥, "
-                f"in % of the cluster's absolute max = {_gmax:.0f} Å²)",
+                "in % of each residue's own surface — relative)",
                 min_value=0, max_value=100, value=0, step=5,
-                key=f"d_asa_thr_abs_{group_key}", format="%d%%",
+                key=f"d_asa_thr_rel_{group_key}", format="%d%%",
             )
             _spec_df = df4[(_asaA >= _asa_thr) | (_asaB >= _asa_thr)].copy()
             _title = ("All contacts" if _asa_thr == 0
                       else f"Contacts with ≥1 residue ≥ {_asa_thr}% of the buried max")
-            # échelle de couleur ABSOLUE (0 → 100 % interface), pas relative au max
+            # échelle de couleur RELATIVE au max de cette matrice (les valeurs
+            # sont toutes petites → une échelle 0-100 % rendrait tout blanc).
             _h_spec, _cB = _aa_matrix_html(
-                _spec_df, f"{_title} ({len(_spec_df)} contacts)", _fixed_mx=100.0)
+                _spec_df, f"{_title} ({len(_spec_df)} contacts)")
             st.components.v1.html(_h_spec, height=20 * _cB + 170, scrolling=True)
 
             # ── Résumé physicochimique des contacts de l'interface ──────────────────
@@ -1339,67 +1329,29 @@ document.querySelectorAll('[data-tt2]').forEach(function(el){
                     ("vdw",   "van der Waals",            int(_pr["vdw"].sum()),   "pct_vdw"),
                 ]
                 st.markdown("**Physicochemical properties of the contacts**")
+                # Médiane des AUTRES clusters S1 par catégorie → l'écart s'affiche
+                # en delta sous chaque %, ce qui remplace l'ancien gros boxplot.
+                _prof = _s1_cluster_contact_type_profiles()
+                _cur_cid = group_key[4:] if str(group_key).startswith("s1c_") else None
+                _others = _prof.drop(index=_cur_cid, errors="ignore") if _cur_cid else _prof
                 _mcols = st.columns(len(_defs))
                 for _mc, (_k, _lbl, _nb, _col) in zip(_mcols, _defs):
-                    _mc.metric(_lbl, f"{_nb}", help=f"{100*_nb/_ntot:.1f}% of contacts")
+                    _here = 100 * _nb / _ntot
+                    _delta = None
+                    if len(_others) >= 2 and _col in _others.columns:
+                        _med = float(pd.to_numeric(_others[_col], errors="coerce").median())
+                        if pd.notna(_med):
+                            _delta = f"{_here - _med:+.1f} pts vs median"
+                    _mc.metric(_lbl, f"{_here:.1f}%", delta=_delta,
+                               help=f"{_nb} contacts (a contact can fall in several categories)")
                 st.caption(
                     "**Salt bridges / H-bonds** = from contact_type (electrostatic / "
                     "directional). **Hydrophobic** = 2 apolar residues. **Aromatic (π)** = "
                     "π-π or π-cation stacking. **van der Waals** = non-specific contacts (the rest). "
-                    "A contact can fall into several categories."
+                    "A contact can fall into several categories. "
+                    "**Δ vs median** = gap to the median of the other S1 clusters "
+                    "(green = above, red = below)."
                 )
-
-                # ── Comparaison de CE cluster vs TOUS les autres clusters S1 ──────
-                # (chaque cluster normalisé sur ses propres contacts d'interface)
-                _prof = _s1_cluster_contact_type_profiles()
-                _cur_cid = group_key[4:] if str(group_key).startswith("s1c_") else None
-                _others = _prof.drop(index=_cur_cid, errors="ignore") if _cur_cid else _prof
-                if len(_others) >= 2:
-                    st.markdown("**This cluster vs the other S1 clusters (interfaces)**")
-                    _cats = [(_lbl, 100 * _nb / _ntot, _others[_col])
-                             for _k, _lbl, _nb, _col in _defs]
-                    fig_cmp, _axes = plt.subplots(
-                        len(_cats), 1, figsize=(7.2, 0.92 * len(_cats) + 0.5))
-                    for _ax, (_lbl, _here, _dist) in zip(_axes, _cats):
-                        _vals = _dist.values.astype(float)
-                        _vals = _vals[~np.isnan(_vals)]
-                        _ax.boxplot(
-                            _vals, vert=False, widths=0.55, positions=[1], patch_artist=True,
-                            boxprops=dict(facecolor="#ececec", edgecolor="#c4c4c4"),
-                            medianprops=dict(color="#888", lw=1.4),
-                            whiskerprops=dict(color="#c4c4c4"), capprops=dict(color="#c4c4c4"),
-                            flierprops=dict(marker="o", ms=2.5, mfc="#dcdcdc", mec="none"))
-                        _ax.scatter([_here], [1], s=90, color="#c0392b", zorder=5,
-                                    edgecolors="white", linewidths=1.1)
-                        _med = float(np.median(_vals))
-                        _rank = float((_vals < _here).mean() * 100)
-                        _d = _here - _med
-                        _lo = min(float(_vals.min()), _here)
-                        _hi = max(float(_vals.max()), _here)
-                        _pad = (_hi - _lo) * 0.12 + 0.4
-                        _ax.set_xlim(_lo - _pad, _hi + _pad)
-                        _ax.set_ylim(0.4, 1.6)
-                        _ax.set_yticks([])
-                        _ax.set_ylabel(_lbl, rotation=0, ha="right", va="center", fontsize=8.5)
-                        _ax.text(0.995, 0.9,
-                                 f"{_here:.1f}%  ·  higher than {_rank:.0f}% of clusters  ·  "
-                                 f"{'+' if _d >= 0 else ''}{_d:.1f} pts vs median",
-                                 transform=_ax.transAxes, ha="right", va="top",
-                                 fontsize=7.5, color="#c0392b", fontweight="bold")
-                        _ax.tick_params(axis="x", labelsize=7)
-                        _ax.grid(axis="x", color="#f2f2f2", lw=0.6)
-                        for _s in ("top", "right", "left"):
-                            _ax.spines[_s].set_visible(False)
-                    _axes[-1].set_xlabel("% of the cluster's interface contacts (scale specific to each row)",
-                                         fontsize=7.5)
-                    plt.tight_layout()
-                    st.pyplot(fig_cmp, use_container_width=True)
-                    plt.close(fig_cmp)
-                    st.caption(
-                        f"Red dot = this cluster · grey box = distribution of the {len(_others)} "
-                        "other S1 clusters (line = median, whiskers = range). Each row has "
-                        "its own scale. “higher than X % of clusters” = percentile rank."
-                    )
 
     # ── TAB E : Spécificité ───────────────────────────────────────────────────
     if "E" in _tab_map:

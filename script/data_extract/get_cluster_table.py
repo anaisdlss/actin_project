@@ -110,6 +110,47 @@ def save_metadata(update_date, request_id, result_url, data_link, csv_path):
         json.dump(metadata, f, indent=2)
 
 
+def slim_to_actin(csv_path, summary_path):
+    """Réduit all_data.csv aux seules interactions où l'actine est en S1 OU S2.
+
+    all_data brut = tout PPI3D (~1 M lignes / 132k PDB), dont l'analyse actine
+    n'utilise que ~0,3 %. On garde uniquement les lignes dont subunit_1_title OU
+    subunit_2_title est une actine réelle (« Result protein » du summary avec
+    Expect value == 0.0, même définition que graphe_filter). C'est un sur-ensemble
+    EXACT de ce que le filtrage downstream conserve → filtered_all_data reste
+    identique (validé). Garde-fou : au moindre doute (summary/colonnes absents,
+    aucune actine) on ne touche à rien — mieux vaut garder le full que risquer
+    une perte.
+    """
+    import pandas as pd
+    if not os.path.exists(summary_path):
+        print(f"  slim ignoré : summary absent ({summary_path})")
+        return
+    try:
+        sm = pd.read_csv(summary_path, sep=";")
+        if "Expect value" not in sm.columns or "Result protein" not in sm.columns:
+            print("  slim ignoré : colonnes summary inattendues")
+            return
+        sm["Expect value"] = pd.to_numeric(sm["Expect value"], errors="coerce")
+        real_actin = set(sm.loc[sm["Expect value"] == 0.0, "Result protein"]
+                         .dropna().unique())
+        if not real_actin:
+            print("  slim ignoré : aucune actine (Expect==0) dans le summary")
+            return
+        df = pd.read_csv(csv_path, low_memory=False)
+        if "subunit_1_title" not in df.columns or "subunit_2_title" not in df.columns:
+            print("  slim ignoré : colonnes subunit_*_title absentes")
+            return
+        keep = (df["subunit_1_title"].isin(real_actin)
+                | df["subunit_2_title"].isin(real_actin))
+        n0 = len(df)
+        df[keep].to_csv(csv_path, index=False)
+        print(f"  slim actine S1/S2 : {n0} -> {int(keep.sum())} lignes "
+              f"(sur-ensemble exact du set filtré)")
+    except Exception as e:
+        print(f"  slim ignoré (erreur, all_data conservé intact) : {e}")
+
+
 def main():
     session = create_session()
     metadata = load_metadata()
@@ -275,6 +316,9 @@ def main():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     csv_path = os.path.join(OUTPUT_DIR, "all_data.csv")
     save_text(csv_path, csv_content)
+    # Ne garder du raw que la partie utile (actine en S1 ou S2) : ~0,3 % des lignes,
+    # le reste (tout PPI3D non-actine) n'est jamais utilisé par le filtrage.
+    slim_to_actin(csv_path, os.path.join(OUTPUT_DIR, "ppi3d_actin_summary.csv"))
 
     request_id = extract_request_id(result_url)
     save_metadata(current_update, request_id, result_url, data_link, csv_path)

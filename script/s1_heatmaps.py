@@ -304,7 +304,19 @@ def _render_s1_patch_plotly(detail, patch):
     fig1.update_yaxes(showticklabels=False)
     fig1.update_xaxes(dtick=25, title_text="Actin canonical position (MAFFT)",
                       title_font=dict(size=10))
-    st.plotly_chart(fig1, use_container_width=True)
+    # Clic sur une position → met à jour le sélecteur « Position canonical » ci-dessus.
+    _ev1 = st.plotly_chart(fig1, use_container_width=True, key=f"s1prof_{patch}",
+                           on_select="rerun", selection_mode="points")
+    try:
+        _pts = (_ev1 or {}).get("selection", {}).get("points", [])
+    except Exception:
+        _pts = []
+    if _pts and _pts[0].get("x") is not None:
+        _cx = int(round(float(_pts[0]["x"])))
+        # ne relance que si la sélection change réellement (évite la boucle)
+        if st.session_state.get(f"s1posdet_{patch}") != _cx:
+            st.session_state[f"_s1_click_{patch}"] = _cx
+            st.rerun()
 
     labels = [f"C70={r[0]} (n={r[1]}) — {r[2]}" for r in c70_rows]
     zmat = np.array([_exp(r[3]) for r in c70_rows])
@@ -397,6 +409,13 @@ def _render_s1_position_detail(detail, patch):
     if not positions:
         return
     st.markdown("**Per-position detail — which aa by organism and ABP**")
+    # Un clic sur le heatmap de profil (plus bas) a pu déposer une position ici :
+    # on la reporte dans le sélecteur avant de l'instancier.
+    _ckey = f"_s1_click_{patch}"
+    if _ckey in st.session_state:
+        _cp = st.session_state.pop(_ckey)
+        if _cp in positions:
+            st.session_state[f"s1posdet_{patch}"] = _cp
     sel_pos = st.selectbox(
         "Position canonical", positions, key=f"s1posdet_{patch}")
 

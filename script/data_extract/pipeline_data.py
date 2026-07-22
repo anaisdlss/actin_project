@@ -184,7 +184,7 @@ def main():
 
         # ══ 2/9 — Filtrage + interactions d'interface ════════════════════════
         run_group("2/9 — Filtrage des structures + interactions d'interface", [
-            ("Filtrage (≥ 4 actines) [notebook]",
+            ("Filtrage (≥ 5 actines connectées) [notebook]",
              is_up_to_date(FILTERED / "filtered_all_data.csv", RAW / "all_data.csv",
                            RAW / "pdb_entry_results.csv", FILTER_NOTEBOOK),
              lambda: _nb(FILTER_NOTEBOOK), FILTERED / "filtered_all_data.csv"),

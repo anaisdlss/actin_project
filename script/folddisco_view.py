@@ -202,14 +202,13 @@ def _render_db_table(sub, db, filt):
     if d.empty:
         st.caption("No protein at this similarity level.")
         return
-    d["Link"] = [_hit_link(db, t) for t in d["target_id"]]
     d["Source"] = (d["target_id"].str.upper()
                    + (" / " + d["target_chain"].fillna("") if db == "pdb" else ""))
     d["Norm. score"] = d["score_norm"].round(2)
     d["RMSD (Å)"] = d["rmsd"].round(2)
     d["Coverage"] = (d["coverage"] * 100).round().astype("Int64").astype(str) + "%"
     cols = ["name", "organism", "interpretation", "Norm. score", "RMSD (Å)",
-            "Coverage", "Source", "Link"]
+            "Coverage", "Source"]
     show = d[cols].rename(columns={"name": "Protein", "organism": "Organism",
                                    "interpretation": "Interpretation"})
     st.caption(f"{len(d)} distinct proteins")
@@ -217,8 +216,7 @@ def _render_db_table(sub, db, filt):
         show, hide_index=True, use_container_width=True, height=400,
         column_config={
             "Protein": st.column_config.TextColumn(width="large"),
-            "Organism": st.column_config.TextColumn(width="medium"),
-            "Link": st.column_config.LinkColumn("Entry", display_text="open")})
+            "Organism": st.column_config.TextColumn(width="medium")})
     top = d.head(15)
     _hbar(top["name"], top["score_norm"],
           [_INTERP_COL.get(i, "#3b6fb5") for i in top["interpretation"]])

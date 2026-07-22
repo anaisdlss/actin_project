@@ -15,10 +15,6 @@ import proteocast_view
 _PROTEOCAST_ABP_DIR = _Path("data/proteocast/abp")
 
 
-_PROTEOCAST_ACTIN_EX = _Path(
-    "proteocast_evalue0_actine/4.query_ProteoCast.csv")
-
-
 _AA_ORDER = list("ACDEFGHIKLMNPQRSTVWY")
 
 
@@ -261,10 +257,6 @@ def _render_abp_proteocast(sel_abp, abp_subunits):
             f"Drop the result into `data/proteocast/abp/{slug}.csv` "
             "(format `4.query_ProteoCast.csv`) and it will show up here."
         )
-        if _PROTEOCAST_ACTIN_EX.exists():
-            with st.expander("See an example render (actin ProteoCast)"):
-                _render_proteocast_mutland(
-                    _PROTEOCAST_ACTIN_EX, {}, "Exemple — ProteoCast actin")
 
 
 @st.cache_data(show_spinner=False)

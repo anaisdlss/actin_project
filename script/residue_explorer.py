@@ -85,7 +85,7 @@ def render_residue_fiche(pp, canon):
     # ── Classe ProteoCast (en gros) + sensibilité vs moyenne ────────────────
     if row is not None:
         _cls = row.get("residue_class")
-        st.markdown(f"## Classe ProteoCast : {_cls}")
+        st.markdown(f"## ProteoCast class: {_cls}")
 
         # Conservation (positif, intuitif : PLUS HAUT = PLUS CONSERVÉ = plus
         # sensible aux mutations). Référence = moyenne des résidus de SURFACE
@@ -97,13 +97,12 @@ def render_residue_fiche(pp, canon):
         avg_surf = float(_cons[_rsa >= _SURF].mean())
         this_c = pd.to_numeric(pd.Series([row.get("conservation")]),
                                errors="coerce").iloc[0]
-        c1, c2, c3 = st.columns(3)
+        c1, c2 = st.columns(2)
         c1.metric(
             "Residue conservation", _fmt(this_c),
             delta=(f"{float(this_c) - avg_surf:+.2f} vs surface"
                    if pd.notna(this_c) and pd.notna(avg_surf) else None))
         c2.metric("Mean actin surface", _fmt(avg_surf))
-        c3.metric("RSA (accessibility)", _fmt(row.get("rsa")))
         if pd.notna(this_c) and pd.notna(avg_surf):
             _more = float(this_c) > avg_surf
             st.caption(
@@ -148,22 +147,22 @@ def render_residue_fiche(pp, canon):
             cc["_aa"] = (cc["abp_aa"].astype(str) + cc["abp_resnum"].astype(str))
             _aa_map = cc.groupby("abp")["_aa"].apply(
                 lambda s: ", ".join(sorted(set(s))))
-            sub["aa d'ABP"] = sub["abp"].map(_aa_map).fillna("—")
+            sub["ABP aa"] = sub["abp"].map(_aa_map).fillna("—")
         else:
-            sub["aa d'ABP"] = "—"
+            sub["ABP aa"] = "—"
     st.markdown("**ABPs that contact this residue**  "
                 "_(% ASA = buried actin residue; ABP aa = contacting ABP residue)_")
     if sub.empty:
         st.caption("No ABP contacts this residue in the dataset.")
     else:
-        _cols = ["ABP", "% ASA max", "Nb interactions", "Clusters C70", "Sites S1"]
-        if "aa d'ABP" in sub.columns:
-            _cols = ["ABP", "aa d'ABP", "% ASA max", "Nb interactions",
+        _cols = ["ABP", "% ASA max", "# interactions", "Clusters C70", "Sites S1"]
+        if "ABP aa" in sub.columns:
+            _cols = ["ABP", "ABP aa", "% ASA max", "# interactions",
                      "Clusters C70", "Sites S1"]
         st.dataframe(
             sub.rename(columns={
                 "abp": "ABP", "asa_max": "% ASA max",
-                "n_int": "Nb interactions", "c70s": "Clusters C70", "sites": "Sites S1",
+                "n_int": "# interactions", "c70s": "Clusters C70", "sites": "Sites S1",
             })[_cols],
             hide_index=True, use_container_width=True,
         )
@@ -962,5 +961,4 @@ def render_actin_overview(pp):
            if _pos_row(pp, c) is not None
            and pd.notna(_pos_row(pp, c).get('actin_aa')) else ""))
     sel = st.session_state.get("actin_ov_selbox", sel)
-    st.divider()
     render_residue_fiche(pp, sel)
