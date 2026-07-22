@@ -20,14 +20,33 @@ CHAINS = OUT / "abp_chains"
 PY = sys.executable
 
 
+_failed = []
+
+
 def _py(script):
-    print(f"  → {script}")
-    subprocess.run([PY, str(SD / script)], check=True, cwd=ROOT)
+    # fail-soft : un sous-script qui échoue (réseau transitoire, données…) est
+    # loggé et on CONTINUE — l'étape ne doit pas tomber pour une brique annexe.
+    # La complétude réelle est jugée sur la sortie clé (familles.csv) à la fin.
+    print(f"  → {script}", flush=True)
+    rc = subprocess.run([PY, str(SD / script)], cwd=ROOT).returncode
+    if rc != 0:
+        print(f"  ! {script} a échoué (code {rc}) — on continue", flush=True)
+        _failed.append(script)
+    return rc == 0
 
 
 def _sh(cmd, desc):
-    print(f"  → {desc}")
-    subprocess.run(cmd, check=True, cwd=ROOT)
+    print(f"  → {desc}", flush=True)
+    try:
+        rc = subprocess.run(cmd, cwd=ROOT).returncode
+    except FileNotFoundError as e:
+        print(f"  ! {desc} : binaire introuvable ({e}) — on continue", flush=True)
+        _failed.append(desc)
+        return False
+    if rc != 0:
+        print(f"  ! {desc} a échoué (code {rc}) — on continue", flush=True)
+        _failed.append(desc)
+    return rc == 0
 
 
 def main():
@@ -68,6 +87,18 @@ def main():
     # nettoyage des tmp foldseek
     for d in (OUT / "foldseek_tmp", OUT / "whole_tmp"):
         subprocess.run(["rm", "-rf", str(d)], check=False)
+
+    if _failed:
+        print(f"== Sous-étapes en échec (non bloquant) : {', '.join(_failed)} ==",
+              flush=True)
+    # Complétude jugée sur la sortie clé. Si elle manque, on sort en erreur pour
+    # que Run/update re-tente l'étape au prochain lancement (les sous-scripts
+    # réseau sont cachés/reprenables → ils repartiront d'où ils se sont arrêtés).
+    familles = OUT / "familles.csv"
+    if not familles.exists():
+        print("== Étape 10 INCOMPLÈTE : familles.csv (sortie clé) absent — "
+              "relance Run/update pour re-tenter. ==", flush=True)
+        sys.exit(1)
     print("== Étape 10 terminée ==")
 
 

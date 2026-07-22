@@ -39,16 +39,21 @@ def resolve_uniprot(accs):
     out = {}
     for i in range(0, len(accs), 100):
         chunk = accs[i:i + 100]
+        r = None
         for attempt in range(5):
-            r = requests.get(UNIPROT, params={
-                "accessions": ",".join(chunk),
-                "fields": "accession,protein_name,organism_name",
-                "format": "tsv"}, timeout=60)
-            if r.status_code == 200:
-                break
+            try:
+                r = requests.get(UNIPROT, params={
+                    "accessions": ",".join(chunk),
+                    "fields": "accession,protein_name,organism_name",
+                    "format": "tsv"}, timeout=60)
+                if r.status_code == 200:
+                    break
+            except requests.exceptions.RequestException as e:
+                print(f"  UniProt erreur réseau ({type(e).__name__}), "
+                      f"retry {attempt + 1}/5")
             time.sleep(5 * (attempt + 1))
-        if r.status_code != 200:
-            print(f"  UniProt {r.status_code} sur lot {i}")
+        if r is None or r.status_code != 200:
+            print(f"  UniProt échec sur lot {i}")
             continue
         df = pd.read_csv(StringIO(r.text), sep="\t")
         for _, row in df.iterrows():
@@ -69,13 +74,18 @@ def resolve_pdb(entries):
              'polymer_entities{rcsb_polymer_entity{pdbx_description} '
              'rcsb_polymer_entity_container_identifiers{auth_asym_ids} '
              'rcsb_entity_source_organism{scientific_name}}}}')
+        r = None
         for attempt in range(5):
-            r = requests.post(RCSB_GQL, json={"query": q}, timeout=60)
-            if r.status_code == 200:
-                break
+            try:
+                r = requests.post(RCSB_GQL, json={"query": q}, timeout=60)
+                if r.status_code == 200:
+                    break
+            except requests.exceptions.RequestException as e:
+                print(f"  RCSB erreur réseau ({type(e).__name__}), "
+                      f"retry {attempt + 1}/5")
             time.sleep(5 * (attempt + 1))
-        if r.status_code != 200:
-            print(f"  RCSB {r.status_code} sur lot {i}")
+        if r is None or r.status_code != 200:
+            print(f"  RCSB échec sur lot {i}")
             continue
         for ent in (r.json().get("data", {}).get("entries") or []):
             pid = ent["rcsb_id"].lower()
