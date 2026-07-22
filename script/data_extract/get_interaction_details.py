@@ -635,12 +635,12 @@ def process_interaction(task):
         pass_total
     ) = task
 
-    session = create_session()
-    url = row["detail_url"]
+    url = row.get("detail_url", "") if hasattr(row, "get") else ""
 
     print(f"Downloading {pass_index}/{pass_total}")
 
     try:
+        session = create_session()
         r = session.get(url, timeout=REQUEST_TIMEOUT)
         r.raise_for_status()
         html = r.text
@@ -1363,44 +1363,59 @@ def main():
         failed_rows = []
 
         with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+            # Robustesse : chaque résultat est traité isolément. Une erreur sur UNE
+            # interaction (écriture, données inattendues…) la marque « failed » et
+            # on continue — elle ne doit JAMAIS faire tomber tout le pipeline.
             for result in executor.map(process_interaction, tasks):
-                if result is None:
-                    continue
+                try:
+                    if result is None:
+                        continue
 
-                if result["status"] == "failed":
-                    failed_rows.append({
+                    if result["status"] == "failed":
+                        failed_rows.append({
+                            "interaction_id": result["interaction_id"],
+                            "detail_url": result["detail_url"],
+                            "status": "failed"
+                        })
+
+                        if len(failed_rows) >= 50:
+                            append_rows(failed_rows, failed_path)
+                            failed_rows = []
+
+                        continue
+
+                    append_rows(result["interactions"], interactions_path)
+                    append_rows(result["proteins"], proteins_path)
+                    append_rows(result["interface_residues"],
+                                interface_residues_path)
+                    append_rows(result["residue_contacts"], residue_contacts_path)
+                    append_rows(result["ligands"], ligands_path)
+                    append_rows(result["metadata_alignements"],
+                                metadata_alignements_path)
+                    append_rows(result["alignment_sequences"],
+                                alignment_sequences_path)
+                    append_rows(result["structures"], structures_path)
+
+                    progress_rows.append({
                         "interaction_id": result["interaction_id"],
                         "detail_url": result["detail_url"],
-                        "status": "failed"
+                        "status": "done"
                     })
 
-                    if len(failed_rows) >= 50:
-                        append_rows(failed_rows, failed_path)
-                        failed_rows = []
-
-                    continue
-
-                append_rows(result["interactions"], interactions_path)
-                append_rows(result["proteins"], proteins_path)
-                append_rows(result["interface_residues"],
-                            interface_residues_path)
-                append_rows(result["residue_contacts"], residue_contacts_path)
-                append_rows(result["ligands"], ligands_path)
-                append_rows(result["metadata_alignements"],
-                            metadata_alignements_path)
-                append_rows(result["alignment_sequences"],
-                            alignment_sequences_path)
-                append_rows(result["structures"], structures_path)
-
-                progress_rows.append({
-                    "interaction_id": result["interaction_id"],
-                    "detail_url": result["detail_url"],
-                    "status": "done"
-                })
-
-                if len(progress_rows) >= 50:
-                    append_rows(progress_rows, progress_path)
-                    progress_rows = []
+                    if len(progress_rows) >= 50:
+                        append_rows(progress_rows, progress_path)
+                        progress_rows = []
+                except Exception as _we:
+                    _iid = (result.get("interaction_id")
+                            if isinstance(result, dict) else None)
+                    print(f"Error handling result {_iid}: {_we} — marqué failed",
+                          flush=True)
+                    if _iid is not None:
+                        failed_rows.append({
+                            "interaction_id": _iid,
+                            "detail_url": (result.get("detail_url", "")
+                                           if isinstance(result, dict) else ""),
+                            "status": "failed"})
 
         if progress_rows:
             append_rows(progress_rows, progress_path)

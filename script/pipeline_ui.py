@@ -48,9 +48,26 @@ def render():
 
     def step_md(key, label, state):
         num = key.split("/")[0]
-        note = {"running": " — *running…*", "done": " — *done*",
-                "skipped": " — *up to date*", "error": " — **error**"}.get(state, "")
-        return f"`{num:>2}` &nbsp;{label}{note}"
+        # pastille de statut colorée (pas d'emoji pictographique ; couleur + texte)
+        _pill = {
+            "running": ("running…", "#1a56db", "#e8f0fe"),
+            "done":    ("done",      "#137333", "#e6f4ea"),
+            "skipped": ("up to date","#5f6368", "#f1f3f4"),
+            "error":   ("error",     "#c5221f", "#fce8e6"),
+            "pending": ("waiting",   "#9aa0a6", "#f8f9fa"),
+        }.get(state, ("", "#000", "#fff"))
+        _txt, _fg, _bg = _pill
+        _dot = ("<span style='display:inline-block;width:8px;height:8px;border-radius:50%;"
+                f"background:{_fg};margin-right:8px;vertical-align:middle'></span>")
+        _badge = (f"<span style='background:{_bg};color:{_fg};padding:1px 9px;"
+                  f"border-radius:10px;font-size:11px;font-weight:600'>{_txt}</span>")
+        _lbl_col = "#202124" if state in ("running", "done", "error") else "#80868b"
+        return (f"<div style='padding:3px 0'>{_dot}"
+                f"<code style='color:#5f6368'>{num:>2}</code>&nbsp;&nbsp;"
+                f"<span style='color:{_lbl_col}'>{label}</span>&nbsp;&nbsp;{_badge}</div>")
+
+    def _set_step(ph, key, label, state):
+        ph.markdown(step_md(key, label, state), unsafe_allow_html=True)
 
 
     def initial_state(key):
@@ -130,8 +147,7 @@ def render():
             st.markdown(f"**{_cat}**")
             for key in _keys:
                 placeholders[key] = st.empty()
-                placeholders[key].markdown(
-                    step_md(key, STEPS[key], initial_state(key)))
+                _set_step(placeholders[key], key, STEPS[key], initial_state(key))
 
     sub_progress_bar = st.empty()
     sub_progress_text = st.empty()
@@ -142,10 +158,15 @@ def render():
 
         for key, label in STEPS.items():
             init = initial_state(key)
-            placeholders[key].markdown(
-                step_md(key, label, init if init == "skipped" else "pending"))
+            _set_step(placeholders[key], key, label,
+                      init if init == "skipped" else "pending")
 
-        pb = progress_bar.progress(0, text="Starting...")
+        pb = progress_bar.progress(0, text="Starting…")
+        _banner = st.empty()
+        _banner.info(
+            "**Pipeline running** — fetching & processing PPI3D data. "
+            "This can take up to ~1 hour on a fresh dataset; steps already up to "
+            "date are skipped. You can keep this tab open — progress updates below.")
 
         current_idx = -1
         step_had_skip = {}
@@ -171,11 +192,11 @@ def render():
                         prev_key = STEP_KEYS[current_idx]
                         state = "skipped" if step_had_skip.get(
                             prev_key) else "done"
-                        placeholders[prev_key].markdown(
-                            step_md(prev_key, STEPS[prev_key], state))
+                        _set_step(placeholders[prev_key], prev_key,
+                                  STEPS[prev_key], state)
 
                     current_idx = i
-                    placeholders[key].markdown(step_md(key, STEPS[key], "running"))
+                    _set_step(placeholders[key], key, STEPS[key], "running")
                     pb.progress(i / TOTAL, text=f"Step {key} — {STEPS[key]}")
                     sub_progress_bar.empty()
                     sub_progress_text.empty()
@@ -197,12 +218,15 @@ def render():
                 if any(kw in line for kw in SKIP_KEYWORDS):
                     step_had_skip[current_key] = True
 
-            if line:
-                # conservé uniquement pour l'affichage en cas d'erreur
+            # conservé pour l'affichage en cas d'erreur — on EXCLUT les lignes de
+            # pure progression (« Downloading X/Y », « X/Y PDBID ») qui, sinon,
+            # noient la vraie erreur / le traceback dans les dernières lignes.
+            if line and result is None and "Downloading " not in line:
                 log_lines.append(line)
 
         proc.wait()
 
+        _banner.empty()
         sub_progress_bar.empty()
         sub_progress_text.empty()
 
@@ -211,8 +235,7 @@ def render():
             state = "skipped" if step_had_skip.get(last_key) else "done"
             if proc.returncode != 0:
                 state = "error"
-            placeholders[last_key].markdown(
-                step_md(last_key, STEPS[last_key], state))
+            _set_step(placeholders[last_key], last_key, STEPS[last_key], state)
 
         if proc.returncode == 0:
             progress_bar.empty()
