@@ -156,8 +156,11 @@ if st.button(_pc_label, key="pc_run_all_missing", type="primary"):
         # 2) soumettre les manquants (4 en parallèle, reprenable)
         #    bufsize=1 + readline : sortie ligne-par-ligne EN DIRECT (sinon le
         #    buffer de lecture anticipée retient tout par blocs → rien à l'écran).
+        # --retry-failed : on re-tente aussi les ABP déjà marqués en échec (le plus
+        # souvent des échecs transitoires : timeout serveur, MSA…) → sinon un clic
+        # sur « X remaining » ne ferait rien si ces X sont tous en échec.
         _proc = subprocess.Popen(
-            [sys.executable, "-u", "script/proteocast_submit_abp.py"],
+            [sys.executable, "-u", "script/proteocast_submit_abp.py", "--retry-failed"],
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
         _buf = []
         for _l in iter(_proc.stdout.readline, ""):

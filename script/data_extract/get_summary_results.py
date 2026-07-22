@@ -10,19 +10,42 @@ import hashlib
 import sys
 
 session = requests.Session()
+# Retry auto (GET) sur timeouts/connexion/5xx + back-off, comme create_session().
+from urllib3.util.retry import Retry as _Retry
+_retry = _Retry(total=5, connect=5, read=5, status=5, backoff_factor=2,
+                status_forcelist=[502, 503, 504], raise_on_status=False)
+_adapter = requests.adapters.HTTPAdapter(max_retries=_retry)
+session.mount("https://", _adapter)
+session.mount("http://", _adapter)
 
 BASE_URL = "https://bioinformatics.lt/ppi3d"
 
 
-def get_with_retry(url, retries=5, delay=15):
+def get_with_retry(url, retries=6, delay=15, timeout=120):
+    """GET robuste : réessaie sur les EXCEPTIONS réseau (timeout, connexion
+    coupée…) ET sur les codes 502/503/504, avec back-off progressif. Sans ça,
+    un simple timeout PPI3D faisait planter tout le pipeline (fréquent lors d'un
+    premier téléchargement depuis un autre poste)."""
+    last_err = None
     for attempt in range(retries):
-        response = session.get(url, timeout=60)
-        if response.status_code == 504:
-            print(f"504 Gateway Timeout on {url}, retry {attempt + 1}/{retries} in {delay}s...")
-            time.sleep(delay)
+        try:
+            response = session.get(url, timeout=timeout)
+        except requests.exceptions.RequestException as e:
+            last_err = e
+            _wait = delay * (attempt + 1)
+            print(f"Network error on {url} ({type(e).__name__}), "
+                  f"retry {attempt + 1}/{retries} in {_wait}s…", flush=True)
+            time.sleep(_wait)
+            continue
+        if response.status_code in (502, 503, 504):
+            _wait = delay * (attempt + 1)
+            print(f"HTTP {response.status_code} on {url}, "
+                  f"retry {attempt + 1}/{retries} in {_wait}s…", flush=True)
+            time.sleep(_wait)
             continue
         return response
-    raise RuntimeError(f"Failed to fetch {url} after {retries} retries (504 Gateway Timeout)")
+    raise RuntimeError(
+        f"Failed to fetch {url} after {retries} retries (last error: {last_err})")
 SUBMIT_URL = f"{BASE_URL}/site/submit_data"
 
 NAME_PROT = "actin"
@@ -55,7 +78,7 @@ def file_hash(path):
 
 def get_ppi3d_update():
     try:
-        html = requests.get(BASE_URL, timeout=60).text
+        html = get_with_retry(BASE_URL).text
     except Exception:
         return "unknown"
     soup = BeautifulSoup(html, "html.parser")

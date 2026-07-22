@@ -13,12 +13,26 @@ def create_session():
         "User-Agent": "ppi3d-actin-scraper/1.0"
     })
 
+    # Retry auto sur erreurs réseau (timeout/connexion) et codes 502/503/504,
+    # avec back-off exponentiel. Robustesse indispensable lors d'un premier
+    # téléchargement depuis un autre poste (PPI3D renvoie parfois des timeouts).
+    # Les GET (idempotents) sont re-tentés ; les POST ne le sont PAS (défaut
+    # urllib3) → pas de double soumission de job.
+    from urllib3.util.retry import Retry
+    retry = Retry(
+        total=5, connect=5, read=5, status=5,
+        backoff_factor=2,
+        status_forcelist=[502, 503, 504],
+        raise_on_status=False,
+    )
     adapter = requests.adapters.HTTPAdapter(
         pool_connections=50,
-        pool_maxsize=50
+        pool_maxsize=50,
+        max_retries=retry,
     )
 
     session.mount("https://", adapter)
+    session.mount("http://", adapter)
 
     return session
 
