@@ -23,6 +23,8 @@ def _build_abp_heatmap_data(*_):
     if not all(os.path.exists(f) for f in _ABP_HM_FILES):
         return None
     df3 = pd.read_csv(_ABP_HM_FILES[0])
+    if "residue_number_canon_mafft" not in df3.columns:
+        df3["residue_number_canon_mafft"] = pd.NA  # étape 3 pas encore faite
     df_int_h = pd.read_csv(_ABP_HM_FILES[1])
     df_all_h = pd.read_csv(_ABP_HM_FILES[2])
     df_pp_h = pd.read_csv(_ABP_HM_FILES[3])
@@ -129,6 +131,8 @@ def _build_c70_jaccard_edges(jaccard_threshold: float, *_mtimes):
         return {}
 
     df3 = pd.read_csv(_S1_SUPER_FILES[0])
+    if "residue_number_canon_mafft" not in df3.columns:
+        df3["residue_number_canon_mafft"] = pd.NA  # étape 3 pas encore faite
     df3 = df3[df3["residue_number_canon_mafft"].notna()][[
         "interaction_id", "chain", "residue_number_canon_mafft"
     ]]
@@ -225,6 +229,8 @@ def _build_s1_superclusters(jaccard_threshold: float, *_mtimes):
         return {}, 0
 
     df3 = pd.read_csv(_S1_SUPER_FILES[0])
+    if "residue_number_canon_mafft" not in df3.columns:
+        df3["residue_number_canon_mafft"] = pd.NA  # étape 3 pas encore faite
     df1 = pd.read_csv(_S1_SUPER_FILES[1], usecols=[
                       "interaction_id", "chain_A_id", "chain_B_id"])
     df_all_s = pd.read_csv(_S1_SUPER_FILES[2])

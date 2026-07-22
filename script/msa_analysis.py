@@ -13,6 +13,19 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 
 
+def _read_interface(path, **kw):
+    """read_csv du fichier d'interface/contacts en GARANTISSANT les colonnes de
+    position canonique MAFFT (ajoutées par l'étape 3 du pipeline). Si elles
+    manquent (pipeline pas encore terminé), on les met en NaN → l'app filtre les
+    lignes au lieu de crasher (KeyError). Dégradation propre."""
+    df = pd.read_csv(path, **kw)
+    for _c in ("residue_number_canon_mafft", "residue_A_canon_mafft",
+               "residue_B_canon_mafft"):
+        if _c not in df.columns:
+            df[_c] = pd.NA
+    return df
+
+
 _CHAIN_ID_RE = re.compile(r'^[0-9][a-z0-9]{3}_[A-Za-z]')
 
 
@@ -91,7 +104,7 @@ def _msa_extract_interface_seqs(filter_fn, rigor_pdbs=None):
     df_filt = pd.read_csv(filt_path, low_memory=False)
     if rigor_pdbs:
         df_filt = df_filt[df_filt["pdb_id"].isin(rigor_pdbs)]
-    df3 = pd.read_csv(int3_path)
+    df3 = _read_interface(int3_path)
 
     mask = df_filt["subunit_2_title"].apply(lambda t: filter_fn(str(t)))
     rows = df_filt[mask][
@@ -385,7 +398,7 @@ def _msa_load_interface_g(filter_fn, rigor_pdbs=None):
     df_filt = pd.read_csv(filt_path, low_memory=False)
     if rigor_pdbs:
         df_filt = df_filt[df_filt["pdb_id"].isin(rigor_pdbs)]
-    df3 = pd.read_csv(int3_path)
+    df3 = _read_interface(int3_path)
     rows = df_filt[df_filt["subunit_2_title"].apply(lambda t: filter_fn(str(t)))][
         ["subunit_2", "s2_sequence"]
     ].drop_duplicates(subset=["subunit_2"])
@@ -550,7 +563,7 @@ def _msa_actin_contacts_per_abp(filter_fn, rigor_pdbs=None):
         ["subunit_1", "subunit_2", "subunit_2_title", "s2_sequence", "s2_taxonomy_id"]
     ].copy()
     df1 = pd.read_csv(int1_path)
-    df3 = pd.read_csv(int3_path)
+    df3 = _read_interface(int3_path)
     df3["residue_number_canon_mafft"] = pd.to_numeric(df3["residue_number_canon_mafft"], errors="coerce")
     df3["chain_lower"] = df3["chain"].str.lower()
     return _msa_actin_contacts_from_pairs(df_pairs, df1, df3)
@@ -823,7 +836,7 @@ def _msa_contact_analysis(filter_fn, group_key, rigor_pdbs=None,
         ch2seq   = {r["subunit_2"]: str(r["s2_sequence"]).strip().lower() for _, r in df_grp.iterrows()}
         ch2title = {r["subunit_2"]: str(r["subunit_2_title"]) for _, r in df_grp.iterrows()}
 
-    df4 = pd.read_csv(int4_path)
+    df4 = _read_interface(int4_path)
     df4 = df4[df4["chain_B_id"].isin(ch2seq)].copy()
     if df4.empty:
         st.info("No contact found for this group.")
@@ -1939,7 +1952,7 @@ def _msa_blast_celegans():
             dsA = [i for i in al if not i.startswith("CE_")]
             # positions d'interface reelles -> colonnes
             _da = pd.read_csv("data/filtered/filtered_all_data.csv", low_memory=False)
-            _d3 = pd.read_csv("data/filtered/details/3.interface_residues.csv")
+            _d3 = _read_interface("data/filtered/details/3.interface_residues.csv")
             def _ismyo(t):
                 t = str(t).lower(); return ("myosin" in t) and ("tropomyosin" not in t)
             _rw = _da[_da["subunit_2_title"].apply(_ismyo)][["subunit_2", "s2_sequence"]].drop_duplicates("subunit_2")
@@ -2496,7 +2509,7 @@ def _msa_section_s2_clusters():
         from collections import defaultdict
         _int1_path_s2cl = _Path("data/filtered/details/1.interactions.csv")
         df_filt = pd.read_csv(filt_path, low_memory=False)
-        df3     = pd.read_csv(int3_path)
+        df3     = _read_interface(int3_path)
         _df1_s2cl = pd.read_csv(_int1_path_s2cl) if _int1_path_s2cl.exists() else pd.DataFrame()
         _df3_s2cl = df3.copy()
         _df3_s2cl["residue_number_canon_mafft"] = pd.to_numeric(
@@ -2834,7 +2847,7 @@ def _msa_s1_cluster_data():
 
     df_filt = pd.read_csv(filt_path, low_memory=False)
     _df1    = pd.read_csv(int1_path)
-    _df3    = pd.read_csv(int3_path)
+    _df3    = _read_interface(int3_path)
     _df3["residue_number_canon_mafft"] = pd.to_numeric(
         _df3["residue_number_canon_mafft"], errors="coerce")
     _df3["chain_lower"] = _df3["chain"].str.lower()
@@ -2880,7 +2893,7 @@ def _msa_section_s1_clusters():
 
         df_filt   = pd.read_csv(filt_path, low_memory=False)
         _df1_s1   = pd.read_csv(int1_path)
-        _df3_s1   = pd.read_csv(int3_path)
+        _df3_s1   = _read_interface(int3_path)
         _df3_s1["residue_number_canon_mafft"] = pd.to_numeric(
             _df3_s1["residue_number_canon_mafft"], errors="coerce")
         _df3_s1["chain_lower"] = _df3_s1["chain"].str.lower()

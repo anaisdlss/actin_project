@@ -32,6 +32,8 @@ def _build_s1_global_heatmap(_mtimes):
     di = pd.read_csv(_S1_GLOBAL_FILES[2])[
         ["interaction_id", "chain_A_id", "chain_B_id"]]
     res = pd.read_csv(_S1_GLOBAL_FILES[3])
+    if "residue_number_canon_mafft" not in res.columns:
+        res["residue_number_canon_mafft"] = pd.NA  # étape 3 pas encore faite
     res["canon"] = pd.to_numeric(
         res["residue_number_canon_mafft"], errors="coerce")
     res["basa"] = pd.to_numeric(
@@ -211,6 +213,8 @@ def _s1_sources(_mtimes):
     di = pd.read_csv(_S1_GLOBAL_FILES[2])[
         ["interaction_id", "chain_A_id", "chain_B_id"]]
     res = pd.read_csv(_S1_GLOBAL_FILES[3])
+    if "residue_number_canon_mafft" not in res.columns:
+        res["residue_number_canon_mafft"] = pd.NA  # étape 3 pas encore faite
     res["canon"] = pd.to_numeric(
         res["residue_number_canon_mafft"], errors="coerce")
     res["basa"] = pd.to_numeric(
@@ -376,6 +380,8 @@ def _s1_position_detail(patch, _mtimes):
 
     # aa d'actin par (position, organisme) — côté actin (chaîne A)
     res = pd.read_csv(_S1_GLOBAL_FILES[3])
+    if "residue_number_canon_mafft" not in res.columns:
+        res["residue_number_canon_mafft"] = pd.NA  # étape 3 pas encore faite
     res = res[res["interaction_id"].isin(iids)].copy()
     res["canon"] = pd.to_numeric(
         res["residue_number_canon_mafft"], errors="coerce")
@@ -389,6 +395,8 @@ def _s1_position_detail(patch, _mtimes):
 
     # aa d'ABP en contact par (position, ABP) — contacts hétéro uniquement
     con = pd.read_csv("data/filtered/details/4.inter-residue_contacts.csv")
+    if "residue_A_canon_mafft" not in con.columns:
+        con["residue_A_canon_mafft"] = pd.NA  # étape 3 pas encore faite
     con = con[con["interaction_id"].isin(iids)].copy()
     con = con[con["interaction_id"].map(iid2s2act) == False]
     con["canon"] = pd.to_numeric(con["residue_A_canon_mafft"], errors="coerce")

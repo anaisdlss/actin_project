@@ -90,7 +90,14 @@ def build_passport(_mtimes):
     m = m[["interaction_id", "chain_A_id", "abp", "c70", "s1_site"]]
 
     # ── res_abp : % ASA du résidu actin par ABP (source = 3.interface_residues) ─
-    iface = pd.read_csv(f_iface)
+    iface = pd.read_csv(f_iface, low_memory=False)
+    # Dégradation propre : si les positions canoniques MAFFT ne sont pas encore
+    # calculées (étape 3 du pipeline non terminée), on renvoie None → l'app
+    # affiche « données indisponibles » au lieu de crasher (KeyError).
+    _need = {"residue_number_canon_mafft", "buried_ASA_percent",
+             "chain", "interaction_id"}
+    if not _need.issubset(iface.columns):
+        return None
     iface["asa_pct"] = pd.to_numeric(
         iface["buried_ASA_percent"].astype(str).str.replace("%", "", regex=False),
         errors="coerce")

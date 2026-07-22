@@ -42,6 +42,8 @@ def _load_bipartite_base(_v, *_mtimes):
         return None
 
     df_res3 = pd.read_csv(_BIPARTITE_FILES[0])
+    if "residue_number_canon_mafft" not in df_res3.columns:
+        df_res3["residue_number_canon_mafft"] = pd.NA  # étape 3 pas encore faite
     df_int_b = pd.read_csv(_BIPARTITE_FILES[1])
     df_all_b = pd.read_csv(_BIPARTITE_FILES[2])
     df_s1_b = pd.read_csv(_BIPARTITE_FILES[3])
@@ -524,6 +526,9 @@ def _load_res4(_v, *_mtimes):
     if not os.path.exists(p):
         return None
     df = pd.read_csv(p)
+    for _c in ("residue_A_canon_mafft", "residue_B_canon_mafft"):
+        if _c not in df.columns:
+            df[_c] = pd.NA  # étape 3 pas encore faite
     df["contact_area"] = pd.to_numeric(
         df["contact_area"], errors="coerce").fillna(0.0)
     df["residue_B_canon_mafft"] = pd.to_numeric(
@@ -766,6 +771,8 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
     # comparant residue_A de la table 4 avec les résidus de chain_A dans la
     # table 3 (qui respecte toujours l'ordre du résumé).
     _df3_t4fix = pd.read_csv(_BIPARTITE_FILES[0])
+    if "residue_number_canon_mafft" not in _df3_t4fix.columns:
+        _df3_t4fix["residue_number_canon_mafft"] = pd.NA  # étape 3 pas encore faite
     _df3_t4fix["residue_number_canon_mafft"] = pd.to_numeric(
         _df3_t4fix["residue_number_canon_mafft"], errors="coerce")
     _df3_t4fix = _df3_t4fix[_df3_t4fix["interaction_id"].isin(all_iids)].copy()

@@ -48,6 +48,8 @@ def _actin_aa_by_organism(_mtimes):
     iid2tax = dict(zip(m["interaction_id"], m["s1_taxonomy_id"]))
     iid2pdb = dict(zip(m["interaction_id"], m["pdb_id"]))
     res = pd.read_csv(f_res)
+    if "residue_number_canon_mafft" not in res.columns:
+        res["residue_number_canon_mafft"] = pd.NA  # étape 3 pas encore faite
     res = res[res["interaction_id"].isin(set(m["interaction_id"]))].copy()
     res["canon"] = pd.to_numeric(res["residue_number_canon_mafft"], errors="coerce")
     res = res.dropna(subset=["canon"])
