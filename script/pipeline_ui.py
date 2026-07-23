@@ -9,9 +9,8 @@ import streamlit as st
 
 def render():
     st.header("Data download", anchor="telechargement-des-donnees")
-    st.caption("— Technical section (reproducibility). Fetches and updates the "
-               "PPI3D data. A biologist can skip ahead to “ABP footprint on "
-               "actin”.")
+    st.caption("Downloads and updates the PPI3D structural data — the source "
+               "of every analysis below.")
 
     STEPS = {
         "1/9":  "PPI3D download (summary + PDB + data)",

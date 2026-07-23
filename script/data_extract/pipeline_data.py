@@ -13,6 +13,7 @@ SUPERCLUSTER_NOTEBOOK = PROJECT_ROOT / "notebooks" / "binding_site_superclusters
 CLUSTER_NOTEBOOK  = PROJECT_ROOT / "notebooks" / "cluster_interaction_analysis.py"
 C70_NOTEBOOK      = PROJECT_ROOT / "notebooks" / "interface_analysis_c70.py"
 S1_NOTEBOOK       = PROJECT_ROOT / "notebooks" / "interface_analysis_s1.py"
+FILAMENT_NOTEBOOK = PROJECT_ROOT / "notebooks" / "actin_filament_positions.py"
 ABP_NOTEBOOK      = PROJECT_ROOT / "notebooks" / "abp_analysis.py"
 
 DATA          = PROJECT_ROOT / "data"
@@ -270,10 +271,18 @@ def main():
         _flag = VISUALISATIONS / "abp_analysis_done.flag"
         _flag.parent.mkdir(parents=True, exist_ok=True)
         run_group("8/9 — Analyse ABP — compétition et interfaces", [
+            # Positions filament (barbé/pointé/latéral par ABP) — requis par
+            # abp_analysis. Ne dépend que des sorties de l'étape 2.
+            ("Positions filament de l'actine [notebook]",
+             is_up_to_date(FILTERED / "actin_filament_positions.csv",
+                           FILTERED / "filtered_all_data.csv",
+                           FILTERED / "proteins_per_pdb.csv", FILAMENT_NOTEBOOK),
+             lambda: _nb(FILAMENT_NOTEBOOK), None),
             ("Compétition, interfaces, PDB sans ABP [notebook]",
              is_up_to_date(_flag, FILTERED / "filtered_all_data.csv",
                            FILTERED / "patches_infos_cluster_data_70.csv",
-                           FILTERED / "patches_infos_s1_binding_site.csv", ABP_NOTEBOOK),
+                           FILTERED / "patches_infos_s1_binding_site.csv",
+                           FILTERED / "actin_filament_positions.csv", ABP_NOTEBOOK),
              lambda: _nb(ABP_NOTEBOOK), _flag),
         ])
 

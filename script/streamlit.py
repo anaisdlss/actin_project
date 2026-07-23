@@ -1119,7 +1119,7 @@ st.caption("Actin's **partner proteins**: overview (who contacts "
 proteins_path = "data/filtered/proteins_per_pdb.csv"
 _all_data_path = "data/filtered/filtered_all_data.csv"
 if os.path.exists(proteins_path):
-    st.subheader("Non-actin proteins (ABPs) — overview")
+    st.subheader("Actin-binding proteins (ABPs) — overview")
     df_pp_all = read_csv(proteins_path)
     df_abp = df_pp_all[~df_pp_all["is_actin"]]
 
