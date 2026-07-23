@@ -91,14 +91,39 @@ def poll_once(session, job_id):
 
 
 def download_extract(session, job_id, slug):
-    """Télécharge le ZIP du job et l'extrait dans data/proteocast/abp/<slug>/."""
+    """Télécharge le ZIP du job et l'extrait dans data/proteocast/abp/<slug>/.
+
+    Robuste à une structure imbriquée : certains ZIP contiennent les fichiers
+    dans un sous-dossier (ex. jobXXXX/…). Si le fichier clé n'est pas à la racine
+    après extraction, on le cherche récursivement et on APLATIT le contenu."""
+    import shutil
     r = session.get(f"{DL}job{job_id}/", timeout=300)
     r.raise_for_status()
     dest = ABP_DIR / slug
     dest.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(io.BytesIO(r.content)) as z:
         z.extractall(dest)
-    return is_done(slug)
+    if is_done(slug):
+        return True
+    # Pas à la racine → chercher le CSV clé dans les sous-dossiers et aplatir.
+    hits = list(dest.rglob("4.query_ProteoCast.csv"))
+    if hits:
+        _src = hits[0].parent
+        for _p in _src.iterdir():
+            _t = dest / _p.name
+            if not _t.exists():
+                shutil.move(str(_p), str(_t))
+        return is_done(slug)
+    # Vraiment absent : ProteoCast n'a pas produit de résultat pour cet ABP.
+    # On logue le contenu du ZIP pour diagnostic.
+    try:
+        with zipfile.ZipFile(io.BytesIO(r.content)) as z:
+            _names = z.namelist()
+        print(f"    (ZIP {slug} : {len(_names)} entrées, ex. "
+              f"{_names[:5]}) — aucun 4.query_ProteoCast.csv", flush=True)
+    except Exception:
+        pass
+    return False
 
 
 def main():
