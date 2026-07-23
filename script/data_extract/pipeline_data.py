@@ -132,7 +132,15 @@ def main():
     SF = FILTERED / "details" / "structures_files"
     RG = PROJECT_ROOT / "script" / "data_extract"
 
-    for d in [RAW, FILTERED, DETAILS, ALIGNMENTS]:
+    # Créer d'emblée TOUS les dossiers de sortie : sur un poste neuf, une étape
+    # peut écrire dans un dossier qu'une étape ultérieure créait normalement
+    # (ex. étape 4 écrit dans bfactor_c70_interface, créé sinon à l'étape 5) →
+    # FileNotFoundError. On les crée tous ici, une bonne fois.
+    _bfi = SF / "bfactor_c70_interface"
+    for d in [RAW, FILTERED, DETAILS, ALIGNMENTS, VISUALISATIONS, SF,
+              _bfi, _bfi / "by_s1_cluster", _bfi / "by_s1_gradient",
+              SF / "bfactor_cluster", SF / "pairwise", SF / "assembly",
+              SF / "pymol", PROJECT_ROOT / "data/exports/abp_site_domain"]:
         d.mkdir(parents=True, exist_ok=True)
 
     try:

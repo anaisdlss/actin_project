@@ -524,6 +524,9 @@ import re as _re
 from pathlib import Path
 
 PDB_DIR = Path('data/filtered/details/structures_files/bfactor_c70_interface')
+# Créer le dossier : sur un poste neuf, l'étape 4 tourne AVANT l'étape 5 qui le
+# créait — sinon l'écriture du .pml plante (FileNotFoundError).
+PDB_DIR.mkdir(parents=True, exist_ok=True)
 OUT_PML = PDB_DIR / 'view_all_clusters.pml'
 
 # Rôles S1/S2 par cluster (généré par bfactor_c70_interface.py)
