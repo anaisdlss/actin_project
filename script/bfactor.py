@@ -27,6 +27,41 @@ df_all = pd.read_csv(ALL_DATA)
 df_int = pd.read_csv(TABLE1)
 df3 = pd.read_csv(TABLE3)
 df8 = pd.read_csv(TABLE8)
+
+# Auto-suffisance : s1_cluster_reference.csv est normalement produit par
+# interface_analysis_s1 (étape 7), or bfactor (étape 5) en a besoin AVANT. Sur un
+# run neuf l'étape 7 n'a pas encore tourné → on le génère ici depuis
+# filtered_all_data (mêmes représentants : séquence la plus fréquente par patch,
+# préférence humaine). L'étape 7 le régénérera à l'identique (déterministe).
+if not os.path.exists(REF_CSV):
+    _HUMAN_TAXID = 9606
+
+    def _mk(df, cols, ren):
+        return df[df[cols[0]] == True][cols[1:]].rename(columns=ren).dropna(
+            subset=["patch"])
+    _s1 = _mk(df_all,
+              ["s1_actine", "pdb_id", "s1_binding_site_cluster_data_70",
+               "s1_sequence", "s1_taxonomy_id", "subunit_1"],
+              {"s1_binding_site_cluster_data_70": "patch", "s1_sequence": "seq",
+               "s1_taxonomy_id": "taxid", "subunit_1": "chain"})
+    _s2 = _mk(df_all,
+              ["s2_actine", "pdb_id", "s2_binding_site_cluster_data_70",
+               "s2_sequence", "s2_taxonomy_id", "subunit_2"],
+              {"s2_binding_site_cluster_data_70": "patch", "s2_sequence": "seq",
+               "s2_taxonomy_id": "taxid", "subunit_2": "chain"})
+    _pool = pd.concat([_s1, _s2], ignore_index=True)
+    _pool["seq"] = _pool["seq"].fillna("").str.upper()
+    _rows = []
+    for _patch, _sub in _pool.groupby("patch"):
+        _cand = _sub[_sub["seq"] == _sub["seq"].value_counts().idxmax()]
+        _hum = _cand[_cand["taxid"] == _HUMAN_TAXID]
+        _ch = _hum.iloc[0] if not _hum.empty else _cand.iloc[0]
+        _rows.append({"patch": _patch, "pdb_id": _ch["pdb_id"],
+                      "chain": str(_ch["chain"])})
+    pd.DataFrame(_rows).to_csv(REF_CSV, index=False)
+    print(f"s1_cluster_reference.csv généré ({len(_rows)} patches) "
+          "— étape 7 pas encore passée")
+
 df_ref = pd.read_csv(REF_CSV)
 df_c70 = pd.read_csv(C70_CSV)
 

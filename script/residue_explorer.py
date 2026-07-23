@@ -87,7 +87,9 @@ def render_residue_fiche(pp, canon):
     # ── Classe ProteoCast (en gros) + sensibilité vs moyenne ────────────────
     if row is not None:
         _cls = row.get("residue_class")
-        st.markdown(f"## ProteoCast class: {_cls}")
+        # h4 (pas h2) : c'est un sous-titre du détail résidu, pas une grande
+        # section — sinon il prend le bandeau de section (style h2 global).
+        st.markdown(f"#### ProteoCast class: {_cls}")
 
         # Conservation (positif, intuitif : PLUS HAUT = PLUS CONSERVÉ = plus
         # sensible aux mutations). Référence = moyenne des résidus de SURFACE
@@ -896,7 +898,8 @@ def _render_actin_overview_3d(pp, sel):
         # résidu sélectionné : patch de surface en JAUNE FLUO, opaque
         v.addSurface(py3Dmol.SES, {"opacity": 1.0, "color": "#eaff00"},
                      {"resi": resi})
-    v.zoomTo()   # vue d'ensemble stable — on ne re-zoome pas sur le résidu
+    v.zoomTo()       # vue d'ensemble stable — on ne re-zoome pas sur le résidu
+    v.zoom(0.82)     # léger dézoom pour que TOUTE l'actine tienne dans le cadre
     v.setBackgroundColor("white")
     st.components.v1.html(v._make_html(), height=470, scrolling=False)
     _aa = row["actin_aa"] if row is not None and pd.notna(row.get("actin_aa")) else ""
