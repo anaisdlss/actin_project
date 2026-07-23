@@ -132,13 +132,36 @@ pipeline_ui.render()
 _pc_mt = os.path.getmtime("data/proteocast/abp_inputs/manifest.csv") \
     if os.path.exists("data/proteocast/abp_inputs/manifest.csv") else 0.0
 _pc_status = proteocast_view.load_status(_pc_mt)
-_pc_miss = int((~_pc_status["fait"]).sum()) if _pc_status is not None else 0
+# Compteur LIVE (lu directement sur le disque à chaque run — pas le cache, qui
+# resterait figé tant que le manifest ne change pas) : « remaining » = ABP sans
+# résultat ET pas en échec définitif. Les ABP que ProteoCast ne SAIT PAS calculer
+# (trop grosses : Myosin/β-myosin ~1900 aa ; fusions ; MSA trop pauvre) sont
+# consignés dans _failed_slugs.txt → on les sort du « remaining » (sinon il ne
+# tomberait jamais à 0) et on les annonce à part.
+import glob as _glob
+_pc_all = set(_pc_status["slug"].astype(str)) if _pc_status is not None else set()
+_pc_done = {os.path.basename(os.path.dirname(_p))
+            for _p in _glob.glob("data/proteocast/abp/*/4.query_ProteoCast.csv")}
+_pc_failf = "data/proteocast/abp/_failed_slugs.txt"
+_pc_permfail = ({l.strip() for l in open(_pc_failf) if l.strip()}
+                if os.path.exists(_pc_failf) else set())
+# « remaining » = tous les ABP sans résultat (lu LIVE sur le disque, pas le cache).
+_pc_missing = _pc_all - _pc_done
+_pc_miss = len(_pc_missing)
+# Parmi eux, ceux que ProteoCast ne SAIT PAS calculer (déjà en échec définitif :
+# trop grosses ~1900 aa, fusions, MSA trop pauvre) → signalés à part.
+_pc_uncomputable = len(_pc_missing & _pc_permfail)
 st.markdown("**ABP ProteoCast — compute the mutational landscape for all ABPs**")
-st.caption("Opt-in, separate from `Run / update` — computing **all** ABPs "
+_pc_cap = ("Opt-in, separate from `Run / update` — computing **all** ABPs "
            "can take **several hours** (submitted 4 at a time). "
            "Resumable: skips those already done.")
+if _pc_uncomputable:
+    _pc_cap += (f"  \n_Of these, {_pc_uncomputable} can't be computed by ProteoCast "
+                "(protein too large / fusion / weak MSA) — expected, they will "
+                "keep failing._")
+st.caption(_pc_cap)
 _pc_label = (f"Compute all missing ProteoCast — {_pc_miss} remaining" if _pc_miss
-             else "Update ProteoCast (refresh ABP list + compute new)")
+             else "Update ProteoCast (refresh + retry)")
 # bouton rouge (comme le téléchargement) mais un peu plus transparent
 st.markdown(
     "<style>[class*='st-key-pc_run_all_missing'] button{"
