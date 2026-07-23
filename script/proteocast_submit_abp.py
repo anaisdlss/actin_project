@@ -209,15 +209,10 @@ def main():
             else:
                 _fail(slug, "ZIP téléchargé mais fichier clé absent")
 
-        # 3) battement de cœur : montrer ce qui tourne + temps écoulé, puis
-        #    patienter avant le prochain tour (sinon l'UI a l'air figée).
+        # 3) patienter avant le prochain tour — SANS log par cycle : on n'affiche
+        #    qu'aux ÉVÉNEMENTS (soumission, téléchargement OK, échec), pas les
+        #    lignes « en cours » répétées identiques qui inondaient la sortie.
         if inflight:
-            _hb = ", ".join(
-                f"{v['title'][:22]} {int(time.time() - v['t0'])}s"
-                for v in inflight.values())
-            _left = len(pending) + len(inflight)
-            print(f"    … {len(inflight)} en cours ({_left} restants) : {_hb}",
-                  flush=True)
             time.sleep(POLL_EVERY)
 
     _save_failed(new_failed)
