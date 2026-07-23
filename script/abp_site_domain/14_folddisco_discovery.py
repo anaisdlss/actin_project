@@ -112,7 +112,14 @@ def _get(url):
     """GET avec retry sur 429/5xx."""
     delay = 15
     for k in range(RETRY_TRIES):
-        r = requests.get(url, timeout=120)
+        try:
+            r = requests.get(url, timeout=120)
+        except requests.exceptions.RequestException as e:
+            print(f"    erreur réseau (GET) {type(e).__name__} — attente {delay}s "
+                  f"(essai {k+1}/{RETRY_TRIES})", flush=True)
+            time.sleep(delay)
+            delay = min(delay * 2, 120)
+            continue
         if r.status_code == 429 or r.status_code >= 500:
             w = _wait_after(r, delay)
             print(f"    {r.status_code} (GET) — attente {w}s "
