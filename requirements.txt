@@ -1,9 +1,0 @@
-streamlit>=1.55.0,<2
-networkx>=3.6.1,<4
-pyvis>=0.3.2,<1
-matplotlib>=3.10.8,<4
-biopython>=1.87,<2
-pandas>=2.0,<3
-numpy>=1.26,<3
-py3dmol
-seaborn>=0.13.2,<0.14
