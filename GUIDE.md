@@ -42,8 +42,17 @@ The full dataset is regenerated locally by a **9-step pipeline** (button
 > the ProteoCast computation are disabled there (they only run on the full local
 > project).
 
-**ProteoCast** (per-ABP mutational landscape) is a separate, opt-in computation
-run on [proteocast.ijm.fr](https://proteocast.ijm.fr) (one job per ABP).
+### How long it takes (local only)
+
+- **Regenerating the full dataset** (*Run / update*) takes **≈ 1 hour** on a
+  fresh clone — it downloads every actin co-structure from PPI3D and runs
+  MAFFT + the structural analyses. It is **resumable** (steps already done are
+  skipped), so you can stop and come back.
+- **ProteoCast** (per-ABP mutational landscape) is a separate, opt-in
+  computation run on [proteocast.ijm.fr](https://proteocast.ijm.fr), **one job
+  per ABP**. Computing **all** ABPs can take **several hours** (some large
+  proteins take ~20 min each). It is resumable too. A few very large / fusion
+  proteins simply cannot be computed by ProteoCast — this is expected.
 
 ---
 
@@ -119,19 +128,54 @@ or compare an ABP pair (footprint overlap), on the per-residue passport table.
 
 ---
 
-## 5. Reading the main visualisations
+## 5. What each readout indicates (quick reference)
 
+Because the interface is kept clean, the meaning of every element is listed here.
+
+**Counts and headers**
+- *"N actin residues · M partner proteins · n=X interactions"* — how much data
+  the current view is built on: X = number of structural interactions pooled,
+  N/M = distinct residues/partners involved.
+- *"2,152 rows · 23 columns"* — size of the underlying table.
+- *"N interactions"* next to a cluster — how many solved interactions fall in it
+  (bigger = more frequently observed geometry).
+
+**Colours**
+- **Buried %ASA scale** (pale yellow → dark red): how buried a residue is at the
+  interface. Pale = barely touching, dark red = deeply buried = central to the
+  contact. Used in the residue networks and the interface sequences.
+- **3D surfaces**: yellow = the selected chain, blue = its partner, grey = the
+  rest of the assembly. In binding-site 3D, the actin surface is shaded by the
+  buried %ASA of the contacted patch.
+- **ABP network node colour** = ABP family; **node size** = share of its binding
+  sites that are contested (competition view).
+- **Purple gradient** (specificity views) = how many partners contact a given
+  actin position (bright = shared by many, pale = specific to one).
+
+**Individual readouts**
 - **Bipartite / radial residue networks** — each residue is a node coloured by
-  **buried %ASA** (pale yellow = low, dark red = high). Edge = a contact. Hover a
-  node for its canonical position, %ASA and interaction count.
-- **Interface sequences coloured by %ASA** — the linear view of the same
-  information: each interface residue is shaded by how buried it is at the
-  contact.
-- **3D surfaces** — the actual structure; colours mark the selected chain / its
-  partner / the contacted region.
+  buried %ASA; an edge is a residue-residue contact. Hover a node for its
+  canonical position, %ASA and interaction count.
+- **Interface sequences coloured by %ASA** — the linear version of the same
+  information: each interface residue is shaded by how buried it is.
 - **Conservation plot (ProteoCast on actin)** — grey line = conservation along
-  the whole actin sequence; red dots = the positions this ABP contacts. Lets you
-  see if a partner binds conserved or variable regions.
+  the whole actin sequence; red dots = the positions the ABP contacts. Tells you
+  whether a partner binds **conserved** (functionally important) or **variable**
+  regions of actin.
+- **Footprint vs surface** (ProteoCast panel) — *higher* / *lower*: is the
+  actin footprint of this ABP more or less conserved than the rest of the actin
+  surface? A Mann-Whitney p-value quantifies it.
+- **Residue conservation … vs mean surface** — for one actin position: its
+  conservation and how far it sits above/below the average surface residue.
+- **ProteoCast mutational landscape** — per position of the ABP, how sensitive
+  it is to mutation (dark = deleterious/constrained). The green track marks the
+  positions that touch actin, so you see if the binding interface is under
+  constraint.
+- **Competition / Cooperation networks** — an edge means two ABPs compete
+  (overlapping footprints) or cooperate (co-present in a PDB).
+- **FoldDisco "same motif" reading** — whether two ABPs (or an ABP vs the PDB)
+  share the same 3D interface geometry: coverage (% shared), normalised score
+  (quality 0-1), RMSD (fit). A low RMSD on few residues is *inconclusive*.
 
 ---
 
