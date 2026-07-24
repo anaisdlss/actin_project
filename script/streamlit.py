@@ -87,25 +87,33 @@ st.markdown(
 _FAST = os.environ.get("FAST", "") == "1"
 
 st.title("Actin-actin and actin-ABP interaction analysis - PPI3D")
+
+# ── Documentation : tout le sens (méthodes, glossaire, ce que veut dire l'ASA,
+#    d'où viennent les données) est dans GUIDE.md, affiché ici. ───────────────
+st.header("Documentation", anchor="documentation")
+_guide = _Path("GUIDE.md")
+with st.expander("How to read this app — methods, glossary, data sources",
+                 expanded=False):
+    if _guide.exists():
+        st.markdown(_guide.read_text(), unsafe_allow_html=False)
+    else:
+        pass
+
 if _FAST:
     st.info("FAST mode: only the networks are loaded (FAST=1).")
 
 with st.sidebar:
-    st.markdown("## Navigation")
+    st.markdown("## Contents")
     st.markdown("""
-**Essentials (biology)**
-- [Actin & its partners](#empreinte-abp)
-- [ABP overview](#abp)
-
-**Explore in detail**
-- [Clusters / binding sites](#clusters-d-interactions)
-- [Compare sequences, ABPs, pairs](#explorateur)
-- [Alignments (MSA)](#msa-proteines)
-
-**Technical (reproducibility)**
+- [Documentation](#documentation)
 - [Data download](#telechargement-des-donnees)
 - [Filtered data](#donnees-filtrees-s1-actin)
 - [Valid PDB structures](#structures-pdb-valides)
+- [ABP footprint on actin](#empreinte-abp)
+- [Interaction clusters](#clusters-d-interactions)
+- [ABP](#abp)
+- [Interactive explorer](#explorateur)
+- [MSA — Interface proteins](#msa-proteines)
 """)
     st.divider()
     # Remède aux « anciennes données » : vide tous les caches (@st.cache_data /
@@ -165,7 +173,6 @@ if not DEPLOY_MODE:
         _pc_cap += (f"  \n_Of these, {_pc_uncomputable} can't be computed by ProteoCast "
                     "(protein too large / fusion / weak MSA) — expected, they will "
                     "keep failing._")
-    st.caption(_pc_cap)
     _pc_label = (f"Compute all missing ProteoCast — {_pc_miss} remaining" if _pc_miss
                  else "Update ProteoCast (refresh + retry)")
     # bouton rouge (comme le téléchargement) mais un peu plus transparent
@@ -252,8 +259,6 @@ if _pc_go:
 
 st.divider()
 st.header("Filtered data", anchor="donnees-filtrees-s1-actin")
-st.caption("— Technical section. Structures kept after quality filtering and "
-           "identification of actin chains.")
 
 
 TABLES = {
@@ -282,8 +287,6 @@ if available_tables:
         cols_to_show = [c for c in df.columns if df[c].nunique() > 1]
     else:
         cols_to_show = list(df.columns)
-    st.caption(
-        f"{len(df):,} rows · {len(cols_to_show)} columns shown (of {len(df.columns)} total)")
     st.dataframe(df[cols_to_show], width="stretch")
 
 # Métrique PDB
@@ -326,11 +329,6 @@ if all(os.path.exists(p) for p in METRICS_FILES.values()):
                 str).str.upper().str.strip().nunique())
             _kept_pdb = int(df_pdb["pdb_id"].nunique())
             _n_int = f"{len(df_int):,}".replace(",", " ")
-            st.caption(
-                f"Data funnel — PPI3D returned **{_raw_pdb}** actin PDB structures → "
-                f"**{_kept_pdb}** kept after the *≥ 5 connected actin subunits* filter → "
-                f"**{_n_int}** interface interactions. The count reflects the current "
-                "PPI3D snapshot (full replace on each update), so it can go up or down.")
             # Visible completeness check: a partial/interrupted details download
             # leaves fewer interactions than the summary — warn instead of failing
             # silently (the pipeline now auto-completes on the next run).
@@ -356,8 +354,6 @@ pdb_filt_path = "data/filtered/filtered_pdb_entry.csv"
 if os.path.exists(pdb_filt_path):
     st.divider()
     st.header("Valid PDB structures", anchor="structures-pdb-valides")
-    st.caption("— Technical section. Explorer for the retained 3D structures "
-               "(chains, sequences, alignments per PDB).")
 
     df_entry = read_csv(pdb_filt_path)
     pdb_ids = sorted(df_entry["pdb_id"].str.upper().unique())
@@ -861,9 +857,6 @@ st.divider()
 # ── Empreinte ABP sur l'actin : grand actin coloré par nb d'ABP + clic résidu ──
 if not _FAST:
     st.header("ABP footprint on actin", anchor="empreinte-abp")
-    st.caption("**The flagship view.** The whole actin, coloured by how many "
-               "partners (ABPs) contact each residue. Click a residue to "
-               "see which ABPs use it, at what %, and whether it is conserved.")
     _pp_ov = build_passport(pp_mtimes())
     if _pp_ov is None:
         st.info("Residue-passport data unavailable "
@@ -878,9 +871,6 @@ if st.session_state.pop("_scroll_clusters", False):
     st.components.v1.html(
         "<script>window.parent.location.hash = 'clusters-d-interactions';"
         "</script>", height=0)
-st.caption("Actin's **binding sites**, grouped: which regions of "
-           "actin are used, by which partners, and how. Choose a "
-           "cluster to see its contact network and 3D structure.")
 
 PATCHES_S1_CSV = "data/filtered/patches_infos_s1_binding_site.csv"
 PATCHES_C70_CSV = "data/filtered/patches_infos_cluster_data_70.csv"
@@ -930,7 +920,6 @@ else:
         if os.path.exists(PATCHES_S1_CSV):
 
             df_s1 = read_csv(PATCHES_S1_CSV)
-            st.caption(f"{len(df_s1)} patchs")
 
             df_s1_display = df_s1.drop(
                 columns=["ids_interactions"], errors="ignore").copy()
@@ -985,20 +974,6 @@ else:
                         key="heatmap_norm_mode",
                     )
                     _rel = heatmap_mode == "Relative (max cluster = 1)"
-                    st.caption(
-                        "Each row normalised by its own max — compares the "
-                        "interface motifs across clusters."
-                        if _rel else
-                        "Absolute values in % buried ASA — compares burial "
-                        "intensity across clusters.")
-                    st.caption(
-                        "Columns at their true canonical position (gaps included); "
-                        "bottom band = number of clusters touching each position; "
-                        "hover = value to 2 decimals. "
-                        "**White** = position never at the interface (gap); "
-                        "**very pale yellow** = position contacted but value ≈ 0. "
-                        "**Click a coloured cell** to open the detail of this "
-                        "cluster (the page scrolls automatically).")
                     _render_s1_global_plotly(
                         _s1g_data, _rel,
                         valid_clusters=set(df_s1["patch"].astype(str)))
@@ -1049,9 +1024,6 @@ else:
                     _html_bip, _n_r, _n_p, _n_t = _build_bipartite_html(
                         sel_s1, _BIP_CACHE_VERSION, *_bip_mtimes())
                     if _html_bip:
-                        st.caption(
-                            f"{_n_r} actin residues · {_n_p} partner proteins"
-                            f" · n={_n_t} interactions")
                         st.components.v1.html(
                             _html_bip, height=540, scrolling=False)
                     else:
@@ -1077,12 +1049,8 @@ else:
                     if _s1solo:
                         _hs, _smax = _s1solo[0], _s1solo[1]
                         st.components.v1.html(_hs, height=490, scrolling=False)
-                        st.caption(
-                            f"Actin only — yellow→red = buried % ASA (max {_smax:.1f}%). "
-                            "Choose an ABP — or “All together” — to add the partner(s).")
                     else:
-                        st.caption(
-                            "Choose an ABP — or “All together” — from the menu.")
+                        pass
                 elif _mode3d == "all":
                     _paths = tuple(o["pdb"] for o in _abp3d)
                     _labs = tuple(o["label"] for o in _abp3d)
@@ -1095,8 +1063,6 @@ else:
                             f"<span style='color:{_ABP_MULTI_COLORS[i % len(_ABP_MULTI_COLORS)]};"
                             f"font-size:16px'>■</span> {l}"
                             for i, (c, l) in enumerate(_cmap.items()))
-                        st.caption(
-                            "Actin: yellow→red surface (% buried ASA). Superimposed ABPs:")
                         st.markdown(_leg, unsafe_allow_html=True)
                     else:
                         st.info("Superposition not possible for this site.")
@@ -1106,9 +1072,6 @@ else:
                         _h3d, _amax, _bmax = _r3d
                         st.components.v1.html(
                             _h3d, height=490, scrolling=False)
-                        st.caption(
-                            f"Actin: yellow→red = buried % ASA (max {_amax:.0f}%) · "
-                            f"ABP: white→green = contact intensity (max {_bmax:.0f}%).")
                     else:
                         st.info("3D structure unreadable for this ABP.")
 
@@ -1142,9 +1105,6 @@ else:
             if _pdetail is None:
                 st.info("Profile unavailable for this cluster.")
             else:
-                st.caption(
-                    "S1 interface profile then breakdown by C70 sub-cluster "
-                    "(each row = 1 C70 cluster) — hover = position + %ASA.")
                 _render_s1_patch_plotly(_pdetail, sel_s1)
 
             # ── Analyse des contacts ABP–actin ──────────────────────────────
@@ -1178,17 +1138,11 @@ else:
     # --- Cluster Data 70 ---
     with tab_c70:
         if os.path.exists(_all_data_path):
-            st.caption(
-                "Red: actin binding sites (S1 + S2 homo) · Purple: C70 clusters · "
-                "Green: partner binding sites (hetero) · "
-                "Grey dashed: actin↔partner interaction · Orange dashed: actin↔actin interaction"
-            )
             st.components.v1.html(_build_tripartite_graph_html(
                 _all_data_path), height=900)
             st.divider()
         if os.path.exists(PATCHES_C70_CSV):
             df_c70 = read_csv(PATCHES_C70_CSV)
-            st.caption(f"{len(df_c70)} patchs")
 
             df_c70_display = df_c70.drop(
                 columns=["ids_interactions"], errors="ignore").copy()
@@ -1235,9 +1189,6 @@ else:
                  _cmat_c70) = _build_bipartite_c70_html(
                     sel_c70, True, _color_mode, _BIP_CACHE_VERSION, *_bip_mtimes())
                 if _html_c70:
-                    st.caption(
-                        f"{_n_s1} actin residues (S1) · {_n_s2} partner residues (S2)"
-                        f" · n={_n_tot} interactions")
                     _net_height = 650
                     if _html_3d_c70:
                         # Biparti + 3D côte à côte (biparti plus large).
@@ -1287,9 +1238,6 @@ else:
 
                         st.markdown("**Interface sequences — buried %ASA "
                                     "(representative pair)**")
-                        st.caption("Actin (S1) and partner (S2) sequences; interface "
-                                   "residues coloured by buried surface (darker = "
-                                   "more buried). Hover = position + %ASA.")
                         _qa1, _qa2 = st.columns(2)
                         with _qa1:
                             st.markdown("Actin (S1)")
@@ -1308,10 +1256,6 @@ else:
 
 st.divider()
 st.header("ABP")
-st.caption("Actin's **partner proteins**: overview (who contacts "
-           "what), which ABPs **compete** or **coexist** on actin "
-           "(networks), then the **detail of a chosen ABP** (its sites, its "
-           "conservation, its footprint).")
 
 # Vue globale des protéines non-actins
 proteins_path = "data/filtered/proteins_per_pdb.csv"
@@ -1445,11 +1389,6 @@ if os.path.exists(proteins_path):
 
 # ── Heatmap ABP × résidus actin ──────────────────────────────────────────────
 st.subheader("Heatmap — actin residues contacted by ABPs")
-st.caption(
-    "Each cell = fair mean buried %ASA of the actin residue (canonical position). "
-    "Two-step mean: first per C70 cluster (0% if no contact), "
-    "then a fair mean across C70 clusters."
-)
 
 
 if not _FAST and all(os.path.exists(f) for f in _ABP_HM_FILES):
@@ -1673,12 +1612,6 @@ if (_net_view == "Competition" and os.path.exists(proteins_path)
             return "#0077cc"   # bleu   — pointée (seul ou + side)
         return "#888888"       # gris   — side seul, barbée+pointée, ou inconnu
 
-    st.caption(
-        f"Overlap threshold {int(_jac_thresh*100)}%. Two ABPs are linked if at least "
-        f"one of their C70 clusters covers ≥{int(_jac_thresh*100)}% of the smaller interface. "
-        f"{len(_edge_wts)} competing pairs "
-        f"({_n_filtered} excluded due to disjoint filament locations)."
-    )
 
     # Tous les ABPs connus (y compris isolés)
     _all_abp_net = set(_merged_net["protein"].dropna().unique())
@@ -1987,11 +1920,7 @@ if (_net_view == "Competition" and os.path.exists(proteins_path)
                 )
 
         if _show_coop and _n_coop_shown:
-            st.caption(
-                f"{_n_coop_shown} green edge(s) = pairs whose footprints "
-                "overlap BUT that co-occur in the same PDB → they cooperate "
-                "(not true competition)."
-            )
+            pass
         _net_html = _net_c.generate_html()
         # Désactiver la physique dès que la stabilisation est terminée
         for _pat_c in [
@@ -2051,11 +1980,6 @@ if (_net_view == "Competition" and os.path.exists(proteins_path)
             "</body>", "<script>" + _inject_search_abp + "</script>\n</body>")
         with st.expander("Show the network graph", expanded=False):
             st.components.v1.html(_net_html, height=880, scrolling=False)
-        st.caption(
-            "Remplissage : **couleur = famille d'ABP**   ·   "
-            "Size: **proportion of binding sites in conflict** (% of contested C70 clusters)   ·   "
-            "Hover: family, filament position, competitors"
-        )
         # Légende COULEUR = famille (uniquement les familles présentes dans le réseau)
         _fams_in_net = sorted({_fam_of[_n] for _n in _all_abp_net})
         _fam_items = "".join(
@@ -2078,11 +2002,6 @@ if (_net_view == "Cooperation" and os.path.exists(proteins_path)
         and len(abp_global) > 0 and "Binding site S1" in abp_global.columns
         and _coop_pairs):
     st.subheader("ABP cooperation network")
-    st.caption(
-        "Two ABPs are linked if they appear **together in the same PDB** "
-        "(co-present on actin → they cooperate). Width = number of shared PDBs "
-        "· size = number of cooperating partners · outline = filament position."
-    )
     import networkx as _nx_coop
     from pyvis.network import Network as _Net_coop
     _Gco = _nx_coop.Graph()
@@ -2151,11 +2070,6 @@ if (_net_view == "Cooperation" and os.path.exists(proteins_path)
         )
     with st.expander("Show the network graph", expanded=False):
         st.components.v1.html(_net_co.generate_html(), height=780, scrolling=False)
-    st.caption(
-        f"{len(_coop_nodes)} cooperating ABPs · {_Gco.number_of_edges()} pairs "
-        "co-present in the same PDB (modules: disassembly, spectrin-actin "
-        "skeleton, thin filament, Arp2/3 complex…)."
-    )
 
 # Mode FAST : on s'arrête après les réseaux (saute Détail/Filament PyMOL/MSA)
 if _FAST:
@@ -2249,11 +2163,6 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
             abp_clust["% ABP-actin interactions"] = (
                 abp_clust["nb_inter"] / _total_abp_inter * 100
             ).round(1)
-            st.caption(
-                f"{len(abp_pdbs)} PDBs containing this ABP · "
-                f"{len(abp_int)} hetero actin–ABP interactions · "
-                f"{abp_clust.shape[0]} clusters C70"
-            )
             abp_clust["Binding site"] = (
                 abp_clust["s1_binding_site_cluster_data_70"].astype(str)
                 + " × "
@@ -2278,17 +2187,12 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
                 if (_bfac_dir_abp / f"{row['cluster_data_70']}.pdb").exists()
             ]
             if not _valid_rows:
-                st.caption(
-                    "No C70 PDB file available for these clusters.")
+                pass
             else:
                 _ylord3d = ["#FFFFCC", "#FFF0A9", "#FEE186", "#FECA65", "#FDAA48",
                             "#FC8C3B", "#FC5A2D", "#EC2D21", "#D30F20", "#800026"]
                 _grn3d = ["#FFFFCC", "#D9F0A3", "#ADDD8E", "#78C679",
                           "#41AB5D", "#238443", "#006837"]
-                st.caption(
-                    "Yellow→red = actin (buried % ASA) · "
-                    "Yellow→green = ABP · white = outside interface"
-                )
                 for _i3d in range(0, len(_valid_rows), 2):
                     _pair = _valid_rows[_i3d:_i3d + 2]
                     _cols3d = st.columns(len(_pair))
@@ -2353,10 +2257,6 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
     )
 
     total_homo = len(homo_cooc)
-    st.caption(
-        f"{len(abp_pdbs)} PDB · "
-        f"{total_homo} interactions homo actin-actin"
-    )
     if homo_cooc.empty:
         st.info("No homo actin-actin interaction in these PDBs.")
     else:
@@ -2389,7 +2289,7 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
     # (Le bouton de calcul global est remonté sous la section téléchargement.)
     st.markdown("#### ABP ProteoCast — mutational landscape + 3D structure")
     if _is_no_abp:
-        st.caption("Select an ABP to see its ProteoCast.")
+        pass
     else:
         _pc_row = None
         if _pc_status is not None:
@@ -2404,10 +2304,6 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
         _pc_tab1, _pc_tab2 = st.tabs(
             ["Paysage mutationnel", "Visualisation 3D"])
         with _pc_tab1:
-            st.caption(
-                "Evolutionary conservation of the ABP (ProteoCast, 20 substitutions/"
-                "position); below, the positions that contact actin → "
-                "is the interface conserved?")
             _render_abp_proteocast(sel_abp, _abp_subunits)
             st.markdown(
                 "**Actin side — conservation of the residues targeted by this ABP**")
@@ -2427,8 +2323,6 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
                     help="Everything proteocast.ijm.fr returned for this ABP: "
                          "MSA, structures, images and sub-folders.")
         with _pc_tab2:
-            st.caption("ABP structure coloured by mutational sensitivity "
-                       "(or AlphaFold pLDDT until ProteoCast is provided).")
             _pc_style = st.radio("Display", ["Surface", "Cartoon"],
                                  horizontal=True, key=f"pc_view_{_pc_slug}")
             # gros ABP : restreindre la 3D à la zone qui touche l'actin (ABD)
@@ -2468,7 +2362,6 @@ if (os.path.exists(proteins_path) and os.path.exists(_all_data_path)
                 _v.setBackgroundColor("white")
                 st.components.v1.html(
                     _v._make_html(), height=510, scrolling=False)
-                st.caption(f"Coloured by: **{_pc_struct['by']}**.")
 
 # ── Explorateur interactif : séquence query / cluster / ABP / paire d'ABP ─────
 if not _FAST:
@@ -2483,8 +2376,6 @@ if not _FAST:
 # ── MSA — Protéines d'interface ───────────────────────────────────────────────
 
 st.header("MSA — Interface proteins", anchor="msa-proteines")
-st.caption("Sequence alignments of interface proteins (actin and ABP) — "
-           "advanced view to spot conserved vs variable residues at the interface.")
 
 
 if not _Path("data/filtered/filtered_all_data.csv").exists():
@@ -2493,12 +2384,6 @@ if not _Path("data/filtered/filtered_all_data.csv").exists():
 else:
     _MSA_ALN_DIR.mkdir(parents=True, exist_ok=True)
 
-    st.caption(
-        "3 families + clusters: full-sequence MSA of ABP (S2) and Actin (S1) — "
-        "green = majority in interaction (conserved aa) · "
-        "purple = majority in interaction (variable aa) · "
-        "red = minority in interaction"
-    )
 
     _msa_section_full(
         "Myosins", "myosin",

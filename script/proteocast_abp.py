@@ -243,14 +243,6 @@ def _render_abp_proteocast(sel_abp, abp_subunits):
         _render_proteocast_mutland(csv, iface_asa, f"ProteoCast — {sel_abp}",
                                    domains=_doms, surface_only=_surface,
                                    rsa=_rsa_struct, focus=_focus)
-        st.caption(
-            "**Green** heatmap: conservation (black/dark = deleterious/conserved). "
-            "**ABP in contact with actin** track (green): positions of **the ABP** that "
-            "touch actin, max buried %ASA. **Domains** track (Pfam/InterPro). "
-            "In *exposed surface* mode, the **buried core** (RSA < 0.2) stays visible "
-            "in **greyscale**; only the exposed surface is green. "
-            "Interactive: zoom + hover."
-        )
     else:
         # UniProt de l'ABP (manifest) pour (re)lancer le calcul / lier le site.
         _uni = None
@@ -294,10 +286,6 @@ def _render_abp_proteocast(sel_abp, abp_subunits):
             st.link_button("Open proteocast.ijm.fr",
                            "https://proteocast.ijm.fr/results/search/",
                            width="stretch")
-        st.caption(
-            "Manual fallback: run it on proteocast.ijm.fr, download the results "
-            f"folder, and drop `4.query_ProteoCast.csv` into "
-            f"`data/proteocast/abp/{slug}/`.")
 
 
 @st.cache_data(show_spinner=False)
@@ -359,17 +347,11 @@ def _render_abp_actin_conservation(sel_abp):
               help="Is the ABP footprint on actin more or less conserved than "
                    "the rest of the exposed actin surface?")
     c3.metric("Mean conservation (rest of surface)", f"{other.mean():.2f}")
-    st.caption(
-        f"“rest of surface” = {len(other)} **exposed** actin residues (RSA ≥ {_SURF_RSA:g}) "
-        "outside the footprint — the **buried core** (highly conserved) is excluded to compare "
-        "surface vs surface.")
     try:
         from scipy.stats import mannwhitneyu
         _p = mannwhitneyu(fpv, other, alternative="two-sided").pvalue
         verdict = ("more conserved" if fpv.mean() >
                    other.mean() else "less conserved")
-        st.caption(f"The actin residues contacted by {sel_abp} are **{verdict}** than the rest "
-                   f"of the surface (Mann-Whitney p = {_p:.1e}).")
     except Exception:
         pass
 

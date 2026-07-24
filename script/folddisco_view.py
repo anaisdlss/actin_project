@@ -200,7 +200,6 @@ def _render_db_table(sub, db, filt):
     if keep is not None:
         d = d[d["interpretation"].isin(keep)]
     if d.empty:
-        st.caption("No protein at this similarity level.")
         return
     d["Source"] = (d["target_id"].str.upper()
                    + (" / " + d["target_chain"].fillna("") if db == "pdb" else ""))
@@ -211,7 +210,6 @@ def _render_db_table(sub, db, filt):
             "Coverage", "Source"]
     show = d[cols].rename(columns={"name": "Protein", "organism": "Organism",
                                    "interpretation": "Interpretation"})
-    st.caption(f"{len(d)} distinct proteins")
     st.dataframe(
         show, hide_index=True, use_container_width=True, height=400,
         column_config={
@@ -228,10 +226,6 @@ def render_discovery(sel_abp):
     mt = os.path.getmtime(_DISCO_CSV) if os.path.exists(_DISCO_CSV) else 0.0
     df = _load_discovery(mt)
     if df is None:
-        st.caption(
-            "Not computed. Run `14_folddisco_discovery.py` then "
-            "`14b_resolve_names.py` (PDB + AlphaFold search, one motif per "
-            "ABP × cluster, resolved names).")
         return
     abp = df[df["query_abp"] == sel_abp]
     if abp.empty:
@@ -247,16 +241,6 @@ def render_discovery(sel_abp):
     for tab, (db, _) in zip(tabs, _DB_TABS):
         with tab:
             _render_db_table(sub[sub["db"] == db], db, filt)
-    st.caption(
-        f"Interface motif of **{sel_abp}** at site **{cl}** searched in the **PDB** "
-        "(real structures → protein = the complex chain) and the **AlphaFold "
-        "proteome** (1 predicted protein per hit, often in other species). "
-        "**Interpretation** (same rules as the local FoldDisco, combines coverage / "
-        "RMSD / normalised score): *same motif (strong)* = coverage ≥ 75 % + RMSD ≤ 4 Å "
-        "+ norm. score ≥ 0.15 · *loose shared* = well covered but RMSD > 4 · *partial* "
-        "= coverage ≥ 50 % · *different* otherwise · *inconclusive* < 5 residues. "
-        "**Norm. score** = score ÷ self-match (0-1, comparable) — the raw score "
-        "has no absolute scale. Deduplicated by name, source excluded.")
 
 
 def render_discovery_cluster(cluster_id):
@@ -266,11 +250,9 @@ def render_discovery_cluster(cluster_id):
     mt = os.path.getmtime(_DISCO_CSV) if os.path.exists(_DISCO_CSV) else 0.0
     df = _load_discovery(mt)
     if df is None:
-        st.caption("Not computed (scripts 14 / 14b).")
         return
     base = df[(df["query_cluster"] == cluster_id) & (~df["is_source"])]
     if base.empty:
-        st.caption("No discovery for this site (not computed yet).")
         return
     filt = _interp_filter_ui(f"disco_clfilt_{cluster_id}")
     keep = _FILTERS[filt]
@@ -281,7 +263,6 @@ def render_discovery_cluster(cluster_id):
             if keep is not None:
                 sub = sub[sub["interpretation"].isin(keep)]
             if sub.empty:
-                st.caption("No protein at this similarity level.")
                 continue
             rows = []
             for nom, g in sub.groupby("name"):
@@ -298,16 +279,9 @@ def render_discovery_cluster(cluster_id):
                 })
             out = pd.DataFrame(rows).sort_values(
                 ["# ABPs", "Norm. score"], ascending=[False, False])
-            st.caption(f"{len(out)} distinct proteins · "
-                       f"{(out['# ABPs'] > 1).sum()} via several ABPs")
             st.dataframe(
                 out, hide_index=True, use_container_width=True, height=400,
                 column_config={
                     "Protein": st.column_config.TextColumn(width="large"),
                     "Link": st.column_config.LinkColumn("Fiche",
                                                         display_text="ouvrir")})
-    st.caption(
-        "Interface motifs of **all the ABPs at this site** (PDB + AlphaFold), "
-        "**pooled and deduplicated by name**. **# ABPs** = how many different "
-        "ABPs this protein came up through: **> 1 = strong convergence**. "
-        "**Interpretation** = same graded reading as the per-ABP view. Sources excluded.")

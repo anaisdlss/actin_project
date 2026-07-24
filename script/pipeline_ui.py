@@ -9,8 +9,6 @@ import streamlit as st
 
 def render():
     st.header("Data download", anchor="telechargement-des-donnees")
-    st.caption("Downloads and updates the PPI3D structural data — the source "
-               "of every analysis below.")
 
     STEPS = {
         "1/9":  "PPI3D download (summary + PDB + data)",
@@ -103,7 +101,6 @@ def render():
     _alldata_p = "data/raw/all_data.csv"
     try:
         _dl_date = pd.Timestamp(os.path.getmtime(_alldata_p), unit="s").date()
-        st.caption(f"PPI3D dataset downloaded on **{_dl_date}**.")
     except Exception:
         pass
 
@@ -207,9 +204,8 @@ def render():
                 current, total, label = result
                 if current is not None and total is not None and total > 0:
                     sub_progress_bar.progress(current / total)
-                    sub_progress_text.caption(label)
                 else:
-                    sub_progress_text.caption(label)
+                    pass
 
             # Suivre les mots-clés "skip"
             if current_idx >= 0:

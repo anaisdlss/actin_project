@@ -109,15 +109,8 @@ def render_residue_fiche(pp, canon):
         c2.metric("Mean actin surface", _fmt(avg_surf))
         if pd.notna(this_c) and pd.notna(avg_surf):
             _more = float(this_c) > avg_surf
-            st.caption(
-                ("→ **more** conserved than the surface average" if _more
-                 else "→ **less** conserved than the surface average")
-                + " (higher = more conserved = residue more sensitive to mutations).")
-        st.caption(
-            f"at interface: **{'yes' if bool(row.get('at_interface')) else 'no'}** · "
-            f"ABPs that contact it: **{int(row.get('n_abp', 0))}**")
     else:
-        st.caption("Position absent from the ProteoCast conservation table.")
+        pass
 
     # ── aa d'actin à cette position (% + organismes) ───────────────────────
     aa_g = _actin_aa_by_organism(pp_mtimes())
@@ -157,7 +150,7 @@ def render_residue_fiche(pp, canon):
     st.markdown("**ABPs that contact this residue**  "
                 "_(% ASA = buried actin residue; ABP aa = contacting ABP residue)_")
     if sub.empty:
-        st.caption("No ABP contacts this residue in the dataset.")
+        pass
     else:
         _cols = ["ABP", "% ASA max", "# interactions", "Clusters C70", "Sites S1"]
         if "ABP aa" in sub.columns:
@@ -279,7 +272,6 @@ def _render_actin_3d(pp, canon):
         try:
             import py3Dmol
         except ImportError:
-            st.caption("py3Dmol indisponible.")
             return
         # chaîne majoritaire du PDB
         v = py3Dmol.view(width="100%", height=420)
@@ -292,8 +284,6 @@ def _render_actin_3d(pp, canon):
         v.zoomTo({"resi": resnum})
         v.setBackgroundColor("white")
         st.components.v1.html(v._make_html(), height=430, scrolling=False)
-        st.caption(f"Residue {row.get('actin_aa','')}{canon} "
-                   f"(structure no. {resnum}) highlighted in magenta.")
 
 
 # ── Vue cluster (#2) ────────────────────────────────────────────────────────
@@ -345,7 +335,6 @@ def render_cluster_tab(pp):
     c1.metric("Interactions", sub["interaction_id"].nunique())
     c2.metric("Actin residues", sub["canon"].nunique())
     c3.metric("ABPs involved", len(abps))
-    st.caption(f"ABP : {', '.join(abps)}  ·  Site(s) S1 : {', '.join(sites)}")
     st.markdown("**Actin residues used by this cluster**")
     _residues_summary(pp, sub)
 
@@ -445,10 +434,6 @@ def render_pair_tab(pp):
     with st.expander("Overview — overlap of all ABP pairs (pairwise)"):
         _ov = _all_pairs_overlap(pp)
         _ov_pos = _ov[_ov["Shared"] > 0]
-        st.caption(
-            f"{len(_ov)} pairs in total · {len(_ov_pos)} with at least 1 shared "
-            "residue. Sorted by descending overlap (Jaccard): at the top = the "
-            "pairs competing most for the same actin site. Sortable columns.")
         st.dataframe(_ov, hide_index=True, use_container_width=True, height=320)
 
     rl = pp["res_long"]
@@ -499,10 +484,6 @@ def render_pair_tab(pp):
     m4.metric("Jaccard (overlap)", f"{jac:.2f}",
               help="shared / union. 0 = no overlap, 1 = identical footprints.")
 
-    st.caption(
-        f"**How to read the band**: each stroke = an actin position. "
-        f"**shared** line (purple) = touched by BOTH · **{lab1}** (blue) · "
-        f"**{lab2}** (orange). The denser the purple line, the more they overlap.")
 
     allc = sorted(union)
 
@@ -698,14 +679,9 @@ def render_sequence_tab(pp):
             return
         _header, q = _fetched
         q = re.sub(r"[^A-Za-z]", "", q).upper()
-        st.caption(f"Sequence fetched — **{acc}** · {_header[:90]} "
-                   f"({len(q)} residues).")
     elif seq_in.strip():
         q = re.sub(r"[^A-Za-z]", "", seq_in).upper()
     else:
-        st.caption(f"Reference: human ACTB P60709 ({len(ref_seq)} residues). "
-                   "Enter a UniProt accession **or** paste a sequence, then click "
-                   "**Analyse sequence**. MAFFT handles the alignment (any length).")
         return
 
     if len(q) < 30:
@@ -767,9 +743,6 @@ def render_sequence_tab(pp):
     st.markdown(f"**{len(subs)} substitutions**, of which **{_n_iface}** at a position "
                 "known at an ABP interface:")
     st.dataframe(df, hide_index=True, use_container_width=True)
-    st.caption("The variations at the top (most ABPs) are the most likely "
-               "to alter the actin–ABP interactions. “canon” = MAFFT "
-               "canonical position used everywhere else in the app.")
 
     # ── Visuels : carte positionnelle + actin 3D avec variations surlignées ──
     import plotly.graph_objects as go
@@ -818,10 +791,6 @@ def render_sequence_tab(pp):
             v.zoomTo()
             v.setBackgroundColor("white")
             st.components.v1.html(v._make_html(), height=510, scrolling=False)
-            st.caption(
-                "Neutral actin (grey). **Green** = your substituted positions, "
-                "highlighted. (Their sensitivity and involved ABPs are in the table "
-                "and the track above.)")
         except ImportError:
             pass
 
@@ -832,9 +801,6 @@ def render_explorer(pp):
     # Deux entrées ici. Par résidu -> section « Empreinte ABP sur l'actin » ;
     # par cluster -> section « Clusters d'interactions » ; par ABP -> « Détail
     # par ABP ». Elles existent déjà, on ne les duplique pas.
-    st.caption(
-        "Two entry points: paste a query **actin sequence** (positions that "
-        "vary × involved ABPs), or compare an **ABP pair** (overlap).")
     mode = st.radio(
         "Exploration mode",
         ["Query sequence", "ABP pair"],
@@ -903,17 +869,11 @@ def _render_actin_overview_3d(pp, sel):
     v.setBackgroundColor("white")
     st.components.v1.html(v._make_html(), height=470, scrolling=False)
     _aa = row["actin_aa"] if row is not None and pd.notna(row.get("actin_aa")) else ""
-    st.caption(f"Surface: white = 0 ABP → red = {int(mx)} ABPs. "
-               f"Selected residue **{_aa}{sel}** = fluo yellow.")
 
 
 def render_actin_overview(pp):
     """Grand actin coloré par nb d'ABP + barre cliquable -> résidu surligné + fiche."""
     import plotly.graph_objects as go
-    st.caption(
-        "Each actin residue is coloured by the **number of different ABPs** "
-        "that contact it. Click a bar (or choose a position): the residue "
-        "is highlighted on the structure and all its info shows below.")
 
     pos = pp["pos"].copy()
     pos = pos[pd.to_numeric(pos["canon"], errors="coerce").notna()]

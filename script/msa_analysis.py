@@ -1061,12 +1061,6 @@ document.querySelectorAll('[data-tt]').forEach(function(el){
     # ── TAB A : Heatmap ABP (positions canonical ABP) ────────────────────────
     if "A" in _tab_map:
         with _tab_map["A"]:
-            st.caption(
-                "Rows = ABP sequences · Columns = canonical ABP positions (MAFFT) · "
-                "Colour = **% of the total interface** of this sequence · "
-                "Corrected mean (zeros included for structures with no contact) · "
-                "**Hover** a cell for details."
-            )
             _corr_b_aa = corr_b.merge(
                 agg_b_aa[["seq_low", "canon_b", "aa_b"]], on=["seq_low", "canon_b"], how="left"
             )
@@ -1109,11 +1103,6 @@ document.querySelectorAll('[data-tt]').forEach(function(el){
     # ── TAB B : Heatmap Actin (positions canonical actin) ──────────────────
     if "B" in _tab_map:
         with _tab_map["B"]:
-            st.caption(
-                "Rows = ABP sequences · Columns = canonical actin positions (MAFFT) · "
-                "Colour = **% of the total interface** of this sequence · "
-                "Corrected mean (zeros included) · **Hover** a cell for details."
-            )
             _corr_a_aa = corr_a.merge(
                 agg_a_aa[["seq_low", "canon_a", "aa_a"]], on=["seq_low", "canon_a"], how="left"
             )
@@ -1230,10 +1219,6 @@ document.querySelectorAll('[data-tt]').forEach(function(el){
     # ── TAB D : Paires AA spécifiques ABP ↔ Actin ───────────────────────────
     if "D" in _tab_map:
         with _tab_map["D"]:
-            st.caption(
-                "**AA-AA matrix**: which ABP amino acids interact with which actin AA. "
-                "**Per-sequence table**: choose an ABP to see all its specific contacts."
-            )
 
             _AA_ORDER = list("ACDEFGHIKLMNPQRSTVWY")
 
@@ -1357,24 +1342,11 @@ document.querySelectorAll('[data-tt2]').forEach(function(el){
                             _delta = f"{_here - _med:+.1f} pts vs median"
                     _mc.metric(_lbl, f"{_here:.1f}%", delta=_delta,
                                help=f"{_nb} contacts (a contact can fall in several categories)")
-                st.caption(
-                    "**Salt bridges / H-bonds** = from contact_type (electrostatic / "
-                    "directional). **Hydrophobic** = 2 apolar residues. **Aromatic (π)** = "
-                    "π-π or π-cation stacking. **van der Waals** = non-specific contacts (the rest). "
-                    "A contact can fall into several categories. "
-                    "**Δ vs median** = gap to the median of the other S1 clusters "
-                    "(green = above, red = below)."
-                )
 
     # ── TAB E : Spécificité ───────────────────────────────────────────────────
     if "E" in _tab_map:
         with _tab_map["E"]:
             _merged_slot = st.container()   # la vue fusionnée est rendue ici, tout en haut
-            st.caption(
-                "For each contacting canonical ABP position, we compare the AA of each sequence. "
-                "A residue is **unique** if it appears in only one sequence at this position. "
-                "These residues are candidates to explain the interaction specificity with actin."
-            )
 
             pos_aa = (
                 df4.groupby(["label", "canon_b", "aa_b"])["area_f"]
@@ -1547,12 +1519,6 @@ document.querySelectorAll('[data-sp]').forEach(function(el){
 
             st.divider()
             st.markdown("#### Actin side — canonical positions specifically contacted")
-            st.caption(
-                "Rows = ABP sequences · Columns = canonical actin positions · "
-                "Letter = actin AA at this position · "
-                "Colour = number of sequences contacting this position: "
-                "**red** = unique (1 myosin only), orange = rare, yellow = minority, grey = shared."
-            )
 
             actin_aa_specific: dict = (
                 df4.groupby(["label", "canon_a"])["aa_a"]
@@ -1833,23 +1799,13 @@ document.querySelectorAll('[data-sp]').forEach(function(el){
             _n_rows_spm = n_seqs + len(variant_labels)
             with _merged_slot:
                 st.markdown("#### Merged view — ABP residues projected onto the actin interface")
-                st.caption(
-                    "Columns = canonical **actin** positions in contact · "
-                    "each cell = the **ABP** residue (the most involved, max surface) contacting this actin position · "
-                    "colour = **ABP residue specificity** among the myosins at this column "
-                    "(**red** = unique, orange = rare, yellow = minority, grey = majority). "
-                    "Bottom row **Actin (ref)** = reference actin residue, coloured in "
-                    "a **purple gradient** by the number of myosins contacting this position "
-                    "(bright purple = contacted by all, pale grey = specific, contacted by only one); "
-                    "the actin variations are listed below with the myosin concerned."
-                )
                 st.components.v1.html(
                     "".join(parts_spm),
                     height=max(_n_rows_spm * CELL_SP + 140, 250),
                     scrolling=True,
                 )
                 if not variant_labels:
-                    st.caption("No actin-residue variation between the myosins at these contact positions.")
+                    pass
                 st.divider()
 
 
@@ -2022,14 +1978,6 @@ def _msa_blast_celegans():
                                           ascending=[True, False])
     st.markdown("**Myosins from the dataset vs _C. elegans_ myosin family (28 sequences):**")
     st.dataframe(_df.reset_index(drop=True), use_container_width=True, hide_index=True)
-    st.caption(
-        "For each myosin: its closest C. elegans homolog, by **whole-sequence** identity "
-        "(BLAST, over the 28) and by **interface** identity "
-        "(CORE: residues contacting actin in >=70% of the myosins, combined MAFFT alignment). "
-        "G1 (muscle) -> muscle myosins (myo-3/unc-54/myo-2), conserved interface; "
-        "G2 (divergent) -> Myosin-14 toward nmy-1 (non-muscle), Plasmodium Myosin-A "
-        "the most distant. No prior alignment needed for BLAST."
-    )
 
 
 def _msa_celegans_comparison():
@@ -2162,7 +2110,7 @@ def _msa_section_full(group_label, group_key, filter_fn, rigor_pdbs=None, note=N
     """Section MSA séquence COMPLÈTE — ABP (S2) et Actin (S1) en colonnes parallèles."""
     with st.expander(f"**{group_label}**", expanded=(group_key == "myosin")):
         if note:
-            st.caption(note)
+            pass
 
         # Tables d'identité vs C. elegans : calculées dans le bloc myosine mais
         # AFFICHÉES après la partie actine (voir plus bas).
@@ -2222,10 +2170,6 @@ def _msa_section_full(group_label, group_key, filter_fn, rigor_pdbs=None, note=N
         if df_seqs.empty:
             st.info("No sequence found.")
         else:
-            st.caption(
-                f"**{len(df_seqs)} unique sequences** "
-                f"({df_seqs['length'].min()}–{df_seqs['length'].max()} aa)"
-            )
             if len(df_seqs) < 2:
                 st.info("Fewer than 2 sequences — alignment impossible.")
             else:
@@ -2333,7 +2277,6 @@ def _msa_section_full(group_label, group_key, filter_fn, rigor_pdbs=None, note=N
                             _core, _var = _msa_load_interface_g(filter_fn, rigor_pdbs)
                             _n_core = sum(len(v) for v in _core.values())
                             _n_var  = sum(len(v) for v in _var.values())
-                            st.caption(f"{_n_core} core residues · {_n_var} variable")
                             _html   = _msa_render_full(_aln, _core, _var, 9999, _label_map)
                             _height = min(_nseqs * 18 + 80, 6000)
                             st.components.v1.html(_html, height=_height, scrolling=True)
@@ -2414,18 +2357,9 @@ def _msa_section_full(group_label, group_key, filter_fn, rigor_pdbs=None, note=N
         # ── S1 : Actin — positions canonical ────────────────────────────────
         st.divider()
         st.markdown("##### Actin — positions canonical (S1)")
-        st.caption(
-            "Same row order as S2. "
-            "Columns = canonical actin positions. "
-            "Horizontal scroll to see the whole sequence."
-        )
         if not _abp_rows_a:
             st.info("No actin interface data found.")
         else:
-            st.caption(
-                f"**{len(_abp_rows_a)} ABP sequences** · "
-                f"{len(_aa_at_a)} positions canonical"
-            )
             # Label map S1 : même noms propres que S2
             from collections import Counter as _Ctr3
             _s1_tcounts = _Ctr3(r["title"] for r in _abp_rows_a)
@@ -2461,15 +2395,11 @@ def _msa_section_full(group_label, group_key, filter_fn, rigor_pdbs=None, note=N
         if _pid_rows:
             with st.expander("Identity on interface residues — vs C. elegans",
                              expanded=False):
-                st.caption("% of identical amino acids only on the coloured "
-                           "columns (residues in contact with actin).")
                 st.dataframe(pd.DataFrame(_pid_rows).set_index("Sequence"),
                              use_container_width=True)
         if _fid_rows:
             with st.expander("Identity on the whole sequence — vs C. elegans",
                              expanded=False):
-                st.caption("% of identical amino acids over all aligned columns "
-                           "(whole motor domain, not just the interface).")
                 st.dataframe(pd.DataFrame(_fid_rows).set_index("Sequence"),
                              use_container_width=True)
 
@@ -2495,7 +2425,6 @@ def _msa_section_s2_clusters():
     )
 
     with st.expander("**Other protein clusters — full sequence**"):
-        st.caption("MAFFT on the full sequence, interface residues coloured (s2_sequence_cluster_70).")
 
         filt_path = _Path("data/filtered/filtered_all_data.csv")
         int3_path = _Path("data/filtered/details/3.interface_residues.csv")
@@ -2650,11 +2579,9 @@ def _msa_section_s2_clusters():
 
                 st.divider()
                 st.markdown("##### Actin — positions canonical (S1)")
-                st.caption("Same row order as S2 (sorted by title). Horizontal scroll.")
                 if not _abp_rows_c2:
                     st.info("No actin interface data for this cluster.")
                 else:
-                    st.caption(f"**{len(_abp_rows_c2)} ABP seq.** · {len(_aa_at_c2)} canonical positions")
                     _html_a2   = _msa_render_actin_contacts(_abp_rows_c2, _aa_at_c2, _col_col_c2, 9999)
                     _height_a2 = min(len(_abp_rows_c2) * 18 + 80, 6000)
                     st.components.v1.html(_html_a2, height=_height_a2, scrolling=True)
@@ -2799,11 +2726,6 @@ def _msa_one_s1_cluster(cid, df_h, _df1_s1, _df3_s1, partners="",
                                 key=lambda r: _rank_fresh.get(r.get("s2seq", ""), 9999),
                             )
                         n_iface_total = sum(u["n_iface"] for u in uniq_s2)
-                        st.caption(
-                            f"Full aligned sequence — interface highlighted "
-                            f"(avg. {n_iface_total // max(len(uniq_s2), 1)} interface residues/seq.) · "
-                            "conserved · variable · grey = outside interface"
-                        )
                         _html_s2c = _msa_render_full(_aln_s1c, core_by_seqlow, var_by_seqlow, 9999)
                         _h_s2c    = min(_ns1c * 18 + 80, 6000)
                         st.components.v1.html(_html_s2c, height=_h_s2c, scrolling=True)
@@ -2811,10 +2733,6 @@ def _msa_one_s1_cluster(cid, df_h, _df1_s1, _df3_s1, partners="",
         # ── S1 : positions canonical actin ──────────────────────────
         st.divider()
         st.markdown("##### Actin — positions canonical (S1)")
-        st.caption(
-            f"**{len(abp_rows_s1)} ABP sequences** — "
-            f"{len(aa_at_s1)} positions canonical actin"
-        )
         _html_s1   = _msa_render_actin_contacts(abp_rows_s1, aa_at_s1, col_col_s1, 9999)
         _height_s1 = min(len(abp_rows_s1) * 18 + 80, 6000)
         st.components.v1.html(_html_s1, height=_height_s1, scrolling=True)
@@ -2875,11 +2793,6 @@ def _msa_section_s1_clusters():
         return t.startswith("actin") and "actin-related" not in t and "actin-depolymerizing" not in t
 
     with st.expander("**S1 clusters — actin binding site**"):
-        st.caption(
-            "Each cluster groups the interactions sharing the same binding site on actin. "
-            "Each row = one ABP sequence. "
-            "The columns are the canonical actin positions contacted by at least one ABP of the cluster."
-        )
 
         filt_path = _Path("data/filtered/filtered_all_data.csv")
         int1_path = _Path("data/filtered/details/1.interactions.csv")

@@ -86,6 +86,8 @@ def main():
     (deploy / "requirements.txt").write_text(REQUIREMENTS)
     (deploy / ".gitignore").write_text("__pycache__/\n*.pyc\n")
     (deploy / "README.md").write_text(DEPLOY_README)
+    if Path("GUIDE.md").exists():           # doc affichée dans l'app
+        shutil.copy2("GUIDE.md", deploy / "GUIDE.md")
 
     print(f"deploy/data/ : {n_files} fichiers, {total/1e6:.0f} Mo")
     print("deploy/ = app autonome (code + data slim + requirements.txt).")

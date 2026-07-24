@@ -64,9 +64,6 @@ def _render_cluster_struct(cid):
             f"No structural comparison for **{cid}**: this site has only **one "
             "ABP** (or it is a homo actin-actin site). The comparison only exists "
             "for sites with **≥ 2 partner ABPs**.")
-        st.caption(
-            f"**{len(_avail)} clusters have a structural comparison** — pick "
-            f"one of them in “S1 binding-site patch”: {', '.join(_avail)}")
         return
 
     master, fam, sweep, wp = T["master"], T["fam"], T["sweep"], T["wp"]
@@ -106,8 +103,6 @@ def _render_cluster_struct(cid):
     else:
         _verdict = ("Interface domain unresolved (“—”): binding regions "
                     "outside any annotated Pfam domain.")
-    st.caption(
-        f"**{len(abps)} ABPs** · **{n_fam} families** at this site. {_verdict}")
 
     # Table par ABP : protéine, famille, domaine À L'INTERFACE, SS, domaines Pfam
     rows = []
@@ -204,29 +199,6 @@ def _render_cluster_struct(cid):
     st.dataframe(pair[_cols_struct], hide_index=True, use_container_width=True)
     st.markdown("*Interface region — 3D motif (FoldDisco)*")
     st.dataframe(pair[_cols_fd], hide_index=True, use_container_width=True)
-    st.caption(
-        "**Whole structure** — **Same domain family** = same Pfam domain at "
-        "the contact (Yes/No; “—” = unresolved) · **TM whole structure** = same "
-        "global fold (≥ 0.5) · **%id** sequence · **Actin footprint** = fraction "
-        "of shared actin residues.  \n"
-        "**Zone d'interface (FoldDisco)** — les deux ABP agrippent-ils l'actin avec le "
-        "**same 3D residue motif**? No clear-cut verdict (no threshold separates "
-        "proprement les cas) : on montre toutes les sorties de `folddisco query` (pour le "
-        "**smaller of the two motifs** searched in the other — one direction, consistent). "
-        "**Matched residues** = raw `n_match` (motif residues found / motif "
-        "size) · **% shared motif** = same in % → **coverage** · **FoldDisco score** "
-        "= raw score (rarity, no absolute scale) · **Norm. score (0-1)** = score ÷ "
-        "self-match → **geometric quality** (close to 1 = very similar motifs) · "
-        "**RMSD (Å)** = superposition of matched residues: **low = true 3D overlap**, "
-        "**high (> ~5 Å) = loose/coincidental** (⚠ trivially low if few residues, e.g. 3/12 at "
-        "0.2 Å). Truly same motif = **high % + high Norm. score + low RMSD on enough "
-        "residues**. **Interpretation** = graded reading (a guide, not a verdict) combining "
-        "these 4 signals: *same motif (strong)* / *largely shared but loose* / *partial* "
-        "/ *different* / *few residues — inconclusive* (< 5 matched residues).  \n"
-        "Reading convergence: **high footprint + different fold (low TM) + rarely "
-        "shared motif** → same actin site, distinct binding solutions "
-        "(**convergence positionnelle**)."
-    )
 
     # Pooled PDB discovery for this site (motifs of all its ABPs)
     folddisco_view.render_discovery_cluster(cid)
@@ -253,9 +225,3 @@ def _render_cluster_struct(cid):
             st.markdown("**Interface chemistry**")
             st.dataframe(pd.DataFrame(crows), hide_index=True,
                          use_container_width=True)
-            st.caption(
-                "ABP / actin-patch charge = (# K,R residues) − (# D,E residues). "
-                "General trend: **charged + ABP facing a charged − actin** "
-                "(electrostatic complementarity) + hydrophobic core → "
-                "a shared chemical strategy even across different families."
-            )

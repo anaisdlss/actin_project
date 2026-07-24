@@ -429,10 +429,9 @@ def _render_s1_position_detail(detail, patch):
 
     c_org, c_abp = st.columns(2)
     with c_org:
-        st.caption("Actin — aa by organism")
         _r = res_actin[res_actin["canon"] == sel_pos]
         if _r.empty:
-            st.caption("—")
+            pass
         else:
             _org = (_r.groupby("taxid")
                     .agg(aa=("residue_name",
@@ -447,10 +446,9 @@ def _render_s1_position_detail(detail, patch):
                     ["Organism", "actin aa", "# PDBs"]],
                 hide_index=True, use_container_width=True)
     with c_abp:
-        st.caption("ABP — contacting aa (+ %ASA on the actin side)")
         _c = con_abp[con_abp["canon"] == sel_pos]
         if _c.empty:
-            st.caption("No atomic ABP contact at this position.")
+            pass
         else:
             _c = _c.copy()
             _c["aa ABP"] = (_c["residue_B_name"].astype(str)
