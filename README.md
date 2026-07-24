@@ -9,6 +9,12 @@ interface, and shows everything in an interactive Streamlit app.
 > **Systems:** macOS (Intel / Apple Silicon) and Linux. Windows is not
 > supported (the MAFFT dependency is unavailable there).
 
+**[→ USER GUIDE (GUIDE.md)](GUIDE.md)** — what the app shows, where the data
+comes from, and what every number / colour means (also shown inside the app,
+top section *Documentation*).
+
+All code lives in **`script/`**; `data/` is regenerated locally (see step 3).
+
 ## 1. Install
 
 Requires **pixi** ([pixi.sh](https://pixi.sh)). In a terminal:
@@ -47,3 +53,9 @@ Computing the per-ABP mutational landscape (**ProteoCast**) is separate from
 Only needed for the 3D scripts the pipeline writes under
 `data/filtered/details/structures_files/bfactor_c70_interface/`. Install from
 [pymol.org](https://pymol.org), then `File > Run Script…` (or `@/path/to.pml`).
+
+## Shareable version (Streamlit Cloud)
+
+A slim, read-only build (data pre-bundled, pipeline disabled) can be deployed to
+Streamlit Community Cloud. Build it with `python script/make_slim_deploy.py`;
+full instructions in **[DEPLOY.md](DEPLOY.md)**.
