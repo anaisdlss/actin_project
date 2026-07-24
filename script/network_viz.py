@@ -1259,6 +1259,8 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
         # Paire de séquences la plus fréquente → représentant. Le PDB pairwise
         # est reconstruit à la volée depuis l'ASSEMBLY (ou lu depuis le fichier
         # pairwise conservé si l'assembly n'est qu'en CIF).
+        import sys as _sys, os as _os     # script/ pas garanti sur sys.path selon le lancement
+        _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
         from structure_utils import pairwise_text, expected_pairwise_path
         _best_sp = _seq_mrg["_sp"].value_counts()
         _rep_iid3d = None

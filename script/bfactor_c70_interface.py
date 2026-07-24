@@ -185,6 +185,10 @@ def equitable_mean_asa(df_patch, side: str) -> dict:
     return profile.to_dict()
 
 # ── Index structures (pairwise reconstruit depuis l'ASSEMBLY) ───────────────────
+# Lancé via « python -m script.bfactor_c70_interface » (cwd = racine), script/
+# n'est pas sur sys.path : on l'ajoute pour importer le module frère.
+import sys as _sys
+_sys.path.insert(0, str(Path(__file__).resolve().parent))
 from structure_utils import pairwise_text
 # iid -> assembly PDB / pdb_id / chaînes physiques (chA, chB) : de quoi
 # reconstruire le pairwise (ou lire le fichier CIF-only conservé).
