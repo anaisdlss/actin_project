@@ -111,7 +111,7 @@ with st.sidebar:
 - [Valid PDB structures](#structures-pdb-valides)
 - [ABP footprint on actin](#empreinte-abp)
 - [Interaction clusters](#clusters-d-interactions)
-- [ABP](#abp)
+- [ABP](#section-abp)
 - [Interactive explorer](#explorateur)
 - [MSA — Interface proteins](#msa-proteines)
 """)
@@ -1255,7 +1255,7 @@ else:
                 st.info("Run the pipeline to generate the network data.")
 
 st.divider()
-st.header("ABP")
+st.header("ABP", anchor="section-abp")
 
 # Vue globale des protéines non-actins
 proteins_path = "data/filtered/proteins_per_pdb.csv"
