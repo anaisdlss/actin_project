@@ -257,35 +257,41 @@ def _render_abp_proteocast(sel_abp, abp_subunits):
                      if _failf.exists() else set())
         _is_failed = slug in _permfail
 
+        # Version déployée (Cloud) : le calcul ne persiste pas → pas de bouton
+        # compute/retry, juste le lien vers le site.
+        _DEPLOY = _Path("data/.slim_deploy").exists()
         if _is_failed:
             st.error(
-                f"**Loading error — ProteoCast could not be computed for {sel_abp}.** "
+                f"**Not available — ProteoCast could not be computed for {sel_abp}.** "
                 "proteocast.ijm.fr returns an error for this protein (typically a "
-                "fusion chimera, a very large protein, or too weak an MSA). "
-                "You can retry, or compute it manually on the website.")
+                "fusion chimera, a very large protein, or too weak an MSA).")
         else:
             st.info(f"**ProteoCast not computed yet** for **{sel_abp}**.")
 
-        _c1, _c2 = st.columns(2)
-        with _c1:
-            if _uni and st.button(
-                    ("Retry ProteoCast" if _is_failed else "Compute ProteoCast now"),
-                    key=f"pc_run_inline_{slug}", type="primary", width="stretch"):
-                with st.status("Submitting to proteocast.ijm.fr…",
-                               expanded=True) as _s:
-                    _ok, _msg = proteocast_view.run_proteocast_job(
-                        _uni, slug, log=_s.write)
-                    if _ok:
-                        _s.update(label="ProteoCast computed and fetched.",
-                                  state="complete")
-                        st.cache_data.clear()
-                        st.rerun()
-                    else:
-                        _s.update(label=f"Failed: {_msg}", state="error")
-        with _c2:
+        if _DEPLOY:
             st.link_button("Open proteocast.ijm.fr",
-                           "https://proteocast.ijm.fr/results/search/",
-                           width="stretch")
+                           "https://proteocast.ijm.fr/results/search/")
+        else:
+            _c1, _c2 = st.columns(2)
+            with _c1:
+                if _uni and st.button(
+                        ("Retry ProteoCast" if _is_failed else "Compute ProteoCast now"),
+                        key=f"pc_run_inline_{slug}", type="primary", width="stretch"):
+                    with st.status("Submitting to proteocast.ijm.fr…",
+                                   expanded=True) as _s:
+                        _ok, _msg = proteocast_view.run_proteocast_job(
+                            _uni, slug, log=_s.write)
+                        if _ok:
+                            _s.update(label="ProteoCast computed and fetched.",
+                                      state="complete")
+                            st.cache_data.clear()
+                            st.rerun()
+                        else:
+                            _s.update(label=f"Failed: {_msg}", state="error")
+            with _c2:
+                st.link_button("Open proteocast.ijm.fr",
+                               "https://proteocast.ijm.fr/results/search/",
+                               width="stretch")
 
 
 @st.cache_data(show_spinner=False)

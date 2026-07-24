@@ -17,7 +17,13 @@ All code lives in **`script/`**; `data/` is regenerated locally (see step 3).
 
 ## 1. Install
 
-Requires **pixi** ([pixi.sh](https://pixi.sh)). In a terminal:
+Requires **pixi** ([pixi.sh](https://pixi.sh)). Install it first (macOS / Linux):
+
+```bash
+curl -fsSL https://pixi.sh/install.sh | bash
+```
+
+Then restart your terminal and set up the project:
 
 ```bash
 git clone https://github.com/anaisdlss/actin_project.git
