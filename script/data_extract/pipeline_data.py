@@ -8,13 +8,13 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 # Étapes d'analyse : anciens notebooks convertis en scripts .py (lancés
 # directement par le pipeline, plus légers et sans dépendance jupyter au runtime).
-FILTER_NOTEBOOK   = PROJECT_ROOT / "notebooks" / "graphe_filter.py"
-SUPERCLUSTER_NOTEBOOK = PROJECT_ROOT / "notebooks" / "binding_site_superclusters.py"
-CLUSTER_NOTEBOOK  = PROJECT_ROOT / "notebooks" / "cluster_interaction_analysis.py"
-C70_NOTEBOOK      = PROJECT_ROOT / "notebooks" / "interface_analysis_c70.py"
-S1_NOTEBOOK       = PROJECT_ROOT / "notebooks" / "interface_analysis_s1.py"
-FILAMENT_NOTEBOOK = PROJECT_ROOT / "notebooks" / "actin_filament_positions.py"
-ABP_NOTEBOOK      = PROJECT_ROOT / "notebooks" / "abp_analysis.py"
+FILTER_NOTEBOOK   = PROJECT_ROOT / "script" / "graphe_filter.py"
+SUPERCLUSTER_NOTEBOOK = PROJECT_ROOT / "script" / "binding_site_superclusters.py"
+CLUSTER_NOTEBOOK  = PROJECT_ROOT / "script" / "cluster_interaction_analysis.py"
+C70_NOTEBOOK      = PROJECT_ROOT / "script" / "interface_analysis_c70.py"
+S1_NOTEBOOK       = PROJECT_ROOT / "script" / "interface_analysis_s1.py"
+FILAMENT_NOTEBOOK = PROJECT_ROOT / "script" / "actin_filament_positions.py"
+ABP_NOTEBOOK      = PROJECT_ROOT / "script" / "abp_analysis.py"
 
 DATA          = PROJECT_ROOT / "data"
 RAW           = DATA / "raw"

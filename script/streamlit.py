@@ -964,7 +964,7 @@ else:
                 if _s1g_data is None:
                     st.info(
                         "Data unavailable (run the pipeline / "
-                        "`notebooks/interface_analysis_s1.py`).")
+                        "`script/interface_analysis_s1.py`).")
                 else:
                     heatmap_mode = st.selectbox(
                         "Normalisation",
