@@ -184,11 +184,17 @@ def equitable_mean_asa(df_patch, side: str) -> dict:
     )
     return profile.to_dict()
 
-# ── Index structures (pairwise PDB par interaction) ─────────────────────────────
-df8_valid = df8[
-    df8["pairwise_pdb_file"].notna() &
-    (df8["pairwise_pdb_file"].astype(str).str.lower() != "nan")
-].copy()
+# ── Index structures (pairwise reconstruit depuis l'ASSEMBLY) ───────────────────
+from structure_utils import pairwise_text
+# iid -> assembly PDB / pdb_id / chaînes physiques (chA, chB) : de quoi
+# reconstruire le pairwise (ou lire le fichier CIF-only conservé).
+_iid_asm = dict(zip(df8["interaction_id"].astype(int),
+                    df8["biological_assembly_pdb_file"].astype(str)))
+_iid_pdb = dict(zip(df8["interaction_id"].astype(int),
+                    df8["pdb_id"].astype(str)))
+_iid_ab = {int(r.interaction_id): (str(r.chain_A_id).split("_")[-1],
+                                   str(r.chain_B_id).split("_")[-1])
+           for r in df_int.itertuples()}
 
 patch_to_type = dict(zip(df_c70["patch"].astype(str), df_c70["interaction_type"]))
 
@@ -232,8 +238,9 @@ for patch, iids in patch_to_iids.items():
         continue
 
     # Représentatif : interaction dont l'actine S1 est la plus fréquente dans all_data.
-    # is_sw_rep détecté via l'avant-dernière colonne du pairwise PDB (vraie chaîne).
-    rep_iid, pdb_file, is_sw_rep = None, None, False
+    # Le PDB pairwise est reconstruit depuis l'assembly (chaînes A/B). is_sw_rep =
+    # la chaîne physique A du pairwise (= chA) correspond-elle à S2 plutôt qu'à S1 ?
+    rep_iid, pw_lines, is_sw_rep = None, None, False
     best_freq = -1
 
     for iid in sorted(iids):
@@ -241,16 +248,22 @@ for patch, iids in patch_to_iids.items():
         freq = _actin_freq.get(s1_sub, 0)
         if freq <= best_freq:
             continue
-        rows = df8_valid[df8_valid["interaction_id"] == iid]
-        for _, r in rows.iterrows():
-            pp = str(r["pairwise_pdb_file"])
-            if not os.path.exists(pp):
-                continue
-            rep_iid, pdb_file, is_sw_rep = iid, pp, _is_swap_pdb(pp, iid)
-            best_freq = freq
-            break
+        _ab = _iid_ab.get(iid)
+        if not _ab:
+            continue
+        _asm = _iid_asm.get(iid)
+        _asm = _asm if (_asm and _asm.lower() != "nan"
+                        and os.path.exists(_asm)) else None
+        _pdbid = str(_iid_pdb.get(iid, "")).lower()
+        _txt = pairwise_text(iid, _pdbid, _ab[0], _ab[1], assembly_pdb=_asm)
+        if not _txt:
+            continue
+        rep_iid = iid
+        pw_lines = _txt.splitlines(keepends=True)
+        is_sw_rep = bool(s1_sub and _ab[0] != s1_sub.split("_")[-1])
+        best_freq = freq
 
-    if pdb_file is None:
+    if pw_lines is None:
         skip += 1
         continue
 
@@ -308,7 +321,7 @@ for patch, iids in patch_to_iids.items():
 
     # Réécrire le PDB : chaîne A = S1, chaîne B = S2, b-factor = ASA équitable
     out_lines: list[str] = []
-    for line in open(pdb_file):
+    for line in pw_lines:
         if line.startswith(("ATOM", "HETATM")) and len(line) > 26:
             ch_phys = line[21]
             try:

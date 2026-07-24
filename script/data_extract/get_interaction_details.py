@@ -68,7 +68,6 @@ ALIGNMENT_SEQUENCE_COLUMNS = [
 STRUCTURES_COLUMNS = [
     "interaction_id",
     "pdb_id",
-    "pairwise_pdb_file",
     "pymol_script_file",
     "biological_assembly_cif_file",
     "biological_assembly_pdb_file",
@@ -1021,11 +1020,20 @@ def process_interaction(task):
             "pdb_id": interaction.get("pdb_id", "")
         }
 
+        # Le PDB pairwise = 2 chaînes de l'assembly biologique (identique). On ne
+        # le télécharge QUE si l'assembly n'existe pas en .pdb (CIF-only) ; sinon
+        # on le reconstruit à la volée (économie ~6 Go). cf. structure_utils.
+        _has_pdb_biounit = any(
+            ("biounits" in _a["href"] and "pdb" in _a["href"]
+             and "mmCIF" not in _a["href"]) for _a in links)
+
         for a in links:
             href = a["href"]
 
             try:
                 if "pdb_files" in href and href.endswith(".pdb"):
+                    if _has_pdb_biounit:
+                        continue  # reconstructible depuis l'assembly → pas de dl
                     pdb_text = download_text(session, href)
                     if pdb_text is None:
                         print(
@@ -1105,9 +1113,7 @@ def process_interaction(task):
 
         missing_required_files = []
 
-        if not structure.get("pairwise_pdb_file"):
-            missing_required_files.append("pairwise_pdb_file")
-
+        # (pairwise_pdb_file n'est plus requis : reconstruit depuis l'assembly.)
         if not structure.get("pymol_script_file"):
             missing_required_files.append("pymol_script_file")
 

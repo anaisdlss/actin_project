@@ -8,7 +8,7 @@ from collections import defaultdict
 
 # ── Bipartite network helpers ─────────────────────────────────────────────────
 # Incrémenter pour invalider le cache en mémoire après un correctif logique
-_BIP_CACHE_VERSION = 3
+_BIP_CACHE_VERSION = 5
 
 _ACTIN_COLOR_NET = "#5B9BD5"
 _ABP_PALETTE_NET = [
@@ -1232,6 +1232,7 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
 
     # ── Représentation 3D du couple représentatif ──────────────────────────────
     _html_3d = None
+    _seq_asa = None
     try:
         import py3Dmol
         from collections import defaultdict as _dd3
@@ -1255,17 +1256,28 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
         _seq_mrg["_sp"] = (_seq_mrg["s1_sequence"].str.lower().fillna("") +
                            "|||" + _seq_mrg["s2_sequence"].str.lower().fillna(""))
 
-        # Paire de séquences la plus fréquente → représentant
+        # Paire de séquences la plus fréquente → représentant. Le PDB pairwise
+        # est reconstruit à la volée depuis l'ASSEMBLY (ou lu depuis le fichier
+        # pairwise conservé si l'assembly n'est qu'en CIF).
+        from structure_utils import pairwise_text, expected_pairwise_path
         _best_sp = _seq_mrg["_sp"].value_counts()
-        _rep_iid3d, _pdb3d = None, None
+        _rep_iid3d = None
+        _pdb3d = _asm3d = _chA3d = _chB3d = None
         if not _best_sp.empty:
             for _riid in _seq_mrg[_seq_mrg["_sp"] == _best_sp.index[0]].index:
                 _r8 = _df8_3d[_df8_3d["interaction_id"] == _riid]
-                if _r8.empty:
+                if _r8.empty or _riid not in meta.index:
                     continue
-                _pp = str(_r8.iloc[0]["pairwise_pdb_file"])
-                if _pp and _pp != "nan" and os.path.exists(_pp):
-                    _rep_iid3d, _pdb3d = _riid, _pp
+                _asm = str(_r8.iloc[0].get("biological_assembly_pdb_file", ""))
+                _asm = _asm if (_asm and _asm != "nan"
+                                and os.path.exists(_asm)) else None
+                _pdbid = str(_r8.iloc[0].get("pdb_id", "")).lower()
+                _ca = str(meta.loc[_riid, "chain_A_id"]).split("_")[-1]
+                _cb = str(meta.loc[_riid, "chain_B_id"]).split("_")[-1]
+                # dispo si assembly PDB OU fichier pairwise conservé (CIF-only)
+                if _asm or expected_pairwise_path(_riid, _pdbid, _ca, _cb).exists():
+                    _rep_iid3d, _asm3d, _pdb3d = _riid, _asm, _pdbid
+                    _chA3d, _chB3d = _ca, _cb
                     break
 
         if _rep_iid3d is not None:
@@ -1285,21 +1297,35 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
 
             _is_homo3d = _partner(_rep_iid3d) == "Actin"
 
-            _pdb_id_3d = _df8_3d.loc[_df8_3d["interaction_id"] == _rep_iid3d,
-                                     "pdb_id"].iat[0]
-            _same_pdb_iids = (
-                set(_df8_3d.loc[_df8_3d["pdb_id"] ==
-                    _pdb_id_3d, "interaction_id"])
-                & all_iids
-            )
-            # Utiliser df_res4 (données brutes, non-swappées) pour mapper les
-            # numéros de résidus physiques (chain A/B) directement à l'ASA.
-            # Pas besoin de filtrer par _swap_iids : l'ASA raw est toujours
-            # asa_pct_A = chaîne A physique, asa_pct_B = chaîne B physique.
-            _t4r = df_res4[df_res4["interaction_id"].isin(_same_pdb_iids)]
+            # IMPORTANT : ne colorer QUE les contacts de la PAIRE représentative
+            # affichée (_rep_iid3d), pas de toutes les interactions du même PDB —
+            # sinon des résidus qui touchent d'AUTRES chaînes s'allument loin de
+            # l'interface montrée (zones colorées hors contact).
+            # df_res4 = données brutes non-swappées : asa_pct_A = chaîne A
+            # physique, asa_pct_B = chaîne B physique.
+            _t4r = df_res4[df_res4["interaction_id"] == _rep_iid3d]
+
             # Colonne ASA correspondant à la chaîne physique S1 / S2
             _asa_s1_col = "asa_pct_B" if _is_sw3d else "asa_pct_A"
             _asa_s2_col = "asa_pct_A" if _is_sw3d else "asa_pct_B"
+            # Les 2 séquences de la paire représentative + %ASA enfouie exacte
+            # par position → affichage « 2 séquences avec ASA ».
+            _sq_s1 = "residue_B_sequence" if _is_sw3d else "residue_A_sequence"
+            _sq_s2 = "residue_A_sequence" if _is_sw3d else "residue_B_sequence"
+            _s1_asa, _s2_asa = {}, {}
+            for _, _rr in _t4r.iterrows():
+                _q1, _q2 = _rr.get(_sq_s1), _rr.get(_sq_s2)
+                if pd.notna(_q1) and pd.notna(_rr.get(_asa_s1_col)):
+                    _k = int(_q1)
+                    _s1_asa[_k] = max(_s1_asa.get(_k, 0.0), float(_rr[_asa_s1_col]))
+                if pd.notna(_q2) and pd.notna(_rr.get(_asa_s2_col)):
+                    _k = int(_q2)
+                    _s2_asa[_k] = max(_s2_asa.get(_k, 0.0), float(_rr[_asa_s2_col]))
+            if _rep_iid3d in _seq_mrg.index:
+                _rseq = _seq_mrg.loc[_rep_iid3d]
+                _seq_asa = {"s1_seq": str(_rseq.get("s1_sequence", "")),
+                            "s2_seq": str(_rseq.get("s2_sequence", "")),
+                            "s1_asa": _s1_asa, "s2_asa": _s2_asa}
 
             # B-factor = asa_pct réel de ce PDB (max par résidu si contacts multiples)
             _s1_bfac, _s2_bfac = {}, {}
@@ -1318,9 +1344,12 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
                         _s2_bfac[_k2] = float(_v2)
 
             # Réécrire les B-factors : 0 hors interface (→ 1er stop gradient),
-            # valeur ASA pour interface — même convention que bfactor_cluster
+            # valeur ASA pour interface — même convention que bfactor_cluster.
+            # PDB pairwise (assembly reconstruit, ou fichier CIF-only conservé).
+            _pw_txt = pairwise_text(_rep_iid3d, _pdb3d, _chA3d, _chB3d,
+                                    assembly_pdb=_asm3d) or ""
             _pdb_lines = []
-            for _line in open(_pdb3d):
+            for _line in _pw_txt.splitlines(keepends=True):
                 if _line.startswith(("ATOM", "HETATM")) and len(_line) > 26:
                     _ch = _line[21]
                     try:
@@ -1370,7 +1399,7 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
     except Exception:
         _html_3d = None
 
-    return html, len(all_s1), len(top_s2), n_total, _html_3d
+    return html, len(all_s1), len(top_s2), n_total, _html_3d, _seq_asa
 
 
 _BFACTOR_CLUSTER_DIR = "data/filtered/details/structures_files/bfactor_cluster"

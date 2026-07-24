@@ -55,3 +55,6 @@ script/compare.py
 # Backups
 # ======================
 *.bak
+
+# Build de déploiement Streamlit Cloud (repo séparé)
+deploy/

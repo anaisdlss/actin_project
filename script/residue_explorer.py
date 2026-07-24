@@ -104,7 +104,7 @@ def render_residue_fiche(pp, canon):
         c1, c2 = st.columns(2)
         c1.metric(
             "Residue conservation", _fmt(this_c),
-            delta=(f"{float(this_c) - avg_surf:+.2f} vs surface"
+            delta=(f"{float(this_c) - avg_surf:+.2f} vs mean surface"
                    if pd.notna(this_c) and pd.notna(avg_surf) else None))
         c2.metric("Mean actin surface", _fmt(avg_surf))
         if pd.notna(this_c) and pd.notna(avg_surf):

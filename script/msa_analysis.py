@@ -2164,6 +2164,10 @@ def _msa_section_full(group_label, group_key, filter_fn, rigor_pdbs=None, note=N
         if note:
             st.caption(note)
 
+        # Tables d'identité vs C. elegans : calculées dans le bloc myosine mais
+        # AFFICHÉES après la partie actine (voir plus bas).
+        _pid_rows, _fid_rows = [], []
+
         # Calcul des contacts actin et chargement des séquences ABP en avance.
         # Ordre partagé : S2 trié par titre, S1 trié par rang de la séquence dans S2.
         _abp_rows_a, _aa_at_a, _col_col_a = _msa_actin_contacts_per_abp(filter_fn, rigor_pdbs)
@@ -2385,19 +2389,8 @@ def _msa_section_full(group_label, group_key, filter_fn, rigor_pdbs=None, note=N
                                             _pct = f"{_matches / _pairs * 100:.1f}%" if _pairs > 0 else "N/A"
                                             _row[_label_map.get(_ce_id, _ce_id)] = _pct
                                         _pid_rows.append(_row)
-                                    if _pid_rows:
-                                        st.divider()
-                                        st.markdown(
-                                            "##### Identity on interface residues — vs *C. elegans*"
-                                        )
-                                        st.caption(
-                                            "% of identical amino acids only on the coloured "
-                                            "columns (residues in contact with actin)."
-                                        )
-                                        st.dataframe(
-                                            pd.DataFrame(_pid_rows).set_index("Sequence"),
-                                            use_container_width=True,
-                                        )
+                                    # (rendu des fenêtres d'identité déplacé après
+                                    #  la partie actine — voir plus bas.)
 
                                     # Tableau %id sur SÉQUENCE ENTIÈRE (toutes colonnes alignées)
                                     _fid_rows = []
@@ -2416,19 +2409,7 @@ def _msa_section_full(group_label, group_key, filter_fn, rigor_pdbs=None, note=N
                                             _r2[_label_map.get(_ce_id, _ce_id)] = (
                                                 f"{_m / _p * 100:.1f}%" if _p > 0 else "N/A")
                                         _fid_rows.append(_r2)
-                                    if _fid_rows:
-                                        st.divider()
-                                        st.markdown(
-                                            "##### Identity on the whole sequence — vs *C. elegans*"
-                                        )
-                                        st.caption(
-                                            "% of identical amino acids over all aligned columns "
-                                            "(whole motor domain, not just the interface)."
-                                        )
-                                        st.dataframe(
-                                            pd.DataFrame(_fid_rows).set_index("Sequence"),
-                                            use_container_width=True,
-                                        )
+                                    # (rendu déplacé après la partie actine.)
 
         # ── S1 : Actin — positions canonical ────────────────────────────────
         st.divider()
@@ -2475,6 +2456,22 @@ def _msa_section_full(group_label, group_key, filter_fn, rigor_pdbs=None, note=N
                 mime="text/html",
                 key=f"msa_{group_key}_s1_dl",
             )
+
+        # ── Identité vs C. elegans (myosine) — placée SOUS la partie actine ──
+        if _pid_rows:
+            with st.expander("Identity on interface residues — vs C. elegans",
+                             expanded=False):
+                st.caption("% of identical amino acids only on the coloured "
+                           "columns (residues in contact with actin).")
+                st.dataframe(pd.DataFrame(_pid_rows).set_index("Sequence"),
+                             use_container_width=True)
+        if _fid_rows:
+            with st.expander("Identity on the whole sequence — vs C. elegans",
+                             expanded=False):
+                st.caption("% of identical amino acids over all aligned columns "
+                           "(whole motor domain, not just the interface).")
+                st.dataframe(pd.DataFrame(_fid_rows).set_index("Sequence"),
+                             use_container_width=True)
 
         # ── Analyse des contacts ABP–actin (onglets A + B C D E) ──
         st.divider()

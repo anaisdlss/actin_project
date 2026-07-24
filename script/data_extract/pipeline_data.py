@@ -110,6 +110,22 @@ def _nb(notebook):
     _exec([sys.executable, str(notebook)])
 
 
+def _prune_pairwise():
+    """Supprime les PDB pairwise reconstructibles depuis l'assembly (et les
+    non-filtrés) : ~6 Go économisés. On ne garde que les CIF-only filtrés."""
+    import pandas as pd
+    sys.path.insert(0, str(PROJECT_ROOT / "script"))
+    from structure_utils import prune_pairwise
+    _p8 = DETAILS / "8.structures.csv"
+    _p1 = DETAILS / "1.interactions.csv"
+    if not (_p8.exists() and _p1.exists()):
+        return
+    _df8 = pd.read_csv(_p8)
+    _iids = set(pd.read_csv(_p1)["interaction_id"].astype(str))
+    rm, kp = prune_pairwise(_df8, used_iids=_iids)
+    print(f"  pairwise : {rm} supprimés (reconstructibles), {kp} conservés (CIF-only)")
+
+
 def run_group(key_title, substeps):
     """Une étape groupée = 1 marqueur ETAPE + plusieurs sous-étapes (cache par sous-étape).
     substeps : liste de (sous-label, deja_a_jour: bool, run: callable, touch: Path|None)."""
@@ -200,6 +216,8 @@ def main():
             ("Interactions d'interface", False,
              lambda: _exec([py, "-m", "script.data_extract.get_interaction_details"],
                            input_text="f\n"), None),
+            ("Purge des pairwise reconstructibles depuis l'assembly", False,
+             _prune_pairwise, None),
         ])
 
         # ══ 3/9 — Alignement MAFFT ═══════════════════════════════════════════

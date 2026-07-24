@@ -65,7 +65,7 @@ def run_proteocast_job(uniprot, slug, log=None):
     if not jid:
         return False, "No job_id returned by the server."
     _say(f"Job {jid} submitted — computing on proteocast.ijm.fr…")
-    status, msg = pcs.wait(sess, jid)
+    status, msg = pcs.wait(sess, jid, on_stage=lambda s: _say(f"  {s}"))
     if status != "finished":
         return False, f"Status “{status}”: {msg or 'no message'}"
     _say("Computation finished — downloading the result folder…")

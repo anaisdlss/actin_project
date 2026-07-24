@@ -224,7 +224,7 @@ def _render_db_table(sub, db, filt):
 
 def render_discovery(sel_abp):
     """Per-ABP view, broken down by cluster: one motif per site, 2 dbs (PDB/AFDB)."""
-    st.subheader("Discovery — interface motif per cluster (FoldDisco)")
+    st.markdown("#### Discovery — interface motif per cluster (FoldDisco)")
     mt = os.path.getmtime(_DISCO_CSV) if os.path.exists(_DISCO_CSV) else 0.0
     df = _load_discovery(mt)
     if df is None:

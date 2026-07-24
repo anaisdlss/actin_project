@@ -78,16 +78,51 @@ def submit(session, uniprot):
 
 
 def poll_once(session, job_id):
-    """Vérifie le statut UNE fois (non bloquant).
-    Renvoie (status, message) : status ∈ finished/error/warning/running/unknown."""
+    """Vérifie le statut UNE fois (non bloquant). Renvoie (status, message) où
+    `status` est la CHAÎNE BRUTE de ProteoCast — soit une étape en cours (ex.
+    « building MSA... », « computing conservation levels... »), soit un état
+    terminal (« finished », « error… », « warning… »). None si erreur réseau
+    transitoire (à ignorer, on re-tentera au tour suivant)."""
     try:
         j = session.get(f"{STATUS}?job_id={job_id}", timeout=60).json()
     except Exception:
-        return "unknown", ""
-    s = j.get("status", "running")
-    if s in ("finished", "error", "warning"):
-        return s, j.get("message") or j.get("warning_message", "")
-    return "running", ""
+        return None, ""
+    return (j.get("status") or ""), (j.get("message") or j.get("warning_message") or "")
+
+
+def _terminal(status):
+    """(terminé ?, réussi ?) d'un status ProteoCast brut."""
+    s = (status or "").lower()
+    if "finished" in s or "success" in s:
+        return True, True
+    if "error" in s or "fail" in s or "warning" in s:
+        return True, False
+    return False, False   # étape intermédiaire (…ing…)
+
+
+def wait(session, job_id, on_stage=None):
+    """Sonde le job jusqu'à un état terminal (ou POLL_MAX). Renvoie (status, message)
+    avec status == 'finished' en cas de succès, sinon le status d'échec / 'timeout'.
+    `on_stage(stage_str)` : callback optionnel appelé à CHAQUE changement d'étape
+    ProteoCast (MSA → GEMME → conservation…) pour un retour en direct côté UI."""
+    t0 = time.time()
+    last = None
+    while True:
+        status, msg = poll_once(session, job_id)
+        if status is None:                     # coupure réseau transitoire
+            if time.time() - t0 > POLL_MAX:
+                return "timeout", "no response from server"
+            time.sleep(POLL_EVERY)
+            continue
+        is_term, ok = _terminal(status)
+        if is_term:
+            return ("finished" if ok else status), msg
+        if on_stage and status and status != last:
+            last = status
+            on_stage(status)
+        if time.time() - t0 > POLL_MAX:
+            return "timeout", f"still “{status}” after {POLL_MAX}s"
+        time.sleep(POLL_EVERY)
 
 
 def download_extract(session, job_id, slug):
@@ -158,8 +193,8 @@ def main():
     pending = list(todo)          # ABP pas encore soumis
     inflight = {}                 # slug -> {jid, uni, title, t0}
 
-    def _fail(slug, msg):
-        print(f"    {slug} : {msg} — marqué en échec", flush=True)
+    def _fail(slug, msg, title=None):
+        print(f"    {title or slug} : {msg} — marqué en échec", flush=True)
         new_failed.add(slug)
 
     while pending or inflight:
@@ -170,10 +205,10 @@ def main():
             try:
                 jid = submit(session, uni)
             except Exception as e:
-                _fail(slug, f"ERREUR soumission: {e}")
+                _fail(slug, f"ERREUR soumission: {e}", title=r["abp_title"])
                 continue
             if not jid:
-                _fail(slug, "pas de job_id")
+                _fail(slug, "pas de job_id", title=r["abp_title"])
                 continue
             inflight[slug] = {"jid": jid, "uni": uni,
                               "title": r["abp_title"], "t0": time.time()}
@@ -185,33 +220,47 @@ def main():
         for slug in list(inflight):
             info = inflight[slug]
             status, msg = poll_once(session, info["jid"])
-            if status == "running":
+            if status is None:          # erreur réseau transitoire → on ré-essaie
                 if time.time() - info["t0"] > POLL_MAX:
                     del inflight[slug]
-                    _fail(slug, "timeout")
+                    _fail(slug, "timeout", title=info["title"])
+                    done_n += 1
+                continue
+            _is_term, _ok = _terminal(status)
+            if not _is_term:
+                # étape ProteoCast en cours (MSA, GEMME, conservation…) : on
+                # n'affiche QUE quand elle CHANGE, pas à chaque tour de boucle.
+                if status and status != info.get("last_status"):
+                    info["last_status"] = status
+                    print(f"    {info['title']} : {status}", flush=True)
+                if time.time() - info["t0"] > POLL_MAX:
+                    del inflight[slug]
+                    _fail(slug, "timeout", title=info["title"])
                     done_n += 1
                 continue
             del inflight[slug]
             done_n += 1
-            if status != "finished":
-                _fail(slug, f"{status} : {msg[:120]}")
+            if not _ok:
+                _fail(slug, f"{status} : {msg[:120]}", title=info["title"])
                 continue
             try:
                 got = download_extract(session, info["jid"], slug)
             except Exception as e:
-                _fail(slug, f"ERREUR téléchargement: {e}")
+                _fail(slug, f"ERREUR téléchargement: {e}", title=info["title"])
                 continue
             if got:
                 ok += 1
                 new_failed.discard(slug)
-                print(f"[{done_n}/{total}] OK -> data/proteocast/abp/{slug}/",
-                      flush=True)
+                print(f"[{done_n}/{total}] OK — {info['title']} "
+                      f"-> data/proteocast/abp/{slug}/", flush=True)
             else:
-                _fail(slug, "ZIP téléchargé mais fichier clé absent")
+                _fail(slug, "ZIP téléchargé mais fichier clé absent",
+                      title=info["title"])
 
         # 3) patienter avant le prochain tour — SANS log par cycle : on n'affiche
-        #    qu'aux ÉVÉNEMENTS (soumission, téléchargement OK, échec), pas les
-        #    lignes « en cours » répétées identiques qui inondaient la sortie.
+        #    qu'aux ÉVÉNEMENTS (soumission, changement d'étape ProteoCast,
+        #    téléchargement OK, échec), pas les lignes « en cours » répétées
+        #    identiques qui inondaient la sortie.
         if inflight:
             time.sleep(POLL_EVERY)
 

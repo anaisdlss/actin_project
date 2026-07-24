@@ -223,14 +223,14 @@ def _render_abp_proteocast(sel_abp, abp_subunits):
         _fz = _abp_actin_focus(sel_abp, slug)
         if _fz:
             _flo, _fhi, _qlen = _fz
-            _whole = st.toggle(
-                f"Whole protein ({_qlen} aa) — otherwise zoom on the "
-                f"actin-binding region (~{_flo}–{_fhi})",
+            _zoom = st.toggle(
+                f"Zoom on the actin-binding region (~{_flo}–{_fhi}) — "
+                f"otherwise the whole protein ({_qlen} aa)",
                 value=False, key=f"pc_whole_{slug}",
                 help="This ABP is multi-domain but only one region contacts "
-                     "actin. We zoom on it by default; enable to see "
-                     "the whole protein.")
-            if not _whole:
+                     "actin. The whole protein is shown by default; enable to "
+                     "zoom on the actin-binding region.")
+            if _zoom:
                 _focus = (_flo, _fhi)
         _surface = st.toggle(
             "Exposed surface only (RSA ≥ 0.2) — recompute the gradient on these positions",
@@ -252,11 +252,52 @@ def _render_abp_proteocast(sel_abp, abp_subunits):
             "Interactive: zoom + hover."
         )
     else:
-        st.info(
-            f"ProteoCast not computed yet for **{sel_abp}**. "
-            f"Drop the result into `data/proteocast/abp/{slug}.csv` "
-            "(format `4.query_ProteoCast.csv`) and it will show up here."
-        )
+        # UniProt de l'ABP (manifest) pour (re)lancer le calcul / lier le site.
+        _uni = None
+        _pcs = proteocast_view.load_status(0.0)
+        if _pcs is not None:
+            _mm = _pcs[_pcs["abp_title"] == sel_abp]
+            _uni = _mm.iloc[0]["uniprot"] if len(_mm) else None
+        # Échec DÉFINITIF déjà consigné (le serveur ProteoCast lui-même échoue :
+        # fusion chimère, protéine trop longue, MSA trop faible…).
+        _failf = _PROTEOCAST_ABP_DIR / "_failed_slugs.txt"
+        _permfail = ({l.strip() for l in _failf.read_text().splitlines() if l.strip()}
+                     if _failf.exists() else set())
+        _is_failed = slug in _permfail
+
+        if _is_failed:
+            st.error(
+                f"**Loading error — ProteoCast could not be computed for {sel_abp}.** "
+                "proteocast.ijm.fr returns an error for this protein (typically a "
+                "fusion chimera, a very large protein, or too weak an MSA). "
+                "You can retry, or compute it manually on the website.")
+        else:
+            st.info(f"**ProteoCast not computed yet** for **{sel_abp}**.")
+
+        _c1, _c2 = st.columns(2)
+        with _c1:
+            if _uni and st.button(
+                    ("Retry ProteoCast" if _is_failed else "Compute ProteoCast now"),
+                    key=f"pc_run_inline_{slug}", type="primary", width="stretch"):
+                with st.status("Submitting to proteocast.ijm.fr…",
+                               expanded=True) as _s:
+                    _ok, _msg = proteocast_view.run_proteocast_job(
+                        _uni, slug, log=_s.write)
+                    if _ok:
+                        _s.update(label="ProteoCast computed and fetched.",
+                                  state="complete")
+                        st.cache_data.clear()
+                        st.rerun()
+                    else:
+                        _s.update(label=f"Failed: {_msg}", state="error")
+        with _c2:
+            st.link_button("Open proteocast.ijm.fr",
+                           "https://proteocast.ijm.fr/results/search/",
+                           width="stretch")
+        st.caption(
+            "Manual fallback: run it on proteocast.ijm.fr, download the results "
+            f"folder, and drop `4.query_ProteoCast.csv` into "
+            f"`data/proteocast/abp/{slug}/`.")
 
 
 @st.cache_data(show_spinner=False)
@@ -287,7 +328,6 @@ def _abp_actin_footprint(sel_abp, mtime):
 
 def _render_abp_actin_conservation(sel_abp):
     """Côté actin : la conservation (ProteoCast actin) des résidus que cet ABP touche."""
-    import matplotlib.pyplot as plt
     cons = _load_actin_conservation()
     if cons is None:
         st.info(
@@ -310,9 +350,14 @@ def _render_abp_actin_conservation(sel_abp):
     fpv = cons[cons.is_fp]["conservation"]
     other = cons[cons.is_surface & ~cons.is_fp]["conservation"]
 
+    _fp_cmp = "Higher" if fpv.mean() > other.mean() else "Lower"
     c1, c2, c3 = st.columns(3)
     c1.metric("Actin residues contacted", len(fpv))
-    c2.metric("Mean conservation (footprint)", f"{fpv.mean():.2f}")
+    # Footprint : on n'affiche plus le chiffre brut, mais s'il est plus/moins
+    # conservé que le reste de la surface.
+    c2.metric("Footprint vs rest of surface", _fp_cmp,
+              help="Is the ABP footprint on actin more or less conserved than "
+                   "the rest of the exposed actin surface?")
     c3.metric("Mean conservation (rest of surface)", f"{other.mean():.2f}")
     st.caption(
         f"“rest of surface” = {len(other)} **exposed** actin residues (RSA ≥ {_SURF_RSA:g}) "
@@ -328,22 +373,38 @@ def _render_abp_actin_conservation(sel_abp):
     except Exception:
         pass
 
-    fig, (axa, axb) = plt.subplots(1, 2, figsize=(13, 3.4),
-                                   gridspec_kw={"width_ratios": [3, 1]})
-    axa.plot(cons["canon"], cons["conservation"],
-             color="lightgrey", lw=0.7, zorder=1)
-    axa.scatter(cons.loc[cons.is_fp, "canon"], cons.loc[cons.is_fp, "conservation"],
-                color="#e63946", s=14, zorder=3, label="footprint of this ABP")
-    axa.set_xlabel("actin canonical position")
-    axa.set_ylabel("conservation")
-    axa.legend(fontsize=8)
-    axa.set_title(
-        f"Actin conservation — residues contacted by {sel_abp}", fontsize=10)
-    axb.boxplot([other.dropna(), fpv.dropna()],
-                tick_labels=["rest\n(surface)", "footprint"],
-                patch_artist=True, boxprops=dict(facecolor="#cfe8e0"))
-    axb.set_ylabel("conservation")
-    axb.set_title("Footprint vs surface", fontsize=10)
-    fig.tight_layout()
-    st.pyplot(fig)
-    plt.close(fig)
+    import plotly.graph_objects as go
+    from plotly.subplots import make_subplots
+    _figc = make_subplots(
+        rows=1, cols=2, column_widths=[0.75, 0.25], horizontal_spacing=0.09,
+        subplot_titles=(f"Actin conservation — residues contacted by {sel_abp}",
+                        "Footprint vs surface"))
+    _cs = cons.sort_values("canon")
+    # Ligne grise = toutes les positions (hover : position + conservation)
+    _figc.add_trace(go.Scatter(
+        x=_cs["canon"], y=_cs["conservation"], mode="lines",
+        line=dict(color="lightgrey", width=1), name="all positions",
+        hovertemplate="actin position %{x}<br>conservation %{y:.2f}<extra></extra>",
+        showlegend=False), row=1, col=1)
+    # Points rouges = empreinte de cet ABP (hover : position + conservation)
+    _fpd = cons[cons.is_fp]
+    _figc.add_trace(go.Scatter(
+        x=_fpd["canon"], y=_fpd["conservation"], mode="markers",
+        marker=dict(color="#e63946", size=8), name="footprint of this ABP",
+        hovertemplate="actin position %{x}<br>conservation %{y:.2f}"
+                      "<extra>footprint</extra>"), row=1, col=1)
+    _figc.update_xaxes(title_text="actin canonical position", row=1, col=1)
+    _figc.update_yaxes(title_text="conservation", row=1, col=1)
+    # Boxplots : reste de la surface vs empreinte
+    _figc.add_trace(go.Box(y=other.dropna(), name="rest (surface)",
+                           marker_color="#8fb9ae", showlegend=False),
+                    row=1, col=2)
+    _figc.add_trace(go.Box(y=fpv.dropna(), name="footprint",
+                           marker_color="#e63946", showlegend=False),
+                    row=1, col=2)
+    _figc.update_yaxes(title_text="conservation", row=1, col=2)
+    _figc.update_layout(
+        height=380, margin=dict(l=10, r=10, t=40, b=10),
+        legend=dict(orientation="h", yanchor="bottom", y=1.04,
+                    xanchor="right", x=1))
+    st.plotly_chart(_figc, use_container_width=True)
