@@ -57,5 +57,5 @@ Only needed for the 3D scripts the pipeline writes under
 ## Shareable version (Streamlit Cloud)
 
 A slim, read-only build (data pre-bundled, pipeline disabled) can be deployed to
-Streamlit Community Cloud. Build it with `python script/make_slim_deploy.py`;
-full instructions in **[DEPLOY.md](DEPLOY.md)**.
+Streamlit Community Cloud: `python script/make_slim_deploy.py` creates a
+self-contained `deploy/` folder to push to a separate repo.
