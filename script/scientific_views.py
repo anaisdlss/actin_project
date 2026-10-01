@@ -12,7 +12,11 @@ from footprint_comparison import FILES,load_footprints
 
 
 def signatures(paths):
-    return tuple((str(p),p.stat().st_mtime_ns,p.stat().st_size) for p in paths if p.exists())
+    # Streamlit hashes this wrapper, not the imported scientific calculations.
+    dependencies=[Path(__file__).with_name('scientific_analysis.py'),
+                  Path(__file__).with_name('footprint_comparison.py'),
+                  Path(__file__).with_name('numbering.py')]
+    return tuple((str(p),p.stat().st_mtime_ns,p.stat().st_size) for p in [*paths,*dependencies] if p.exists())
 
 
 @st.cache_data(show_spinner=False)
