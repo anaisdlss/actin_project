@@ -80,14 +80,16 @@ The full dataset is regenerated locally by a **9-step pipeline** (button
 ## 4. Navigation and scientific pages
 
 The sidebar follows the eleven sections of the scientific brief. Selecting a
-section opens its own page. The **View** control at the top changes the analysis
-within that page; only the chosen view is rendered. Residue, protein, cluster
+section opens its own page. Documentation displays the guide directly. Where
+a section contains several analyses, the **View** control selects which one
+is rendered. Main tables, selected networks and structural evidence are visible
+without an extra disclosure control. Residue, protein, cluster
 and explicitly keyed analysis choices are retained during navigation in the
 same browser session. Reloading the browser starts a new Streamlit session.
 
 | Page | Available views and purpose |
 |---|---|
-| **Documentation** | Guide; **Data and calculations** for cache reload and, in the full project, data updates and ProteoCast job diagnostics. |
+| **Documentation** | Guide displayed directly; **Data management** groups cache reload and, in the full project, data updates and ProteoCast job diagnostics. |
 | **Summary tables** | **Structures** (retained PDB explorer), **Source tables**, **Residue numbering**, **Dataset checks**. |
 | **Actin use at a residue level** | **Residue explorer** with contacts and a 3D surface; **Binding-site heatmap** across homo/hetero sites. |
 | **Actin-actin interfaces** | **Binding sites**, **Compare footprints**, **Structural evidence**. Mixed sites are also included. |

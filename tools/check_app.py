@@ -40,7 +40,15 @@ def choose_view(section, view):
 check('startup: documentation only')
 assert len(app.get('plotly_chart')) == 0
 assert not app.selectbox
-assert 'Run / update' not in [b.label for b in app.button]
+assert not app.radio
+assert any('What this app is' in m.value for m in app.markdown)
+assert any(e.label == 'Data management — reload, download and calculations' for e in app.expander)
+if Path('data/.slim_deploy').exists():
+    assert 'Run / update' not in [b.label for b in app.button]
+    assert not any(b.key == 'pc_run_all_missing' for b in app.button)
+else:
+    assert 'Run / update' in [b.label for b in app.button]
+    assert any(b.key == 'pc_run_all_missing' for b in app.button)
 
 # Exercise every page and each visible view selector with the installed data.
 # Offline check: an unavailable remote AlphaFold fallback is simulated only;
@@ -52,17 +60,11 @@ with patch.object(proteocast_view, '_fetch_af_pdb', return_value=None):
         if view_widget:
             for view in list(view_widget.options)[1:]:
                 choose_view(section, view)
-                if section == 'documentation':
-                    if Path('data/.slim_deploy').exists():
-                        assert 'Run / update' not in [b.label for b in app.button]
-                        assert not any(b.key == 'pc_run_all_missing' for b in app.button)
-                    else:
-                        assert 'Run / update' in [b.label for b in app.button]
-                        assert any(b.key == 'pc_run_all_missing' for b in app.button)
 
 page('comparative-binding-sites', 'ABP networks')
 app.radio(key='net_view').set_value('Cooperation')
 check('ABP co-presence network')
+assert not any(e.label == 'Show the network graph' for e in app.expander)
 
 page('residue-level', 'Residue explorer')
 assert len(app.selectbox(key='actin_ov_selbox').options) == 375
@@ -89,6 +91,7 @@ check('footprint groups, ASA threshold and full Jaccard matrix')
 app.multiselect(key='fp_aligned_abps').set_value(['Cofilin-1'])
 check('aligned ABP footprints')
 choose_view('actin-actin-interfaces', 'Binding sites')
+assert not any(e.label == 'Show binding-site table' for e in app.expander)
 app.selectbox(key='homo_site_link').set_value('6685_3')
 app.button(key='homo_site_open').click()
 check('mixed binding-site navigation')

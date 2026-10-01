@@ -147,3 +147,13 @@ Contrôle final : les parcours complets passent avec les jeux local et public,
 y compris les réseaux de compétition et de coprésence. Dans le navigateur,
 le résidu M47 est conservé après aller-retour par Summary tables ; le bouton
 d’exploration du jeu public ouvre bien la page du cluster sélectionné.
+
+## Réduire les niveaux de navigation — 1 octobre 2026
+
+Documentation affiche directement le guide, avec un seul panneau secondaire
+Data management pour le cache, le pipeline et les commandes ProteoCast. Le
+sélecteur Guide / Data and calculations et le panneau de mise à jour imbriqué
+sont supprimés. Les tableaux homo/hétéro, le réseau ABP sélectionné et les
+résultats Structural evidence s'affichent directement. Les onze rubriques et
+les choix entre analyses distinctes sont conservés. Ce lot modifie uniquement
+la présentation, sans changer les données ni les formules.

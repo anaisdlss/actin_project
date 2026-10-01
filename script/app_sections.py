@@ -81,8 +81,11 @@ def render_cluster_table(kind):
     st.markdown("**Binding-site summary**")
     st.caption("Homo = actin–actin only; hetero = actin–ABP only; mixed = both. "
                "A mixed site is included in both interface sections. Counts are those of the existing dataset.")
-    with st.expander("Show binding-site table", expanded=(kind in {"homo", "hetero"})):
+    if kind in {"homo", "hetero"}:
         st.dataframe(_readable_cluster_table(table), hide_index=True, width="stretch")
+    else:
+        with st.expander("Show binding-site table"):
+            st.dataframe(_readable_cluster_table(table), hide_index=True, width="stretch")
     if kind in {"homo", "hetero"} and not table.empty:
         cluster = st.selectbox("Binding site to explore", sorted(table["patch"].astype(str), key=str.casefold), key=f"{kind}_site_link")
         if st.button("Explore selected cluster", key=f"{kind}_site_open"):

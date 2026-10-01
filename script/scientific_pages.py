@@ -14,15 +14,9 @@ def render(section):
     import page_views as views
 
     if section == "documentation":
-        view = page_view(section, ["Guide", "Data and calculations"])
-        if view == "Guide":
-            st.markdown("Explore actin residues, interfaces and their binding partners using the sections in the sidebar. "
-                        "Each page offers its own views; selected residues, proteins and analysis settings are retained when you return.")
-            guide = Path("GUIDE.md")
-            if guide.exists():
-                st.markdown(guide.read_text())
-        else:
-            st.subheader("Reload the local dataset")
+        st.markdown("Explore actin residues, interfaces and their binding partners using the sections in the sidebar. "
+                    "Selected residues, proteins and analysis settings are retained when you return.")
+        with st.expander("Data management — reload, download and calculations"):
             st.caption("Re-read the files already installed. This does not download new data or start calculations.")
             if st.button("Clear cache and reload", key="reload_local_cache"):
                 st.cache_data.clear()
@@ -33,8 +27,13 @@ def render(section):
             if views.DEPLOY_MODE:
                 st.info("This public app uses a prepared dataset. Data updates and calculations are managed in the full project.")
             else:
-                with st.expander("Download or update the research dataset"):
-                    views.render_data_tools()
+                views.render_data_tools()
+        guide = Path("GUIDE.md")
+        if guide.exists():
+            content = guide.read_text()
+            if content.startswith("# "):
+                content = content.partition("\n")[2]
+            st.markdown(content)
     elif section == "summary-tables":
         view = page_view(section, ["Structures", "Source tables", "Residue numbering", "Dataset checks"])
         if view == "Structures": views.render_structures()

@@ -269,36 +269,36 @@ def evidence_cached(stamp):
 def render_interface_evidence():
     p=Path('data/filtered/filtered_all_data.csv')
     if not p.exists():return
-    with st.expander('Evidence for prevalent and context-associated actin–actin interfaces'):
-        sites,c70,occurrences,matches=evidence_cached(signatures([p]))
-        st.caption('Counts use distinct PDB structures and both sides of actin–actin interactions. '
-                   'The denominator is all retained PDBs with a homo interaction. Cofilin/coronin/WDR1 '
-                   '(including actin-interacting protein 1) are matched by source names anywhere in that PDB. '
-                   'Co-occurrence does not establish direct contact or a distorted filament conformation.')
-        fig=go.Figure(go.Bar(x=sites.site,y=sites.PDB_count,marker_color='#0072B2'))
-        fig.update_layout(xaxis_title='Binding-site cluster',yaxis_title='Distinct PDB structures',height=330)
-        st.plotly_chart(fig,use_container_width=True,key='interface_evidence_counts')
-        st.dataframe(sites,hide_index=True,width='stretch')
-        st.markdown('**Interface clusters (C70)**')
-        st.dataframe(c70,hide_index=True,width='stretch')
-        st.caption('Fisher tests compare occurrence within the context cohort versus other retained PDBs; '
-                   'BH correction is separate for sites and C70 clusters. PDB entries need not be independent '
-                   'experiments. Statistical association supports prioritization, not a validated major/minor '
-                   'biological label. The proposed 6685_1–4 reference group must also be checked structurally.')
-        download(sites,'Download site evidence','actin_interface_site_evidence.csv','ie_sites')
-        download(c70,'Download C70 evidence','actin_interface_c70_evidence.csv','ie_c70')
-        download(occurrences,'Download PDB–site–C70 correspondence','interface_occurrences.csv','ie_occurrences')
-        st.markdown('**Source names defining the context cohort**')
-        st.dataframe(matches,hide_index=True,width='stretch')
-        geometry=Path('reports/scientific_audit/representative_geometry_summary.csv')
-        if geometry.exists():
-            st.markdown('**Representative structural check**')
-            st.caption('One actin subunit is superimposed by its mapped C-alpha atoms; the neighbor is measured '
-                       'under the same transform, without refitting. 3J8A is the F-actin/tropomyosin reference; '
-                       '5YU8 and 6VAO are cofilin-decorated references. These examples support distinct pair '
-                       'geometries; they do not validate every cluster or prove a clash.')
-            st.dataframe(pd.read_csv(geometry),hide_index=True,width='stretch')
-            st.markdown('[3J8A](https://www.rcsb.org/structure/3J8A) · '
-                        '[5YU8](https://www.rcsb.org/structure/5YU8) · '
-                        '[6VAO](https://www.rcsb.org/structure/6VAO)')
-            download(pd.read_csv(geometry),'Download representative geometry check','representative_geometry.csv','ie_geometry')
+    st.subheader("Evidence for actin–actin interfaces")
+    sites,c70,occurrences,matches=evidence_cached(signatures([p]))
+    st.caption('Counts use distinct PDB structures and both sides of actin–actin interactions. '
+               'The denominator is all retained PDBs with a homo interaction. Cofilin/coronin/WDR1 '
+               '(including actin-interacting protein 1) are matched by source names anywhere in that PDB. '
+               'Co-occurrence does not establish direct contact or a distorted filament conformation.')
+    fig=go.Figure(go.Bar(x=sites.site,y=sites.PDB_count,marker_color='#0072B2'))
+    fig.update_layout(xaxis_title='Binding-site cluster',yaxis_title='Distinct PDB structures',height=330)
+    st.plotly_chart(fig,use_container_width=True,key='interface_evidence_counts')
+    st.dataframe(sites,hide_index=True,width='stretch')
+    st.markdown('**Interface clusters (C70)**')
+    st.dataframe(c70,hide_index=True,width='stretch')
+    st.caption('Fisher tests compare occurrence within the context cohort versus other retained PDBs; '
+               'BH correction is separate for sites and C70 clusters. PDB entries need not be independent '
+               'experiments. Statistical association supports prioritization, not a validated major/minor '
+               'biological label. The proposed 6685_1–4 reference group must also be checked structurally.')
+    download(sites,'Download site evidence','actin_interface_site_evidence.csv','ie_sites')
+    download(c70,'Download C70 evidence','actin_interface_c70_evidence.csv','ie_c70')
+    download(occurrences,'Download PDB–site–C70 correspondence','interface_occurrences.csv','ie_occurrences')
+    st.markdown('**Source names defining the context cohort**')
+    st.dataframe(matches,hide_index=True,width='stretch')
+    geometry=Path('reports/scientific_audit/representative_geometry_summary.csv')
+    if geometry.exists():
+        st.markdown('**Representative structural check**')
+        st.caption('One actin subunit is superimposed by its mapped C-alpha atoms; the neighbor is measured '
+                   'under the same transform, without refitting. 3J8A is the F-actin/tropomyosin reference; '
+                   '5YU8 and 6VAO are cofilin-decorated references. These examples support distinct pair '
+                   'geometries; they do not validate every cluster or prove a clash.')
+        st.dataframe(pd.read_csv(geometry),hide_index=True,width='stretch')
+        st.markdown('[3J8A](https://www.rcsb.org/structure/3J8A) · '
+                    '[5YU8](https://www.rcsb.org/structure/5YU8) · '
+                    '[6VAO](https://www.rcsb.org/structure/6VAO)')
+        download(pd.read_csv(geometry),'Download representative geometry check','representative_geometry.csv','ie_geometry')

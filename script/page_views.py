@@ -103,8 +103,8 @@ _GRAPH_COMPONENT = st.components.v1.declare_component("actin_graph", path=str(_P
 def render_data_tools():
     pipeline_ui.render()
     if not DEPLOY_MODE:
-        with st.expander("ProteoCast calculations and job diagnostics"):
-            render_proteocast_jobs()
+        st.divider()
+        render_proteocast_jobs()
 
 
 def render_proteocast_jobs():
@@ -1691,8 +1691,7 @@ def render_abp_networks():
             )
             _net_html = _net_html.replace(
                 "</body>", "<script>" + _inject_search_abp + "</script>\n</body>")
-            with st.expander("Show the network graph", expanded=False):
-                st.components.v1.html(_net_html, height=880, scrolling=False)
+            st.components.v1.html(_net_html, height=880, scrolling=False)
             # Légende COULEUR = famille (uniquement les familles présentes dans le réseau)
             _fams_in_net = sorted({_fam_of[_n] for _n in _all_abp_net})
             _fam_items = "".join(
@@ -1781,8 +1780,7 @@ def render_abp_networks():
                 title=f"co-present in {_w_e} PDBs",
                 color={"color": "#1f9e3a", "opacity": 0.5},
             )
-        with st.expander("Show the network graph", expanded=False):
-            st.components.v1.html(_net_co.generate_html(), height=780, scrolling=False)
+        st.components.v1.html(_net_co.generate_html(), height=780, scrolling=False)
 
 
 def render_abp_details():
