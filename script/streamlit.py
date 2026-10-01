@@ -10,6 +10,7 @@ from s1_heatmaps import (
 import pipeline_ui
 from app_sections import create_sections, render_cluster_table, describe_table, table_label
 from st_io import (_load_pdb_file, read_csv)
+from pdb_catalog import build_pdb_catalog
 import warnings as _warnings
 import logging as _logging
 import re as _re_sd
@@ -368,45 +369,38 @@ with _sections["summary-tables"]:
 
 
     # ---------------------------------------------------------------------------
-    # Section PDB valides — explorateur
+    # Section PDB retenues dans les analyses — explorateur
     # ---------------------------------------------------------------------------
 
-    pdb_filt_path = "data/filtered/filtered_pdb_entry.csv"
-    if os.path.exists(pdb_filt_path):
+    _pdb_retained_path = "data/filtered/filtered_all_data.csv"
+    _pdb_summary_path = "data/filtered/filtered_summary.csv"
+    _pdb_details_path = "data/filtered/details/1.interactions.csv"
+    _pdb_catalog = build_pdb_catalog(
+        read_csv(_pdb_retained_path) if os.path.exists(_pdb_retained_path) else None,
+        read_csv(_pdb_summary_path) if os.path.exists(_pdb_summary_path) else None,
+        read_csv(_pdb_details_path) if os.path.exists(_pdb_details_path) else None,
+    )
+    pdb_ids = _pdb_catalog["pdb_id"].tolist()
+    if st.session_state.get("pdb_selector") not in pdb_ids:
+        for _key in ("pdb_selector", "last_pdb", "sel_inter", "sel_node",
+                     "viewer_key", "viewer_html"):
+            st.session_state.pop(_key, None)
+    if not pdb_ids:
+        st.info("No retained PDB structures are available in the current analysis dataset.")
+    else:
         st.divider()
-        st.subheader("Valid PDB structures", anchor="structures-pdb-valides")
-
-        df_entry = read_csv(pdb_filt_path)
-        pdb_ids = sorted(df_entry["pdb_id"].str.upper().unique())
-
-        summary_path = "data/filtered/filtered_summary.csv"
-        if os.path.exists(summary_path):
-            df_sum = read_csv(summary_path)
-            unique = df_sum[["PDB ID", "Structure title"]
-                            ].drop_duplicates("PDB ID")
-            title_map = dict(
-                zip(unique["PDB ID"].str.upper(), unique["Structure title"]))
-        else:
-            title_map = {}
+        st.subheader("Retained PDB structures", anchor="structures-pdb-valides")
+        st.caption("Only structures with interactions retained in the current analysis dataset are listed.")
+        title_map = _pdb_catalog.set_index("pdb_id")["title"].to_dict()
 
         col_sel, _ = st.columns([1, 1])
         with col_sel:
             selected_pdb = st.selectbox(
-                f"Choose a structure ({len(pdb_ids)} valid PDBs)",
+                f"Choose a structure ({len(pdb_ids)} retained PDBs)",
                 pdb_ids,
-                format_func=lambda x: f"{x} — {title_map[x]}" if x in title_map else x,
+                format_func=lambda x: f"{x} — {title_map[x]}",
                 key="pdb_selector",
             )
-
-        sub = df_entry[df_entry["pdb_id"].str.upper() == selected_pdb]
-        _retained_file = "data/filtered/filtered_all_data.csv"
-        if os.path.exists(_retained_file):
-            _retained_pdbs = set(read_csv(_retained_file)["pdb_id"].astype(str).str.upper())
-            if selected_pdb not in _retained_pdbs:
-                st.info("This structure passed the connected-actin screen, but has no "
-                        "interaction retained by the subsequent analysis filters. It is "
-                        "shown for transparency and is not included in residue-contact totals.")
-
 
         # Reset de l'interaction sélectionnée quand on change de PDB
         if st.session_state.get("last_pdb") != selected_pdb:

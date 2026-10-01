@@ -36,6 +36,15 @@ Une correction des heatmaps S1 associe désormais la chaîne à son interaction 
 
 ## Avant le papier et la mise à jour Cloud
 
+Mise à jour du sélecteur PDB (1 octobre 2026) : son contenu est désormais construit
+depuis `filtered_all_data.csv`, et non la liste du préfiltre. Les quatre entrées
+7Q8B, 7Q8C, 7Q8S et 8OID n'y apparaissent donc plus ; les sources sont conservées.
+Le menu compte 159 PDB dans le projet complet et 151 dans le jeu public. Tous ont
+actuellement un titre et un fichier 3D disponible. Une sélection devenue absente
+après une mise à jour des données est réinitialisée, avec son ancienne vue 3D.
+Les titres disposent de replis sur les métadonnées locales ; leur absence seule
+ne provoque pas l'exclusion d'une structure retenue.
+
 Restent à valider : la provenance structurale de la RSA (notamment filament versus monomère), les annotations de protéines/fusions, les règles majoritaire/minoritaire, la robustesse statistique et les données variants. Les figures précalculées doivent être régénérées avec les mêmes sources et paramètres que les vues contrôlées, puis comparées aux anciennes. Les versions des outils et la date des sources doivent accompagner les figures retenues.
 
 La comparaison de seuils peut être reproduite sur le jeu complet par :

@@ -81,7 +81,12 @@ The full dataset is regenerated locally by a **9-step pipeline** (button
 ### Data download *(local only)*
 Runs / updates the 9-step pipeline. Resumable. Hidden on the shared version.
 
-### Filtered data & Valid PDB structures (explorer)
+### Filtered data & Retained PDB structures (explorer)
+The menu follows the current retained interaction dataset automatically. Structures
+excluded after the initial connected-actin screen are not listed. Missing titles
+are recovered from the other local metadata tables; missing metadata or 3D files
+alone do not remove a structure from the retained dataset.
+
 Pick a PDB. You get:
 - **Interaction network** — the chains of that structure and who touches whom
   (orange = actin, blue = ABP). Click an edge (a pair) or a node (a chain).
