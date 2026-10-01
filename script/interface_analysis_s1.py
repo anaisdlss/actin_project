@@ -31,7 +31,7 @@ df_int  = pd.read_csv(DETAILS / '1.interactions.csv')
 df_all  = pd.read_csv(FILTERED / 'filtered_all_data.csv')
 
 # Chaîne S1 (chain_A) pour chaque interaction_id
-s1_chain_map = df_int.set_index('interaction_id')['chain_A_id'].str.lower()
+s1_chain_map = df_int.set_index('interaction_id')['chain_A_id']
 
 df_res3_tmp = df_res3.copy()
 df_res3_tmp["buried_ASA_percent"] = pd.to_numeric(
@@ -43,7 +43,7 @@ df_res3_tmp["buried_ASA_percent"] = pd.to_numeric(
 df_res3_tmp['s1_chain'] = df_res3_tmp['interaction_id'].map(s1_chain_map)
 df_res_s1 = df_res3_tmp[
     df_res3_tmp['residue_number_canon_mafft'].notna() &
-    (df_res3_tmp['chain'].str.lower() == df_res3_tmp['s1_chain'])
+    (df_res3_tmp['chain'] == df_res3_tmp['s1_chain'])
 ].copy()
 df_res_s1['canon'] = df_res_s1['residue_number_canon_mafft'].astype(int)
 
@@ -64,14 +64,14 @@ iid_to_s2_patch = merge_cols['s2_binding_site_cluster_data_70']
 df_res_s1['patch'] = df_res_s1['interaction_id'].map(iid_to_s1_patch)
 
 # --- Résidus S2 (chain_B) pour interactions homo uniquement ---
-actin_chains = set(df_pp[df_pp['is_actin']]['chain'].str.lower())
-homo_int_ids = set(df_int[df_int['chain_B_id'].str.lower().isin(actin_chains)]['interaction_id'])
-s2_chain_map = df_int.set_index('interaction_id')['chain_B_id'].str.lower()
+actin_chains = set(df_pp[df_pp['is_actin']]['chain'])
+homo_int_ids = set(df_int[df_int['chain_B_id'].isin(actin_chains)]['interaction_id'])
+s2_chain_map = df_int.set_index('interaction_id')['chain_B_id']
 
 df_res_s2 = df_res3_tmp[
     df_res3_tmp['interaction_id'].isin(homo_int_ids) &
     df_res3_tmp['residue_number_canon_mafft'].notna() &
-    (df_res3_tmp['chain'].str.lower() == df_res3_tmp['interaction_id'].map(s2_chain_map))
+    (df_res3_tmp['chain'] == df_res3_tmp['interaction_id'].map(s2_chain_map))
 ].copy()
 df_res_s2['canon'] = df_res_s2['residue_number_canon_mafft'].astype(int)
 df_res_s2['patch'] = df_res_s2['interaction_id'].map(iid_to_s2_patch)
@@ -286,10 +286,10 @@ all_clusters_ordered = homo_clusters + hetero_clusters
 
 
 # ## 5. Heatmap global — moyenne équitable par sous-cluster C70
-# 
-# Version alternative du heatmap global (section 2) :  
-# au lieu de moyenner toutes les interactions brutes (où un C70 à 440 individus écrase un C70 à 2),  
-# on calcule d'abord **la moyenne par sous-cluster C70**, puis on fait la **moyenne de ces moyennes** (poids égal à chaque C70).  
+#
+# Version alternative du heatmap global (section 2) :
+# au lieu de moyenner toutes les interactions brutes (où un C70 à 440 individus écrase un C70 à 2),
+# on calcule d'abord **la moyenne par sous-cluster C70**, puis on fait la **moyenne de ces moyennes** (poids égal à chaque C70).
 # L'objectif est de comparer les deux pour repérer des biais de représentation.
 
 # In[6]:
@@ -464,33 +464,33 @@ print(df_ref.head())
 
 from matplotlib.colors import ListedColormap
 
-# Top 4 clusters homo (S1 + S2 confondus) 
-iids = {iid for c in sorted(homo_clusters,      
-key=lambda c: -c['n'])[:4] for iid in c['iids']}  
+# Top 4 clusters homo (S1 + S2 confondus)
+iids = {iid for c in sorted(homo_clusters,
+key=lambda c: -c['n'])[:4] for iid in c['iids']}
 
-canon_used = list(set(df_res[df_res['interaction_id'].isin(iids)]['canon']))                      
-used = np.array([1.0 if p in canon_used else 0.0  
-for p in all_positions]).reshape(1, -1)         
+canon_used = list(set(df_res[df_res['interaction_id'].isin(iids)]['canon']))
+used = np.array([1.0 if p in canon_used else 0.0
+for p in all_positions]).reshape(1, -1)
 
 fig, ax = plt.subplots(figsize=(max(14,len(all_positions) * 0.09), 1.2))
-ax.imshow(used, aspect='auto',cmap=ListedColormap(['#D0D0D0', 'red']), interpolation='none', vmin=0, vmax=1) 
-step = max(1, len(all_positions) // 50)           
-xticks_idx = list(range(0, len(all_positions),  step))                                            
+ax.imshow(used, aspect='auto',cmap=ListedColormap(['#D0D0D0', 'red']), interpolation='none', vmin=0, vmax=1)
+step = max(1, len(all_positions) // 50)
+xticks_idx = list(range(0, len(all_positions),  step))
 ax.set_xticks(xticks_idx)
-ax.set_xticklabels([all_positions[i] for i in     
-xticks_idx], fontsize=6, rotation=90)             
-ax.set_xlabel('Position canonique MAFFT (actin)', fontsize=9)                                       
-ax.set_yticks([])                               
+ax.set_xticklabels([all_positions[i] for i in
+xticks_idx], fontsize=6, rotation=90)
+ax.set_xlabel('Position canonique MAFFT (actin)', fontsize=9)
+ax.set_yticks([])
 ax.set_title(f"Résidus S1 (actin) présents au moins 1 fois dans les top 4 clusters homo ({len(iids)} interactions)", fontsize=10)
-plt.tight_layout()                                
-plt.savefig(VIS_DIR /                           
-'actin_s1_top4homo_used_heatmap.png', dpi=150,    
+plt.tight_layout()
+plt.savefig(VIS_DIR /
+'actin_s1_top4homo_used_heatmap.png', dpi=150,
 bbox_inches='tight')
-plt.show()                                        
+plt.show()
 
 print(f"{len(canon_used)} positions rouges,{len(all_positions) - len(canon_used)} grises")
-print(f"color white")                             
-print(f"color red, resi {'+'.join(str(r) for r in canon_used)}") 
+print(f"color white")
+print(f"color red, resi {'+'.join(str(r) for r in canon_used)}")
 
 
 # In[10]:
@@ -595,14 +595,14 @@ _draw_global_heatmap(
 
 from matplotlib.colors import ListedColormap
 
-actin_chains = set(df_pp[df_pp['is_actin']]['chain'].str.lower())  
-homo_iids  = set(df_int[df_int['chain_B_id'].str.lower().isin(actin_chains)]['interaction_id'])                                    
+actin_chains = set(df_pp[df_pp['is_actin']]['chain'])
+homo_iids  = set(df_int[df_int['chain_B_id'].isin(actin_chains)]['interaction_id'])
 
 canon_used = list(set(df_res[df_res['interaction_id'].isin(homo_iids)]['canon']))
-used = np.array([1.0 if p in canon_used else 0.0 for p in all_positions]).reshape(1, -1)                                     
+used = np.array([1.0 if p in canon_used else 0.0 for p in all_positions]).reshape(1, -1)
 
 fig, ax = plt.subplots(figsize=(max(14, len(all_positions) * 0.09),
-1.2))                                                    
+1.2))
 ax.imshow(used, aspect='auto', cmap=ListedColormap(['#D0D0D0','red']),
         interpolation='none', vmin=0, vmax=1)
 step = max(1, len(all_positions) // 50)
@@ -616,10 +616,10 @@ ax.set_title(f"Résidus S1 (actin) présents au moins 1 fois dans uneinteraction
 fontsize=10)
 plt.tight_layout()
 plt.savefig(VIS_DIR / 'actin_s1_homo_used_heatmap.png', dpi=150,
-bbox_inches='tight')                                               
+bbox_inches='tight')
 plt.show()
 
-print(f"{len(canon_used)} positions rouges, {len(all_positions) - len(canon_used)} positions blanches")                     
+print(f"{len(canon_used)} positions rouges, {len(all_positions) - len(canon_used)} positions blanches")
 print(list(canon_used))
 
 print(f"color white")
@@ -676,14 +676,14 @@ plt.show()
 
 from matplotlib.colors import ListedColormap
 
-actin_chains = set(df_pp[df_pp['is_actin']]['chain'].str.lower())  
-hetero_iids  = set(df_int[~df_int['chain_B_id'].str.lower().isin(actin_chains)]['interaction_id'])                                    
+actin_chains = set(df_pp[df_pp['is_actin']]['chain'])
+hetero_iids  = set(df_int[~df_int['chain_B_id'].isin(actin_chains)]['interaction_id'])
 
 canon_used = list(set(df_res[df_res['interaction_id'].isin(hetero_iids)]['canon']))
-used = np.array([1.0 if p in canon_used else 0.0 for p in all_positions]).reshape(1, -1)                                     
+used = np.array([1.0 if p in canon_used else 0.0 for p in all_positions]).reshape(1, -1)
 
 fig, ax = plt.subplots(figsize=(max(14, len(all_positions) * 0.09),
-1.2))                                                    
+1.2))
 ax.imshow(used, aspect='auto', cmap=ListedColormap(['#D0D0D0','#27AE60']),
         interpolation='none', vmin=0, vmax=1)
 step = max(1, len(all_positions) // 50)
@@ -697,10 +697,10 @@ ax.set_title(f"Résidus S1 (actin) présents au moins 1 fois dans uneinteraction
 fontsize=10)
 plt.tight_layout()
 plt.savefig(VIS_DIR / 'actin_s1_hetero_used_heatmap.png', dpi=150,
-bbox_inches='tight')                                               
+bbox_inches='tight')
 plt.show()
 
-print(f"{len(canon_used)} positions vertes, {len(all_positions) - len(canon_used)} positions blanches")                     
+print(f"{len(canon_used)} positions vertes, {len(all_positions) - len(canon_used)} positions blanches")
 print(list(canon_used))
 
 print(f"color gray70")

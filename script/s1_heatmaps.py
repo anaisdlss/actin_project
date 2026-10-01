@@ -3,9 +3,9 @@ import os
 import numpy as np
 import pandas as pd
 import streamlit as st
+import numbering
 
 
-_ACTIN_LEN = 375
 
 
 _S1_GLOBAL_FILES = [
@@ -25,8 +25,8 @@ def _build_s1_global_heatmap(_mtimes):
     if not all(os.path.exists(f) for f in _S1_GLOBAL_FILES):
         return None
     area = pd.read_csv(_S1_GLOBAL_FILES[0], index_col="patch")
-    # actin canonical = 375 résidus : on ignore les positions > 375 (artefacts MSA)
-    positions = [int(p) for p in area.columns if int(p) <= _ACTIN_LEN]
+    # colonnes MAFFT ayant un résidu P60709 (les insertions sont écartées)
+    positions = [int(p) for p in area.columns if numbering.to_uniprot(p) is not None]
     pos_index = {p: i for i, p in enumerate(positions)}
     df = pd.read_csv(_S1_GLOBAL_FILES[1], low_memory=False)
     di = pd.read_csv(_S1_GLOBAL_FILES[2])[
@@ -107,6 +107,10 @@ def _render_s1_global_plotly(data, relative, valid_clusters=None):
     import plotly.graph_objects as go
     from plotly.subplots import make_subplots
     positions, homo, hm, hetero, em = data
+    # affichage en numérotation P60709 (colonnes MAFFT sans résidu écartées)
+    _keep = [j for j, p in enumerate(positions) if numbering.to_uniprot(p) is not None]
+    positions = [numbering.to_uniprot(positions[j]) for j in _keep]
+    hm, em = hm[:, _keep], em[:, _keep]
     full = list(range(min(positions), max(positions) + 1))
     idx = {p: i for i, p in enumerate(full)}
 
@@ -174,7 +178,7 @@ def _render_s1_global_plotly(data, relative, valid_clusters=None):
     fig.update_yaxes(title_text="n clusters",
                      title_font=dict(size=10), row=3, col=1)
     fig.update_xaxes(dtick=25, row=3, col=1,
-                     title_text="Position canonical de l'actin (MAFFT)",
+                     title_text=numbering.AXIS_TITLE,
                      title_font=dict(size=11))
     # annotations de section
     fig.add_annotation(text=f"HOMO — actin / actin ({nh})", xref="paper",
@@ -208,7 +212,7 @@ def _s1_sources(_mtimes):
     if not all(os.path.exists(f) for f in _S1_GLOBAL_FILES):
         return None
     area = pd.read_csv(_S1_GLOBAL_FILES[0], index_col="patch")
-    positions = [int(p) for p in area.columns if int(p) <= _ACTIN_LEN]
+    positions = [int(p) for p in area.columns if numbering.to_uniprot(p) is not None]
     df = pd.read_csv(_S1_GLOBAL_FILES[1], low_memory=False)
     di = pd.read_csv(_S1_GLOBAL_FILES[2])[
         ["interaction_id", "chain_A_id", "chain_B_id"]]
@@ -286,6 +290,11 @@ def _render_s1_patch_plotly(detail, patch):
     """Profil 1-ligne du patch + heatmap décomposée par C70, positions à leur place."""
     import plotly.graph_objects as go
     positions, patch_profile, c70_rows = detail
+    # affichage en numérotation P60709 (colonnes MAFFT sans résidu écartées)
+    _keep = [j for j, p in enumerate(positions) if numbering.to_uniprot(p) is not None]
+    positions = [numbering.to_uniprot(positions[j]) for j in _keep]
+    patch_profile = np.asarray(patch_profile)[_keep]
+    c70_rows = [(r[0], r[1], r[2], np.asarray(r[3])[_keep]) + tuple(r[4:]) for r in c70_rows]
     full = list(range(min(positions), max(positions) + 1))
     idx = {p: i for i, p in enumerate(full)}
 
@@ -306,7 +315,7 @@ def _render_s1_patch_plotly(detail, patch):
         title=dict(text=f"Patch {patch} — S1 interface profile (fair-C70 %ASA)",
                    font=dict(size=12)))
     fig1.update_yaxes(showticklabels=False)
-    fig1.update_xaxes(dtick=25, title_text="Actin canonical position (MAFFT)",
+    fig1.update_xaxes(dtick=25, title_text=numbering.AXIS_TITLE,
                       title_font=dict(size=10))
     # Clic sur une position → met à jour le sélecteur « Position canonical » ci-dessus.
     _ev1 = st.plotly_chart(fig1, use_container_width=True, key=f"s1prof_{patch}",
@@ -316,9 +325,9 @@ def _render_s1_patch_plotly(detail, patch):
     except Exception:
         _pts = []
     if _pts and _pts[0].get("x") is not None:
-        _cx = int(round(float(_pts[0]["x"])))
+        _cx = numbering.to_canon(int(round(float(_pts[0]["x"]))))
         # ne relance que si la sélection change réellement (évite la boucle)
-        if st.session_state.get(f"s1posdet_{patch}") != _cx:
+        if _cx is not None and st.session_state.get(f"s1posdet_{patch}") != _cx:
             st.session_state[f"_s1_click_{patch}"] = _cx
             st.rerun()
 
@@ -334,7 +343,7 @@ def _render_s1_patch_plotly(detail, patch):
         title=dict(text=f"Patch {patch} — breakdown by C70 sub-cluster "
                    f"({len(labels)} C70)", font=dict(size=12)))
     fig2.update_yaxes(autorange="reversed", tickfont=dict(size=9))
-    fig2.update_xaxes(dtick=25, title_text="Actin canonical position (MAFFT)",
+    fig2.update_xaxes(dtick=25, title_text=numbering.AXIS_TITLE,
                       title_font=dict(size=10))
     st.plotly_chart(fig2, use_container_width=True)
 
@@ -388,7 +397,7 @@ def _s1_position_detail(patch, _mtimes):
     res = res.dropna(subset=["canon"])
     res["canon"] = res["canon"].astype(int)
     res["_actinch"] = res["interaction_id"].map(iid2actinch)
-    res = res[res["chain"].str.lower() == res["_actinch"].str.lower()].copy()
+    res = res[res["chain"] == res["_actinch"]].copy()
     res["taxid"] = res["interaction_id"].map(iid2tax)
     res["pdb_id"] = res["interaction_id"].map(iid2pdb)
     res_actin = res[["canon", "residue_name", "taxid", "pdb_id"]].copy()
@@ -425,7 +434,8 @@ def _render_s1_position_detail(detail, patch):
         if _cp in positions:
             st.session_state[f"s1posdet_{patch}"] = _cp
     sel_pos = st.selectbox(
-        "Position canonical", positions, key=f"s1posdet_{patch}")
+        numbering.SHORT_LABEL, positions, key=f"s1posdet_{patch}",
+        format_func=numbering.label)
 
     c_org, c_abp = st.columns(2)
     with c_org:

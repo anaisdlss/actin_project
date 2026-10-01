@@ -124,9 +124,9 @@ _FILTERS = {
     "All": None,
 }
 _INTERP_COL = {
-    "same motif (strong)": "#1a7f37",
-    "residues largely shared, loose superposition": "#9a6700",
-    "partially shared motif": "#9a6700",
+    "same motif (strong)": "#0072B2",
+    "residues largely shared, loose superposition": "#E69F00",
+    "partially shared motif": "#E69F00",
     "different motifs": "#8c8c8c",
     "few residues — inconclusive": "#8c8c8c",
 }

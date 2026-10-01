@@ -50,8 +50,8 @@ hetero = df_all[df_all["s1_actine"] & ~df_all["s2_actine"]].copy()
 
 # Lier avec proteins_per_pdb pour avoir le nom propre de la protéine
 df_abp    = df_pp[~df_pp["is_actin"]].copy()
-df_abp["chain_low"] = df_abp["chain"].str.lower()
-hetero["subunit_2_low"] = hetero["subunit_2"].str.lower()
+df_abp["chain_low"] = df_abp["chain"]
+hetero["subunit_2_low"] = hetero["subunit_2"]
 hetero_m  = hetero.merge(df_abp[["chain_low", "protein", "pdb_id"]],
                          left_on="subunit_2_low", right_on="chain_low", how="left")
 
@@ -171,8 +171,8 @@ df3 = df3[df3.canon.notna() & df3.buried_ASA_percent.notna()].copy()
 di = pd.read_csv(_R/'data/filtered/details/1.interactions.csv')
 da = pd.read_csv(_R/'data/filtered/filtered_all_data.csv', low_memory=False)
 pp = pd.read_csv(_R/'data/filtered/proteins_per_pdb.csv')
-actin_ch = set(pp[pp.is_actin]['chain'].str.lower())
-homo = set(di[di['chain_B_id'].str.lower().isin(actin_ch)]['interaction_id'])
+actin_ch = set(pp[pp.is_actin]['chain'])
+homo = set(di[di['chain_B_id'].isin(actin_ch)]['interaction_id'])
 het = di[~di.interaction_id.isin(homo)].merge(
     da[['subunit_1','subunit_2','subunit_2_title','s2_actine','cluster_data_70']],
     left_on=['chain_A_id','chain_B_id'], right_on=['subunit_1','subunit_2'], how='left').drop_duplicates('interaction_id')
@@ -186,9 +186,9 @@ def _arp_name(n):
     if _re.match(r'Actin-related protein 2(\b|,|$)', n): return 'Arp2'
     return n
 het['abp'] = het['subunit_2_title'].fillna('Unknown').str.replace(r'\s*\(.*?\)','',regex=True).str.strip().str[:50].map(_arp_name)
-s1ch=het.set_index('interaction_id')['chain_A_id'].str.lower(); abpn=het.set_index('interaction_id')['abp']; c70n=het.set_index('interaction_id')['cluster_data_70']
+s1ch=het.set_index('interaction_id')['chain_A_id']; abpn=het.set_index('interaction_id')['abp']; c70n=het.set_index('interaction_id')['cluster_data_70']
 d3 = df3[df3.interaction_id.isin(set(het.interaction_id))].copy()
-d3['_s1c']=d3.interaction_id.map(s1ch); d3=d3[d3.chain.str.lower()==d3._s1c].copy()
+d3['_s1c']=d3.interaction_id.map(s1ch); d3=d3[d3.chain==d3._s1c].copy()
 d3['abp']=d3.interaction_id.map(abpn); d3['canon']=d3.canon.astype(int); d3['c70']=d3.interaction_id.map(c70n)
 abp_freq=d3.groupby('abp')['interaction_id'].nunique().sort_values(ascending=False)
 ac70n=d3.groupby(['abp','c70'])['interaction_id'].nunique()
@@ -272,13 +272,13 @@ from pathlib import Path as _P
 _R = _P('..') if _P('../data').exists() else _P('.')
 
 # --- tendance cote filament par ABP (via actin_filament_positions.csv) ---
-fil = pd.read_csv(_R/'data/filtered/actin_filament_positions.csv'); c2l = dict(zip(fil['chain'].str.lower(), fil['label']))
+fil = pd.read_csv(_R/'data/filtered/actin_filament_positions.csv'); c2l = dict(zip(fil['chain'], fil['label']))
 _da = pd.read_csv(_R/'data/filtered/filtered_all_data.csv', low_memory=False); _da['s2_actine']=_da['s2_actine'].fillna(False).astype(bool)
 _di = pd.read_csv(_R/'data/filtered/details/1.interactions.csv').merge(
     _da[['subunit_1','subunit_2','subunit_2_title','s2_actine']].drop_duplicates(), left_on=['chain_A_id','chain_B_id'], right_on=['subunit_1','subunit_2'], how='left')
 _di['s2_actine']=_di['s2_actine'].fillna(False).astype(bool); _di=_di[~_di['s2_actine']].copy()
 _di['abp']=_di['subunit_2_title'].fillna('Unknown').str.replace(r'\s*\(.*?\)','',regex=True).str.strip().str[:50].map(_arp_name)
-_di['fil']=_di['chain_A_id'].str.lower().map(c2l)
+_di['fil']=_di['chain_A_id'].map(c2l)
 def _simp(l):
     if pd.isna(l): return None
     if l=='+': return '+'          # bout barbe strict
@@ -389,8 +389,8 @@ _df3['canon']=pd.to_numeric(_df3['residue_number_canon_mafft'],errors='coerce')
 _df3=_df3[_df3.canon.notna()&_df3.pct.notna()].copy()
 _di=pd.read_csv(_R/'data/filtered/details/1.interactions.csv')
 _da=pd.read_csv(_R/'data/filtered/filtered_all_data.csv',low_memory=False)
-_pp=pd.read_csv(_R/'data/filtered/proteins_per_pdb.csv'); _ac=set(_pp[_pp.is_actin]['chain'].str.lower())
-_homo=set(_di[_di['chain_B_id'].str.lower().isin(_ac)]['interaction_id'])
+_pp=pd.read_csv(_R/'data/filtered/proteins_per_pdb.csv'); _ac=set(_pp[_pp.is_actin]['chain'])
+_homo=set(_di[_di['chain_B_id'].isin(_ac)]['interaction_id'])
 _het=_di[~_di.interaction_id.isin(_homo)].merge(
     _da[['subunit_1','subunit_2','subunit_2_title','s2_actine','cluster_data_70','s1_binding_site_cluster_data_70']],
     left_on=['chain_A_id','chain_B_id'],right_on=['subunit_1','subunit_2'],how='left').drop_duplicates('interaction_id')
@@ -398,9 +398,9 @@ _het=_het[_het['s2_actine'].fillna(False)==False].copy()
 _het['abp']=_het['subunit_2_title'].fillna('Unknown').str.replace(r'\s*\(.*?\)','',regex=True).str.strip().str[:50].map(_arpn)
 # un "site" = cluster de site de liaison S1 (fallback = cluster_data_70 si manquant)
 _het['site']=_het['s1_binding_site_cluster_data_70'].fillna('c70_'+_het['cluster_data_70'].astype(str))
-_im=_het.set_index('interaction_id'); _s1=_im['chain_A_id'].str.lower(); _ab=_im['abp']; _st=_im['site']
+_im=_het.set_index('interaction_id'); _s1=_im['chain_A_id']; _ab=_im['abp']; _st=_im['site']
 _dd=_df3[_df3.interaction_id.isin(set(_het.interaction_id))].copy()
-_dd['_c']=_dd.interaction_id.map(_s1); _dd=_dd[_dd.chain.str.lower()==_dd._c].copy()   # cote actine
+_dd['_c']=_dd.interaction_id.map(_s1); _dd=_dd[_dd.chain==_dd._c].copy()   # cote actine
 _dd['abp']=_dd.interaction_id.map(_ab); _dd['site']=_dd.interaction_id.map(_st); _dd['canon']=_dd.canon.astype(int)
 _cdf=pd.read_csv(_R/'data/proteocast/conservation_vs_asa_per_position.csv'); _cons=dict(zip(_cdf['canon'].astype(int),_cdf['conservation']))
 _KD={'A':1.8,'R':-4.5,'N':-3.5,'D':-3.5,'C':2.5,'Q':-3.5,'E':-3.5,'G':-0.4,'H':-3.2,'I':4.5,'L':3.8,'K':-3.9,'M':1.9,'F':2.8,'P':-1.6,'S':-0.8,'T':-0.7,'W':-0.9,'Y':-1.3,'V':4.2}
@@ -423,8 +423,8 @@ _hb=_het.groupby(['abp','site'])[['num_contacts','num_hbonds','num_salt_bridges'
 _hb['pct_hbond']=100*_hb['num_hbonds']/_hb['num_contacts']; _hb['pct_saltbridge']=100*_hb['num_salt_bridges']/_hb['num_contacts']
 F=F.join(_hb.groupby('abp')[['pct_hbond','pct_saltbridge']].mean())
 # position ordinale (aussi utilisee en couleur)
-_fil=pd.read_csv(_R/'data/filtered/actin_filament_positions.csv'); _c2l=dict(zip(_fil['chain'].str.lower(),_fil['label']))
-_het['fil']=_het['chain_A_id'].str.lower().map(_c2l)
+_fil=pd.read_csv(_R/'data/filtered/actin_filament_positions.csv'); _c2l=dict(zip(_fil['chain'],_fil['label']))
+_het['fil']=_het['chain_A_id'].map(_c2l)
 _het['grp']=_het['fil'].map(lambda l: l if l in ('+','-') else ('side' if pd.notna(l) else None))
 _ps=_het.dropna(subset=['grp']).groupby('abp')['grp'].apply(set)
 F['position']=pd.Series({a:(1.0 if ('+' in _ps.get(a,set()) and '-' not in _ps.get(a,set())) else (-1.0 if ('-' in _ps.get(a,set()) and '+' not in _ps.get(a,set())) else 0.0)) for a in F.index})
@@ -547,16 +547,16 @@ _df3['canon']=pd.to_numeric(_df3['residue_number_canon_mafft'],errors='coerce')
 _df3=_df3[_df3.canon.notna()&_df3.pct.notna()].copy()
 _di=pd.read_csv(_R/'data/filtered/details/1.interactions.csv')
 _da=pd.read_csv(_R/'data/filtered/filtered_all_data.csv',low_memory=False)
-_pp=pd.read_csv(_R/'data/filtered/proteins_per_pdb.csv'); _ac=set(_pp[_pp.is_actin]['chain'].str.lower())
-_homo=set(_di[_di['chain_B_id'].str.lower().isin(_ac)]['interaction_id'])
+_pp=pd.read_csv(_R/'data/filtered/proteins_per_pdb.csv'); _ac=set(_pp[_pp.is_actin]['chain'])
+_homo=set(_di[_di['chain_B_id'].isin(_ac)]['interaction_id'])
 _het=_di[~_di.interaction_id.isin(_homo)].merge(
     _da[['subunit_1','subunit_2','subunit_2_title','s2_actine','cluster_data_70','s2_sequence_cluster_40','s2_sequence_cluster_70']],
     left_on=['chain_A_id','chain_B_id'],right_on=['subunit_1','subunit_2'],how='left').drop_duplicates('interaction_id')
 _het=_het[_het['s2_actine'].fillna(False)==False].copy()
 _het['abp']=_het['subunit_2_title'].fillna('Unknown').str.replace(r'\s*\(.*?\)','',regex=True).str.strip().str[:50].map(_arpn)
-_im=_het.set_index('interaction_id'); _s1=_im['chain_A_id'].str.lower(); _ab=_im['abp']; _c70=_im['cluster_data_70']; _fm=_im['s2_sequence_cluster_40']; _fm70=_im['s2_sequence_cluster_70']
+_im=_het.set_index('interaction_id'); _s1=_im['chain_A_id']; _ab=_im['abp']; _c70=_im['cluster_data_70']; _fm=_im['s2_sequence_cluster_40']; _fm70=_im['s2_sequence_cluster_70']
 _d=_df3[_df3.interaction_id.isin(set(_het.interaction_id))].copy()
-_d['_c']=_d.interaction_id.map(_s1); _d=_d[_d.chain.str.lower()==_d._c].copy()   # cote actine
+_d['_c']=_d.interaction_id.map(_s1); _d=_d[_d.chain==_d._c].copy()   # cote actine
 _d['abp']=_d.interaction_id.map(_ab); _d['fam']=_d.interaction_id.map(_fm); _d['fam70']=_d.interaction_id.map(_fm70); _d['c70']=_d.interaction_id.map(_c70); _d['canon']=_d.canon.astype(int)
 
 _KD={'A':1.8,'R':-4.5,'N':-3.5,'D':-3.5,'C':2.5,'Q':-3.5,'E':-3.5,'G':-0.4,'H':-3.2,'I':4.5,'L':3.8,'K':-3.9,'M':1.9,'F':2.8,'P':-1.6,'S':-0.8,'T':-0.7,'W':-0.9,'Y':-1.3,'V':4.2}
@@ -590,11 +590,11 @@ P['n_fam_core']=P['n_fam_core'].fillna(0)
 P['n_fam70_core']=_d[_d['pct']>25].dropna(subset=['fam70']).groupby('canon')['fam70'].nunique().fillna(0)
 P['n_fam70_core']=P['n_fam70_core'].reindex(P.index).fillna(0)
 # preference filament (+1 barbe / -1 pointe / 0 lateral) des ABP touchant la position
-_fil=pd.read_csv(_R/'data/filtered/actin_filament_positions.csv'); _c2l=dict(zip(_fil['chain'].str.lower(),_fil['label']))
+_fil=pd.read_csv(_R/'data/filtered/actin_filament_positions.csv'); _c2l=dict(zip(_fil['chain'],_fil['label']))
 def _filnum(l):
     if pd.isna(l): return np.nan
     l=str(l); return 1.0 if l.startswith('+') else (-1.0 if l.startswith('-') else 0.0)
-_i2f=_het.assign(_fn=_het['chain_A_id'].str.lower().map(_c2l).map(_filnum)).set_index('interaction_id')['_fn']
+_i2f=_het.assign(_fn=_het['chain_A_id'].map(_c2l).map(_filnum)).set_index('interaction_id')['_fn']
 P['pref_filament']=_d.assign(_pf=_d.interaction_id.map(_i2f)).groupby('canon')['_pf'].mean()
 
 # --- Figure PCA circulaire RETIREE ---------------------------------------------
@@ -879,9 +879,9 @@ _m['abp_title']=_m['subunit_2_title'].fillna('?').astype(str).str.replace(r'\s*\
 _clu2abp=_m[~_m['homo']].groupby('cluster_data_70')['abp_title'].agg(lambda x:x.value_counts().index[0])
 _m['interface_area']=pd.to_numeric(_m['interface_area'].astype(str).str.replace('Å²','',regex=False).str.strip(),errors='coerce')
 for _c in ['num_hbonds','num_salt_bridges','num_contacts']: _m[_c]=pd.to_numeric(_m[_c],errors='coerce')
-_imap=_m.set_index('interaction_id'); _chA=_imap['chain_A_id'].str.lower(); _clu=_imap['cluster_data_70']
+_imap=_m.set_index('interaction_id'); _chA=_imap['chain_A_id']; _clu=_imap['cluster_data_70']
 _d=_df3[_df3.interaction_id.isin(set(_m.interaction_id))].copy()
-_d['_a']=_d.interaction_id.map(_chA); _d=_d[_d.chain.str.lower()==_d._a].copy()   # cote actine = chaine A (subunit_1)
+_d['_a']=_d.interaction_id.map(_chA); _d=_d[_d.chain==_d._a].copy()   # cote actine = chaine A (subunit_1)
 _d['clu']=_d.interaction_id.map(_clu); _d['canon']=_d.canon.astype(int)
 _cdf=pd.read_csv(_R/'data/proteocast/conservation_vs_asa_per_position.csv'); _cons=dict(zip(_cdf['canon'].astype(int),_cdf['conservation']))
 _KD={'A':1.8,'R':-4.5,'N':-3.5,'D':-3.5,'C':2.5,'Q':-3.5,'E':-3.5,'G':-0.4,'H':-3.2,'I':4.5,'L':3.8,'K':-3.9,'M':1.9,'F':2.8,'P':-1.6,'S':-0.8,'T':-0.7,'W':-0.9,'Y':-1.3,'V':4.2}
@@ -905,9 +905,9 @@ _cc['charge_compl']=-(_cc['residue_A_name'].map(lambda r:_CHG.get(str(r),0))*_cc
 Fi['charge_compl']=_cc.groupby('_clu')['charge_compl'].mean()
 Fi['pct_hbond']=100*_ag['hb']/_ag['ct']; Fi['pct_saltbridge']=100*_ag['sb']/_ag['ct']
 # --- descripteurs cote PARTENAIRE (chaine B = S2 ; actine pour homo, ABP pour hetero) ---
-_chB=_imap['chain_B_id'].str.lower()
+_chB=_imap['chain_B_id']
 _db=_df3[_df3.interaction_id.isin(set(_m.interaction_id))].copy()
-_db['_b']=_db.interaction_id.map(_chB); _db=_db[_db.chain.str.lower()==_db._b].copy()
+_db['_b']=_db.interaction_id.map(_chB); _db=_db[_db.chain==_db._b].copy()
 _db['clu']=_db.interaction_id.map(_clu)
 _db['kd']=_db['residue_name'].map(lambda r:_KD.get(str(r),0.0))
 _db['ispos']=_db['residue_name'].isin({'R','K'}).astype(float)
@@ -1136,8 +1136,8 @@ plt.tight_layout(); plt.show()
 from scipy.stats import mannwhitneyu
 _di1=pd.read_csv(_R/'data/filtered/details/1.interactions.csv')
 _pp1=pd.read_csv(_R/'data/filtered/proteins_per_pdb.csv')
-_ac1=set(_pp1[_pp1.is_actin]['chain'].str.lower())
-_homoids=set(_di1[_di1['chain_B_id'].str.lower().isin(_ac1)]['interaction_id'])
+_ac1=set(_pp1[_pp1.is_actin]['chain'])
+_homoids=set(_di1[_di1['chain_B_id'].isin(_ac1)]['interaction_id'])
 _d3=_df3[_df3.canon.notna()&_df3.pct.notna()].copy(); _d3['canon']=_d3.canon.astype(int)
 _d3['is_homo']=_d3.interaction_id.isin(_homoids)
 _hm=_d3[_d3.is_homo].groupby('canon')['pct'].max()      # ASA max cote filament
@@ -1369,12 +1369,12 @@ _n_inter_total = (
 )
 
 # Garder seulement les résidus de la chaîne actine (S1)
-_id_to_actin = site_with_ids.set_index("interaction_id")["chain_A_id"].str.lower()
+_id_to_actin = site_with_ids.set_index("interaction_id")["chain_A_id"]
 _id_to_prot  = site_with_ids.set_index("interaction_id")["protein"]
 
 df3_site = df3_nb[df3_nb["interaction_id"].isin(site_with_ids["interaction_id"])].copy()
 df3_site["_actin_ch"] = df3_site["interaction_id"].map(_id_to_actin)
-df3_site = df3_site[df3_site["chain"].str.lower() == df3_site["_actin_ch"]].copy()
+df3_site = df3_site[df3_site["chain"] == df3_site["_actin_ch"]].copy()
 df3_site["protein"] = df3_site["interaction_id"].map(_id_to_prot)
 df3_site = df3_site.dropna(subset=["residue_number_canon_mafft", "protein"])
 df3_site["canon"] = df3_site["residue_number_canon_mafft"].astype(int)
@@ -1498,9 +1498,9 @@ _m=_di.merge(_da[['subunit_1','subunit_2','s2_actine','s1_binding_site_cluster_d
              left_on=['chain_A_id','chain_B_id'],right_on=['subunit_1','subunit_2'],how='left').drop_duplicates('interaction_id')
 _m['homo']=_m['s2_actine'].fillna(False).astype(bool)
 _h=_m[_m.homo].dropna(subset=['s1_binding_site_cluster_data_70']).copy()
-_chA=_h.set_index('interaction_id')['chain_A_id'].str.lower(); _site=_h.set_index('interaction_id')['s1_binding_site_cluster_data_70']
+_chA=_h.set_index('interaction_id')['chain_A_id']; _site=_h.set_index('interaction_id')['s1_binding_site_cluster_data_70']
 _d=_df3[_df3.interaction_id.isin(set(_h.interaction_id))].copy()
-_d['_a']=_d.interaction_id.map(_chA); _d=_d[_d.chain.str.lower()==_d._a].copy()
+_d['_a']=_d.interaction_id.map(_chA); _d=_d[_d.chain==_d._a].copy()
 _d['site']=_d.interaction_id.map(_site); _d['canon']=_d.canon.astype(int)
 _main=['6685_1','6685_2','6685_3','6685_4']; _d['grp']=_d['site'].where(_d['site'].isin(_main),'autres')
 _pr=_d.groupby(['grp','canon'])['pct'].mean().reset_index()
@@ -1546,10 +1546,10 @@ _qA=_a.map(lambda r:_CHG.get(r,0)); _qB=_b.map(lambda r:_CHG.get(r,0)); _c['comp
 _c['aromatique_A']=_a.isin(_ARO).astype(int); _c['aromatique_B']=_b.isin(_ARO).astype(int)
 _c['charge_A']=_qA.values; _c['charge_B']=_qB.values             # charges nettes separees
 # conservation cote actine
-_pp=pd.read_csv(_R/'data/filtered/proteins_per_pdb.csv'); _ac=set(_pp[_pp.is_actin]['chain'].str.lower())
+_pp=pd.read_csv(_R/'data/filtered/proteins_per_pdb.csv'); _ac=set(_pp[_pp.is_actin]['chain'])
 _cdf=pd.read_csv(_R/'data/proteocast/conservation_vs_asa_per_position.csv'); _cons=dict(zip(_cdf['canon'].astype(int),_cdf['conservation']))
 _cnA=pd.to_numeric(_c['residue_A_canon_mafft'],errors='coerce'); _cnB=pd.to_numeric(_c['residue_B_canon_mafft'],errors='coerce')
-_isA=_c['chain_A_id'].str.lower().isin(_ac).values; _isB=_c['chain_B_id'].str.lower().isin(_ac).values
+_isA=_c['chain_A_id'].isin(_ac).values; _isB=_c['chain_B_id'].isin(_ac).values
 _c['iface']=np.where(_isA&_isB,'actine-actine',np.where(_isA^_isB,'actine-ABP','autre'))  # type de contact homo/hetero
 def _cv(cn,ia): return _cons.get(int(cn),np.nan) if (ia and pd.notna(cn)) else np.nan
 _csA=np.array([_cv(cn,ia) for cn,ia in zip(_cnA,_isA)]); _csB=np.array([_cv(cn,ia) for cn,ia in zip(_cnB,_isB)])
@@ -1612,9 +1612,9 @@ print(_c.groupby('type').agg(asa_A=('asa_A','median'),asa_B=('asa_B','median'),c
 # (memes axes que la cellule precedente : _pcs, _cor, _ev, _feat, _c, _ac, _R)
 _daX=pd.read_csv(_R/'data/filtered/filtered_all_data.csv',low_memory=False)
 _t2l={}
-for _s,_t in zip(_daX['subunit_1'].astype(str).str.lower(),_daX['subunit_1_title'].astype(str)): _t2l[_s]=_t
-for _s,_t in zip(_daX['subunit_2'].astype(str).str.lower(),_daX['subunit_2_title'].astype(str)): _t2l[_s]=_t
-_cA=_c['chain_A_id'].str.lower(); _cB=_c['chain_B_id'].str.lower()
+for _s,_t in zip(_daX['subunit_1'].astype(str),_daX['subunit_1_title'].astype(str)): _t2l[_s]=_t
+for _s,_t in zip(_daX['subunit_2'].astype(str),_daX['subunit_2_title'].astype(str)): _t2l[_s]=_t
+_cA=_c['chain_A_id']; _cB=_c['chain_B_id']
 _partner=np.where(_cA.isin(_ac),_cB,_cA)
 _ptitle=pd.Series(_partner).map(lambda x:_t2l.get(x,'')).fillna('')
 _is_arp=_ptitle.str.contains('actin-related',case=False,regex=False).values
@@ -1649,7 +1649,7 @@ plt.tight_layout(); plt.show()
 # (s'appuie sur _c, _feat, _cdf, _ac definis dans la cellule contactpca)
 _clsmap=dict(zip(_cdf['canon'].astype(int),_cdf['residue_class']))   # canon -> sensitive / tolerant
 _cnA=pd.to_numeric(_c['residue_A_canon_mafft'],errors='coerce'); _cnB=pd.to_numeric(_c['residue_B_canon_mafft'],errors='coerce')
-_isA=_c['chain_A_id'].str.lower().isin(_ac).values; _isB=_c['chain_B_id'].str.lower().isin(_ac).values
+_isA=_c['chain_A_id'].isin(_ac).values; _isB=_c['chain_B_id'].isin(_ac).values
 _clA=_cnA.map(lambda x:_clsmap.get(int(x)) if pd.notna(x) else None)
 _clB=_cnB.map(lambda x:_clsmap.get(int(x)) if pd.notna(x) else None)
 _clsv=np.array(['inconnu']*len(_c),dtype=object)

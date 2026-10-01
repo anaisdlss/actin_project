@@ -13,6 +13,7 @@ import os
 import numpy as np
 import pandas as pd
 import streamlit as st
+import numbering
 
 from residue_passport import pp_mtimes
 
@@ -55,7 +56,7 @@ def _actin_aa_by_organism(_mtimes):
     res = res.dropna(subset=["canon"])
     res["canon"] = res["canon"].astype(int)
     res["_ch"] = res["interaction_id"].map(iid2ch)
-    res = res[res["chain"].str.lower() == res["_ch"].str.lower()].copy()
+    res = res[res["chain"] == res["_ch"]].copy()
     res["taxid"] = res["interaction_id"].map(iid2tax)
     res["pdb_id"] = res["interaction_id"].map(iid2pdb)
     return res[["canon", "residue_name", "taxid", "pdb_id"]]
@@ -82,7 +83,7 @@ def render_residue_fiche(pp, canon):
     """Fiche complète d'un résidu d'actin (position canonical)."""
     row = _pos_row(pp, canon)
     aa = row["actin_aa"] if row is not None and pd.notna(row.get("actin_aa")) else "?"
-    st.markdown(f"### Residue **{aa}{canon}**  (canonical position {canon})")
+    st.markdown(f"### Residue **{aa}{numbering.label(canon)}**  (UniProt P60709 numbering)")
 
     # ── Classe ProteoCast (en gros) + sensibilité vs moyenne ────────────────
     if row is not None:
@@ -150,7 +151,7 @@ def render_residue_fiche(pp, canon):
     st.markdown("**ABPs that contact this residue**  "
                 "_(% ASA = buried actin residue; ABP aa = contacting ABP residue)_")
     if sub.empty:
-        pass
+        st.info("No ABP interaction recorded for this residue in the current dataset.")
     else:
         _cols = ["ABP", "% ASA max", "# interactions", "Clusters C70", "Sites S1"]
         if "ABP aa" in sub.columns:
@@ -187,7 +188,8 @@ def render_residue_tab(pp):
 
     piv = _build_pivot(pp, "asa_max")
     xcanon = list(piv.columns)
-    xlabels = [str(c) for c in xcanon]
+    xlabels = [numbering.label(c) for c in xcanon]
+    label2canon = dict(zip(xlabels, xcanon))
     z = piv.values.astype(float)
 
     fig = go.Figure(go.Heatmap(
@@ -199,7 +201,7 @@ def render_residue_tab(pp):
     fig.update_layout(
         height=max(420, len(piv.index) * 15 + 120),
         margin=dict(l=4, r=4, t=10, b=40),
-        xaxis=dict(title="Position canonical (MAFFT)", tickangle=90,
+        xaxis=dict(title=numbering.AXIS_TITLE, tickangle=90,
                    tickfont=dict(size=8)),
         yaxis=dict(tickfont=dict(size=9), autorange="reversed"),
     )
@@ -212,7 +214,7 @@ def render_residue_tab(pp):
     try:
         pts = ev["selection"]["points"]
         if pts:
-            clicked = int(pts[-1]["x"])
+            clicked = label2canon.get(str(pts[-1]["x"]))
     except (KeyError, TypeError, ValueError):
         clicked = None
 
@@ -222,9 +224,9 @@ def render_residue_tab(pp):
     default_idx = (canon_opts.index(st.session_state["explo_res_sel"])
                    if st.session_state.get("explo_res_sel") in canon_opts else 0)
     sel = st.selectbox(
-        "Position canonical", canon_opts, index=default_idx,
+        numbering.SHORT_LABEL, canon_opts, index=default_idx,
         key="explo_res_selbox",
-        format_func=lambda c: f"{c}"
+        format_func=lambda c: numbering.label(c)
         + (f"  ({_pos_row(pp, c)['actin_aa']})"
            if _pos_row(pp, c) is not None
            and pd.notna(_pos_row(pp, c).get('actin_aa')) else ""))
@@ -376,6 +378,12 @@ def render_abp_tab(pp):
     _residues_summary_with_others(pp, disp, others)
 
 
+def other_abps_by_position(res_long, excluded):
+    """Look beyond the selected ABPs/clusters when reporting other partners."""
+    return res_long.groupby("canon")["abp"].apply(
+        lambda values: " ; ".join(sorted(set(values.dropna()) - set(excluded), key=str.casefold)))
+
+
 def _residues_summary_with_others(pp, df_long, others_map):
     agg = (df_long.groupby("canon")
            .agg(actin_aa=("actin_aa", "first"),
@@ -437,7 +445,7 @@ def render_pair_tab(pp):
         st.dataframe(_ov, hide_index=True, use_container_width=True, height=320)
 
     rl = pp["res_long"]
-    abps = pp["abp_list"]
+    abps = sorted(pp["abp_list"], key=str.casefold)
     c1, c2 = st.columns(2)
     a1 = c1.selectbox("ABP A", abps, index=0, key="explo_pair_a")
     a2 = c2.selectbox("ABP B", abps,
@@ -494,13 +502,13 @@ def render_pair_tab(pp):
     for cat in ["shared", lab1, lab2]:
         cs = [c for c in allc if _cat(c) == cat]
         fig.add_trace(go.Scatter(
-            x=cs, y=[cat] * len(cs), mode="markers",
+            x=[numbering.to_uniprot(c) for c in cs], y=[cat] * len(cs), mode="markers",
             marker=dict(size=16, color=colors[cat], symbol="line-ns",
                         line=dict(color=colors[cat], width=2)),
             name=cat, hovertemplate="position %{x}<extra>" + cat + "</extra>"))
     fig.update_layout(
         height=240, margin=dict(l=4, r=4, t=10, b=30),
-        xaxis=dict(title="Actin canonical position", dtick=25),
+        xaxis=dict(title=numbering.AXIS_TITLE, dtick=25),
         yaxis=dict(autorange="reversed"), showlegend=False)
     st.plotly_chart(fig, use_container_width=True)
 
@@ -509,8 +517,10 @@ def render_pair_tab(pp):
 
     if inter:
         st.markdown("**Shared residues (detail)**")
-        _residues_summary(pp, pd.concat([sub1, sub2])[
-            pd.concat([sub1, sub2])["canon"].isin(inter)])
+        shared = pd.concat([sub1, sub2])
+        shared = shared[shared["canon"].isin(inter)]
+        others = other_abps_by_position(rl, {a1, a2})
+        _residues_summary_with_others(pp, shared, others)
     else:
         st.info("These two selections share no actin residue.")
 
@@ -742,12 +752,12 @@ def render_sequence_tab(pp):
     _n_iface = int((df["# ABPs"] > 0).sum())
     st.markdown(f"**{len(subs)} substitutions**, of which **{_n_iface}** at a position "
                 "known at an ABP interface:")
-    st.dataframe(df, hide_index=True, use_container_width=True)
+    st.dataframe(df.drop(columns=["canon"]), hide_index=True, use_container_width=True)
 
     # ── Visuels : carte positionnelle + actin 3D avec variations surlignées ──
     import plotly.graph_objects as go
     _dd = df.dropna(subset=["canon"]).copy()
-    _allp = sorted(pp["res_abp"]["canon"].unique())
+    _allp = [p for p in (numbering.to_uniprot(c) for c in sorted(pp["res_abp"]["canon"].unique())) if p]
     figt = go.Figure()
     figt.add_trace(go.Scatter(
         x=_allp, y=[0] * len(_allp), mode="markers", showlegend=False,
@@ -756,7 +766,7 @@ def render_sequence_tab(pp):
     if not _dd.empty:
         _cons = pd.to_numeric(_dd["Conservation"], errors="coerce")
         figt.add_trace(go.Scatter(
-            x=_dd["canon"], y=[0] * len(_dd), mode="markers+text",
+            x=_dd["canon"].map(numbering.to_uniprot), y=[0] * len(_dd), mode="markers+text",
             marker=dict(size=15, color=_cons, colorscale="Blues",
                         line=dict(color="#333", width=1),
                         colorbar=dict(title="mut. sensitivity", thickness=12)),
@@ -766,7 +776,7 @@ def render_sequence_tab(pp):
             showlegend=False))
     figt.update_layout(
         height=190, margin=dict(l=4, r=4, t=34, b=34),
-        xaxis=dict(title="Actin canonical position", dtick=25),
+        xaxis=dict(title=numbering.AXIS_TITLE, dtick=25),
         yaxis=dict(visible=False),
         title=dict(text="Where your variations fall (grey = interface positions; "
                         "colour = mutational sensitivity, dark = more sensitive)",
@@ -877,8 +887,10 @@ def render_actin_overview(pp):
 
     pos = pp["pos"].copy()
     pos = pos[pd.to_numeric(pos["canon"], errors="coerce").notna()]
-    pos = pos[pos["canon"] <= 375].sort_values("canon")
+    pos["uniprot"] = pos["canon"].map(numbering.to_uniprot)
+    pos = pos.dropna(subset=["uniprot"]).sort_values("uniprot")
     x = pos["canon"].astype(int).tolist()
+    xu = pos["uniprot"].astype(int).tolist()
     y = pos["n_abp"].fillna(0).astype(int).tolist()
     aa = pos["actin_aa"].fillna("?").tolist()
 
@@ -887,14 +899,14 @@ def render_actin_overview(pp):
     # Barre cliquable (rendue avant le 3D pour lire le clic, mais affichée à droite)
     with colbar:
         fig = go.Figure(go.Bar(
-            x=x, y=y, customdata=aa,
+            x=xu, y=y, customdata=aa,
             marker=dict(color=y, colorscale="YlOrRd",
                         colorbar=dict(title="n ABP", thickness=12)),
             hovertemplate=("Residue %{customdata}%{x}"
                            "<br>ABPs in contact: %{y}<extra></extra>")))
         fig.update_layout(
             height=460, margin=dict(l=6, r=6, t=10, b=44), bargap=0.1,
-            xaxis=dict(title="Actin canonical position (MAFFT)", dtick=25),
+            xaxis=dict(title=numbering.AXIS_TITLE, dtick=25),
             yaxis=dict(title="number of ABPs in contact"))
         ev = st.plotly_chart(fig, use_container_width=True, key="actin_ov",
                              on_select="rerun", selection_mode="points")
@@ -904,7 +916,7 @@ def render_actin_overview(pp):
     try:
         pts = ev["selection"]["points"]
         if pts:
-            clicked = int(pts[-1]["x"])
+            clicked = numbering.to_canon(pts[-1]["x"])
     except (KeyError, TypeError, ValueError):
         clicked = None
     if clicked is not None and clicked in x:
@@ -921,7 +933,7 @@ def render_actin_overview(pp):
     # Sélecteur (repli / choix manuel) — piloté par la même clé que le clic
     st.selectbox(
         "Position to detail", x, key="actin_ov_selbox",
-        format_func=lambda c: f"{c}"
+        format_func=lambda c: numbering.label(c)
         + (f"  ({_pos_row(pp, c)['actin_aa']})"
            if _pos_row(pp, c) is not None
            and pd.notna(_pos_row(pp, c).get('actin_aa')) else ""))

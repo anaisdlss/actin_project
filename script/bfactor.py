@@ -98,12 +98,12 @@ iid_to_s1_patch = merge_cols["s1_binding_site_cluster_data_70"]
 iid_to_s2_patch = merge_cols["s2_binding_site_cluster_data_70"]
 
 # --- Résidus S1 (chain_A) ---
-id_to_s1chain = df_int.set_index("interaction_id")["chain_A_id"].str.lower()
+id_to_s1chain = df_int.set_index("interaction_id")["chain_A_id"]
 df3_tmp = df3.copy()
 df3_tmp["s1_chain"] = df3_tmp["interaction_id"].map(id_to_s1chain)
 df3_s1 = df3_tmp[
     df3_tmp["residue_number_canon_mafft"].notna() &
-    (df3_tmp["chain"].str.lower() == df3_tmp["s1_chain"])
+    (df3_tmp["chain"] == df3_tmp["s1_chain"])
 ].copy()
 df3_s1["patch"] = df3_s1["interaction_id"].map(iid_to_s1_patch)
 
@@ -116,11 +116,11 @@ homo_iids = set(
         how="left"
     )["interaction_id"].dropna().astype(int)
 )
-id_to_s2chain = df_int.set_index("interaction_id")["chain_B_id"].str.lower()
+id_to_s2chain = df_int.set_index("interaction_id")["chain_B_id"]
 df3_s2 = df3_tmp[
     df3_tmp["interaction_id"].isin(homo_iids) &
     df3_tmp["residue_number_canon_mafft"].notna() &
-    (df3_tmp["chain"].str.lower() ==
+    (df3_tmp["chain"] ==
      df3_tmp["interaction_id"].map(id_to_s2chain))
 ].copy()
 df3_s2["patch"] = df3_s2["interaction_id"].map(iid_to_s2_patch)

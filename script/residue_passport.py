@@ -22,6 +22,9 @@ import os
 import pandas as pd
 import numpy as np
 import streamlit as st
+import numbering
+
+_REF_FASTA = "data/P60709_ref.fasta"
 
 _PP_FILES = [
     "data/filtered/details/1.interactions.csv",
@@ -108,7 +111,7 @@ def build_passport(_mtimes):
 
     im = iface.merge(m, on="interaction_id", how="inner")
     # ne garder que le côté actin (chaîne A de l'interaction)
-    im = im[im["chain"].str.lower() == im["chain_A_id"].str.lower()].copy()
+    im = im[im["chain"] == im["chain_A_id"]].copy()
 
     res_abp = (
         im.groupby(["canon", "abp"])
@@ -135,8 +138,8 @@ def build_passport(_mtimes):
     if os.path.exists(f_con):
         con = pd.read_csv(f_con)
         con = con.merge(m, on="interaction_id", how="inner")
-        con = con[con["chain_A_id_x"].str.lower() ==
-                  con["chain_A_id_y"].str.lower()] if "chain_A_id_x" in con else con
+        con = con[con["chain_A_id_x"] ==
+                  con["chain_A_id_y"]] if "chain_A_id_x" in con else con
         con["canon"] = pd.to_numeric(con["residue_A_canon_mafft"], errors="coerce")
         con = con[con["canon"].notna()].copy()
         con["canon"] = con["canon"].astype(int)
@@ -160,11 +163,17 @@ def build_passport(_mtimes):
     pos = pos[pos["canon"].notna()].copy()
     pos["canon"] = pos["canon"].astype(int)
 
-    # aa canonical de l'actin par position (depuis les résidus d'interface)
+    # lettre affichée = résidu de la référence P60709 (les aa observés par
+    # organisme restent dans la fiche) ; à défaut, aa majoritaire observé
     aa_by_canon = (im.dropna(subset=["residue_name"])
-                   .drop_duplicates("canon")
-                   .set_index("canon")["residue_name"])
+                   .groupby("canon")["residue_name"]
+                   .agg(lambda s: s.value_counts().index[0]))
     pos["actin_aa"] = pos["canon"].map(aa_by_canon)
+    if os.path.exists(_REF_FASTA):
+        _ref = "".join(l.strip() for l in open(_REF_FASTA) if not l.startswith(">"))
+        _ref_aa = pos["canon"].map(numbering.to_uniprot).map(
+            lambda u: _ref[int(u) - 1] if u is not None and u == u and 1 <= u <= len(_ref) else None)
+        pos["actin_aa"] = _ref_aa.fillna(pos["actin_aa"])
 
     # agrégats ABP par position
     abp_by_canon = res_abp.groupby("canon")["abp"].apply(

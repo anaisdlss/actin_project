@@ -43,7 +43,7 @@ It opens in your browser (otherwise: `http://localhost:8501`).
 
 The repo ships **code only** — `data/` is git-ignored and regenerated locally.
 
-In the app, open **Data download** and click **Run / update**. It runs the whole
+In the app, open **Documentation → Data management — download / update (local project)** and click **Run / update**. It runs the whole
 pipeline (9 steps, ~1 h on a fresh clone). It is **resumable**: already-computed
 steps are skipped, so you can quit and come back — it continues where it stopped.
 
@@ -51,8 +51,7 @@ steps are skipped, so you can quit and come back — it continues where it stopp
 
 Computing the per-ABP mutational landscape (**ProteoCast**) is separate from
 `Run / update` and takes **several hours** (one job per ABP on
-[proteocast.ijm.fr](https://proteocast.ijm.fr)). In the **ABP** section →
-*ABP ProteoCast*, click **Compute all missing ProteoCast**. It is resumable.
+[proteocast.ijm.fr](https://proteocast.ijm.fr)). In the **ABP conservation** section, click **Compute all missing ProteoCast**. It is resumable.
 
 ## PyMOL (optional)
 
@@ -65,3 +64,9 @@ Only needed for the 3D scripts the pipeline writes under
 A slim, read-only build (data pre-bundled, pipeline disabled) can be deployed to
 Streamlit Community Cloud: `python script/make_slim_deploy.py` creates a
 self-contained `deploy/` folder to push to a separate repo.
+
+## Scientific app reorganization
+
+See [diagnostic and roadmap](SCIENTIFIC_APP_ROADMAP.md) for the September 2026 reorganization, scientific checks still required and the local/public synchronization strategy.
+
+Regression checks (in an environment with the app dependencies installed): `python -m unittest discover -s tests -v`.

@@ -380,13 +380,13 @@ df_res3 = pd.read_csv(DETAILS / '3.interface_residues.csv')
 df_int1_full = pd.read_csv(DETAILS / '1.interactions.csv')
 
 # Résidus côté S1 uniquement (chain_A) avec position canonique
-s1_chain_map = df_int1_full.set_index('interaction_id')['chain_A_id'].str.lower()
+s1_chain_map = df_int1_full.set_index('interaction_id')['chain_A_id']
 df_res3['s1_chain'] = df_res3['interaction_id'].map(s1_chain_map)
 df_res3['buried_ASA_Å²'] = pd.to_numeric(df_res3['buried_ASA_Å²'], errors='coerce')
 
 df_res_s1 = df_res3[
     df_res3['residue_number_canon_mafft'].notna() &
-    (df_res3['chain'].str.lower() == df_res3['s1_chain'])
+    (df_res3['chain'] == df_res3['s1_chain'])
 ].copy()
 df_res_s1['canon'] = df_res_s1['residue_number_canon_mafft'].astype(int)
 

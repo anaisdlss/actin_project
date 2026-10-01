@@ -55,7 +55,18 @@ def _keep(path: Path) -> bool:
     return True
 
 
+def validate_source(source=SRC):
+    required = ("filtered/filtered_all_data.csv", "filtered/details/1.interactions.csv",
+                "filtered/details/3.interface_residues.csv", "filtered/details/4.inter-residue_contacts.csv",
+                "filtered/proteins_per_pdb.csv")
+    missing = [name for name in required if not (source / name).is_file() or (source / name).stat().st_size == 0]
+    if missing:
+        raise SystemExit("Cannot build a public dataset: required source files are missing or empty: "
+                         + ", ".join(missing) + ". Existing deploy/ has been preserved.")
+
+
 def main():
+    validate_source()
     if DST.exists():
         shutil.rmtree(DST)
     DST.mkdir(parents=True)

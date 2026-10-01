@@ -40,9 +40,9 @@ def _build_abp_heatmap_data(*_):
     df3 = df3[df3["residue_number_canon_mafft"].notna()
               & df3["buried_ASA_percent"].notna()].copy()
 
-    _actin_ch = set(df_pp_h[df_pp_h["is_actin"]]["chain"].str.lower())
+    _actin_ch = set(df_pp_h[df_pp_h["is_actin"]]["chain"])
     homo_iids = set(
-        df_int_h[df_int_h["chain_B_id"].str.lower().isin(_actin_ch)
+        df_int_h[df_int_h["chain_B_id"].isin(_actin_ch)
                  ]["interaction_id"]
     )
     het_int = (
@@ -60,14 +60,14 @@ def _build_abp_heatmap_data(*_):
         het_int["subunit_2_title"].fillna("Unknown")
         .str.replace(r"\s*\(.*?\)", "", regex=True).str.strip().str[:50]
     )
-    _s1ch = het_int.set_index("interaction_id")["chain_A_id"].str.lower()
+    _s1ch = het_int.set_index("interaction_id")["chain_A_id"]
     _abpn = het_int.set_index("interaction_id")["abp_name"]
     _c70n = het_int.set_index("interaction_id")["cluster_data_70"]
 
     het_ids = set(het_int["interaction_id"])
     df3_h = df3[df3["interaction_id"].isin(het_ids)].copy()
     df3_h["_s1c"] = df3_h["interaction_id"].map(_s1ch)
-    df3_h = df3_h[df3_h["chain"].str.lower() == df3_h["_s1c"]].copy()
+    df3_h = df3_h[df3_h["chain"] == df3_h["_s1c"]].copy()
     df3_h["abp"] = df3_h["interaction_id"].map(_abpn)
     df3_h["canon"] = df3_h["residue_number_canon_mafft"].astype(int)
     df3_h["c70"] = df3_h["interaction_id"].map(_c70n)
@@ -144,7 +144,7 @@ def _build_c70_jaccard_edges(jaccard_threshold: float, *_mtimes):
 
     pp_c70 = pd.read_csv("data/filtered/proteins_per_pdb.csv")
     abp_pp_c70 = pp_c70[~pp_c70["is_actin"]].copy()
-    abp_pp_c70["chain_low"] = abp_pp_c70["chain"].str.lower()
+    abp_pp_c70["chain_low"] = abp_pp_c70["chain"]
 
     # Interactions hétéro (les deux directions) avec cluster C70 et chaîne actin
     h1 = df_all_s[df_all_s["s1_actine"] & ~df_all_s["s2_actine"]][[
@@ -155,7 +155,7 @@ def _build_c70_jaccard_edges(jaccard_threshold: float, *_mtimes):
     ]].rename(columns={"subunit_2": "actin_chain", "subunit_1": "abp_chain"})
     hetero_c70 = pd.concat([h1, h2], ignore_index=True).dropna(
         subset=["cluster_data_70"])
-    hetero_c70["abp_chain_low"] = hetero_c70["abp_chain"].str.lower()
+    hetero_c70["abp_chain_low"] = hetero_c70["abp_chain"]
 
     # Récupérer interaction_id via 1.interactions.csv
     hetero_c70 = hetero_c70.merge(

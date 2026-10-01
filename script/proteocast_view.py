@@ -88,14 +88,14 @@ def abp_interface_chains(title, _mtime):
     df["s2_actine"] = df["s2_actine"].fillna(False).astype(bool)
     chains = set()
     d1 = df[df["s1_actine"] & ~df["s2_actine"] & (df["subunit_2_title"] == title)]
-    chains |= set(d1["subunit_2"].dropna().str.lower())
+    chains |= set(d1["subunit_2"].dropna())
     d2 = df[~df["s1_actine"] & df["s2_actine"] & (df["subunit_1_title"] == title)]
-    chains |= set(d2["subunit_1"].dropna().str.lower())
+    chains |= set(d2["subunit_1"].dropna())
     if not chains:
         return set()
     ir = pd.read_csv(_IFACE, usecols=["chain"])
-    # remonter à la casse réelle d'interface_residues
-    return {c for c in ir["chain"].dropna().unique() if str(c).lower() in chains}
+    # identifiants de chaîne sensibles à la casse (9y52_A actine ≠ 9y52_a cofiline)
+    return {c for c in ir["chain"].dropna().unique() if str(c) in chains}
 
 
 def result_images(slug):
@@ -125,7 +125,7 @@ def folder_zip(slug):
     return f"proteocast_{slug}.zip", buf.getvalue()
 
 
-@st.cache_data(show_spinner="Domaines InterPro…")
+@st.cache_data(show_spinner="Loading InterPro domains…")
 def fetch_domains(uniprot):
     """Domaines d'un UniProt via l'API InterPro : liste {name, db, acc, spans}.
     spans = liste de (start, end). Garde Pfam / SMART / InterPro (domain/repeat/
@@ -281,11 +281,11 @@ def abp_interface_asa_on_query(abp_title, slug, _mtime):
             continue
         d = df[df[col_t] == abp_title].dropna(subset=[col_c, col_s])
         for c, s in zip(d[col_c], d[col_s]):
-            chain_seq.setdefault(str(c).lower(), s)
+            chain_seq.setdefault(str(c), s)
     if not chain_seq:
         return {}
     ir = pd.read_csv(_IFACE)
-    ir["_low"] = ir["chain"].astype(str).str.lower()
+    ir["_low"] = ir["chain"].astype(str)
     ir = ir[ir["_low"].isin(chain_seq)]
     if ir.empty:
         return {}

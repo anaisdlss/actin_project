@@ -367,28 +367,28 @@ def _render_abp_actin_conservation(sel_abp):
         rows=1, cols=2, column_widths=[0.75, 0.25], horizontal_spacing=0.09,
         subplot_titles=(f"Actin conservation — residues contacted by {sel_abp}",
                         "Footprint vs surface"))
-    _cs = cons.sort_values("canon")
+    _cs = cons.sort_values("Residue")
     # Ligne grise = toutes les positions (hover : position + conservation)
     _figc.add_trace(go.Scatter(
-        x=_cs["canon"], y=_cs["conservation"], mode="lines",
+        x=_cs["Residue"], y=_cs["conservation"], mode="lines",
         line=dict(color="lightgrey", width=1), name="all positions",
-        hovertemplate="actin position %{x}<br>conservation %{y:.2f}<extra></extra>",
+        hovertemplate="actin residue %{x}<br>conservation %{y:.2f}<extra></extra>",
         showlegend=False), row=1, col=1)
     # Points rouges = empreinte de cet ABP (hover : position + conservation)
     _fpd = cons[cons.is_fp]
     _figc.add_trace(go.Scatter(
-        x=_fpd["canon"], y=_fpd["conservation"], mode="markers",
-        marker=dict(color="#e63946", size=8), name="footprint of this ABP",
-        hovertemplate="actin position %{x}<br>conservation %{y:.2f}"
+        x=_fpd["Residue"], y=_fpd["conservation"], mode="markers",
+        marker=dict(color="#D55E00", size=8), name="footprint of this ABP",
+        hovertemplate="actin residue %{x}<br>conservation %{y:.2f}"
                       "<extra>footprint</extra>"), row=1, col=1)
-    _figc.update_xaxes(title_text="actin canonical position", row=1, col=1)
+    _figc.update_xaxes(title_text="Actin residue (UniProt P60709)", row=1, col=1)
     _figc.update_yaxes(title_text="conservation", row=1, col=1)
     # Boxplots : reste de la surface vs empreinte
     _figc.add_trace(go.Box(y=other.dropna(), name="rest (surface)",
-                           marker_color="#8fb9ae", showlegend=False),
+                           marker_color="#56B4E9", showlegend=False),
                     row=1, col=2)
     _figc.add_trace(go.Box(y=fpv.dropna(), name="footprint",
-                           marker_color="#e63946", showlegend=False),
+                           marker_color="#D55E00", showlegend=False),
                     row=1, col=2)
     _figc.update_yaxes(title_text="conservation", row=1, col=2)
     _figc.update_layout(

@@ -67,7 +67,7 @@ The full dataset is regenerated locally by a **9-step pipeline** (button
 | **Buried contact area (Å²)** | The physical contact surface between **two** specific residues (one on each side). |
 | **Binding site (S1) cluster** | Groups of actin surface patches used by partners (labels like `6685_2`). Two partners on the same binding-site cluster use the **same region of actin**. |
 | **C70 cluster** (`cluster_data_70`) | Structural clustering of whole **interactions** at a 70 % threshold — interactions in the same C70 cluster have the **same 3D interface geometry** (labels like `0_7797_0`). |
-| **Canonical position** | Residue numbering in the shared MSA reference — lets you compare the **same** position across different structures/species (independent of each PDB's own numbering). |
+| **Actin residue number (UniProt P60709)** | Actin residues are numbered as in human beta-actin (UniProt P60709, 1–375), whatever the PDB's own numbering. Internally, the app aligns every actin chain (MAFFT) and converts the alignment column to the P60709 residue; the few alignment columns absent from P60709 (N-terminal insertion of alpha-actins, one internal insertion) are shown as "ins.". Partner (ABP) positions are still alignment columns of their own sequence cluster. |
 | **Conservation** | Evolutionary conservation of an actin position (ProteoCast/GEMME): higher = more conserved = less tolerant to mutation. |
 | **Competition** | Two ABPs **compete** if their footprints on actin overlap (their C70 clusters cover the same region beyond a chosen %). |
 | **Cooperation** | Two ABPs **cooperate** if they are **co-present in the same PDB** (they coexist on actin at the same time). |
@@ -84,7 +84,7 @@ Runs / updates the 9-step pipeline. Resumable. Hidden on the shared version.
 ### Filtered data & Valid PDB structures (explorer)
 Pick a PDB. You get:
 - **Interaction network** — the chains of that structure and who touches whom
-  (orange = actin, green = ABP). Click an edge (a pair) or a node (a chain).
+  (orange = actin, blue = ABP). Click an edge (a pair) or a node (a chain).
 - **3D visualisation — interface contacts** — the structure in surface;
   the selected chain is **yellow**, its partner **blue**, the rest grey.
 - **Sequences — interface residues** — the two sequences with their interface

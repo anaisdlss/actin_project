@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import numbering
 import numpy as np
 import os
 import re
@@ -176,6 +177,18 @@ def _msa_extract_interface_seqs(filter_fn, rigor_pdbs=None):
     return df[["seq_id", "title", "organism", "length_full", "n_interface", "interface_seq"]].reset_index(drop=True)
 
 
+def _mafft_controls(container, key):
+    """Public builds only read precomputed alignments; local runs need MAFFT."""
+    import shutil
+    public = _Path("data/.slim_deploy").exists()
+    available = not public and shutil.which("mafft") is not None
+    if public:
+        st.caption("This public build displays saved alignments only. Generate missing alignments in the full local project.")
+    elif not available:
+        st.caption("MAFFT is not installed in this environment. Existing alignments remain available.")
+    return container.button("Run MAFFT", key=key, disabled=not available)
+
+
 def _msa_run_mafft(fasta_path: _Path, aln_path: _Path):
     mafft_bin = shutil.which("mafft")
     if mafft_bin is None:
@@ -312,7 +325,7 @@ def _msa_render_full(alignment, core_by_seqlow: dict, var_by_seqlow: dict,
                     if buf_grey:
                         seg_parts.append(f'<span style="color:#ccc">{"".join(buf_grey)}</span>')
                         buf_grey = []
-                    seg_parts.append(f'<span style="background:#27ae60;color:#fff">{aa_u}</span>')
+                    seg_parts.append(f'<span style="background:#0072B2;color:#fff">{aa_u}</span>')
                 elif color == "red":
                     if buf_grey:
                         seg_parts.append(f'<span style="color:#ccc">{"".join(buf_grey)}</span>')
@@ -322,7 +335,7 @@ def _msa_render_full(alignment, core_by_seqlow: dict, var_by_seqlow: dict,
                     if buf_grey:
                         seg_parts.append(f'<span style="color:#ccc">{"".join(buf_grey)}</span>')
                         buf_grey = []
-                    seg_parts.append(f'<span style="background:#e74c3c;color:#fff">{aa_u}</span>')
+                    seg_parts.append(f'<span style="background:#D55E00;color:#fff">{aa_u}</span>')
                 else:
                     buf_grey.append(aa_u)
             if buf_grey:
@@ -338,11 +351,11 @@ def _msa_render_full(alignment, core_by_seqlow: dict, var_by_seqlow: dict,
     # Légende
     parts.append(
         '<div style="margin-top:14px;font-size:10px;color:#666">'
-        '<span style="background:#27ae60;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">'
+        '<span style="background:#0072B2;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">'
         '&#9632; Majority in interaction (conserved aa)</span>'
         '<span style="background:#8e44ad;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">'
         '&#9632; Majority in interaction (variable aa)</span>'
-        '<span style="background:#e74c3c;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">'
+        '<span style="background:#D55E00;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">'
         '&#9632; Minority in interaction</span>'
         '<span style="color:#ccc;margin-right:6px">&#9632; Non-interface</span>'
         '</div></div>'
@@ -456,7 +469,6 @@ def _msa_actin_contacts_from_pairs(df_pairs, df1, df3):
     iid_to_s1 = (
         df_joined.drop_duplicates("interaction_id")
         .set_index("interaction_id")["subunit_1"]
-        .str.lower()
     )
 
     # Résidus S1 (actin) avec position canonical
@@ -485,12 +497,12 @@ def _msa_actin_contacts_from_pairs(df_pairs, df1, df3):
     aa_at_canon = {pos: cnt.most_common(1)[0][0] for pos, cnt in aa_counter.items() if cnt}
 
     # Séquence canonical complète : toutes les interactions S1 (pas juste le groupe filtré)
-    _iid_to_s1_all = df1.set_index("interaction_id")["chain_A_id"].str.lower()
+    _iid_to_s1_all = df1.set_index("interaction_id")["chain_A_id"]
     _df3_full = df3[pd.to_numeric(df3["residue_number_canon_mafft"], errors="coerce").notna()].copy()
     _df3_full["canon_f"] = pd.to_numeric(_df3_full["residue_number_canon_mafft"], errors="coerce").astype(int)
     _df3_full["aa_f"]    = _df3_full["residue_name"].str.strip().str.upper()
     if "chain_lower" not in _df3_full.columns:
-        _df3_full["chain_lower"] = _df3_full["chain"].str.lower()
+        _df3_full["chain_lower"] = _df3_full["chain"]
     _df3_full["exp_s1_f"] = _df3_full["interaction_id"].map(_iid_to_s1_all)
     _df3_full_s1 = _df3_full[
         (_df3_full["chain_lower"] == _df3_full["exp_s1_f"]) &
@@ -565,7 +577,7 @@ def _msa_actin_contacts_per_abp(filter_fn, rigor_pdbs=None):
     df1 = pd.read_csv(int1_path)
     df3 = _read_interface(int3_path)
     df3["residue_number_canon_mafft"] = pd.to_numeric(df3["residue_number_canon_mafft"], errors="coerce")
-    df3["chain_lower"] = df3["chain"].str.lower()
+    df3["chain_lower"] = df3["chain"]
     return _msa_actin_contacts_from_pairs(df_pairs, df1, df3)
 
 
@@ -594,7 +606,7 @@ def _msa_render_actin_contacts(abp_rows, aa_at_canon, col_color, cols_per_line=6
         pos_slice = all_positions[c0:c1]
         parts.append(
             f'<div style="color:#aaa;font-size:10px;margin:{("14px" if li else "0")} 0 2px 0">'
-            f'Positions actin canonical {pos_slice[0]}–{pos_slice[-1]}</div>'
+            f'Actin residues (P60709) {numbering.label(pos_slice[0])}–{numbering.label(pos_slice[-1])}</div>'
         )
         parts.append('<table style="border-collapse:collapse;">')
         for row in abp_rows:
@@ -606,7 +618,7 @@ def _msa_render_actin_contacts(abp_rows, aa_at_canon, col_color, cols_per_line=6
                 aa = aa_at_canon.get(pos, "-")
                 if pos in contacts:
                     color = col_color.get(pos, "yellow")
-                    bg = "#27ae60" if color == "orange" else ("#8e44ad" if color == "red" else "#e74c3c")
+                    bg = "#0072B2" if color == "orange" else ("#8e44ad" if color == "red" else "#D55E00")
                     seg_parts.append(f'<span style="background:{bg};color:#fff">{aa}</span>')
                 else:
                     seg_parts.append(f'<span style="color:#ccc">{aa}</span>')
@@ -619,9 +631,9 @@ def _msa_render_actin_contacts(abp_rows, aa_at_canon, col_color, cols_per_line=6
         parts.append("</table>")
     parts.append(
         '<div style="margin-top:14px;font-size:10px;color:#666">'
-        '<span style="background:#27ae60;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">&#9632; Majority in interaction (conserved actin aa)</span>'
+        '<span style="background:#0072B2;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">&#9632; Majority in interaction (conserved actin aa)</span>'
         '<span style="background:#8e44ad;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">&#9632; Majority in interaction (variable actin aa)</span>'
-        '<span style="background:#e74c3c;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">&#9632; Minority in interaction</span>'
+        '<span style="background:#D55E00;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">&#9632; Minority in interaction</span>'
         '<span style="color:#ccc;margin-right:6px">AA Not contacted</span>'
         '</div></div>'
     )
@@ -691,7 +703,7 @@ def _msa_render_projected(full_seqs_by_id, aln_iface, iface_pos_by_id, cols_per_
                     if buf_grey:
                         seg_parts.append(f'<span style="color:#ccc">{"".join(buf_grey)}</span>')
                         buf_grey = []
-                    bg = "#27ae60" if color == "orange" else ("#8e44ad" if color == "red" else "#e74c3c")
+                    bg = "#0072B2" if color == "orange" else ("#8e44ad" if color == "red" else "#D55E00")
                     seg_parts.append(f'<span style="background:{bg};color:#fff">{aa_u}</span>')
                 else:
                     buf_grey.append(aa_u)
@@ -706,9 +718,9 @@ def _msa_render_projected(full_seqs_by_id, aln_iface, iface_pos_by_id, cols_per_
         parts.append("</table>")
     parts.append(
         '<div style="margin-top:14px;font-size:10px;color:#666">'
-        '<span style="background:#27ae60;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">&#9632; Majority in interaction (conserved aa)</span>'
+        '<span style="background:#0072B2;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">&#9632; Majority in interaction (conserved aa)</span>'
         '<span style="background:#8e44ad;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">&#9632; Majority in interaction (variable aa)</span>'
-        '<span style="background:#e74c3c;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">&#9632; Minority in interaction</span>'
+        '<span style="background:#D55E00;color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px">&#9632; Minority in interaction</span>'
         '<span style="color:#ccc;margin-right:6px">&#9632; Non-interface</span>'
         '</div></div>'
     )
@@ -940,7 +952,8 @@ def _msa_contact_analysis(filter_fn, group_key, rigor_pdbs=None,
 
     # ── Générateur HTML heatmap interactive ──────────────────────────────────
     def _html_interactive_heatmap(pivot_df, row_labels, col_labels, max_area,
-                                   tooltip_fn, title_str, subtitle_str, cell_px=9):
+                                   tooltip_fn, title_str, subtitle_str, cell_px=9,
+                                   col_label_fn=str):
         def _bg(v):
             if pd.isna(v) or v == 0:
                 return "background:#f0f0f0", "#bbb"
@@ -993,7 +1006,7 @@ document.querySelectorAll('[data-tt]').forEach(function(el){
             f'<th style="width:{LABEL_W}px;min-width:{LABEL_W}px"></th>',
         ]
         for j, c in enumerate(col_labels):
-            lbl = str(c) if j % col_step == 0 else ""
+            lbl = col_label_fn(c) if j % col_step == 0 else ""
             parts.append(
                 f'<th style="width:{cell_px}px;min-width:{cell_px}px;font-size:7px;font-weight:normal;'
                 f'color:#aaa;writing-mode:vertical-rl;text-align:left;padding:0;'
@@ -1125,10 +1138,10 @@ document.querySelectorAll('[data-tt]').forEach(function(el){
                 sl        = next((s for s, lb in title_to_label.items() if lb == rl), None)
                 aa_b_spec = aa_b_specific.get((sl, ca), "?") if sl else "?"
                 if pd.isna(v) or v == 0:
-                    return f"Actin pos: {ca}\nNo contact"
+                    return f"Actin residue (P60709): {numbering.label(ca)}\nNo contact"
                 cm = cm_a_lut.get((rl, ca), 0.0)
                 return (
-                    f"Pos actin : {ca}\n"
+                    f"Actin residue (P60709): {numbering.label(ca)}\n"
                     f"Actin residue        : {aa_a_val}\n"
                     f"ABP residue ({rl[:18]}): {aa_b_spec}\n"
                     f"% interface          : {v:.2f}%\n"
@@ -1140,6 +1153,7 @@ document.querySelectorAll('[data-tt]').forEach(function(el){
                 "ABP–actin contacts — actin side",
                 f"{len(row_labels_a)} sequences · {len(col_labels_a)} positions · "
                 f"value = % of the total interface per sequence · max {max_pct_a:.2f}%",
+                col_label_fn=numbering.label,
             )
             st.components.v1.html(_h_b, height=max(len(row_labels_a) * 16 + 180, 300), scrolling=True)
 
@@ -1153,16 +1167,16 @@ document.querySelectorAll('[data-tt]').forEach(function(el){
                 "Charged (−)":      set("DE"),
             }
             _CLASS_COL = {
-                "Hydrophobic":       "#66bb6a",
-                "Polar (neutral)": "#42a5f5",
-                "Charged (+)":       "#ef5350",
-                "Charged (−)":       "#ab47bc",
+                "Hydrophobic":       "#0072B2",
+                "Polar (neutral)": "#56B4E9",
+                "Charged (+)":       "#D55E00",
+                "Charged (−)":       "#8E44AD",
             }
             def _cls(aa):
                 for c, s in _CLASSES.items():
                     if aa in s:
                         return c
-                return "Autre"
+                return "Other"
 
             agg_b["class"] = agg_b["aa_b"].apply(_cls)
             agg_a["class"] = agg_a["aa_a"].apply(_cls)
@@ -1192,7 +1206,7 @@ document.querySelectorAll('[data-tt]').forEach(function(el){
                 aa_sum = aa_sum.sort_values("pct", ascending=True)
                 with lbl:
                     st.markdown(f"**{side} residues in contact**")
-                    fig_c, axes = plt.subplots(1, 2, figsize=(6, 3))
+                    fig_c, axes = plt.subplots(1, 2, figsize=(8, 4.5))
                     colors_c = [_CLASS_COL.get(c, "#aaa") for c in cls_sum["class"]]
                     axes[0].barh(cls_sum["class"], cls_sum["pct"], color=colors_c)
                     axes[0].set_xlabel("% of total interface", fontsize=8)
@@ -1391,7 +1405,7 @@ document.querySelectorAll('[data-tt2]').forEach(function(el){
                     return "background:#f5f5f5", "#ccc"
                 c = freq.get(aa, 0)
                 if c == 1:
-                    return "background:#e74c3c", "#fff"
+                    return "background:#D55E00", "#fff"
                 if c == 2:
                     return "background:#e67e22", "#fff"
                 if c <= n_total // 2:
@@ -1432,7 +1446,7 @@ document.querySelectorAll('[data-sp]').forEach(function(el){
                 'Rows = sequences · Columns = canonical ABP positions in contact with actin · '
                 'Hover = amino acid + contacted actin positions</div>',
                 '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:10px">',
-                '<span style="background:#e74c3c;color:#fff;padding:1px 7px;border-radius:3px">Unique (1/n)</span>',
+                '<span style="background:#D55E00;color:#fff;padding:1px 7px;border-radius:3px">Unique (1/n)</span>',
                 '<span style="background:#e67e22;color:#fff;padding:1px 7px;border-radius:3px">Rare (2/n)</span>',
                 '<span style="background:#f1c40f;color:#333;padding:1px 7px;border-radius:3px">Minority</span>',
                 '<span style="background:#95a5a6;color:#fff;padding:1px 7px;border-radius:3px">Majority</span>',
@@ -1518,7 +1532,7 @@ document.querySelectorAll('[data-sp]').forEach(function(el){
             st.components.v1.html("".join(parts_sp), height=_ht_sp, scrolling=True)
 
             st.divider()
-            st.markdown("#### Actin side — canonical positions specifically contacted")
+            st.markdown("#### Actin side — residues (P60709) specifically contacted")
 
             actin_aa_specific: dict = (
                 df4.groupby(["label", "canon_a"])["aa_a"]
@@ -1545,7 +1559,7 @@ document.querySelectorAll('[data-sp]').forEach(function(el){
                 if n_contact == 0:
                     return "background:#f5f5f5", "#ccc"
                 if n_contact == 1:
-                    return "background:#e74c3c", "#fff"
+                    return "background:#D55E00", "#fff"
                 if n_contact == 2:
                     return "background:#e67e22", "#fff"
                 if n_contact <= n_total // 2:
@@ -1563,7 +1577,7 @@ document.querySelectorAll('[data-sp]').forEach(function(el){
                 f'<th style="width:{LABEL_SP}px;min-width:{LABEL_SP}px"></th>',
             ]
             for j, p in enumerate(all_pos_a):
-                lbl_p = str(p) if j % col_step_a == 0 else ""
+                lbl_p = numbering.label(p) if j % col_step_a == 0 else ""
                 parts_spa.append(
                     f'<th style="width:{CELL_SP}px;min-width:{CELL_SP}px;font-size:7px;font-weight:normal;'
                     f'color:#aaa;writing-mode:vertical-rl;text-align:left;padding:0;'
@@ -1598,7 +1612,7 @@ document.querySelectorAll('[data-sp]').forEach(function(el){
                             else f"shared ({n_c}/{n_seqs})"
                         )
                         tt = (
-                            f"Pos actin : {p}\n"
+                            f"Actin residue (P60709): {numbering.label(p)}\n"
                             f"AA actin  : {aa_act}\n"
                             f"Contact    : {lb[:28]} — {uniq_lbl}"
                         )
@@ -1666,7 +1680,7 @@ document.querySelectorAll('[data-sp]').forEach(function(el){
                 f'<th style="width:{LABEL_SP}px;min-width:{LABEL_SP}px"></th>',
             ]
             for j, p in enumerate(all_pos_a):
-                lbl_p = str(p)
+                lbl_p = numbering.label(p)
                 parts_spm.append(
                     f'<th style="width:{CELL_SP}px;min-width:{CELL_SP}px;font-size:7px;font-weight:normal;'
                     f'color:#888;writing-mode:vertical-rl;text-align:left;padding:0;'
@@ -1698,7 +1712,7 @@ document.querySelectorAll('[data-sp]').forEach(function(el){
                         others = [f"{al}:{col_abp_aa[p].get(al)}"
                                   for al in all_labels if al != lb and col_abp_aa[p].get(al)]
                         tt = (
-                            f"Actin pos: {p} ({actin_consensus[p]})\n"
+                            f"Actin residue (P60709): {numbering.label(p)} ({actin_consensus[p]})\n"
                             f"{lb[:28]}\n"
                             f"ABP residue: {aa} — {uniq_lbl}"
                         )
@@ -1749,7 +1763,7 @@ document.querySelectorAll('[data-sp]').forEach(function(el){
                     f'<td style="width:{CELL_SP}px;min-width:{CELL_SP}px;height:{CELL_SP}px;'
                     f'{bg_a};color:{fg_a};text-align:center;font-size:8px;font-weight:700;'
                     f'border-top:2px solid #16607a;cursor:default;padding:0" '
-                    f'data-spm="Actin pos: {p}&#10;Reference actin residue: {aa_ref}'
+                    f'data-spm="Actin residue (P60709): {numbering.label(p)}&#10;Reference actin residue: {aa_ref}'
                     f'&#10;Contacted by {n_c}/{n_seqs} myosins">{aa_ref}</td>'
                 )
             parts_spm.append('</tr>')
@@ -1777,7 +1791,7 @@ document.querySelectorAll('[data-sp]').forEach(function(el){
                         bg, fg = _spec_bg(aa_v, col_act_freq[p], n_seqs)
                         c_v = col_act_freq[p].get(aa_v, 0)
                         tt = (
-                            f"Pos actin : {p}\n"
+                            f"Actin residue (P60709): {numbering.label(p)}\n"
                             f"Ref: {actin_consensus.get(p)} → variation {aa_v}\n"
                             f"Chez : {lb[:28]} ({c_v}/{n_seqs})"
                         )
@@ -2176,11 +2190,11 @@ def _msa_section_full(group_label, group_key, filter_fn, rigor_pdbs=None, note=N
                 fasta_path = _MSA_ALN_DIR / f"{group_key}_msa.fasta"
                 aln_path   = _MSA_ALN_DIR / f"{group_key}_msa.aln"
                 _btn_c, _force_c = st.columns([1, 2])
-                _run   = _btn_c.button("Lancer MAFFT", key=f"msa_{group_key}_btn")
-                _force = _force_c.checkbox("Forcer recalcul", key=f"msa_{group_key}_force")
+                _run   = _mafft_controls(_btn_c, f"msa_{group_key}_btn")
+                _force_c.caption("Run MAFFT replaces the saved alignment.")
 
                 if _run or aln_path.exists():
-                    if _run or not aln_path.exists() or _force:
+                    if _run or not aln_path.exists():
                         _MSA_ALN_DIR.mkdir(parents=True, exist_ok=True)
                         SeqIO.write(
                             [SeqRecord(Seq(r["seq"]), id=r["seq_id"][:50], description="")
@@ -2190,7 +2204,7 @@ def _msa_section_full(group_label, group_key, filter_fn, rigor_pdbs=None, note=N
                         with st.spinner(f"MAFFT on {len(df_seqs)} sequences…"):
                             _ok, _err = _msa_run_mafft(fasta_path, aln_path)
                         if not _ok:
-                            st.error(f"Erreur MAFFT : {_err}")
+                            st.error(f"MAFFT error: {_err}")
 
                     if aln_path.exists():
                         try:
@@ -2356,7 +2370,7 @@ def _msa_section_full(group_label, group_key, filter_fn, rigor_pdbs=None, note=N
 
         # ── S1 : Actin — positions canonical ────────────────────────────────
         st.divider()
-        st.markdown("##### Actin — positions canonical (S1)")
+        st.markdown("##### Actin — residues, UniProt P60709 numbering (S1)")
         if not _abp_rows_a:
             st.info("No actin interface data found.")
         else:
@@ -2379,7 +2393,7 @@ def _msa_section_full(group_label, group_key, filter_fn, rigor_pdbs=None, note=N
             # Téléchargement : vue S1 en HTML autonome (ouvrable dans un navigateur)
             _html_a_full = (
                 '<!DOCTYPE html><html><head><meta charset="utf-8">'
-                f'<title>Actin — positions canonical (S1) — {group_key}</title></head>'
+                f'<title>Actin — residues P60709 (S1) — {group_key}</title></head>'
                 '<body style="background:#161b22;margin:0;padding:16px">'
                 + _html_a + '</body></html>'
             )
@@ -2440,7 +2454,7 @@ def _msa_section_s2_clusters():
         _df3_s2cl = df3.copy()
         _df3_s2cl["residue_number_canon_mafft"] = pd.to_numeric(
             _df3_s2cl["residue_number_canon_mafft"], errors="coerce")
-        _df3_s2cl["chain_lower"] = _df3_s2cl["chain"].str.lower()
+        _df3_s2cl["chain_lower"] = _df3_s2cl["chain"]
 
         mask    = ~df_filt["subunit_2_title"].apply(lambda t: _EXCLUDE_FN(str(t)))
         df_other = df_filt[mask].copy()
@@ -2550,11 +2564,11 @@ def _msa_section_s2_clusters():
                 fasta_path = _MSA_ALN_DIR / f"{ckey}_msa.fasta"
                 aln_path   = _MSA_ALN_DIR / f"{ckey}_msa.aln"
                 _bc, _fc = st.columns([1, 2])
-                _run2   = _bc.button("Lancer MAFFT", key=f"msa_{ckey}_btn")
-                _force2 = _fc.checkbox("Forcer recalcul", key=f"msa_{ckey}_force")
+                _run2   = _mafft_controls(_bc, f"msa_{ckey}_btn")
+                _fc.caption("Run MAFFT replaces the saved alignment.")
 
                 if _run2 or aln_path.exists():
-                    if _run2 or not aln_path.exists() or _force2:
+                    if _run2 or not aln_path.exists():
                         _MSA_ALN_DIR.mkdir(parents=True, exist_ok=True)
                         SeqIO.write(
                             [SeqRecord(Seq(s["seq"]), id=s["seq_id"][:50], description="") for s in uniq],
@@ -2563,7 +2577,7 @@ def _msa_section_s2_clusters():
                         with st.spinner(f"MAFFT ({len(uniq)} seq.)…"):
                             _ok2, _err2 = _msa_run_mafft(fasta_path, aln_path)
                         if not _ok2:
-                            st.error(f"Erreur MAFFT : {_err2}")
+                            st.error(f"MAFFT error: {_err2}")
 
                     if aln_path.exists():
                         try:
@@ -2578,7 +2592,7 @@ def _msa_section_s2_clusters():
                             st.components.v1.html(_html2, height=_height2, scrolling=True)
 
                 st.divider()
-                st.markdown("##### Actin — positions canonical (S1)")
+                st.markdown("##### Actin — residues, UniProt P60709 numbering (S1)")
                 if not _abp_rows_c2:
                     st.info("No actin interface data for this cluster.")
                 else:
@@ -2691,11 +2705,11 @@ def _msa_one_s1_cluster(cid, df_h, _df1_s1, _df3_s1, partners="",
         else:
             fasta_path_s1c = _MSA_ALN_DIR / f"{ckey}_full.fasta"
             _bc1, _fc1 = st.columns([1, 2])
-            _run_s1c   = _bc1.button("Lancer MAFFT", key=f"msa_{wkey}_btn")
-            _force_s1c = _fc1.checkbox("Forcer recalcul", key=f"msa_{wkey}_force")
+            _run_s1c   = _mafft_controls(_bc1, f"msa_{wkey}_btn")
+            _fc1.caption("Run MAFFT replaces the saved alignment.")
 
             if _run_s1c or _aln_path_s1c.exists():
-                if _run_s1c or not _aln_path_s1c.exists() or _force_s1c:
+                if _run_s1c or not _aln_path_s1c.exists():
                     _MSA_ALN_DIR.mkdir(parents=True, exist_ok=True)
                     SeqIO.write(
                         [SeqRecord(Seq(u["seq"]), id=u["seq_id"][:50], description="")
@@ -2705,7 +2719,7 @@ def _msa_one_s1_cluster(cid, df_h, _df1_s1, _df3_s1, partners="",
                     with st.spinner(f"MAFFT ({len(uniq_s2)} seq.)…"):
                         _ok_s1c, _err_s1c = _msa_run_mafft(fasta_path_s1c, _aln_path_s1c)
                     if not _ok_s1c:
-                        st.error(f"Erreur MAFFT : {_err_s1c}")
+                        st.error(f"MAFFT error: {_err_s1c}")
 
                 if _aln_path_s1c.exists():
                     try:
@@ -2732,7 +2746,7 @@ def _msa_one_s1_cluster(cid, df_h, _df1_s1, _df3_s1, partners="",
 
         # ── S1 : positions canonical actin ──────────────────────────
         st.divider()
-        st.markdown("##### Actin — positions canonical (S1)")
+        st.markdown("##### Actin — residues, UniProt P60709 numbering (S1)")
         _html_s1   = _msa_render_actin_contacts(abp_rows_s1, aa_at_s1, col_col_s1, 9999)
         _height_s1 = min(len(abp_rows_s1) * 18 + 80, 6000)
         st.components.v1.html(_html_s1, height=_height_s1, scrolling=True)
@@ -2765,7 +2779,7 @@ def _msa_s1_cluster_data():
     _df3    = _read_interface(int3_path)
     _df3["residue_number_canon_mafft"] = pd.to_numeric(
         _df3["residue_number_canon_mafft"], errors="coerce")
-    _df3["chain_lower"] = _df3["chain"].str.lower()
+    _df3["chain_lower"] = _df3["chain"]
     df_h = df_filt[~df_filt["subunit_2_title"].apply(lambda t: _is_actin(str(t)))]
     return df_h, _df1, _df3
 
@@ -2806,7 +2820,7 @@ def _msa_section_s1_clusters():
         _df3_s1   = _read_interface(int3_path)
         _df3_s1["residue_number_canon_mafft"] = pd.to_numeric(
             _df3_s1["residue_number_canon_mafft"], errors="coerce")
-        _df3_s1["chain_lower"] = _df3_s1["chain"].str.lower()
+        _df3_s1["chain_lower"] = _df3_s1["chain"]
 
         df_h = df_filt[~df_filt["subunit_2_title"].apply(lambda t: _is_actin(str(t)))]
 
