@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 import numbering
+from plot_interaction import position_hover
 
 FILES = [Path('data/filtered/filtered_all_data.csv'),
          Path('data/filtered/details/1.interactions.csv'),
@@ -101,6 +102,7 @@ def render_footprint_comparison():
                                  colorscale=[[0,'#f2f2f2'],[1,'#0072B2']],zmin=0,zmax=1,showscale=False,
                                  hovertemplate='%{y}<br>P60709 position %{x}<br>Observed: %{z}<extra></extra>'))
         fig.update_layout(height=230,xaxis_title=numbering.AXIS_TITLE,margin=dict(l=5,r=5,t=10,b=40))
+        position_hover(fig)
         st.plotly_chart(fig,use_container_width=True,key='homo_footprint_comparison')
         names=sorted(records.loc[records.kind.eq('abp'),'group'].unique(),key=str.casefold)
         abps={name:positions('abp',[name]) for name in names}

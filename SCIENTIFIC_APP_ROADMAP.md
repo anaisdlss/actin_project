@@ -138,3 +138,37 @@ Comparaison des empreintes : la section actine–actine propose deux groupes de 
 ## Lot complémentaire : variants, conservation et interfaces (1 octobre 2026)
 
 Voir [SCIENTIFIC_ANALYSES.md](SCIENTIFIC_ANALYSES.md) pour les méthodes, résultats et limites actuels. Ce lot remplace le statut antérieur « variants non intégrés » et régénère les figures S1 répertoriées dans `reports/s1_figures_all.json`. Les catégories biologiques et conclusions cliniques ne sont pas déduites automatiquement.
+
+
+## Demandes de Rémi restant à compléter — revue du 1 octobre 2026
+
+Cette liste vient d'une nouvelle comparaison du Word original avec le code et les
+fichiers réellement présents ; les bilans précédents décrivent des lots successifs.
+
+- **Données et annotations** : identifier les structures mutées/pathologiques,
+  compléter la séparation des toxines et la normalisation des noms de protéines.
+- **Seuil ASA commun** : les contrôles actuels s'appliquent à leur analyse locale ;
+  un réglage partagé entre toutes les analyses reste à concevoir et à vérifier.
+- **ProteoCast des ABP** : au contrôle, 49/54 résultats sont présents dans le jeu
+  public, et 0/57 fichiers de scores dans le projet complet (des MSA/structures
+  existent). Le calcul disponible dans l'interface ne remplace pas les résultats.
+  Les cinq noms sans scores publics sont Myosin heavy chain 4, Spectrin beta chain,
+  Utrophin, Vibrio VopV et VopV.
+- **FoldDisco avancé** : motif éditable et visualisation 3D de la requête,
+  annotations GO, requêtes réunissant plusieurs clusters et validation des motifs
+  retrouvés dans des domaines ABD connus. L'affichage des candidats et des scores
+  existe déjà.
+- **Analyses structurales** : établir la provenance monomère/filament de la RSA,
+  poursuivre la validation des interfaces minoritaires et les contrôles de clashs.
+  Les comparaisons géométriques actuelles couvrent trois structures représentatives.
+- **Propriétés physicochimiques** : compléter la surface globale de l'actine
+  colorée par la propriété dominante de ses partenaires.
+- **Variants** : ajouter l'ASA par ABP pour le sous-groupe des observations
+  inter-gènes ; le tableau actuel d'ASA porte sur les positions P/LP d'un gène.
+  Les VUS restent des VUS ; une prédiction demanderait une évaluation indépendante.
+- **Exports et documentation** : les figures S1 ont été régénérées, mais pas tous
+  les exports historiques C70/réseaux. Les textes scientifiques définitifs restent
+  à relire avec Rémi.
+
+La coévolution et les perspectives de chimères/deep learning du Word ne sont pas
+traitées comme des fonctionnalités obligatoires déjà promises.

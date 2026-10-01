@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from pathlib import Path as _Path
 import proteocast_view
 from residue_metrics import surface_masks
+from plot_interaction import position_hover
 
 
 _PROTEOCAST_ABP_DIR = _Path("data/proteocast/abp")
@@ -165,6 +166,8 @@ def _render_proteocast_mutland(csv_path, iface_asa=None, title="", domains=None,
         fig.update_xaxes(title_text="position (ABP residue)", row=2, col=1)
     if focus:                                    # recadrage sur la zone de liaison
         fig.update_xaxes(range=[focus[0] - 0.5, focus[1] + 0.5])
+    # Domain spans only carry endpoints; preserve the cell/domain hover there.
+    position_hover(fig, unified=not bool(_ndom))
     st.plotly_chart(fig, use_container_width=True)
 
 
@@ -408,4 +411,5 @@ def _render_abp_actin_conservation(sel_abp):
         height=380, margin=dict(l=10, r=10, t=40, b=10),
         legend=dict(orientation="h", yanchor="bottom", y=1.04,
                     xanchor="right", x=1))
+    position_hover(_figc, axes=["x"], unified=False)
     st.plotly_chart(_figc, use_container_width=True)

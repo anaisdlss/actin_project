@@ -11,6 +11,7 @@ import pipeline_ui
 from app_sections import create_sections, render_cluster_table, describe_table, table_label
 from st_io import (_load_pdb_file, read_csv)
 from pdb_catalog import build_pdb_catalog
+from plot_interaction import position_hover
 import warnings as _warnings
 import logging as _logging
 import re as _re_sd
@@ -1523,6 +1524,7 @@ with _sections["abp-actin-interfaces"]:
             _fig_hm.update_xaxes(dtick=25, row=2, col=1,
                                  title_text=numbering.AXIS_TITLE,
                                  title_font=dict(size=11))
+            position_hover(_fig_hm)
             st.plotly_chart(_fig_hm, use_container_width=True)
 
     with _sections["comparative-binding-sites"]:

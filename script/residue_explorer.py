@@ -14,6 +14,7 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 import numbering
+from plot_interaction import position_hover
 from residue_metrics import pdb_residue_frequencies
 from residue_contacts import render_contacts
 
@@ -214,6 +215,7 @@ def render_residue_tab(pp):
         yaxis=dict(tickfont=dict(size=9), autorange="reversed"),
     )
 
+    position_hover(fig)
     ev = st.plotly_chart(fig, use_container_width=True, key="explo_hm",
                          on_select="rerun", selection_mode="points")
 
@@ -518,6 +520,7 @@ def render_pair_tab(pp):
         height=240, margin=dict(l=4, r=4, t=10, b=30),
         xaxis=dict(title=numbering.AXIS_TITLE, dtick=25),
         yaxis=dict(autorange="reversed"), showlegend=False)
+    position_hover(fig, unified=False)
     st.plotly_chart(fig, use_container_width=True)
 
     # ── Actin 3D : lieux de contact, mêmes couleurs (partagé / A / B) ──────
@@ -789,6 +792,7 @@ def render_sequence_tab(pp):
         title=dict(text="Where your variations fall (grey = interface positions; "
                         "colour = mutational sensitivity, dark = more sensitive)",
                    font=dict(size=11)))
+    position_hover(figt, unified=False)
     st.plotly_chart(figt, use_container_width=True)
 
     # actin 3D : PAS de gradient — actin neutre, seules les positions
@@ -916,6 +920,7 @@ def render_actin_overview(pp):
             height=460, margin=dict(l=6, r=6, t=10, b=44), bargap=0.1,
             xaxis=dict(title=numbering.AXIS_TITLE, dtick=25),
             yaxis=dict(title="number of ABPs in contact"))
+        position_hover(fig)
         ev = st.plotly_chart(fig, use_container_width=True, key="actin_ov",
                              on_select="rerun", selection_mode="points")
 

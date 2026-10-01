@@ -6,6 +6,7 @@ import numpy as np
 import streamlit as st
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+from plot_interaction import position_hover
 from scientific_analysis import (load_variants,load_actin_scores,conservation_summary,
                                  interface_evidence,disease_associations,variant_footprint_summary,GENES)
 from footprint_comparison import FILES,load_footprints
@@ -51,14 +52,15 @@ def render_conservation():
     table,cor,clusters=conservation_summary(scores,current_footprints(),cutoff)
     fig=make_subplots(rows=4,cols=1,shared_xaxes=True,vertical_spacing=.06,
                       subplot_titles=('Mutational sensitivity','RSA in existing structural source','Distinct ABP source names','Observed actin–actin contacts'))
-    for row,(col,color) in enumerate([('sensitivity','#0072B2'),('rsa','#777777'),('n_abp_names','#E69F00'),('homo_contact','#884EA0')],1):
-        fig.add_trace(go.Scatter(x=table.position,y=table[col],mode='lines',name=col,line=dict(color=color),customdata=table.aa,
-                                 hovertemplate='%{customdata}%{x}: %{y}<extra></extra>'),row=row,col=1)
+    for row,(col,label,color) in enumerate([('sensitivity','Mutational sensitivity','#0072B2'),('rsa','RSA','#777777'),('n_abp_names','Distinct ABP source names','#E69F00'),('homo_contact','Actin–actin contact (0/1)','#884EA0')],1):
+        fig.add_trace(go.Scatter(x=table.position,y=table[col],mode='lines',name=label,line=dict(color=color),customdata=table.aa,
+                                 hovertemplate='%{customdata}%{x} · %{fullData.name}: %{y:.3~g}<extra></extra>'),row=row,col=1)
     fig.update_layout(height=700,showlegend=False);fig.update_xaxes(title_text='P60709 position',row=4,col=1)
+    position_hover(fig)
     st.plotly_chart(fig,use_container_width=True,key='cons_tracks')
     with st.expander('Actin ProteoCast landscape and sequence alignment'):
         pivot=raw.pivot(index='alternate',columns='position',values='Variant_score').reindex(columns=range(1,376))
-        st.plotly_chart(go.Figure(go.Heatmap(z=pivot.values,x=pivot.columns,y=pivot.index,colorscale='Blues',colorbar=dict(title='Variant score'))),use_container_width=True,key='cons_landscape')
+        st.plotly_chart(position_hover(go.Figure(go.Heatmap(z=pivot.values,x=pivot.columns,y=pivot.index,colorscale='Blues',colorbar=dict(title='Variant score')))),use_container_width=True,key='cons_landscape')
         msa=Path('data/proteocast/actin/2.aliAF-P60709-F1-msa_v6.fasta')
         if msa.exists():st.download_button('Download actin ProteoCast alignment',msa.read_bytes(),file_name=msa.name,key='cons_msa')
         download(raw,'Download actin variant scores','actin_proteocast_scores.csv','cons_raw')
@@ -87,6 +89,7 @@ def render_conservation():
             fig=go.Figure(go.Scatter(x=table.position,y=table.sensitivity,mode='lines',name='All positions',line=dict(color='#BBBBBB')))
             fig.add_trace(go.Scatter(x=profile.position,y=profile.sensitivity,mode='markers',name=site,marker_color='#0072B2',customdata=profile.aa,hovertemplate='%{customdata}%{x}: %{y}<extra></extra>'))
             fig.update_layout(xaxis_title='P60709 position',yaxis_title='ProteoCast sensitivity',height=320)
+            position_hover(fig, unified=False)
             st.plotly_chart(fig,use_container_width=True,key='cons_cluster_profile')
             download(profile,'Download selected cluster conservation','cluster_conservation.csv','cons_cluster_csv')
     download(table,'Download aligned residue profiles','actin_conservation_profiles.csv','cons_profiles_csv')
@@ -121,6 +124,7 @@ def render_variants():
     matrix=pd.crosstab(per.aa_alt,per.position).reindex(index=list('ACDEFGHIKLMNPQRSTVWY'),columns=range(1,376),fill_value=0)
     fig=go.Figure(go.Heatmap(z=matrix.values,x=matrix.columns,y=matrix.index,colorscale=[[0,'#ffffff'],[1,'#0072B2']],zmin=0,zmax=max(1,matrix.values.max()),hovertemplate='P60709 %{x} → %{y}<br>Substitutions: %{z}<extra></extra>'))
     fig.update_layout(title=f'{gene}: {category}',xaxis_title='Aligned P60709 position',yaxis_title='Alternate amino acid',height=420)
+    position_hover(fig)
     st.plotly_chart(fig,use_container_width=True,key='hv_gene_heatmap')
     counts=selected.groupby(['gene','position']).size().unstack(fill_value=0).reindex(index=sorted(GENES),columns=range(1,376),fill_value=0).fillna(0)
     combined=counts.sum(axis=0).to_frame().T;combined.index=['All genes (gene-specific substitutions)']
@@ -131,6 +135,7 @@ def render_variants():
     n=fp[fp.kind.eq('abp')&fp.asa.gt(0)].groupby('position')['group'].nunique().reindex(range(1,376),fill_value=0)
     fig.add_trace(go.Bar(x=n.index,y=n.values,name='ABP names',marker_color='#E69F00'),row=3,col=1)
     fig.update_layout(height=630);fig.update_xaxes(title_text='P60709 position',row=3,col=1)
+    position_hover(fig)
     st.plotly_chart(fig,use_container_width=True,key='hv_combined')
     detail=valid[valid.gene.eq(gene)].copy()
     detail['P60709_reference']=detail.position.map(scores.set_index('position').aa)
@@ -145,7 +150,7 @@ def render_variants():
         st.markdown('**ClinVar records explicitly marked conflicting**')
         st.dataframe(conflicts,hide_index=True,width='stretch')
         conflict_counts=conflicts.drop_duplicates(['gene','position','aa_ref','aa_alt']).groupby(['gene','position']).size().unstack(fill_value=0).reindex(index=sorted(GENES),columns=range(1,376),fill_value=0).fillna(0)
-        st.plotly_chart(go.Figure(go.Heatmap(z=conflict_counts.values,x=conflict_counts.columns,y=conflict_counts.index,colorscale='Purples')),use_container_width=True,key='hv_conflicts_heatmap')
+        st.plotly_chart(position_hover(go.Figure(go.Heatmap(z=conflict_counts.values,x=conflict_counts.columns,y=conflict_counts.index,colorscale='Purples'))),use_container_width=True,key='hv_conflicts_heatmap')
         keys=['position','aa_ref','aa_alt']
         patho=valid[valid.source.eq('clinvar')&valid.classif_cat.isin(['pathogenic','likely_pathogenic'])][['gene',*keys]].drop_duplicates()
         population=valid[valid.source.eq('gnomad')][['gene',*keys]].drop_duplicates()

@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 import numbering
+from plot_interaction import position_hover
 from residue_metrics import select_interaction_chains
 
 
@@ -183,6 +184,7 @@ def _render_s1_global_plotly(data, relative, valid_clusters=None):
     fig.add_annotation(text=f"HOMO — actin / actin ({nh})", xref="paper",
                        yref="paper", x=0, y=1.0, showarrow=False,
                        font=dict(size=11), xanchor="left")
+    position_hover(fig)
     _ev = st.plotly_chart(fig, use_container_width=True, key="s1g_hm",
                           on_select="rerun", selection_mode="points")
 
@@ -314,6 +316,7 @@ def _render_s1_patch_plotly(detail, patch):
     fig1.update_xaxes(dtick=25, title_text=numbering.AXIS_TITLE,
                       title_font=dict(size=10))
     # Clic sur une position → met à jour le sélecteur « Position canonical » ci-dessus.
+    position_hover(fig1)
     _ev1 = st.plotly_chart(fig1, use_container_width=True, key=f"s1prof_{patch}",
                            on_select="rerun", selection_mode="points")
     try:
@@ -341,6 +344,7 @@ def _render_s1_patch_plotly(detail, patch):
     fig2.update_yaxes(autorange="reversed", tickfont=dict(size=9))
     fig2.update_xaxes(dtick=25, title_text=numbering.AXIS_TITLE,
                       title_font=dict(size=10))
+    position_hover(fig2)
     st.plotly_chart(fig2, use_container_width=True)
 
 

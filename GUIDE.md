@@ -99,6 +99,11 @@ Pick a PDB. You get:
   the S1/S2 binding-site clusters it belongs to.
 
 ### Interaction clusters
+Position plots use a vertical hover guide. Aligned numerical tracks share a
+tooltip so their values can be read at the same residue. Heatmaps retain the
+hovered cell's value; sparse markers and domain segments retain their own hover
+details. Clickable residue and binding-site selections remain available.
+
 Actin's binding sites, grouped. Two selectors:
 - **Patch S1 binding site** → the *Interactive network — actin residues ↔
   partners* (each actin residue coloured by buried %ASA) + an **Interface 3D**
