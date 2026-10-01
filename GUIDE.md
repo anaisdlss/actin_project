@@ -51,8 +51,9 @@ The full dataset is regenerated locally by a **9-step pipeline** (button
 - **ProteoCast** (per-ABP mutational landscape) is a separate, opt-in
   computation run on [proteocast.ijm.fr](https://proteocast.ijm.fr), **one job
   per ABP**. Computing **all** ABPs can take **several hours** (some large
-  proteins take ~20 min each). It is resumable too. A few very large / fusion
-  proteins simply cannot be computed by ProteoCast — this is expected.
+  proteins take ~20 min each). It is resumable too. Missing results and failed
+  jobs have separate diagnostics; a failure alone does not show that a protein
+  cannot be computed.
 
 ---
 
@@ -76,65 +77,48 @@ The full dataset is regenerated locally by a **9-step pipeline** (button
 
 ---
 
-## 4. The app, section by section
+## 4. Navigation and scientific pages
 
-### Data download *(local only)*
-Runs / updates the 9-step pipeline. Resumable. Hidden on the shared version.
+The sidebar follows the eleven sections of the scientific brief. Selecting a
+section opens its own page. The **View** control at the top changes the analysis
+within that page; only the chosen view is rendered. Residue, protein, cluster
+and explicitly keyed analysis choices are retained during navigation in the
+same browser session. Reloading the browser starts a new Streamlit session.
 
-### Filtered data & Retained PDB structures (explorer)
-The menu follows the current retained interaction dataset automatically. Structures
-excluded after the initial connected-actin screen are not listed. Missing titles
-are recovered from the other local metadata tables; missing metadata or 3D files
-alone do not remove a structure from the retained dataset.
+| Page | Available views and purpose |
+|---|---|
+| **Documentation** | Guide; **Data and calculations** for cache reload and, in the full project, data updates and ProteoCast job diagnostics. |
+| **Summary tables** | **Structures** (retained PDB explorer), **Source tables**, **Residue numbering**, **Dataset checks**. |
+| **Actin use at a residue level** | **Residue explorer** with contacts and a 3D surface; **Binding-site heatmap** across homo/hetero sites. |
+| **Actin-actin interfaces** | **Binding sites**, **Compare footprints**, **Structural evidence**. Mixed sites are also included. |
+| **ABP-actin interfaces** | **By protein** (clusters and structures), **Overview and heatmap**, **Binding sites**. |
+| **Comparative analyses of binding sites** | **Binding-site clusters**, **Interaction clusters**, **ABP networks**, **ABP pairs and sequences**. |
+| **Actin binding sites conservation** | **Overview**, **By ABP footprint**, **Solvent accessibility**. |
+| **Human actin variants** | Gene/category selection, substitution maps, footprint summaries and exploratory associations. |
+| **ABP conservation** | **Profiles**, **3D structure**, **Sequence alignments**. Missing results are identified explicitly. |
+| **Physico-chemical properties of the interface** | **Actin surface chemistry**, **By binding site** (contact chemistry, alignments and structural comparisons). |
+| **Homolog search** | Existing FoldDisco candidates, query motifs and annotations for the selected ABP. |
 
-Pick a PDB. You get:
-- **Interaction network** — the chains of that structure and who touches whom
-  (orange = actin, blue = ABP). Click an edge (a pair) or a node (a chain).
-- **3D visualisation — interface contacts** — the structure in surface;
-  the selected chain is **yellow**, its partner **blue**, the rest grey.
-- **Sequences — interface residues** — the two sequences with their interface
-  residues highlighted (yellow = S1, blue = S2). Hover a highlighted residue to
-  read its **canonical position**.
-- **Interaction clusters per pair** — for the selected pair, the C70 cluster and
-  the S1/S2 binding-site clusters it belongs to.
+**Explore selected cluster** opens the matching comparative view. Clicking a
+binding-site heatmap cell opens that cluster with the clicked residue selected
+when that position has contact details in the cluster.
+In the global binding-site network, a site node selects its details and an ABP
+node opens the protein page. Global cluster networks and catalogues are grouped
+under **All binding sites: network and table** or **All interaction clusters:
+network and table**, above the selected-cluster results.
 
-### Interaction clusters
+The PDB menu follows the current retained interaction dataset automatically.
+Missing titles are recovered from local metadata when possible. Missing titles
+or structure files alone do not remove an otherwise retained structure.
+The structure explorer combines chain/interaction networks, interface surfaces,
+sequences and cluster assignments. Orange identifies actin and blue identifies
+ABPs in the assembly view; the selected-pair view has its own labelled colours.
+
 Position plots use a vertical hover guide. Aligned numerical tracks share a
-tooltip so their values can be read at the same residue. Heatmaps retain the
-hovered cell's value; sparse markers and domain segments retain their own hover
-details. Clickable residue and binding-site selections remain available.
-
-Actin's binding sites, grouped. Two selectors:
-- **Patch S1 binding site** → the *Interactive network — actin residues ↔
-  partners* (each actin residue coloured by buried %ASA) + an **Interface 3D**
-  of that binding site.
-- **Patch cluster_data_70** (C70) → a **bipartite network** (actin residues ↔
-  partner residues, coloured by buried %ASA) + the **3D interface of the
-  representative pair** + the **two interface sequences coloured by buried
-  %ASA** (pale → dark red; hover = position + %ASA).
-
-### ABP
-- **Overview** — table of all ABPs.
-- **ABP networks** — **Competition** (footprints overlap) or **Cooperation**
-  (co-present in a PDB). Node colour = ABP family, node size = proportion of
-  binding sites in conflict.
-- **Per-ABP detail** — for one ABP: its interaction clusters, actin–actin homo
-  interactions on the same PDBs, Foldseek interface-motif discovery, and its
-  **ProteoCast** panel.
-- **ProteoCast panel** — the ABP's **mutational landscape** (per-position
-  substitution sensitivity / conservation) and the **actin-side conservation**
-  of the residues it contacts (is the footprint more or less conserved than the
-  rest of the actin surface?), plus a 3D structure coloured by mutational
-  sensitivity.
-
-### MSA — Interface proteins
-Per family (myosins, tropomyosins…), the aligned sequences with interface
-columns highlighted, actin canonical positions, and a *vs C. elegans* identity
-comparison.
-
-### Interactive explorer
-Paste a query actin sequence (which positions vary → which ABPs are involved),
-or compare an ABP pair (footprint overlap), on the per-residue passport table.
+tooltip to read their values at the same residue. Heatmaps retain the hovered
+cell's value. Downloads and saved ProteoCast figures are grouped below the
+profile; calculation controls are kept in Documentation. Loading a page does
+not start the pipeline or submit a new ProteoCast job.
 
 ---
 
@@ -191,9 +175,9 @@ Because the interface is kept clean, the meaning of every element is listed here
 
 ## 6. Notes & caveats
 
-- **A few ProteoCast entries can't be computed** by proteocast.ijm.fr (very large
-  proteins, fusion constructs, or too weak an MSA) — this is expected, not an
-  app bug.
+- **ProteoCast results may be missing** because of service failures, input
+  limitations or incomplete jobs. Consult the recorded diagnostics before
+  retrying; the cause cannot be inferred from a missing score file alone.
 - Numbers are **structure-derived** (from deposited PDB co-structures): they
   describe the interfaces that have actually been solved, not every possible
   interaction.

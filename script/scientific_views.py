@@ -103,9 +103,10 @@ def render_conservation():
             position_hover(fig, unified=False)
             st.plotly_chart(fig,use_container_width=True,key='cons_cluster_profile')
             download(profile,'Download selected cluster conservation','cluster_conservation.csv','cons_cluster_csv')
-    download(table,'Download aligned residue profiles','actin_conservation_profiles.csv','cons_profiles_csv')
-    download(cor,'Download correlations','actin_conservation_correlations.csv','cons_cor_csv')
-    download(clusters,'Download footprint conservation summaries','footprint_conservation.csv','cons_clusters_csv')
+    with st.expander('Download conservation tables'):
+        download(table,'Download aligned residue profiles','actin_conservation_profiles.csv','cons_profiles_csv')
+        download(cor,'Download correlations','actin_conservation_correlations.csv','cons_cor_csv')
+        download(clusters,'Download footprint conservation summaries','footprint_conservation.csv','cons_clusters_csv')
 
 
 def render_variants():
@@ -122,7 +123,6 @@ def render_variants():
                'and retained in the audit. Classifications and conditions use the original snapshot; current '
                'classifications are retained separately for comparison. Presence in gnomAD is not a benign label.')
     manifest=base/'manifest.json'
-    st.download_button('Download variant source provenance',manifest.read_bytes(),file_name='variant_sources.json',key='hv_manifest')
     c1,c2,c3=st.columns(3)
     c1.metric('Source records',len(variants));c2.metric('Records eligible for analysis',len(valid));c3.metric('Excluded records',len(variants)-len(valid))
     gene=st.selectbox('Human actin gene',sorted(GENES),key='hv_gene')
@@ -161,8 +161,10 @@ def render_variants():
     detail.loc[detail.aa_ref.ne(detail.P60709_reference),'Variant_score']=np.nan
     detail['Variant_score_context']='P60709 model; not gene-specific or clinical prediction'
     detail['clinvar_url']=detail.clinvar_id.map(lambda x:f'https://www.ncbi.nlm.nih.gov/clinvar/variation/{int(x)}/' if pd.notna(x) else '')
-    st.dataframe(detail,hide_index=True,width='stretch')
-    download(detail,'Download selected gene records and research scores',f'{gene}_variants.csv','hv_gene_csv')
+    with st.expander('Source records and downloads'):
+        st.dataframe(detail,hide_index=True,width='stretch')
+        download(detail,'Download selected gene records and research scores',f'{gene}_variants.csv','hv_gene_csv')
+        st.download_button('Download variant source provenance',manifest.read_bytes(),file_name='variant_sources.json',key='hv_manifest')
     with st.expander('Conflicting annotations, mapping audit and cross-gene observations'):
         conflicts=valid[valid.source.eq('clinvar')&valid.classif_cat.eq('conflicting')]
         st.markdown('**ClinVar records explicitly marked conflicting**')

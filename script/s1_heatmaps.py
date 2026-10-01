@@ -36,10 +36,19 @@ def _on_s1_global_selection(valid_clusters):
     for point in reversed(_selected_points("s1g_hm")):
         selected = point.get("y")
         if selected in valid_clusters:
+            try:
+                position = float(point.get("x"))
+                canonical = (numbering.to_canon(int(position))
+                             if np.isfinite(position) and position.is_integer() else None)
+            except (ValueError, TypeError):
+                canonical = None
+            if canonical is not None:
+                st.session_state[f"_s1_click_{selected}"] = canonical
             if st.session_state.get("sel_s1") != selected:
                 st.session_state["sel_s1"] = selected
-                st.session_state["_scroll_to_s1"] = True
                 st.toast(f"Cluster {selected} selected — opening detail…")
+            from app_navigation import request_page
+            request_page("comparative-binding-sites", "Binding-site clusters")
             break
 
 
@@ -154,7 +163,7 @@ def _render_s1_global_plotly(data, relative, valid_clusters=None):
     """HOMO + HÉTÉRO empilés + bande agrégée, positions à leur place (trous inclus).
 
     Un clic sur une cellule sélectionne le cluster (label Y) dans `sel_s1` et
-    recharge la page pour afficher son détail plus bas."""
+    ouvre la page comparative pour afficher son détail."""
     import plotly.graph_objects as go
     from plotly.subplots import make_subplots
     positions, homo, hm, hetero, em = data

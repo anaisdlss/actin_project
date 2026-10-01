@@ -1,7 +1,6 @@
 """Scientific navigation and descriptions, shared by local and public builds.
 
-Containers change presentation order without changing legacy computation order.
-The analytical calculations remain in their existing modules.
+The same scientific sections are used by both native page navigations.
 """
 import ast
 from pathlib import Path
@@ -22,23 +21,6 @@ SECTIONS = (
     ("interface-properties", "Physico-chemical properties of the interface", "Contact chemistry and structural comparisons for a selected binding site."),
     ("homolog-search", "Homolog search", "Explore existing FoldDisco results for a selected ABP."),
 )
-
-
-def create_sections():
-    with st.sidebar:
-        st.markdown("## Contents")
-        st.markdown("\n".join(f"- [{title}](#{key})" for key, title, _ in SECTIONS))
-    sections = {}
-    for key, title, description in SECTIONS:
-        sections[key] = st.container()
-        with sections[key]:
-            st.header(title, anchor=key)
-            if description:
-                st.caption(description)
-            if key in {"actin-conservation", "abp-conservation", "interface-properties", "homolog-search"}:
-                if not Path("data/filtered/proteins_per_pdb.csv").exists():
-                    st.info("Analysis data are not available in this local dataset yet.")
-    return sections
 
 
 def select_cluster_types(table, kind):
@@ -99,17 +81,14 @@ def render_cluster_table(kind):
     st.markdown("**Binding-site summary**")
     st.caption("Homo = actin–actin only; hetero = actin–ABP only; mixed = both. "
                "A mixed site is included in both interface sections. Counts are those of the existing dataset.")
-    with st.expander("Show binding-site table", expanded=False):
+    with st.expander("Show binding-site table", expanded=(kind in {"homo", "hetero"})):
         st.dataframe(_readable_cluster_table(table), hide_index=True, width="stretch")
     if kind in {"homo", "hetero"} and not table.empty:
         cluster = st.selectbox("Binding site to explore", sorted(table["patch"].astype(str), key=str.casefold), key=f"{kind}_site_link")
         if st.button("Explore selected cluster", key=f"{kind}_site_open"):
-            st.session_state[f"{kind}_opened_site"] = cluster
-            st.session_state["_pending_s1"] = cluster
-            st.session_state["_scroll_clusters"] = True
+            from app_navigation import request_page
+            request_page("comparative-binding-sites", "Binding-site clusters", sel_s1=cluster)
             st.rerun()
-        if st.session_state.get(f"{kind}_opened_site") == cluster:
-            st.markdown(f"**Selected: {cluster}.** [Go to the cluster heatmap, network and 3D view](#patchsel)")
     if kind == "homo" and not table.empty and "n_homo_pdbs" in table:
         counts = table.set_index("patch")["n_homo_pdbs"].sort_values(ascending=False)
         import plotly.graph_objects as go

@@ -117,3 +117,33 @@ La heatmap S1 affiche une légende colorée avant le grand graphique et une éch
 La matrice des variants individuels est explicitement binaire (substitution enregistrée ou absente du snapshot sélectionné). Elle n’affiche plus de dégradé continu trompeur entre 0 et 1. Le graphique agrégé utilise un vrai dégradé du nombre entier de substitutions distinctes par position ; il ne représente ni la gravité, ni une fréquence allélique.
 
 Validation : **88 tests passent dans chacun des deux dépôts**, dont les événements Plotly transmis au moteur Streamlit, puis les choix manuels et reruns indépendants. Le smoke de l’application réelle passe au démarrage, pour le résidu P60709 47 et pour ACTA1/pathogenic. Vérification navigateur du passage clic G46 → choix manuel M47 et de la légende S1 visible.
+
+## Navigation par pages — 1 octobre 2026
+
+Les onze rubriques du document de Rémi deviennent onze pages natives. Une vue
+sélectionnée charge ses analyses ; les vues des autres rubriques ne sont plus
+construites à chaque interaction. Les calculs de données restent dans
+Documentation, tandis que les analyses restent accessibles par un sélecteur
+visible en haut de chaque page. Les exports et réseaux globaux sont regroupés.
+
+Les choix explicitement identifiés de résidu, protéine, cluster et paramètres
+sont conservés dans la session. Les événements Plotly et boutons de calcul ne
+sont pas conservés comme des choix : revenir à une page ne rejoue pas un calcul.
+Une heatmap ouvre le cluster sélectionné ; un nœud ABP ouvre la page du partenaire.
+
+`tools/check_app.py` parcourt les onze pages et toutes leurs vues, puis vérifie
+les changements de paramètres, les transitions cluster/protéine, le clic sur
+une heatmap, les contrôles de calcul réservés au projet complet et le retour
+au résidu M47. Il utilise les données installées ; seul le téléchargement de
+secours AlphaFold est neutralisé dans ce parcours pour permettre le contrôle
+hors ligne. Les résultats locaux et les autres analyses ne sont pas simulés.
+Les 88 tests de régression passent dans les deux dépôts.
+
+Les formules, seuils et jeux de données ne sont pas modifiés par cette
+réorganisation. Une meilleure navigation ne remplace pas les validations
+biologiques encore répertoriées dans SCIENTIFIC_ANALYSES.md.
+
+Contrôle final : les parcours complets passent avec les jeux local et public,
+y compris les réseaux de compétition et de coprésence. Dans le navigateur,
+le résidu M47 est conservé après aller-retour par Summary tables ; le bouton
+d’exploration du jeu public ouvre bien la page du cluster sélectionné.

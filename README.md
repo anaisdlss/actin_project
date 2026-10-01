@@ -11,7 +11,7 @@ interface, and shows everything in an interactive Streamlit app.
 
 **[→ USER GUIDE (GUIDE.md)](GUIDE.md)** — what the app shows, where the data
 comes from, and what every number / colour means (also shown inside the app,
-top section *Documentation*).
+*Documentation → Guide*).
 
 All code lives in **`script/`**; `data/` is regenerated locally (see step 3).
 
@@ -39,11 +39,15 @@ pixi run streamlit run script/streamlit.py
 
 It opens in your browser (otherwise: `http://localhost:8501`).
 
+The sidebar opens one scientific page at a time. Use **View** to choose an
+analysis within that page. Selections are retained while moving between pages
+in the same session; calculations and dataset updates are under Documentation.
+
 ## 3. Generate the data
 
 The repo ships **code only** — `data/` is git-ignored and regenerated locally.
 
-In the app, open **Documentation → Data management — download / update (local project)** and click **Run / update**. It runs the whole
+In the app, open **Documentation → Data and calculations → Download or update the research dataset** and click **Run / update**. It runs the whole
 pipeline (9 steps, ~1 h on a fresh clone). It is **resumable**: already-computed
 steps are skipped, so you can quit and come back — it continues where it stopped.
 
@@ -51,7 +55,7 @@ steps are skipped, so you can quit and come back — it continues where it stopp
 
 Computing the per-ABP mutational landscape (**ProteoCast**) is separate from
 `Run / update` and takes **several hours** (one job per ABP on
-[proteocast.ijm.fr](https://proteocast.ijm.fr)). In the **ABP conservation** section, click **Compute all missing ProteoCast**. It is resumable.
+[proteocast.ijm.fr](https://proteocast.ijm.fr)). Open **Documentation → Data and calculations → Download or update the research dataset → ProteoCast calculations and job diagnostics**, then use **Compute missing ProteoCast**. Results remain under **ABP conservation**. It is resumable.
 
 ## PyMOL (optional)
 
