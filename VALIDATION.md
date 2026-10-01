@@ -107,3 +107,13 @@ L'ancien calcul de contacts MSA sélectionnait des chaînes sans restreindre leu
 Dans la nouvelle vue de chimie, une relecture a également imposé une moyenne par interface avant PDB puis ABP. Par rapport au premier calcul provisoire qui regroupait directement les paires d'une PDB, 234 positions changent, avec un écart maximal de fraction de 0,175746 et trois changements de classe dominante. Le code final et ses tests incluent cette correction. La projection de 7PDZ I contrôle 371 résidus et 2 894 identifiants atomiques distincts ; HIC73 est distinguée de l'histidine standard.
 
 Les méthodes, paramètres, couvertures et limites figurent dans SCIENTIFIC_ANALYSES.md. Le nouveau calcul d'accessibilité a son propre manifeste et son contrôle numérique 480/960 points. Les tableaux de comparaison inter-gènes et de chimie sont reproductibles avec `tools/export_scientific_audit.py`. Les anciens exports spécialisés de chimie/FoldDisco non listés dans ces manifestes ne sont pas réputés régénérés. Les tests ne constituent pas une validation biologique de toutes les interfaces ou une validation clinique des variants.
+
+## Sélections interactives et échelles de couleur — 1 octobre 2026
+
+Les clics Plotly sont traités par des callbacks d’événement : une ancienne sélection ne réécrit plus les choix manuels des résidus ou des clusters lors des reruns. La vue d’ensemble garde le résidu choisi dans le menu, la fiche, la surface et son repère sur le graphique.
+
+La heatmap S1 affiche une légende colorée avant le grand graphique et une échelle native compacte conservée dans les exports. Le mode absolu respecte désormais la plage annoncée 0–100 % ; le mode relatif utilise 0–1 par cluster. Les valeurs scientifiques et les pourcentages absolus au survol sont inchangés.
+
+La matrice des variants individuels est explicitement binaire (substitution enregistrée ou absente du snapshot sélectionné). Elle n’affiche plus de dégradé continu trompeur entre 0 et 1. Le graphique agrégé utilise un vrai dégradé du nombre entier de substitutions distinctes par position ; il ne représente ni la gravité, ni une fréquence allélique.
+
+Validation : **88 tests passent dans chacun des deux dépôts**, dont les événements Plotly transmis au moteur Streamlit, puis les choix manuels et reruns indépendants. Le smoke de l’application réelle passe au démarrage, pour le résidu P60709 47 et pour ACTA1/pathogenic. Vérification navigateur du passage clic G46 → choix manuel M47 et de la légende S1 visible.

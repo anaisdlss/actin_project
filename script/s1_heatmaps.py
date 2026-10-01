@@ -8,6 +8,57 @@ from plot_interaction import position_hover
 from residue_metrics import select_interaction_chains
 
 
+def _s1_colour_scale(relative):
+    """Render the exact heatmap gradient above even very tall figures."""
+    from plotly.colors import get_colorscale
+    stops = ", ".join(f"{colour} {fraction * 100:g}%"
+                      for fraction, colour in get_colorscale("YlOrRd"))
+    ticks = ["0", "0.25", "0.5", "0.75", "1"] if relative else ["0%", "25%", "50%", "75%", "100%"]
+    title = ("Relative buried ASA — fraction of each cluster’s maximum"
+             if relative else "Absolute buried ASA — fixed scale from 0% to 100%")
+    labels = "".join(f"<span>{tick}</span>" for tick in ticks)
+    return (
+        f'<div role="img" aria-label="{title}" style="max-width:560px;margin:8px 0 12px">'
+        f'<div style="font-size:14px;margin-bottom:5px">{title}</div>'
+        f'<div style="height:18px;border:1px solid #777;border-radius:3px;'
+        f'background:linear-gradient(to right,{stops})"></div>'
+        f'<div style="display:flex;justify-content:space-between;font-size:12px;margin-top:3px">{labels}</div>'
+        '</div>')
+
+
+def _selected_points(key):
+    state = st.session_state.get(key, {})
+    return state.get("selection", {}).get("points", []) if hasattr(state, "get") else []
+
+
+def _on_s1_global_selection(valid_clusters):
+    """Apply a fresh chart event once, before this run creates the selectbox."""
+    for point in reversed(_selected_points("s1g_hm")):
+        selected = point.get("y")
+        if selected in valid_clusters:
+            if st.session_state.get("sel_s1") != selected:
+                st.session_state["sel_s1"] = selected
+                st.session_state["_scroll_to_s1"] = True
+                st.toast(f"Cluster {selected} selected — opening detail…")
+            break
+
+
+def _on_s1_patch_selection(patch):
+    """Queue a fresh position click; the detail view validates its options."""
+    points = _selected_points(f"s1prof_{patch}")
+    if not points:
+        return
+    try:
+        position = float(points[-1].get("x"))
+    except (TypeError, ValueError):
+        return
+    if not np.isfinite(position) or not position.is_integer():
+        return
+    canonical = numbering.to_canon(int(position))
+    if canonical is not None and st.session_state.get(f"s1posdet_{patch}") != canonical:
+        st.session_state[f"_s1_click_{patch}"] = canonical
+
+
 
 
 _S1_GLOBAL_FILES = [
@@ -133,10 +184,12 @@ def _render_s1_global_plotly(data, relative, valid_clusters=None):
     hZ, eZ = _norm(hE), _norm(eE)
 
     nh, ne = len(homo), len(hetero)
-    zmax = 1.0 if relative else float(
-        max(np.nanmax(hE) if hE.size else 0, np.nanmax(eE) if eE.size else 0, 1))
-    # titre de l'échelle de couleur ; l'infobulle montre toujours le %ASA absolu
-    cbar_title = "relatif (0–1)" if relative else "% ASA"
+    # Display normalization only: absolute ASA always uses the promised 0–100%.
+    zmax = 1.0 if relative else 100.0
+    st.markdown(_s1_colour_scale(relative), unsafe_allow_html=True)
+    st.caption("Pale yellow = zero; dark red = the top of the selected scale. "
+               "White = no value (or no positive cluster maximum in relative mode). "
+               "Hover values always report absolute buried ASA percentages.")
 
     # hauteurs de rangées proportionnelles au nombre de clusters + bande
     track = max(6, (nh + ne) * 0.08)
@@ -148,16 +201,21 @@ def _render_s1_global_plotly(data, relative, valid_clusters=None):
     # %ASA absolu affiché au survol (via customdata), même en mode relatif
     _ht = ("Cluster : %{y}<br>Position : %{x}"
            "<br>%ASA : %{customdata:.2f}<extra></extra>")
+    # Keep a compact native scale in PNG/SVG exports too, on the first heatmap.
+    colorbar = dict(title=dict(text="Relative (0–1)" if relative else "% ASA", side="top"),
+                    lenmode="pixels", len=180, y=1, yanchor="top",
+                    thickness=14, x=1.01, xanchor="left")
     if nh:
         fig.add_trace(go.Heatmap(
             z=hZ, x=full, y=homo, customdata=hE,
             colorscale="YlOrRd", zmin=0, zmax=zmax,
-            showscale=False, hoverongaps=False, hovertemplate=_ht), row=1, col=1)
+            colorbar=colorbar, showscale=True,
+            hoverongaps=False, hovertemplate=_ht), row=1, col=1)
     if ne:
         fig.add_trace(go.Heatmap(
             z=eZ, x=full, y=hetero, customdata=eE,
             colorscale="YlOrRd", zmin=0, zmax=zmax,
-            colorbar=dict(title=cbar_title, thickness=12, len=0.75, y=0.6),
+            colorbar=colorbar, showscale=not nh,
             hoverongaps=False, hovertemplate=_ht), row=2, col=1)
     fig.add_trace(go.Bar(
         x=full, y=cnt, marker=dict(
@@ -167,7 +225,7 @@ def _render_s1_global_plotly(data, relative, valid_clusters=None):
 
     fig.update_layout(
         height=max(540, (nh + ne) * 11 + 170), bargap=0,
-        margin=dict(l=120, r=4, t=28, b=44),
+        margin=dict(l=120, r=100, t=28, b=44),
         plot_bgcolor="white",   # trous (NaN) en blanc
         title=dict(text="Global S1 heatmap — HOMO (actin/actin) & "
                         "HETERO (actin/ABP), fair C70", font=dict(size=13)))
@@ -185,26 +243,12 @@ def _render_s1_global_plotly(data, relative, valid_clusters=None):
                        yref="paper", x=0, y=1.0, showarrow=False,
                        font=dict(size=11), xanchor="left")
     position_hover(fig)
-    _ev = st.plotly_chart(fig, use_container_width=True, key="s1g_hm",
-                          on_select="rerun", selection_mode="points")
-
-    # Clic sur une cellule -> sélectionne ce cluster dans sel_s1 (détail plus bas)
     _labels = set(homo) | set(hetero)
     if valid_clusters is not None:
         _labels &= set(valid_clusters)
-    try:
-        _pts = _ev["selection"]["points"]
-    except (KeyError, TypeError):
-        _pts = []
-    for _p in reversed(_pts):
-        _y = _p.get("y")
-        if _y in _labels:
-            if st.session_state.get("sel_s1") != _y:
-                st.session_state["sel_s1"] = _y
-                st.session_state["_scroll_to_s1"] = True
-                st.toast(f"Cluster {_y} selected — opening detail…")
-                st.rerun()
-            break
+    st.plotly_chart(fig, use_container_width=True, key="s1g_hm",
+                    on_select=lambda: _on_s1_global_selection(_labels),
+                    selection_mode="points")
 
 
 @st.cache_data(show_spinner=False)
@@ -317,18 +361,9 @@ def _render_s1_patch_plotly(detail, patch):
                       title_font=dict(size=10))
     # Clic sur une position → met à jour le sélecteur « Position canonical » ci-dessus.
     position_hover(fig1)
-    _ev1 = st.plotly_chart(fig1, use_container_width=True, key=f"s1prof_{patch}",
-                           on_select="rerun", selection_mode="points")
-    try:
-        _pts = (_ev1 or {}).get("selection", {}).get("points", [])
-    except Exception:
-        _pts = []
-    if _pts and _pts[0].get("x") is not None:
-        _cx = numbering.to_canon(int(round(float(_pts[0]["x"]))))
-        # ne relance que si la sélection change réellement (évite la boucle)
-        if _cx is not None and st.session_state.get(f"s1posdet_{patch}") != _cx:
-            st.session_state[f"_s1_click_{patch}"] = _cx
-            st.rerun()
+    st.plotly_chart(fig1, use_container_width=True, key=f"s1prof_{patch}",
+                    on_select=lambda: _on_s1_patch_selection(str(patch)),
+                    selection_mode="points")
 
     labels = [f"C70={r[0]} (n={r[1]}) — {r[2]}" for r in c70_rows]
     zmat = np.array([_exp(r[3]) for r in c70_rows])

@@ -11,6 +11,7 @@ from scientific_analysis import (load_variants,load_actin_scores,conservation_su
                                  interface_evidence,disease_associations,variant_footprint_summary,GENES,
                                  abp_position_asa,cross_gene_footprint_analysis,conflicting_variant_counts)
 from footprint_comparison import FILES,load_footprints
+from variant_heatmaps import presence_matrix,presence_figure,substitution_count_trace
 
 
 def signatures(paths):
@@ -128,23 +129,30 @@ def render_variants():
     categories=sorted(valid.classif_cat.dropna().unique())
     category=st.selectbox('Variant annotation to display',categories,index=categories.index('pathogenic'),key='hv_category')
     selected=valid[valid.classif_cat.eq(category)].drop_duplicates(['gene','position','aa_ref','aa_alt'])
-    st.caption('Heatmaps count distinct protein substitutions in the selected category. Categories can overlap '
-               'when different source records describe the same substitution. White = no record in this snapshot/category.')
+    st.caption('For one gene, each alternate-amino-acid/position cell is binary: blue = a recorded substitution; '
+               'light gray = no record in this snapshot and selected category. Colour does not grade pathogenicity '
+               'or severity. Categories can overlap when source records differ.')
     per=selected[selected.gene.eq(gene)]
-    matrix=pd.crosstab(per.aa_alt,per.position).reindex(index=list('ACDEFGHIKLMNPQRSTVWY'),columns=range(1,376),fill_value=0)
-    fig=go.Figure(go.Heatmap(z=matrix.values,x=matrix.columns,y=matrix.index,colorscale=[[0,'#ffffff'],[1,'#0072B2']],zmin=0,zmax=max(1,matrix.values.max()),hovertemplate='P60709 %{x} → %{y}<br>Substitutions: %{z}<extra></extra>'))
-    fig.update_layout(title=f'{gene}: {category}',xaxis_title='Aligned P60709 position',yaxis_title='Alternate amino acid',height=420)
-    position_hover(fig)
+    matrix=presence_matrix(per)
+    fig=presence_figure(matrix,gene,category)
+    position_hover(fig,unified=False)
     st.plotly_chart(fig,use_container_width=True,key='hv_gene_heatmap')
     counts=selected.groupby(['gene','position']).size().unstack(fill_value=0).reindex(index=sorted(GENES),columns=range(1,376),fill_value=0).fillna(0)
-    combined=counts.sum(axis=0).to_frame().T;combined.index=['All genes (gene-specific substitutions)']
+    combined=counts.sum(axis=0).to_frame().T;combined.index=['All genes (sum)']
     counts=pd.concat([counts,combined])
-    fig=make_subplots(rows=3,cols=1,shared_xaxes=True,row_heights=[.6,.2,.2],vertical_spacing=.08)
-    fig.add_trace(go.Heatmap(z=counts.values,x=counts.columns,y=counts.index,colorscale='Blues',colorbar=dict(title='Count',len=.45,y=.8)),row=1,col=1)
+    st.markdown('**Number of distinct substitutions per position**')
+    st.caption('Here the gradient represents a count: darker cells contain more different substitutions '
+               'in the selected category. The total row sums gene-specific substitutions, so the same change '
+               'in two genes contributes twice. This is neither a pathogenicity score nor an allele frequency.')
+    fig=make_subplots(rows=3,cols=1,shared_xaxes=True,row_heights=[.6,.2,.2],vertical_spacing=.08,
+                      subplot_titles=['Substitution counts by gene','P60709 model sensitivity','Observed ABP source names'])
+    fig.add_trace(substitution_count_trace(counts),row=1,col=1)
     fig.add_trace(go.Scatter(x=scores.position,y=scores.sensitivity,name='ProteoCast sensitivity',line=dict(color='#884EA0')),row=2,col=1)
     n=fp[fp.kind.eq('abp')&fp.asa.gt(0)].groupby('position')['group'].nunique().reindex(range(1,376),fill_value=0)
     fig.add_trace(go.Bar(x=n.index,y=n.values,name='ABP names',marker_color='#E69F00'),row=3,col=1)
-    fig.update_layout(height=630);fig.update_xaxes(title_text='P60709 position',row=3,col=1)
+    fig.update_layout(height=720,margin=dict(l=85,r=135,t=65,b=115),
+                      legend=dict(orientation='h',x=0,y=-.16,xanchor='left',yanchor='top'))
+    fig.update_xaxes(title_text='P60709 position',row=3,col=1)
     position_hover(fig)
     st.plotly_chart(fig,use_container_width=True,key='hv_combined')
     detail=valid[valid.gene.eq(gene)].copy()

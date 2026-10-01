@@ -10,6 +10,7 @@ Cinq vues sur la même table « passeport résidu » (residue_passport.build_pas
 """
 
 import os
+from functools import partial
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -189,6 +190,16 @@ def _build_pivot(pp, value="asa_max"):
     return piv
 
 
+def _select_residue_from_chart(chart_key, selector_key, positions):
+    """Apply a new Plotly selection before rendering, never replay an old click."""
+    event = st.session_state.get(chart_key, {})
+    points = event.get("selection", {}).get("points", [])
+    if points:
+        position = positions.get(points[-1].get("x"))
+        if position is not None:
+            st.session_state[selector_key] = position
+
+
 def render_residue_tab(pp):
     import plotly.graph_objects as go
     st.markdown(
@@ -199,6 +210,11 @@ def render_residue_tab(pp):
     xcanon = list(piv.columns)
     xlabels = [numbering.label(c) for c in xcanon]
     label2canon = dict(zip(xlabels, xcanon))
+    if not xcanon:
+        st.info("No residue contacts are available in the current dataset.")
+        return
+    if st.session_state.get("explo_res_selbox") not in xcanon:
+        st.session_state["explo_res_selbox"] = xcanon[0]
     z = piv.values.astype(float)
 
     fig = go.Figure(go.Heatmap(
@@ -216,31 +232,18 @@ def render_residue_tab(pp):
     )
 
     position_hover(fig)
-    ev = st.plotly_chart(fig, use_container_width=True, key="explo_hm",
-                         on_select="rerun", selection_mode="points")
+    st.plotly_chart(fig, use_container_width=True, key="explo_hm",
+                    on_select=partial(_select_residue_from_chart, "explo_hm",
+                                      "explo_res_selbox", label2canon),
+                    selection_mode="points")
 
-    # position sélectionnée : clic heatmap prioritaire, sinon selectbox
-    clicked = None
-    try:
-        pts = ev["selection"]["points"]
-        if pts:
-            clicked = label2canon.get(str(pts[-1]["x"]))
-    except (KeyError, TypeError, ValueError):
-        clicked = None
-
-    canon_opts = xcanon
-    if clicked is not None and clicked in canon_opts:
-        st.session_state["explo_res_sel"] = clicked
-    default_idx = (canon_opts.index(st.session_state["explo_res_sel"])
-                   if st.session_state.get("explo_res_sel") in canon_opts else 0)
     sel = st.selectbox(
-        numbering.SHORT_LABEL, canon_opts, index=default_idx,
+        numbering.SHORT_LABEL, xcanon,
         key="explo_res_selbox",
         format_func=lambda c: numbering.label(c)
         + (f"  ({_pos_row(pp, c)['actin_aa']})"
            if _pos_row(pp, c) is not None
            and pd.notna(_pos_row(pp, c).get('actin_aa')) else ""))
-    st.session_state["explo_res_sel"] = sel
 
     st.divider()
     render_residue_fiche(pp, sel)
@@ -905,6 +908,12 @@ def render_actin_overview(pp):
     xu = pos["uniprot"].astype(int).tolist()
     y = pos["n_abp"].fillna(0).astype(int).tolist()
     aa = pos["actin_aa"].fillna("?").tolist()
+    if not x:
+        st.info("No mapped actin positions are available in the current dataset.")
+        return
+    if st.session_state.get("actin_ov_selbox") not in x:
+        st.session_state["actin_ov_selbox"] = x[0]
+    sel = st.session_state["actin_ov_selbox"]
 
     col3d, colbar = st.columns([1, 2])
 
@@ -914,6 +923,8 @@ def render_actin_overview(pp):
             x=xu, y=y, customdata=aa,
             marker=dict(color=y, colorscale="YlOrRd",
                         colorbar=dict(title="n ABP", thickness=12)),
+            selected=dict(marker=dict(opacity=1)),
+            unselected=dict(marker=dict(opacity=1)),
             hovertemplate=("Residue %{customdata}%{x}"
                            "<br>ABPs in contact: %{y}<extra></extra>")))
         fig.update_layout(
@@ -921,23 +932,11 @@ def render_actin_overview(pp):
             xaxis=dict(title=numbering.AXIS_TITLE, dtick=25),
             yaxis=dict(title="number of ABPs in contact"))
         position_hover(fig)
-        ev = st.plotly_chart(fig, use_container_width=True, key="actin_ov",
-                             on_select="rerun", selection_mode="points")
-
-    # Clic -> on pilote le selectbox PAR SA CLÉ (sinon Streamlit ignore l'update)
-    clicked = None
-    try:
-        pts = ev["selection"]["points"]
-        if pts:
-            clicked = numbering.to_canon(pts[-1]["x"])
-    except (KeyError, TypeError, ValueError):
-        clicked = None
-    if clicked is not None and clicked in x:
-        st.session_state["actin_ov_selbox"] = clicked
-
-    sel = st.session_state.get("actin_ov_selbox")
-    if sel not in x:
-        sel = x[0]
+        fig.add_vline(x=numbering.to_uniprot(sel), line_color="#444444", line_width=1)
+        st.plotly_chart(fig, use_container_width=True, key="actin_ov",
+                        on_select=partial(_select_residue_from_chart, "actin_ov",
+                                          "actin_ov_selbox", dict(zip(xu, x))),
+                        selection_mode="points")
 
     # 3D à gauche, avec le résidu sélectionné surligné
     with col3d:
