@@ -63,3 +63,35 @@ La comparaison d’empreintes est testée avec le site 6685_17, un seuil d’ASA
 Voir [SCIENTIFIC_ANALYSES.md](SCIENTIFIC_ANALYSES.md) pour les méthodes, résultats et limites actuels. Ce lot remplace le statut antérieur « variants non intégrés » et régénère les figures S1 répertoriées dans `reports/s1_figures_all.json`. Les catégories biologiques et conclusions cliniques ne sont pas déduites automatiquement.
 
 Validation du lot complémentaire : **30 tests unitaires passent** ; les **8 parcours AppTest passent** sur le jeu de ce dépôt, y compris ACTG2/VUS, conflits et empreintes vides au seuil ASA de 100 %. Inspection visuelle du navigateur sur le projet complet et de la figure S1 6685_17. Audit d’identité des 1 623 entrées ClinVar achevé. Ces contrôles ne remplacent pas la revue biologique des conclusions par les auteurs.
+
+
+## Diagnostic ProteoCast (1 octobre 2026)
+
+Dans le projet complet, la campagne de 55 ABP s'est terminée sans nouveau fichier
+`4.query_ProteoCast.csv`. Les 55 fichiers d'alignement `2.ali*.fasta` téléchargés
+sont vides, alors que les fichiers de structure et RSA sont présents. Le manifeste
+contient aussi deux entrées sans UniProt, Cofilin et Cofilin (UNC-60B), non soumises.
+Les 49 résultats déjà présents dans le jeu public sont conservés.
+
+Un contrôle en lecture des liens MSA v6 renvoyés par l'API officielle AlphaFold pour
+P23528 et Q11176 a reçu HTTP 403 (AccessDenied) pour les deux alignements. Cela
+oriente vers un problème de récupération des MSA ; nous n'avons pas les journaux
+internes de ProteoCast permettant d'attribuer individuellement les 55 échecs à
+cette cause. La [documentation ProteoCast](https://proteocast.ijm.fr/documentation/)
+indique que ce mode récupère l'alignement depuis AlphaFold. L'accès aux alignements
+ou l'apport de MSA valides doit être résolu avant une nouvelle campagne.
+
+Les diagnostics montrent désormais les fichiers incomplets et les UniProt absents.
+Les prochains jobs enregistrent leur identifiant et la raison d'échec localement
+(`data/proteocast/abp/.job_status/`, ignoré par Git). Le bilan et le journal de la
+dernière campagne restent affichés dans la session après son rechargement. Les
+compteurs distinguent le total du lot, les calculs réussis, les échecs, les tâches
+en cours et celles en attente. Les erreurs de préparation et les codes de sortie
+ne sont plus présentés comme une réussite. Un fichier de scores vide ne compte
+pas comme un résultat disponible.
+
+Validation de cette correction : 7 tests unitaires ProteoCast réussis, 7 scénarios
+AppTest isolés avec soumissions simulées réussis, et démarrage sans exception des
+deux applications avec leurs données respectives. Aucun nouveau calcul externe
+n'a été soumis pendant ce diagnostic. Ces vérifications valident le suivi logiciel,
+pas le fonctionnement actuel du calcul sur le serveur distant.

@@ -23,11 +23,7 @@ _AA_ORDER = list("ACDEFGHIKLMNPQRSTVWY")
 def _find_proteocast_csv(slug):
     """Cherche le ProteoCast d'un ABP : data/proteocast/abp/<slug>.csv
     ou data/proteocast/abp/<slug>/4.query_ProteoCast.csv."""
-    for c in (_PROTEOCAST_ABP_DIR / f"{slug}.csv",
-              _PROTEOCAST_ABP_DIR / slug / "4.query_ProteoCast.csv"):
-        if c.exists():
-            return c
-    return None
+    return proteocast_view.result_file(_PROTEOCAST_ABP_DIR, slug)
 
 
 @st.cache_data(show_spinner=False)
@@ -222,6 +218,7 @@ def _render_abp_proteocast(sel_abp, abp_subunits):
         if _pcs is not None:
             _mm = _pcs[_pcs["abp_title"] == sel_abp]
             _uni = _mm.iloc[0]["uniprot"] if len(_mm) else None
+            _uni = None if pd.isna(_uni) else str(_uni).strip()
         if _uni:
             _doms = proteocast_view.fetch_domains(_uni)
         # Gros ABP multi-domaines : seule une région contacte l'actin. On zoome
@@ -258,8 +255,8 @@ def _render_abp_proteocast(sel_abp, abp_subunits):
         if _pcs is not None:
             _mm = _pcs[_pcs["abp_title"] == sel_abp]
             _uni = _mm.iloc[0]["uniprot"] if len(_mm) else None
-        # Échec DÉFINITIF déjà consigné (le serveur ProteoCast lui-même échoue :
-        # fusion chimère, protéine trop longue, MSA trop faible…).
+            _uni = None if pd.isna(_uni) else str(_uni).strip()
+        # Un échec antérieur ne signifie pas que cette protéine est incalculable.
         _failf = _PROTEOCAST_ABP_DIR / "_failed_slugs.txt"
         _permfail = ({l.strip() for l in _failf.read_text().splitlines() if l.strip()}
                      if _failf.exists() else set())
@@ -268,13 +265,14 @@ def _render_abp_proteocast(sel_abp, abp_subunits):
         # Version déployée (Cloud) : le calcul ne persiste pas → pas de bouton
         # compute/retry, juste le lien vers le site.
         _DEPLOY = _Path("data/.slim_deploy").exists()
+        _reason = proteocast_view.missing_result_reason(_PROTEOCAST_ABP_DIR, slug)
+        if not _uni:
+            _reason = 'No UniProt identifier in the manifest; not submitted.'
         if _is_failed:
             st.error(
-                f"**Not available — ProteoCast could not be computed for {sel_abp}.** "
-                "proteocast.ijm.fr returns an error for this protein (typically a "
-                "fusion chimera, a very large protein, or too weak an MSA).")
+                f"**ProteoCast result unavailable for {sel_abp}.** {_reason}")
         else:
-            st.info(f"**ProteoCast not computed yet** for **{sel_abp}**.")
+            st.info(f"**ProteoCast result unavailable for {sel_abp}.** {_reason}")
 
         if _DEPLOY:
             st.link_button("Open proteocast.ijm.fr",

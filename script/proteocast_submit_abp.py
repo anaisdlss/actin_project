@@ -27,12 +27,16 @@ from pathlib import Path
 
 import pandas as pd
 import requests
+try:
+    from .proteocast_results import result_file, record_job, missing_result_reason
+except ImportError:
+    from proteocast_results import result_file, record_job, missing_result_reason
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "data/proteocast/abp_inputs/manifest.csv"
 ABP_DIR = ROOT / "data/proteocast/abp"
-# ABP dont la soumission a échoué définitivement (UniProt invalide, fusion, etc.)
-# → on ne les re-soumet pas à chaque run (sauf --retry-failed).
+# Échecs de tentatives précédentes, sans présumer qu'ils sont définitifs.
+# On ne les re-soumet pas à chaque run (sauf --retry-failed).
 FAILED = ABP_DIR / "_failed_slugs.txt"
 
 
@@ -58,7 +62,7 @@ UA = "Mozilla/5.0"
 
 
 def is_done(slug):
-    return (ABP_DIR / slug / "4.query_ProteoCast.csv").exists()
+    return result_file(ABP_DIR, slug) is not None
 
 
 def submit(session, uniprot):
@@ -189,13 +193,15 @@ def main():
     ok = 0
     done_n = 0
     total = len(todo)
-    new_failed = set(failed)
+    new_failed = _load_failed()  # Preserve failures outside a limited retry batch.
     pending = list(todo)          # ABP pas encore soumis
     inflight = {}                 # slug -> {jid, uni, title, t0}
 
     def _fail(slug, msg, title=None):
         print(f"    {title or slug} : {msg} — marqué en échec", flush=True)
         new_failed.add(slug)
+        record_job(ABP_DIR, slug, 'failed', msg, title=title or slug)
+        _save_failed(new_failed)
 
     while pending or inflight:
         # 1) remplir la fenêtre : soumettre jusqu'à `window` jobs en vol
@@ -206,12 +212,16 @@ def main():
                 jid = submit(session, uni)
             except Exception as e:
                 _fail(slug, f"ERREUR soumission: {e}", title=r["abp_title"])
+                done_n += 1
                 continue
             if not jid:
                 _fail(slug, "pas de job_id", title=r["abp_title"])
+                done_n += 1
                 continue
             inflight[slug] = {"jid": jid, "uni": uni,
                               "title": r["abp_title"], "t0": time.time()}
+            record_job(ABP_DIR, slug, 'submitted', job_id=jid,
+                       uniprot=uni, title=r['abp_title'])
             print(f"[soumis {len(inflight)}/{window} en vol] "
                   f"{r['abp_title']} ({uni}) — job {jid}", flush=True)
             time.sleep(1)         # court délai entre deux soumissions
@@ -241,7 +251,7 @@ def main():
             del inflight[slug]
             done_n += 1
             if not _ok:
-                _fail(slug, f"{status} : {msg[:120]}", title=info["title"])
+                _fail(slug, f"{status} : {msg}", title=info["title"])
                 continue
             try:
                 got = download_extract(session, info["jid"], slug)
@@ -251,10 +261,12 @@ def main():
             if got:
                 ok += 1
                 new_failed.discard(slug)
+                record_job(ABP_DIR, slug, 'finished', title=info['title'])
+                _save_failed(new_failed)
                 print(f"[{done_n}/{total}] OK — {info['title']} "
                       f"-> data/proteocast/abp/{slug}/", flush=True)
             else:
-                _fail(slug, "ZIP téléchargé mais fichier clé absent",
+                _fail(slug, missing_result_reason(ABP_DIR, slug),
                       title=info["title"])
 
         # 3) patienter avant le prochain tour — SANS log par cycle : on n'affiche
@@ -266,7 +278,8 @@ def main():
 
     _save_failed(new_failed)
     print(f"\nterminé : {ok}/{total} ABP calculés")
+    return 0 if ok == total else 1
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

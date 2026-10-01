@@ -13,6 +13,7 @@ import re
 import urllib.request
 import pandas as pd
 import streamlit as st
+from proteocast_results import result_file, missing_result_reason, record_job
 
 _MANIFEST = "data/proteocast/abp_inputs/manifest.csv"
 _ABP_DIR = "data/proteocast/abp"
@@ -30,18 +31,25 @@ def _result_dir_or_csv(slug):
     return d if os.path.isdir(d) else None
 
 
-@st.cache_data(show_spinner=False)
-def load_status(_mtime):
+def load_status(mtime=None):
     """Table ABP : titre, uniprot, slug, statut (fait / à faire), fusion."""
     if not os.path.exists(_MANIFEST):
         return None
     m = pd.read_csv(_MANIFEST).sort_values("abp_title").reset_index(drop=True)
 
     def done(row):
-        p1 = os.path.join(_ABP_DIR, f"{row['slug']}.csv")
-        p2 = os.path.join(_ABP_DIR, row["slug"], "4.query_ProteoCast.csv")
-        return os.path.exists(p1) or os.path.exists(p2)
+        return result_file(_ABP_DIR, row['slug']) is not None
     m["fait"] = m.apply(done, axis=1)
+
+    def diagnostic(row):
+        if row['fait']:
+            return ''
+        uniprot = row.get('uniprot')
+        if pd.isna(uniprot) or not str(uniprot).strip():
+            return 'No UniProt identifier in the manifest; not submitted.'
+        return missing_result_reason(_ABP_DIR, row['slug'])
+
+    m['diagnostic'] = m.apply(diagnostic, axis=1)
     return m
 
 
@@ -56,25 +64,31 @@ def run_proteocast_job(uniprot, slug, log=None):
     def _say(t):
         if log:
             log(t)
+    def _failure(message):
+        record_job(_ABP_DIR, slug, 'failed', message, uniprot=uniprot)
+        return False, message
     sess = requests.Session()
     sess.headers.update({"User-Agent": pcs.UA})
     try:
         jid = pcs.submit(sess, uniprot)
     except Exception as e:
-        return False, f"Submission failed: {e}"
+        return _failure(f"Submission failed: {e}")
     if not jid:
-        return False, "No job_id returned by the server."
+        return _failure("No job_id returned by the server.")
+    record_job(_ABP_DIR, slug, 'submitted', job_id=jid, uniprot=uniprot)
     _say(f"Job {jid} submitted — computing on proteocast.ijm.fr…")
     status, msg = pcs.wait(sess, jid, on_stage=lambda s: _say(f"  {s}"))
     if status != "finished":
-        return False, f"Status “{status}”: {msg or 'no message'}"
+        return _failure(f"Status “{status}”: {msg or 'no message'}")
     _say("Computation finished — downloading the result folder…")
     try:
         ok = pcs.download_extract(sess, jid, slug)
     except Exception as e:
-        return False, f"Download failed: {e}"
-    return (ok, "ProteoCast fetched." if ok
-            else "ZIP downloaded but key file missing.")
+        return _failure(f"Download failed: {e}")
+    if not ok:
+        return _failure(missing_result_reason(_ABP_DIR, slug))
+    record_job(_ABP_DIR, slug, 'finished')
+    return True, "ProteoCast fetched."
 
 
 @st.cache_data(show_spinner=False)

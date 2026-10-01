@@ -134,44 +134,32 @@ if not DEPLOY_MODE:
         pipeline_ui.render()
 
 # ── ProteoCast (opt-in) — campagne de calcul pour TOUS les ABP ─────────────
-# Placé juste sous le téléchargement principal : c'est une campagne séparée du
-# Run/update (elle dure des heures ; 1 job à la fois ; reprenable). Les
-# résultats par ABP s'affichent ensuite dans la section « Per-ABP detail ».
 _pc_mt = os.path.getmtime("data/proteocast/abp_inputs/manifest.csv") \
     if os.path.exists("data/proteocast/abp_inputs/manifest.csv") else 0.0
 _pc_status = proteocast_view.load_status(_pc_mt)
-# Compteur LIVE (lu directement sur le disque à chaque run — pas le cache, qui
-# resterait figé tant que le manifest ne change pas) : « remaining » = ABP sans
-# résultat ET pas en échec définitif. Les ABP que ProteoCast ne SAIT PAS calculer
-# (trop grosses : Myosin/β-myosin ~1900 aa ; fusions ; MSA trop pauvre) sont
-# consignés dans _failed_slugs.txt → on les sort du « remaining » (sinon il ne
-# tomberait jamais à 0) et on les annonce à part.
-import glob as _glob
 _pc_all = set(_pc_status["slug"].astype(str)) if _pc_status is not None else set()
-_pc_done = {os.path.basename(os.path.dirname(_p))
-            for _p in _glob.glob("data/proteocast/abp/*/4.query_ProteoCast.csv")}
+_pc_done = (set(_pc_status.loc[_pc_status["fait"], "slug"].astype(str))
+            if _pc_status is not None else set())
 _pc_failf = "data/proteocast/abp/_failed_slugs.txt"
-_pc_permfail = ({l.strip() for l in open(_pc_failf) if l.strip()}
-                if os.path.exists(_pc_failf) else set())
-# « remaining » = tous les ABP sans résultat (lu LIVE sur le disque, pas le cache).
+_pc_previous_failed = ({l.strip() for l in open(_pc_failf) if l.strip()}
+                       if os.path.exists(_pc_failf) else set())
 _pc_missing = _pc_all - _pc_done
 _pc_miss = len(_pc_missing)
-# Parmi eux, ceux que ProteoCast ne SAIT PAS calculer (déjà en échec définitif :
-# trop grosses ~1900 aa, fusions, MSA trop pauvre) → signalés à part.
-_pc_uncomputable = len(_pc_missing & _pc_permfail)
+_pc_failed_missing = len(_pc_missing & _pc_previous_failed)
 with _sections["abp-conservation"]:
     if not DEPLOY_MODE:
         st.markdown("**ABP ProteoCast — compute the mutational landscape for all ABPs**")
         _pc_cap = ("Opt-in, separate from `Run / update` — computing **all** ABPs "
                    "can take **several hours** (one ABP at a time). "
-                   "Resumable: skips those already done.")
-        if _pc_uncomputable:
-            _pc_cap += (f"  \n_Of these, {_pc_uncomputable} can't be computed by ProteoCast "
-                        "(protein too large / fusion / weak MSA) — expected, they will "
-                        "keep failing._")
-        _pc_label = (f"Compute all missing ProteoCast — {_pc_miss} remaining" if _pc_miss
-                     else "Update ProteoCast (refresh + retry)")
-        # bouton rouge (comme le téléchargement) mais un peu plus transparent
+                   "Existing results are kept; only missing results are requested.")
+        if _pc_failed_missing:
+            _pc_cap += (f"  \n{_pc_failed_missing} missing results have failed before. "
+                        "A previous failure does not establish that the protein cannot "
+                        "be computed; consult the recorded reason before retrying.")
+        st.caption(_pc_cap)
+        _pc_label = (f"Compute missing ProteoCast — {_pc_miss} without results" if _pc_miss
+                     else "Update ProteoCast (refresh + retry)" if _pc_all
+                     else "Prepare manifest and compute missing ProteoCast")
         st.markdown(
             "<style>[class*='st-key-pc_run_all_missing'] button{"
             "background:rgba(224,82,82,0.75)!important;border-color:rgba(224,82,82,0.4)!important;"
@@ -181,77 +169,170 @@ with _sections["abp-conservation"]:
         _pc_go = st.button(_pc_label, key="pc_run_all_missing", type="primary")
     else:
         _pc_go = False
+    if _pc_status is not None and _pc_miss:
+        with st.expander("Missing ProteoCast results — diagnostics"):
+            st.caption("Last recorded job error or a check of the local result files.")
+            st.dataframe(
+                _pc_status.loc[~_pc_status["fait"], ["abp_title", "uniprot", "diagnostic"]]
+                .rename(columns={"abp_title": "ABP", "uniprot": "UniProt", "diagnostic": "Diagnostic"}),
+                hide_index=True, use_container_width=True)
     if _pc_go:
+        from datetime import datetime, timezone
+
+        _campaign = {
+            "started_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            "state": "running", "message": "Preparing the ABP manifest…",
+            "total": None, "done": [], "failures": [], "in_progress": {},
+            "returncode": None, "preparation_returncode": None, "log": "",
+        }
+        st.session_state["_pc_last_campaign"] = _campaign.copy()
         with st.status("Computing ProteoCast via proteocast.ijm.fr "
                        "(one ABP at a time)…", expanded=True) as _pcall:
             _pclog = st.empty()
-            _pclog.code("Preparing the ABP manifest…")
-            # 1) régénérer le manifest depuis abp_master (couvre les ABP actuels)
-            subprocess.run([sys.executable, "-m", "script.proteocast_prep_manifest"])
-            # 2) soumettre les manquants (1 à la fois, reprenable)
-            #    bufsize=1 + readline : sortie ligne-par-ligne EN DIRECT (sinon le
-            #    buffer de lecture anticipée retient tout par blocs → rien à l'écran).
-            # --retry-failed : on re-tente aussi les ABP déjà marqués en échec (le plus
-            # souvent des échecs transitoires : timeout serveur, MSA…) → sinon un clic
-            # sur « X remaining » ne ferait rien si ces X sont tous en échec.
-            _proc = subprocess.Popen(
-                [sys.executable, "-u", "script/proteocast_submit_abp.py",
-                 "--retry-failed", "--jobs", "1"],
-                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
+            _pcfailures = st.empty()
+            _pclog.code(_campaign["message"])
+            _log_lines = []
+            _board = {}
+            _done = set()
+            _failed = {}
+            _total = None
 
-            # Tableau de bord VIVANT : on n'affiche pas le log brut qui s'accumule,
-            # mais seulement l'étape ACTUELLE de chaque job (+ compteurs faits/échoués).
-            import re as _re
-            _board = {}            # titre ABP -> message d'étape en cours
-            _done, _failed = [], []
-            _total = [None]
-
-            def _pretty(_s):
-                _s = _s.strip().rstrip(".").strip()
-                return (_s[:1].upper() + _s[1:] + "…") if _s else "…"
-
-            def _render():
-                _rows = [f"**{len(_done)} done** · **{len(_failed)} failed**"
-                         + (f" · {_total[0]} to compute" if _total[0] else "")]
+            def _render_pc_campaign():
+                _waiting = (max(0, _total - len(_done) - len(_failed) - len(_board))
+                            if _total is not None else None)
+                _rows = [(f"**Batch total: {_total}** · " if _total is not None else "")
+                         + f"**{len(_done)} computed** · **{len(_failed)} failed** · "
+                         + f"**{len(_board)} in progress**"
+                         + (f" · **{_waiting} waiting**" if _waiting is not None else "")]
                 if _board:
-                    _rows.append(f"\n**In progress ({len(_board)})**")
                     _rows += [f"- **{_t}** — {_m}" for _t, _m in _board.items()]
-                elif _done or _failed:
-                    _rows.append("\nWaiting for the next submissions…")
                 _pclog.markdown("\n".join(_rows))
+                _failure_rows = [{"ABP": _title, "Failure reason": _reason}
+                                 for _title, _reason in _failed.items()]
+                if _failure_rows:
+                    _pcfailures.dataframe(pd.DataFrame(_failure_rows), hide_index=True,
+                                          use_container_width=True)
+                _campaign.update(total=_total, done=sorted(_done), failures=_failure_rows,
+                                 in_progress=dict(_board), log="\n".join(_log_lines))
+                st.session_state["_pc_last_campaign"] = _campaign.copy()
 
-            _render()
-            for _l in iter(_proc.stdout.readline, ""):
-                _l = _l.rstrip()
-                if not _l:
-                    continue
-                m = _re.match(r"^(\d+) ABP à soumettre", _l)
-                if m:
-                    _total[0] = int(m.group(1)); _render(); continue
-                m = _re.match(r"^\[soumis .*?\]\s+(.+?)\s+\([^)]*\)\s+—\s+job", _l)
-                if m:
-                    _board[m.group(1)] = "Submitted — waiting for first status…"
-                    _render(); continue
-                m = _re.match(r"^\[\d+/\d+\] OK — (.+?)\s+->", _l)
-                if m:
-                    _board.pop(m.group(1), None); _done.append(m.group(1))
-                    _render(); continue
-                if _l.endswith("marqué en échec"):
-                    m = _re.match(r"^\s+(.+?)\s+:\s+.*—\s+marqué en échec$", _l)
-                    if m:
-                        _board.pop(m.group(1), None); _failed.append(m.group(1))
-                        _render()
-                    continue
-                m = _re.match(r"^\s{4,}(.+?)\s+:\s+(.+)$", _l)
-                if m and m.group(1) in _board:
-                    _board[m.group(1)] = _pretty(m.group(2)); _render(); continue
-            _proc.wait()
-            _pclog.markdown(
-                f"**Finished** — {len(_done)} computed · {len(_failed)} failed"
-                + (f" (out of {_total[0]})" if _total[0] else ""))
-            _pcall.update(label="ProteoCast campaign finished.", state="complete")
+            # A failed preparation must not submit an old or incomplete manifest.
+            try:
+                _prep = subprocess.run(
+                    [sys.executable, "-m", "script.proteocast_prep_manifest"],
+                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+                _campaign["preparation_returncode"] = _prep.returncode
+                if _prep.stdout:
+                    _log_lines.append(_prep.stdout.rstrip())
+                _prep_ok = _prep.returncode == 0
+                if not _prep_ok:
+                    _campaign.update(state="error", message=(
+                        f"Manifest preparation failed (exit code {_prep.returncode}). "
+                        "No calculation was submitted. See the campaign log."))
+            except OSError as _exc:
+                _prep_ok = False
+                _log_lines.append(str(_exc))
+                _campaign.update(state="error", message=(
+                    "Manifest preparation could not start. No calculation was submitted."))
+
+            if _prep_ok:
+                try:
+                    _proc = subprocess.Popen(
+                        [sys.executable, "-u", "script/proteocast_submit_abp.py",
+                         "--retry-failed", "--jobs", "1"],
+                        stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                        text=True, bufsize=1)
+                except OSError as _exc:
+                    _log_lines.append(str(_exc))
+                    _campaign.update(state="error", message=(
+                        "The ProteoCast campaign could not start. See the campaign log."))
+                else:
+                    _render_pc_campaign()
+                    for _line in iter(_proc.stdout.readline, ""):
+                        _line = _line.rstrip()
+                        _log_lines.append(_line)
+                        _match = re.match(r"^(\d+) ABP à soumettre", _line)
+                        if _match:
+                            _total = int(_match.group(1))
+                        else:
+                            _match = re.match(
+                                r"^\[soumis .*?\]\s+(.+?)\s+\([^)]*\)\s+—\s+job", _line)
+                            if _match:
+                                _board[_match.group(1)] = "Submitted — waiting for first status…"
+                            else:
+                                _match = re.match(r"^\[\d+/\d+\] OK — (.+?)\s+->", _line)
+                                if _match:
+                                    _title = _match.group(1)
+                                    _board.pop(_title, None)
+                                    _failed.pop(_title, None)
+                                    _done.add(_title)
+                                else:
+                                    _match = re.match(
+                                        r"^\s+(.+?)\s+:\s+(.*?)\s+—\s+marqué en échec$", _line)
+                                    if _match:
+                                        _title, _reason = _match.groups()
+                                        _board.pop(_title, None)
+                                        _failed[_title] = _reason
+                                    else:
+                                        _match = re.match(r"^\s{4,}(.+?)\s+:\s+(.+)$", _line)
+                                        if _match and _match.group(1) in _board:
+                                            _board[_match.group(1)] = _match.group(2)
+                        _render_pc_campaign()
+                    _returncode = _proc.wait()
+                    _campaign["returncode"] = _returncode
+                    _incomplete = (_total is None or len(_done) + len(_failed) != _total
+                                   or bool(_board))
+                    if _failed and not _incomplete:
+                        _campaign.update(state="error", message=(
+                            f"Campaign finished with {len(_failed)} failed calculation(s). "
+                            "See the recorded reasons below."))
+                    elif _returncode != 0:
+                        _campaign.update(state="error", message=(
+                            f"ProteoCast campaign stopped with exit code {_returncode}. "
+                            "See the failure details and campaign log."))
+                    elif _incomplete:
+                        _campaign.update(state="error", message=(
+                            "The campaign ended without a complete result summary. "
+                            "Some jobs may still be running remotely; check the log before retrying."))
+                    else:
+                        _campaign.update(state="complete", message=(
+                            f"Campaign finished: {len(_done)} new result(s) downloaded."))
+            _campaign["finished_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+            _render_pc_campaign()
+            _pcall.update(label=_campaign["message"], state=_campaign["state"], expanded=True)
         st.cache_data.clear()
         st.rerun()
+
+    # Preserve the outcome across the final rerun, including diagnostics on failure.
+    _last_pc_campaign = st.session_state.get("_pc_last_campaign")
+    if not DEPLOY_MODE and _last_pc_campaign:
+        with st.expander("Latest ProteoCast campaign",
+                         expanded=_last_pc_campaign["state"] != "complete"):
+            _notice = st.success if _last_pc_campaign["state"] == "complete" else st.warning
+            _notice(_last_pc_campaign["message"])
+            _last_total = _last_pc_campaign["total"]
+            _last_done = len(_last_pc_campaign["done"])
+            _last_failed = len(_last_pc_campaign["failures"])
+            st.caption(
+                f"Started: {_last_pc_campaign['started_at']} · "
+                + (f"Batch total: {_last_total} · " if _last_total is not None else "")
+                + f"{_last_done} computed · {_last_failed} failed"
+                + (f" · {max(0, _last_total - _last_done - _last_failed)} without a final status"
+                   if _last_total is not None and _last_total > _last_done + _last_failed else ""))
+            if _last_pc_campaign["failures"]:
+                st.dataframe(pd.DataFrame(_last_pc_campaign["failures"]),
+                             hide_index=True, use_container_width=True)
+            if _last_pc_campaign["in_progress"]:
+                st.caption("Last observed remote statuses (not refreshed automatically):")
+                st.dataframe(pd.DataFrame([
+                    {"ABP": _title, "Last status": _status}
+                    for _title, _status in _last_pc_campaign["in_progress"].items()]),
+                    hide_index=True, use_container_width=True)
+            if _last_pc_campaign["log"]:
+                st.download_button("Download the latest ProteoCast campaign log",
+                                   data=_last_pc_campaign["log"],
+                                   file_name="proteocast_campaign.log", mime="text/plain",
+                                   key="pc_latest_campaign_log")
 
 with _sections["summary-tables"]:
     st.divider()
