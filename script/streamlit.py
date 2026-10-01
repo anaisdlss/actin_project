@@ -92,6 +92,10 @@ st.markdown(
 #    et ne garde que les RÉSEAUX (compétition + coopération).
 _FAST = os.environ.get("FAST", "") == "1"
 
+# One protein-type palette for both views of the selected PDB structure.
+_PDB_ACTIN_COLOR = "#E69F00"
+_PDB_ABP_COLOR = "#0072B2"
+
 st.title("Actin-actin and actin-ABP interaction analysis - PPI3D")
 
 # Téléchargement des données (projet local uniquement) : en tête de page, visible.
@@ -450,7 +454,7 @@ with _sections["summary-tables"]:
                         "id": chain_norm,
                         "label": chain_norm.split("_")[-1],
                         "title": str(nr["protein"]),
-                        "color": "#E69F00" if is_act else "#0072B2",
+                        "color": _PDB_ACTIN_COLOR if is_act else _PDB_ABP_COLOR,
                         "size": 15,
                     })
 
@@ -541,7 +545,7 @@ with _sections["summary-tables"]:
                     sel_inter = st.session_state.get("sel_inter")
                     sel_node = st.session_state.get("sel_node")
 
-                    # Mapping chaîne → type pour colorier orange/vert dans le viewer
+                    # Même code couleur par type de protéine que dans le réseau.
                     _chain_is_actin: dict[str, bool] = {}
                     if os.path.exists(pp_path):
                         _df_pp_3d = read_csv(pp_path)
@@ -552,10 +556,10 @@ with _sections["summary-tables"]:
                                 str(_nr["chain"])).split("_")[-1]
                             _chain_is_actin[_letter] = bool(_nr["is_actin"])
 
-                    # chain_colors : par défaut orange=actin / vert=ABP
+                    # chain_colors : par défaut orange=actin / bleu=ABP
                     # (appliqué même quand rien n'est sélectionné)
                     chain_colors = {
-                        _letter: ("#E67E22" if _is_actin else "#2ECC71")
+                        _letter: (_PDB_ACTIN_COLOR if _is_actin else _PDB_ABP_COLOR)
                         for _letter, _is_actin in _chain_is_actin.items()
                     }
 
@@ -570,7 +574,7 @@ with _sections["summary-tables"]:
                         }
                     elif sel_node:
                         # Cas 2 : nœud sélectionné — sélection en jaune,
-                        # autres : orange=actin, vert=ABP
+                        # autres : orange=actin, bleu=ABP
                         sel_letter = sel_node.split("_")[-1]
                         chain_colors = {}
                         for _letter, _is_actin in _chain_is_actin.items():
@@ -578,7 +582,7 @@ with _sections["summary-tables"]:
                                 chain_colors[_letter] = "#FFD700"
                             else:
                                 chain_colors[_letter] = (
-                                    "#E67E22" if _is_actin else "#2ECC71")
+                                    _PDB_ACTIN_COLOR if _is_actin else _PDB_ABP_COLOR)
 
                     # Résidus des chaînes voisines TOUCHÉS par la chaîne sélectionnée
                     # (jaune) → colorés en BLEU sur la surface.
@@ -611,7 +615,8 @@ with _sections["summary-tables"]:
                     pdb_data = _load_pdb_file(
                         pdb_file, mtime=os.path.getmtime(pdb_file))
 
-                    viewer_key = (selected_pdb, sel_inter, sel_node)
+                    viewer_key = (selected_pdb, sel_inter, sel_node,
+                                  _PDB_ACTIN_COLOR, _PDB_ABP_COLOR)
                     if st.session_state.get("viewer_key") != viewer_key:
                         import py3Dmol
                         view = py3Dmol.view(width=580, height=450)
