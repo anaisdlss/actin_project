@@ -1,0 +1,368 @@
+gene,pos,aa_ref,aa_alt,hgvsp,classification,classif_cat,maladies,review_status,clinvar_id
+ACTA1,71,Y,N,p.Y71N,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",4856633
+ACTA1,38,G,C,p.G38C,Likely pathogenic,likely_pathogenic,ACTA1-related disorder,"criteria provided, single submitter",4855875
+ACTA1,95,E,V,p.E95V,Likely pathogenic,likely_pathogenic,ACTA1-related disorder,"criteria provided, single submitter",4855064
+ACTA1,189,D,N,p.D189N,Uncertain significance,uncertain,ACTA1-related disorder,"criteria provided, single submitter",4854931
+ACTA1,87,I,F,p.I87F,Likely pathogenic,likely_pathogenic,"Congenital myopathy 2c, severe infantile, autosomal dominant","criteria provided, single submitter",4845245
+ACTA1,340,S,W,p.S340W,Uncertain significance,uncertain,,"criteria provided, single submitter",4823827
+ACTA1,363,E,A,p.E363A,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",4806471
+ACTA1,68,T,I,p.T68I,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",4746928
+ACTA1,353,T,N,p.T353N,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",4746556
+ACTA1,95,E,Q,p.E95Q,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",4745186
+ACTA1,169,E,A,p.E169A,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",4743976
+ACTA1,49,M,T,p.M49T,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",4740740
+ACTA1,3,D,E,p.D3E,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",4707010
+ACTA1,32,V,M,p.V32M,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",4701248
+ACTA1,183,A,T,p.A183T,Pathogenic,pathogenic,,"criteria provided, single submitter",4690201
+ACTA1,94,N,D,p.N94D,Likely pathogenic,likely_pathogenic,"Actin accumulation myopathy | Congenital myopathy 2c, severe infantile, autosomal dominant","criteria provided, single submitter",4687909
+ACTA1,309,P,A,p.P309A,Pathogenic,pathogenic,"Congenital myopathy 4A, autosomal dominant","criteria provided, single submitter",4685499
+ACTA1,28,A,G,p.A28G,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",4566113
+ACTA1,74,E,K,p.E74K,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",4534620
+ACTA1,163,H,R,p.H163R,Pathogenic,pathogenic,Alpha-actinopathy,"criteria provided, single submitter",4531395
+ACTA1,235,S,F,p.S235F,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",4529911
+ACTA1,93,Y,H,p.Y93H,Uncertain significance,uncertain,"Congenital myopathy 2b, severe infantile, autosomal recessive","criteria provided, single submitter",4293593
+ACTA1,354,F,G,p.F354G,Uncertain significance,uncertain,"Congenital myopathy 2c, severe infantile, autosomal dominant","criteria provided, single submitter",4291858
+ACTA1,273,S,W,p.S273W,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",4277420
+ACTA1,312,A,S,p.A312S,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",4220735
+ACTA1,133,A,S,p.A133S,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",4220725
+ACTA1,94,N,K,p.N94K,Pathogenic,pathogenic,,"criteria provided, single submitter",4083365
+ACTA1,218,L,Q,p.L218Q,Uncertain significance,uncertain,Actin accumulation myopathy,no assertion criteria provided,4081947
+ACTA1,326,T,N,p.T326N,Uncertain significance,uncertain,,"criteria provided, single submitter",4077826
+ACTA1,160,G,R,p.G160R,Uncertain significance,uncertain,,"criteria provided, single submitter",4077825
+ACTA1,265,Q,H,p.Q265H,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",4072248
+ACTA1,181,D,Y,p.D181Y,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",4056452
+ACTA1,132,P,S,p.P132S,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",4001377
+ACTA1,183,A,P,p.A183P,Uncertain significance,uncertain,Actin accumulation myopathy,no assertion criteria provided,3899924
+ACTA1,303,G,A,p.G303A,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",3825663
+ACTA1,25,G,E,p.G25E,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",3767885
+ACTA1,334,P,A,p.P334A,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",3719947
+ACTA1,208,R,C,p.R208C,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",3719227
+ACTA1,351,L,P,p.L351P,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",3717520
+ACTA1,217,K,R,p.K217R,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",3715316
+ACTA1,324,P,T,p.P324T,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",3705892
+ACTA1,249,V,F,p.V249F,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",3685819
+ACTA1,224,D,H,p.D224H,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",3664443
+ACTA1,313,D,H,p.D313H,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",3660252
+ACTA1,268,F,V,p.F268V,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",3654558
+ACTA1,297,A,V,p.A297V,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",3652987
+ACTA1,296,Y,C,p.Y296C,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",3652512
+ACTA1,59,E,V,p.E59V,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",3647934
+ACTA1,197,E,K,p.E197K,Likely pathogenic,likely_pathogenic,"Congenital myopathy 2c, severe infantile, autosomal dominant","criteria provided, single submitter",3600996
+ACTA1,76,G,D,p.G76D,Pathogenic,pathogenic,ACTA1-related disorder | Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",3572955
+ACTA1,47,V,E,p.V47E,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",3572944
+ACTA1,376,C,S,p.C376S,Pathogenic,pathogenic,Alpha-actinopathy,reviewed by expert panel,3390919
+ACTA1,131,V,A,p.V131A,Uncertain significance,uncertain,,"criteria provided, single submitter",3390001
+ACTA1,65,G,V,p.G65V,Likely pathogenic,likely_pathogenic,"Congenital myopathy 2c, severe infantile, autosomal dominant","criteria provided, single submitter",3382820
+ACTA1,119,E,K,p.E119K,Likely pathogenic,likely_pathogenic,"Actin accumulation myopathy | Congenital myopathy 4A, autosomal dominant | Progressive scapulohumeroperoneal distal myopathy","criteria provided, single submitter",3382549
+ACTA1,353,T,I,p.T353I,Likely pathogenic,likely_pathogenic,Alpha-actinopathy,"criteria provided, single submitter",3377005
+ACTA1,119,E,Q,p.E119Q,Likely pathogenic,likely_pathogenic,Alpha-actinopathy,"criteria provided, single submitter",3376570
+ACTA1,294,D,E,p.D294E,Uncertain significance,uncertain,,"criteria provided, single submitter",3364063
+ACTA1,83,D,N,p.D83N,Uncertain significance,uncertain,ACTA1-related disorder,no assertion criteria provided,3348631
+ACTA1,1,M,I,p.M1I,Uncertain significance,uncertain,"Congenital myopathy 2b, severe infantile, autosomal recessive","criteria provided, single submitter",3341326
+ACTA1,100,P,H,p.P100H,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",3341309
+ACTA1,4,E,G,p.E4G,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",3263489
+ACTA1,97,R,G,p.R97G,Likely pathogenic,likely_pathogenic,"Congenital myopathy 2c, severe infantile, autosomal dominant","criteria provided, single submitter",3252017
+ACTA1,247,G,W,p.G247W,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",3238763
+ACTA1,255,E,Q,p.E255Q,Likely pathogenic,likely_pathogenic,Nemaline myopathy,"criteria provided, single submitter",3233275
+ACTA1,116,A,P,p.A116P,Likely pathogenic,likely_pathogenic,Nemaline myopathy,"criteria provided, single submitter",3233260
+ACTA1,68,T,N,p.T68N,Pathogenic,pathogenic,Nemaline myopathy,"criteria provided, single submitter",3233255
+ACTA1,156,D,H,p.D156H,Pathogenic,pathogenic,Nemaline myopathy,"criteria provided, single submitter",3233251
+ACTA1,27,D,N,p.D27N,Pathogenic,pathogenic,Actin accumulation myopathy,no assertion criteria provided,3068434
+ACTA1,257,F,L,p.F257L,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",3065810
+ACTA1,153,I,L,p.I153L,Uncertain significance,uncertain,ACTA1-related disorder,no assertion criteria provided,3049360
+ACTA1,237,S,P,p.S237P,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",2989244
+ACTA1,339,Y,N,p.Y339N,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",2860475
+ACTA1,207,E,V,p.E207V,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",2849834
+ACTA1,340,S,A,p.S340A,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",2847225
+ACTA1,124,I,V,p.I124V,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",2822508
+ACTA1,345,G,S,p.G345S,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",2819676
+ACTA1,243,E,Q,p.E243Q,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",2805603
+ACTA1,318,E,D,p.E318D,Uncertain significance,uncertain,"Actin accumulation myopathy | Congenital myopathy 2c, severe infantile, autosomal dominant | Progressive scapulohumeroperoneal distal myopathy","criteria provided, single submitter",2775438
+ACTA1,23,F,L,p.F23L,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",2756194
+ACTA1,94,N,Y,p.N94Y,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",2755663
+ACTA1,143,S,F,p.S143F,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",2750098
+ACTA1,209,E,D,p.E209D,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",2744116
+ACTA1,113,N,S,p.N113S,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",2734106
+ACTA1,253,G,D,p.G253D,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",2734105
+ACTA1,270,G,S,p.G270S,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",2734104
+ACTA1,269,I,V,p.I269V,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",2715143
+ACTA1,22,G,C,p.G22C,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",2710175
+ACTA1,117,N,Y,p.N117Y,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",2706133
+ACTA1,279,T,N,p.T279N,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",2704889
+ACTA1,28,A,T,p.A28T,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",2697379
+ACTA1,95,E,G,p.E95G,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",2697196
+ACTA1,292,R,K,p.R292K,Uncertain significance,uncertain,,"criteria provided, single submitter",2690832
+ACTA1,216,E,K,p.E216K,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",2640061
+ACTA1,221,V,L,p.V221L,Uncertain significance,uncertain,Alpha-actinopathy,"criteria provided, single submitter",2637956
+ACTA1,19,V,M,p.V19M,Uncertain significance,uncertain,ACTA1-related disorder,"criteria provided, single submitter",2637032
+ACTA1,229,M,T,p.M229T,Pathogenic,pathogenic,Alpha-actinopathy,reviewed by expert panel,2635623
+ACTA1,214,I,V,p.I214V,Uncertain significance,uncertain,ACTA1-related disorder,"criteria provided, single submitter",2635438
+ACTA1,336,E,D,p.E336D,Likely pathogenic,likely_pathogenic,ACTA1-related disorder,"criteria provided, single submitter",2633560
+ACTA1,179,R,H,p.R179H,Likely pathogenic,likely_pathogenic,ACTA1-related disorder,"criteria provided, single submitter",2632575
+ACTA1,258,R,G,p.R258G,Likely pathogenic,likely_pathogenic,Congenital myopathy | Nemaline myopathy,"criteria provided, single submitter",2582826
+ACTA1,373,H,Q,p.H373Q,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",2582825
+ACTA1,375,K,N,p.K375N,Likely pathogenic,likely_pathogenic,Nemaline myopathy,"criteria provided, single submitter",2582824
+ACTA1,38,G,A,p.G38A,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",2582823
+ACTA1,209,E,D,p.E209D,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",2582820
+ACTA1,210,I,M,p.I210M,Uncertain significance,uncertain,Myopathy,"criteria provided, single submitter",2582819
+ACTA1,278,E,D,p.E278D,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",2582818
+ACTA1,297,A,T,p.A297T,Pathogenic,pathogenic,Myopathy,"criteria provided, single submitter",2582817
+ACTA1,369,P,H,p.P369H,Uncertain significance,uncertain,Myopathy,"criteria provided, single submitter",2582816
+ACTA1,48,G,A,p.G48A,Pathogenic/Likely pathogenic,likely_pathogenic,Actin accumulation myopathy | Alpha-actinopathy | Congenital myopathy with fiber type disproportion,"criteria provided, multiple submitters, no conflicts",2582815
+ACTA1,106,L,P,p.L106P,Likely pathogenic,likely_pathogenic,Neuromuscular disease,"criteria provided, single submitter",2582814
+ACTA1,109,E,D,p.E109D,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",2582813
+ACTA1,150,T,I,p.T150I,Uncertain significance,uncertain,Intranuclear rod myopathy,"criteria provided, single submitter",2582812
+ACTA1,147,S,Y,p.S147Y,Pathogenic/Likely pathogenic,likely_pathogenic,Fetal akinesia | Fetal akinesia deformation sequence,"criteria provided, single submitter",2582811
+ACTA1,147,S,F,p.S147F,Pathogenic/Likely pathogenic,likely_pathogenic,Actin accumulation myopathy | Neuromuscular disease,"criteria provided, multiple submitters, no conflicts",2582810
+ACTA1,148,G,V,p.G148V,Likely pathogenic,likely_pathogenic,Alpha-actinopathy,reviewed by expert panel,2582809
+ACTA1,285,M,R,p.M285R,Pathogenic/Likely pathogenic,likely_pathogenic,"Actin accumulation myopathy | Congenital myopathy 2c, severe infantile, autosomal dominant","criteria provided, multiple submitters, no conflicts",2582807
+ACTA1,290,D,N,p.D290N,Pathogenic,pathogenic,Nemaline myopathy,"criteria provided, single submitter",2582806
+ACTA1,309,P,S,p.P309S,Likely pathogenic,likely_pathogenic,Congenital myopathy,"criteria provided, single submitter",2582805
+ACTA1,30,R,K,p.R30K,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",2582804
+ACTA1,41,R,L,p.R41L,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",2582803
+ACTA1,80,N,T,p.N80T,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",2582802
+ACTA1,122,T,P,p.T122P,Likely pathogenic,likely_pathogenic,Myopathy,"criteria provided, single submitter",2582801
+ACTA1,169,E,G,p.E169G,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",2582800
+ACTA1,181,D,H,p.D181H,Pathogenic,pathogenic,Actin accumulation myopathy | Alpha-actinopathy,"criteria provided, multiple submitters, no conflicts",2582799
+ACTA1,186,D,H,p.D186H,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",2582798
+ACTA1,196,T,P,p.T196P,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",2582797
+ACTA1,241,S,R,p.S241R,Likely pathogenic,likely_pathogenic,Neuromuscular disease,"criteria provided, single submitter",2582796
+ACTA1,256,R,G,p.R256G,Likely pathogenic,likely_pathogenic,Congenital myopathy | Primary dilated cardiomyopathy,"criteria provided, single submitter",2582795
+ACTA1,294,D,Y,p.D294Y,Uncertain significance,uncertain,Congenital myopathy with fiber type disproportion,"criteria provided, single submitter",2582794
+ACTA1,59,E,K,p.E59K,Likely pathogenic,likely_pathogenic,Alpha-actinopathy,reviewed by expert panel,2582036
+ACTA1,354,F,S,p.F354S,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",2507259
+ACTA1,198,R,H,p.R198H,Pathogenic/Likely pathogenic,likely_pathogenic,"Actin accumulation myopathy | Congenital myopathy 2c, severe infantile, autosomal dominant","criteria provided, multiple submitters, no conflicts",2501790
+ACTA1,288,D,G,p.D288G,Pathogenic,pathogenic,"Congenital myopathy 2c, severe infantile, autosomal dominant",no assertion criteria provided,2443893
+ACTA1,376,C,Y,p.C376Y,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",2442103
+ACTA1,75,H,N,p.H75N,Uncertain significance,uncertain,,"criteria provided, single submitter",2438836
+ACTA1,352,S,F,p.S352F,Uncertain significance,uncertain,,"criteria provided, single submitter",2438835
+ACTA1,350,S,W,p.S350W,Uncertain significance,uncertain,,"criteria provided, single submitter",2438833
+ACTA1,94,N,H,p.N94H,Uncertain significance,uncertain,,"criteria provided, single submitter",2438832
+ACTA1,325,S,R,p.S325R,Uncertain significance,uncertain,,"criteria provided, single submitter",2438831
+ACTA1,276,I,P,p.I276P,Uncertain significance,uncertain,,"criteria provided, single submitter",2438830
+ACTA1,49,M,V,p.M49V,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",2434933
+ACTA1,258,R,C,p.R258C,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",2431197
+ACTA1,17,G,D,p.G17D,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",2203001
+ACTA1,136,V,A,p.V136A,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",2203000
+ACTA1,204,T,I,p.T204I,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",2202998
+ACTA1,104,P,H,p.P104H,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",2191787
+ACTA1,239,E,G,p.E239G,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",2148607
+ACTA1,164,N,S,p.N164S,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",2132822
+ACTA1,282,N,H,p.N282H,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",2128194
+ACTA1,72,P,L,p.P72L,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",2123531
+ACTA1,120,K,Q,p.K120Q,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",2112241
+ACTA1,344,G,S,p.G344S,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",2108675
+ACTA1,329,I,T,p.I329T,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",2075759
+ACTA1,337,R,H,p.R337H,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",2062106
+ACTA1,307,M,R,p.M307R,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",2054260
+ACTA1,251,T,S,p.T251S,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",2043450
+ACTA1,144,L,P,p.L144P,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",2030953
+ACTA1,359,I,V,p.I359V,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",2008339
+ACTA1,145,Y,F,p.Y145F,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",2005485
+ACTA1,246,D,E,p.D246E,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",1997342
+ACTA1,265,Q,R,p.Q265R,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",1992629
+ACTA1,1,M,I,p.M1I,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",1984506
+ACTA1,274,A,S,p.A274S,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",1950363
+ACTA1,137,A,D,p.A137D,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",1919298
+ACTA1,103,H,Y,p.H103Y,Uncertain significance,uncertain,Actin accumulation myopathy | Inborn genetic diseases,"criteria provided, multiple submitters, no conflicts",1810614
+ACTA1,266,P,L,p.P266L,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",1714078
+ACTA1,178,M,L,p.M178L,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",1713410
+ACTA1,343,I,V,p.I343V,Uncertain significance,uncertain,Progressive scapulohumeroperoneal distal myopathy,"criteria provided, single submitter",1709939
+ACTA1,150,T,S,p.T150S,Likely pathogenic,likely_pathogenic,Progressive scapulohumeroperoneal distal myopathy,"criteria provided, single submitter",1705499
+ACTA1,184,G,D,p.G184D,Pathogenic,pathogenic,,"criteria provided, single submitter",1704132
+ACTA1,197,E,D,p.E197D,Uncertain significance,uncertain,,"criteria provided, single submitter",1690664
+ACTA1,120,K,M,p.K120M,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",1685499
+ACTA1,254,N,K,p.N254K,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",1685233
+ACTA1,53,D,V,p.D53V,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",1679829
+ACTA1,195,L,V,p.L195V,Uncertain significance,uncertain,,"criteria provided, single submitter",1676539
+ACTA1,151,T,N,p.T151N,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",1522830
+ACTA1,267,S,C,p.S267C,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",1502214
+ACTA1,64,R,I,p.R64I,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",1489557
+ACTA1,14,N,Y,p.N14Y,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",1485789
+ACTA1,327,M,K,p.M327K,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",1479985
+ACTA1,116,A,T,p.A116T,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",1475492
+ACTA1,48,G,R,p.G48R,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",1474488
+ACTA1,233,A,N,p.A233N,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",1469898
+ACTA1,186,D,N,p.D186N,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",1467132
+ACTA1,35,S,C,p.S35C,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",1463480
+ACTA1,57,G,R,p.G57R,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",1457959
+ACTA1,282,N,K,p.N282K,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",1457951
+ACTA1,350,S,L,p.S350L,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",1457948
+ACTA1,235,S,Y,p.S235Y,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",1456499
+ACTA1,42,H,Y,p.H42Y,Pathogenic,pathogenic,Alpha-actinopathy,reviewed by expert panel,1452968
+ACTA1,170,G,D,p.G170D,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",1452454
+ACTA1,173,L,M,p.L173M,Uncertain significance,uncertain,Actin accumulation myopathy | Inborn genetic diseases,"criteria provided, multiple submitters, no conflicts",1450632
+ACTA1,196,T,I,p.T196I,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",1447156
+ACTA1,28,A,S,p.A28S,Uncertain significance,uncertain,Actin accumulation myopathy | Inborn genetic diseases,"criteria provided, multiple submitters, no conflicts",1428668
+ACTA1,142,L,R,p.L142R,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",1409843
+ACTA1,28,A,C,p.A28C,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",1404743
+ACTA1,44,G,V,p.G44V,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",1403375
+ACTA1,304,G,D,p.G304D,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",1366585
+ACTA1,208,R,S,p.R208S,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",1351681
+ACTA1,51,Q,H,p.Q51H,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",1349618
+ACTA1,308,Y,H,p.Y308H,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",1349349
+ACTA1,96,L,V,p.L96V,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",1348211
+ACTA1,140,A,D,p.A140D,Pathogenic/Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",1333773
+ACTA1,343,I,M,p.I343M,Uncertain significance,uncertain,,"criteria provided, single submitter",1306956
+ACTA1,344,G,R,p.G344R,Uncertain significance,uncertain,,"criteria provided, single submitter",1303501
+ACTA1,348,L,Q,p.L348Q,Likely pathogenic,likely_pathogenic,Alpha-actinopathy,reviewed by expert panel,1303122
+ACTA1,354,F,L,p.F354L,Likely pathogenic,likely_pathogenic,ACTA1-related myopathies,"criteria provided, single submitter",1301883
+ACTA1,250,I,T,p.I250T,Uncertain significance,uncertain,Alpha-actinopathy,reviewed by expert panel,1180752
+ACTA1,281,Y,H,p.Y281H,Pathogenic,pathogenic,ACTA1-related disorder | Actin accumulation myopathy | Alpha-actinopathy,"criteria provided, multiple submitters, no conflicts",1073998
+ACTA1,200,Y,C,p.Y200C,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",1072266
+ACTA1,76,G,R,p.G76R,Pathogenic/Likely pathogenic,likely_pathogenic,Actin accumulation myopathy | Non-immune hydrops fetalis,"criteria provided, multiple submitters, no conflicts",1065494
+ACTA1,38,G,D,p.G38D,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",1054689
+ACTA1,253,G,C,p.G253C,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",1052696
+ACTA1,116,A,S,p.A116S,Conflicting classifications of pathogenicity,conflicting,ACTA1-related myopathies | Actin accumulation myopathy,"criteria provided, conflicting classifications",1042202
+ACTA1,112,L,I,p.L112I,Uncertain significance,uncertain,Alpha-actinopathy,reviewed by expert panel,1034583
+ACTA1,134,M,V,p.M134V,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",1031830
+ACTA1,334,P,R,p.P334R,Pathogenic,pathogenic,Alpha-actinopathy,reviewed by expert panel,1031829
+ACTA1,1,M,V,p.M1V,Uncertain significance,uncertain,Congenital myopathy with fiber type disproportion,"criteria provided, single submitter",1029074
+ACTA1,172,A,V,p.A172V,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",1018348
+ACTA1,248,Q,K,p.Q248K,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",1015544
+ACTA1,27,D,Y,p.D27Y,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",985592
+ACTA1,72,P,R,p.P72R,Pathogenic/Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",974929
+ACTA1,116,A,V,p.A116V,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",974928
+ACTA1,20,K,N,p.K20N,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",958807
+ACTA1,322,L,V,p.L322V,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",956562
+ACTA1,40,P,R,p.P40R,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",954259
+ACTA1,289,I,N,p.I289N,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",952017
+ACTA1,17,G,S,p.G17S,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",951759
+ACTA1,13,D,E,p.D13E,Conflicting classifications of pathogenicity,conflicting,Actin accumulation myopathy,"criteria provided, conflicting classifications",951155
+ACTA1,198,R,C,p.R198C,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",948691
+ACTA1,94,N,K,p.N94K,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",948238
+ACTA1,66,I,S,p.I66S,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",947145
+ACTA1,108,T,I,p.T108I,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",945505
+ACTA1,79,T,I,p.T79I,Pathogenic/Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",941283
+ACTA1,21,A,T,p.A21T,Uncertain significance,uncertain,Actin accumulation myopathy | Progressive scapulohumeroperoneal distal myopathy,"criteria provided, multiple submitters, no conflicts",930499
+ACTA1,25,G,R,p.G25R,Uncertain significance,uncertain,,"criteria provided, single submitter",916379
+ACTA1,258,R,H,p.R258H,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",872627
+ACTA1,50,G,V,p.G50V,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",870972
+ACTA1,134,M,I,p.M134I,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",870613
+ACTA1,45,V,I,p.V45I,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",861879
+ACTA1,131,V,M,p.V131M,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",858634
+ACTA1,226,E,K,p.E226K,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",858299
+ACTA1,154,V,L,p.V154L,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",855039
+ACTA1,281,Y,C,p.Y281C,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",848617
+ACTA1,146,A,V,p.A146V,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",848385
+ACTA1,143,S,P,p.S143P,Pathogenic/Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",845550
+ACTA1,43,Q,R,p.Q43R,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",844831
+ACTA1,353,T,A,p.T353A,Conflicting classifications of pathogenicity,conflicting,Actin accumulation myopathy,"criteria provided, conflicting classifications",843807
+ACTA1,48,G,V,p.G48V,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",843072
+ACTA1,256,R,H,p.R256H,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",836935
+ACTA1,357,M,I,p.M357I,Uncertain significance,uncertain,Alpha-actinopathy,reviewed by expert panel,835545
+ACTA1,246,D,E,p.D246E,Conflicting classifications of pathogenicity,conflicting,Actin accumulation myopathy,"criteria provided, conflicting classifications",807360
+ACTA1,30,R,S,p.R30S,Uncertain significance,uncertain,,"criteria provided, single submitter",806378
+ACTA1,70,K,R,p.K70R,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",801632
+ACTA1,335,P,R,p.P335R,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",801631
+ACTA1,376,C,F,p.C376F,Likely pathogenic,likely_pathogenic,Alpha-actinopathy,reviewed by expert panel,801630
+ACTA1,247,G,R,p.G247R,Pathogenic,pathogenic,"Actin accumulation myopathy | Arthrogryposis multiplex congenita | Congenital myopathy 2b, severe infantile, autosomal recessive | Congenital myopathy 2c, severe infantile, autosomal dominant | Fetal akinesia deformation sequence 1 | Progressive scapulohumeroperoneal distal myopathy","criteria provided, multiple submitters, no conflicts",692271
+ACTA1,163,H,Q,p.H163Q,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",692085
+ACTA1,377,F,S,p.F377S,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",692083
+ACTA1,375,K,E,p.K375E,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",662251
+ACTA1,220,Y,F,p.Y220F,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",659561
+ACTA1,229,M,L,p.M229L,Likely pathogenic,likely_pathogenic,Alpha-actinopathy,reviewed by expert panel,657321
+ACTA1,322,L,Q,p.L322Q,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",655648
+ACTA1,95,E,K,p.E95K,Pathogenic,pathogenic,Alpha-actinopathy,reviewed by expert panel,654469
+ACTA1,274,A,E,p.A274E,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",654415
+ACTA1,41,R,G,p.R41G,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",654180
+ACTA1,206,A,V,p.A206V,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",650485
+ACTA1,186,D,G,p.D186G,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",644740
+ACTA1,238,L,P,p.L238P,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",642876
+ACTA1,13,D,N,p.D13N,Likely pathogenic,likely_pathogenic,Alpha-actinopathy,reviewed by expert panel,642798
+ACTA1,37,V,L,p.V37L,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",639455
+ACTA1,349,A,V,p.A349V,Uncertain significance,uncertain,,"criteria provided, single submitter",636712
+ACTA1,177,I,V,p.I177V,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",617579
+ACTA1,335,P,A,p.P335A,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",583243
+ACTA1,50,G,C,p.G50C,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",582273
+ACTA1,299,N,K,p.N299K,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",581898
+ACTA1,228,E,Q,p.E228Q,Pathogenic/Likely pathogenic,likely_pathogenic,ACTA1-related disorder | Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",579324
+ACTA1,268,F,S,p.F268S,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",577383
+ACTA1,335,P,L,p.P335L,Pathogenic/Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",575911
+ACTA1,344,G,D,p.G344D,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",573874
+ACTA1,256,R,C,p.R256C,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",567852
+ACTA1,140,A,G,p.A140G,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",565462
+ACTA1,28,A,P,p.A28P,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",560936
+ACTA1,180,L,P,p.L180P,Conflicting classifications of pathogenicity,conflicting,"Actin accumulation myopathy | Congenital myopathy 2c, severe infantile, autosomal dominant","criteria provided, conflicting classifications",560935
+ACTA1,165,V,L,p.V165L,Pathogenic,pathogenic,Progressive scapulohumeroperoneal distal myopathy,no assertion criteria provided,549690
+ACTA1,266,P,S,p.P266S,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",532773
+ACTA1,49,M,R,p.M49R,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",532772
+ACTA1,154,V,A,p.V154A,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",532771
+ACTA1,334,P,L,p.P334L,Likely pathogenic,likely_pathogenic,Alpha-actinopathy,reviewed by expert panel,532770
+ACTA1,150,T,S,p.T150S,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",532769
+ACTA1,73,I,S,p.I73S,Likely pathogenic,likely_pathogenic,Inborn genetic diseases,"criteria provided, single submitter",521671
+ACTA1,290,D,H,p.D290H,Pathogenic,pathogenic,Alpha-actinopathy,reviewed by expert panel,521371
+ACTA1,27,D,E,p.D27E,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",497440
+ACTA1,357,M,V,p.M357V,Uncertain significance,uncertain,,"criteria provided, single submitter",493064
+ACTA1,327,M,I,p.M327I,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",464138
+ACTA1,300,V,F,p.V300F,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",464136
+ACTA1,271,M,R,p.M271R,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",464135
+ACTA1,271,M,V,p.M271V,Conflicting classifications of pathogenicity,conflicting,"Actin accumulation myopathy | Congenital myopathy 4A, autosomal dominant | Progressive scapulohumeroperoneal distal myopathy","criteria provided, conflicting classifications",464134
+ACTA1,27,D,G,p.D27G,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",464133
+ACTA1,202,F,L,p.F202L,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",464127
+ACTA1,200,Y,N,p.Y200N,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",464126
+ACTA1,185,R,C,p.R185C,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",464125
+ACTA1,142,L,P,p.L142P,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, single submitter",464123
+ACTA1,134,M,I,p.M134I,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",464122
+ACTA1,130,N,S,p.N130S,Uncertain significance,uncertain,Actin accumulation myopathy | Alpha-actinopathy,"criteria provided, multiple submitters, no conflicts",464121
+ACTA1,66,I,N,p.I66N,Pathogenic/Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",464119
+ACTA1,370,S,Y,p.S370Y,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",464115
+ACTA1,37,V,L,p.V37L,Pathogenic,pathogenic,Alpha-actinopathy,reviewed by expert panel,464114
+ACTA1,352,S,P,p.S352P,Likely pathogenic,likely_pathogenic,Alpha-actinopathy,reviewed by expert panel,464113
+ACTA1,338,K,N,p.K338N,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",464112
+ACTA1,110,A,V,p.A110V,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",449751
+ACTA1,270,G,D,p.G270D,Pathogenic/Likely pathogenic,likely_pathogenic,"ACTA1-related myopathies | Nemaline myopathy 3, autosomal dominant or recessive | Neurodevelopmental delay","criteria provided, multiple submitters, no conflicts",434074
+ACTA1,274,A,V,p.A274V,Pathogenic/Likely pathogenic,likely_pathogenic,Actin accumulation myopathy | Nemaline myopathy 2 | Progressive scapulohumeroperoneal distal myopathy,"criteria provided, multiple submitters, no conflicts",432685
+ACTA1,369,P,L,p.P369L,Pathogenic,pathogenic,Alpha-actinopathy,reviewed by expert panel,431989
+ACTA1,44,G,C,p.G44C,Uncertain significance,uncertain,Alpha-actinopathy,reviewed by expert panel,430393
+ACTA1,73,I,V,p.I73V,Pathogenic,pathogenic,,"criteria provided, single submitter",430007
+ACTA1,174,P,R,p.P174R,Uncertain significance,uncertain,,"criteria provided, single submitter",429225
+ACTA1,58,D,N,p.D58N,Likely pathogenic,likely_pathogenic,Alpha-actinopathy,reviewed by expert panel,427190
+ACTA1,160,G,S,p.G160S,Pathogenic/Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",420707
+ACTA1,185,R,S,p.R185S,Pathogenic/Likely pathogenic,likely_pathogenic,"Actin accumulation myopathy | Congenital myopathy 2c, severe infantile, autosomal dominant","criteria provided, multiple submitters, no conflicts",420099
+ACTA1,192,M,T,p.M192T,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",389122
+ACTA1,46,M,T,p.M46T,Pathogenic/Likely pathogenic,likely_pathogenic,Actin accumulation myopathy | Progressive scapulohumeroperoneal distal myopathy,"criteria provided, multiple submitters, no conflicts",381642
+ACTA1,206,A,T,p.A206T,Pathogenic/Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",381641
+ACTA1,226,E,Q,p.E226Q,Pathogenic/Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",381640
+ACTA1,247,G,R,p.G247R,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",381639
+ACTA1,102,E,K,p.E102K,Likely pathogenic,likely_pathogenic,Alpha-actinopathy,reviewed by expert panel,377433
+ACTA1,174,P,L,p.P174L,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,no assertion criteria provided,374934
+ACTA1,335,P,Q,p.P335Q,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",373580
+ACTA1,371,I,M,p.I371M,Uncertain significance,uncertain,Actin accumulation myopathy | Congenital myopathy with fiber type disproportion | Familial restrictive cardiomyopathy,"criteria provided, single submitter",296051
+ACTA1,239,E,K,p.E239K,Conflicting classifications of pathogenicity,conflicting,,"criteria provided, conflicting classifications",289023
+ACTA1,148,G,R,p.G148R,Likely pathogenic,likely_pathogenic,Alpha-actinopathy,reviewed by expert panel,280732
+ACTA1,144,L,F,p.L144F,Pathogenic/Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",265457
+ACTA1,74,E,D,p.E74D,no classification for the single variant,other,,no classification for the single variant,242762
+ACTA1,75,H,Y,p.H75Y,no classification for the single variant,other,,no classification for the single variant,242693
+ACTA1,270,G,R,p.G270R,Pathogenic,pathogenic,Actin accumulation myopathy | Neuromuscular disease,"criteria provided, multiple submitters, no conflicts",228243
+ACTA1,114,P,L,p.P114L,Uncertain significance,uncertain,,"criteria provided, single submitter",224689
+ACTA1,308,Y,C,p.Y308C,Conflicting classifications of pathogenicity,conflicting,Actin accumulation myopathy,"criteria provided, conflicting classifications",224672
+ACTA1,154,V,L,p.V154L,Likely pathogenic,likely_pathogenic,Congenital muscular dystrophy with rigid spine,"criteria provided, single submitter",224666
+ACTA1,197,E,D,p.E197D,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",224412
+ACTA1,229,M,V,p.M229V,Pathogenic,pathogenic,Alpha-actinopathy,reviewed by expert panel,197716
+ACTA1,48,G,S,p.G48S,Pathogenic/Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",196311
+ACTA1,172,A,E,p.A172E,Pathogenic,pathogenic,"Nemaline myopathy 3, autosomal dominant or recessive","criteria provided, single submitter",128261
+ACTA1,138,I,N,p.I138N,Likely pathogenic,likely_pathogenic,"Nemaline myopathy 3, autosomal dominant or recessive","criteria provided, single submitter",128260
+ACTA1,358,W,C,p.W358C,Likely pathogenic,likely_pathogenic,Alpha-actinopathy,reviewed by expert panel,127188
+ACTA1,149,R,K,p.R149K,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",93550
+ACTA1,148,G,S,p.G148S,Likely pathogenic,likely_pathogenic,Alpha-actinopathy,reviewed by expert panel,93549
+ACTA1,45,V,F,p.V45F,Pathogenic/Likely pathogenic,likely_pathogenic,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",93548
+ACTA1,328,K,N,p.K328N,Pathogenic,pathogenic,"Congenital myopathy 2c, severe infantile, autosomal dominant",no assertion criteria provided,50318
+ACTA1,243,E,K,p.E243K,Uncertain significance,uncertain,Actin accumulation myopathy,"criteria provided, single submitter",42109
+ACTA1,207,E,D,p.E207D,not provided,other,Congenital myopathy with fiber type disproportion,no classification provided,42108
+ACTA1,6,E,K,p.E6K,Pathogenic/Likely pathogenic,likely_pathogenic,ACTA1-related disorder | Actin accumulation myopathy | Progressive scapulohumeroperoneal distal myopathy,"criteria provided, multiple submitters, no conflicts",42107
+ACTA1,48,G,D,p.G48D,Pathogenic,pathogenic,Actin accumulation myopathy | Congenital myopathy,"criteria provided, multiple submitters, no conflicts",42106
+ACTA1,165,V,M,p.V165M,Pathogenic,pathogenic,Alpha-actinopathy,reviewed by expert panel,18292
+ACTA1,334,P,S,p.P334S,Pathogenic,pathogenic,Alpha-actinopathy,reviewed by expert panel,18291
+ACTA1,223,L,P,p.L223P,Likely pathogenic,likely_pathogenic,Actin accumulation myopathy | Congenital myopathy with fiber type disproportion,"criteria provided, multiple submitters, no conflicts",18290
+ACTA1,294,D,V,p.D294V,Pathogenic,pathogenic,"Actin accumulation myopathy | Congenital myopathy 2c, severe infantile, autosomal dominant",no assertion criteria provided,18289
+ACTA1,336,E,A,p.E336A,Likely pathogenic,likely_pathogenic,Alpha-actinopathy,reviewed by expert panel,18288
+ACTA1,3,D,Y,p.D3Y,Pathogenic,pathogenic,Actin accumulation myopathy,no assertion criteria provided,18287
+ACTA1,138,I,M,p.I138M,Likely pathogenic,likely_pathogenic,Alpha-actinopathy,reviewed by expert panel,18286
+ACTA1,270,G,C,p.G270C,Pathogenic,pathogenic,Actin accumulation myopathy,no assertion criteria provided,18285
+ACTA1,359,I,L,p.I359L,Pathogenic,pathogenic,Alpha-actinopathy,reviewed by expert panel,18284
+ACTA1,261,E,V,p.E261V,Pathogenic/Likely pathogenic,likely_pathogenic,ACTA1-related myopathies | Actin accumulation myopathy | Congenital myopathy with fiber type disproportion | Progressive scapulohumeroperoneal distal myopathy,"criteria provided, multiple submitters, no conflicts",18283
+ACTA1,165,V,L,p.V165L,Pathogenic,pathogenic,"Actin accumulation myopathy | Congenital myopathy 2c, severe infantile, autosomal dominant",no assertion criteria provided,18282
+ACTA1,17,G,R,p.G17R,Pathogenic/Likely pathogenic,likely_pathogenic,"Actin accumulation myopathy | Congenital myopathy 2b, severe infantile, autosomal recessive | Congenital myopathy 2c, severe infantile, autosomal dominant | Progressive scapulohumeroperoneal distal myopathy","criteria provided, multiple submitters, no conflicts",18281
+ACTA1,117,N,S,p.N117S,Pathogenic,pathogenic,Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",18280
+ACTA1,96,L,P,p.L96P,Pathogenic/Likely pathogenic,likely_pathogenic,ACTA1-related myopathies | Actin accumulation myopathy,"criteria provided, multiple submitters, no conflicts",18279

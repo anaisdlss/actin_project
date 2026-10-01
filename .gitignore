@@ -58,3 +58,6 @@ script/compare.py
 
 # Build de déploiement Streamlit Cloud (repo séparé)
 deploy/
+
+# Local safety copies of regenerated figures
+reports/figure_backups/

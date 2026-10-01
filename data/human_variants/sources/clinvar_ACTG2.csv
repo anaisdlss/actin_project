@@ -1,0 +1,89 @@
+gene,pos,aa_ref,aa_alt,hgvsp,classification,classif_cat,maladies,review_status,clinvar_id
+ACTG2,142,S,C,p.S142C,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",4840941
+ACTG2,242,E,K,p.E242K,Likely benign,likely_benign,Megacystis-microcolon-intestinal hypoperistalsis syndrome 5,"criteria provided, single submitter",4795842
+ACTG2,74,H,Q,p.H74Q,Uncertain significance,uncertain,,"criteria provided, single submitter",4795716
+ACTG2,102,H,Y,p.H102Y,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",4566170
+ACTG2,135,V,I,p.V135I,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",4566161
+ACTG2,221,A,V,p.A221V,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",4566150
+ACTG2,149,T,K,p.T149K,Uncertain significance,uncertain,Visceral myopathy 1,"criteria provided, single submitter",4280730
+ACTG2,71,P,R,p.P71R,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",4221027
+ACTG2,330,I,M,p.I330M,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",4221016
+ACTG2,133,M,T,p.M133T,Uncertain significance,uncertain,,"criteria provided, single submitter",4077828
+ACTG2,78,T,N,p.T78N,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",4001683
+ACTG2,340,V,I,p.V340I,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",4001673
+ACTG2,193,I,F,p.I193F,Pathogenic,pathogenic,,"criteria provided, single submitter",3903193
+ACTG2,70,Y,C,p.Y70C,Likely pathogenic,likely_pathogenic,Visceral myopathy 1,no assertion criteria provided,3895473
+ACTG2,163,N,D,p.N163D,Uncertain significance,uncertain,Visceral myopathy 1,"criteria provided, single submitter",3779025
+ACTG2,88,H,R,p.H88R,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",3483599
+ACTG2,160,V,L,p.V160L,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",3483589
+ACTG2,143,L,F,p.L143F,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",3375767
+ACTG2,152,I,N,p.I152N,Uncertain significance,uncertain,,"criteria provided, single submitter",3369720
+ACTG2,265,P,S,p.P265S,Uncertain significance,uncertain,,"criteria provided, single submitter",3365426
+ACTG2,138,Q,R,p.Q138R,Pathogenic,pathogenic,Megacystis-microcolon-intestinal hypoperistalsis syndrome 5,"criteria provided, single submitter",3362785
+ACTG2,35,I,T,p.I35T,Uncertain significance,uncertain,Megacystis-microcolon-intestinal hypoperistalsis syndrome 5,"criteria provided, single submitter",3362480
+ACTG2,155,D,G,p.D155G,Likely pathogenic,likely_pathogenic,Megacystis-microcolon-intestinal hypoperistalsis syndrome 5,"criteria provided, single submitter",3256572
+ACTG2,253,N,S,p.N253S,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",3141279
+ACTG2,336,R,Q,p.R336Q,Likely pathogenic,likely_pathogenic,Megacystis-microcolon-intestinal hypoperistalsis syndrome 5,"criteria provided, single submitter",3065144
+ACTG2,10,V,M,p.V10M,Likely pathogenic,likely_pathogenic,Visceral myopathy 1,"criteria provided, single submitter",3062129
+ACTG2,178,R,S,p.R178S,Pathogenic,pathogenic,Megacystis-microcolon-intestinal hypoperistalsis syndrome 5 | Visceral myopathy 1,"criteria provided, single submitter",3024243
+ACTG2,329,K,Q,p.K329Q,Uncertain significance,uncertain,Megacystis-microcolon-intestinal hypoperistalsis syndrome 5,no assertion criteria provided,2664269
+ACTG2,120,M,T,p.M120T,Uncertain significance,uncertain,Megacystis-microcolon-intestinal hypoperistalsis syndrome 5,no assertion criteria provided,2664268
+ACTG2,356,M,I,p.M356I,Uncertain significance,uncertain,,"criteria provided, single submitter",2580447
+ACTG2,44,V,E,p.V44E,Uncertain significance,uncertain,Megacystis-microcolon-intestinal hypoperistalsis syndrome 5,"criteria provided, single submitter",2572538
+ACTG2,213,I,V,p.I213V,Uncertain significance,uncertain,,"criteria provided, single submitter",2571828
+ACTG2,46,V,A,p.V46A,Uncertain significance,uncertain,,"criteria provided, single submitter",2500567
+ACTG2,206,E,K,p.E206K,Uncertain significance,uncertain,,"criteria provided, single submitter",2438844
+ACTG2,116,N,K,p.N116K,Uncertain significance,uncertain,,"criteria provided, single submitter",2438843
+ACTG2,374,K,R,p.K374R,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",2259560
+ACTG2,234,S,F,p.S234F,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",2255405
+ACTG2,211,R,L,p.R211L,Pathogenic,pathogenic,Visceral myopathy 1,"criteria provided, single submitter",1804921
+ACTG2,198,G,V,p.G198V,Likely pathogenic,likely_pathogenic,Megacystis-microcolon-intestinal hypoperistalsis syndrome 5,"criteria provided, single submitter",1803217
+ACTG2,63,R,L,p.R63L,Likely pathogenic,likely_pathogenic,Megacystis-microcolon-intestinal hypoperistalsis syndrome 5,"criteria provided, multiple submitters, no conflicts",1709289
+ACTG2,205,A,V,p.A205V,Uncertain significance,uncertain,,"criteria provided, single submitter",1708919
+ACTG2,39,P,R,p.P39R,Likely pathogenic,likely_pathogenic,Megacystis-microcolon-intestinal hypoperistalsis syndrome 5,"criteria provided, single submitter",1703035
+ACTG2,147,G,R,p.G147R,Likely pathogenic,likely_pathogenic,"Megacystis, microcolon, hypoperistalsis syndrome","criteria provided, single submitter",1526399
+ACTG2,335,E,K,p.E335K,Uncertain significance,uncertain,,"criteria provided, single submitter",1432699
+ACTG2,197,R,T,p.R197T,Likely pathogenic,likely_pathogenic,Visceral myopathy 1,"criteria provided, single submitter",1339551
+ACTG2,327,K,N,p.K327N,Uncertain significance,uncertain,Intestinal pseudo-obstruction,"criteria provided, single submitter",1339480
+ACTG2,60,Q,E,p.Q60E,Uncertain significance,uncertain,Visceral myopathy 1,"criteria provided, single submitter",1333874
+ACTG2,210,V,A,p.V210A,Uncertain significance,uncertain,,"criteria provided, single submitter",1307890
+ACTG2,346,I,T,p.I346T,Uncertain significance,uncertain,,"criteria provided, single submitter",1307098
+ACTG2,271,E,K,p.E271K,Uncertain significance,uncertain,,"criteria provided, single submitter",1307078
+ACTG2,148,R,C,p.R148C,Likely pathogenic,likely_pathogenic,Intestinal obstruction | Visceral myopathy 1,"criteria provided, multiple submitters, no conflicts",1177291
+ACTG2,323,P,L,p.P323L,Likely pathogenic,likely_pathogenic,Chronic intestinal pseudoobstruction,"criteria provided, single submitter",1047916
+ACTG2,344,G,A,p.G344A,Uncertain significance,uncertain,Visceral myopathy 1,"criteria provided, single submitter",1032761
+ACTG2,205,A,D,p.A205D,Uncertain significance,uncertain,Visceral myopathy 1,"criteria provided, single submitter",992909
+ACTG2,336,R,W,p.R336W,Uncertain significance,uncertain,Visceral myopathy 1,no assertion criteria provided,973103
+ACTG2,196,E,D,p.E196D,Pathogenic/Likely pathogenic,likely_pathogenic,Visceral myopathy 1,"criteria provided, multiple submitters, no conflicts",973102
+ACTG2,149,T,R,p.T149R,Uncertain significance,uncertain,Visceral myopathy 1,no assertion criteria provided,973101
+ACTG2,41,H,Q,p.H41Q,Uncertain significance,uncertain,Visceral myopathy 1,no assertion criteria provided,973100
+ACTG2,116,N,K,p.N116K,Likely pathogenic,likely_pathogenic,Visceral myopathy 1,"criteria provided, single submitter",807365
+ACTG2,63,R,Q,p.R63Q,Pathogenic,pathogenic,Visceral myopathy 1,"criteria provided, single submitter",694269
+ACTG2,39,P,L,p.P39L,Pathogenic,pathogenic,Visceral myopathy 1,"criteria provided, single submitter",694268
+ACTG2,160,V,I,p.V160I,not provided,other,ACTG2-related disorder,no classification provided,684544
+ACTG2,113,P,A,p.P113A,Likely pathogenic,likely_pathogenic,Visceral myopathy 1,"criteria provided, single submitter",666312
+ACTG2,61,S,R,p.S61R,Uncertain significance,uncertain,,no assertion criteria provided,591920
+ACTG2,23,A,T,p.A23T,Uncertain significance,uncertain,Visceral myopathy 1,"criteria provided, single submitter",495146
+ACTG2,211,R,Q,p.R211Q,Pathogenic/Likely pathogenic,likely_pathogenic,Visceral myopathy 1,"criteria provided, multiple submitters, no conflicts",495145
+ACTG2,345,S,C,p.S345C,Uncertain significance,uncertain,,"criteria provided, single submitter",451698
+ACTG2,196,E,D,p.E196D,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",427095
+ACTG2,73,E,Q,p.E73Q,Uncertain significance,uncertain,,"criteria provided, single submitter",387322
+ACTG2,116,N,S,p.N116S,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",384793
+ACTG2,189,Y,H,p.Y189H,Uncertain significance,uncertain,,"criteria provided, single submitter",379898
+ACTG2,195,T,I,p.T195I,Conflicting classifications of pathogenicity,conflicting,ACTG2-related disorder,"criteria provided, conflicting classifications",379697
+ACTG2,205,A,T,p.A205T,Pathogenic,pathogenic,Visceral myopathy 1,"criteria provided, multiple submitters, no conflicts",369682
+ACTG2,198,G,D,p.G198D,Pathogenic,pathogenic,Visceral myopathy 1,"criteria provided, multiple submitters, no conflicts",218312
+ACTG2,63,R,G,p.R63G,Pathogenic,pathogenic,Visceral myopathy 1,"criteria provided, multiple submitters, no conflicts",218310
+ACTG2,45,M,T,p.M45T,Pathogenic,pathogenic,Visceral myopathy 1,"criteria provided, single submitter",218309
+ACTG2,38,R,H,p.R38H,Pathogenic,pathogenic,Chronic intestinal pseudoobstruction,no assertion criteria provided,217521
+ACTG2,257,R,H,p.R257H,Pathogenic,pathogenic,Inborn genetic diseases | Visceral myopathy 1,"criteria provided, multiple submitters, no conflicts",208792
+ACTG2,148,R,L,p.R148L,Pathogenic/Likely pathogenic,likely_pathogenic,Visceral myopathy 1,no assertion criteria provided,180620
+ACTG2,269,G,E,p.G269E,Pathogenic,pathogenic,Visceral myopathy 1,no assertion criteria provided,156554
+ACTG2,134,Y,N,p.Y134N,Pathogenic/Likely pathogenic,likely_pathogenic,Megacystis-microcolon-intestinal hypoperistalsis syndrome 5 | Visceral myopathy 1,"criteria provided, multiple submitters, no conflicts",132805
+ACTG2,257,R,C,p.R257C,Pathogenic,pathogenic,"Inborn genetic diseases | Megacystis-microcolon-intestinal hypoperistalsis syndrome 5 | Visceral myopathy 1 | Visceral neuropathy, familial, 3, autosomal dominant","criteria provided, multiple submitters, no conflicts",132803
+ACTG2,40,R,H,p.R40H,Pathogenic/Likely pathogenic,likely_pathogenic,"Constipation | Megacystis-microcolon-intestinal hypoperistalsis syndrome 5 | Visceral myopathy 1 | Visceral neuropathy, familial, 3, autosomal dominant","criteria provided, multiple submitters, no conflicts",132802
+ACTG2,178,R,H,p.R178H,Pathogenic,pathogenic,Fetal anomalies with a likely genetic cause | Inborn genetic diseases | Megacystis-microcolon-intestinal hypoperistalsis syndrome 5 | Visceral myopathy 1,"criteria provided, multiple submitters, no conflicts",132801
+ACTG2,178,R,C,p.R178C,Pathogenic,pathogenic,Megacystis-microcolon-intestinal hypoperistalsis syndrome 5 | Visceral myopathy 1,"criteria provided, multiple submitters, no conflicts",132800
+ACTG2,40,R,C,p.R40C,Pathogenic/Likely pathogenic,likely_pathogenic,Visceral myopathy 1,"criteria provided, multiple submitters, no conflicts",132799
+ACTG2,178,R,L,p.R178L,Pathogenic,pathogenic,Inborn genetic diseases,"criteria provided, multiple submitters, no conflicts",132798
+ACTG2,148,R,S,p.R148S,Pathogenic,pathogenic,Visceral myopathy 1,"criteria provided, single submitter",132797

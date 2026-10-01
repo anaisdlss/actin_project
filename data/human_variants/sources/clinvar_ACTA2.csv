@@ -1,0 +1,330 @@
+gene,pos,aa_ref,aa_alt,hgvsp,classification,classif_cat,maladies,review_status,clinvar_id
+ACTA2,203,V,L,p.V203L,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",4849734
+ACTA2,323,A,E,p.A323E,Uncertain significance,uncertain,,"criteria provided, single submitter",4848131
+ACTA2,115,K,Q,p.K115Q,Uncertain significance,uncertain,,"criteria provided, single submitter",4847771
+ACTA2,273,S,F,p.S273F,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",4842610
+ACTA2,53,D,E,p.D53E,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",4804634
+ACTA2,45,V,L,p.V45L,Pathogenic,pathogenic,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",4802635
+ACTA2,334,P,T,p.P334T,Uncertain significance,uncertain,,"criteria provided, single submitter",4795650
+ACTA2,374,R,G,p.R374G,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",4771581
+ACTA2,224,D,E,p.D224E,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",4762230
+ACTA2,238,L,I,p.L238I,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",4758213
+ACTA2,31,A,T,p.A31T,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",4757516
+ACTA2,93,Y,D,p.Y93D,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",4757515
+ACTA2,231,T,I,p.T231I,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",4756232
+ACTA2,93,Y,H,p.Y93H,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",4745395
+ACTA2,140,A,P,p.A140P,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",4743039
+ACTA2,311,I,T,p.I311T,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",4741927
+ACTA2,165,V,D,p.V165D,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",4739012
+ACTA2,58,D,E,p.D58E,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",4707227
+ACTA2,113,N,Y,p.N113Y,Uncertain significance,uncertain,,"criteria provided, single submitter",4685878
+ACTA2,327,M,L,p.M327L,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",4635332
+ACTA2,376,C,R,p.C376R,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",4635331
+ACTA2,110,A,V,p.A110V,Uncertain significance,uncertain,,"criteria provided, single submitter",4536430
+ACTA2,203,V,F,p.V203F,,other,,,4365791
+ACTA2,27,D,Y,p.D27Y,Pathogenic,pathogenic,Marfan syndrome,"criteria provided, single submitter",4279100
+ACTA2,219,C,S,p.C219S,Uncertain significance,uncertain,,"criteria provided, single submitter",4278836
+ACTA2,334,P,L,p.P334L,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",4220853
+ACTA2,224,D,H,p.D224H,Uncertain significance,uncertain,,"criteria provided, single submitter",4072625
+ACTA2,99,A,V,p.A99V,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",4001476
+ACTA2,342,W,S,p.W342S,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",4001468
+ACTA2,306,T,I,p.T306I,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",4001459
+ACTA2,294,D,V,p.D294V,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",4001441
+ACTA2,279,T,A,p.T279A,Uncertain significance,uncertain,,"criteria provided, single submitter",3773937
+ACTA2,359,I,N,p.I359N,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",3721819
+ACTA2,45,V,L,p.V45L,Pathogenic,pathogenic,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",3720953
+ACTA2,160,G,D,p.G160D,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",3720952
+ACTA2,207,E,G,p.E207G,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",3720751
+ACTA2,244,L,V,p.L244V,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",3720036
+ACTA2,265,Q,R,p.Q265R,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",3715526
+ACTA2,105,T,I,p.T105I,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",3705530
+ACTA2,14,N,S,p.N14S,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",3665544
+ACTA2,197,E,Q,p.E197Q,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",3663025
+ACTA2,276,I,T,p.I276T,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",3658884
+ACTA2,86,K,N,p.K86N,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",3655065
+ACTA2,38,G,I,p.G38I,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",3650797
+ACTA2,298,N,I,p.N298I,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",3647654
+ACTA2,35,S,P,p.S35P,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",3643782
+ACTA2,75,H,Q,p.H75Q,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",3633441
+ACTA2,214,I,L,p.I214L,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",3621388
+ACTA2,79,T,I,p.T79I,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",3619322
+ACTA2,7,S,G,p.S7G,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",3618007
+ACTA2,34,P,L,p.P34L,Uncertain significance,uncertain,,"criteria provided, single submitter",3573738
+ACTA2,6,T,N,p.T6N,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",3513101
+ACTA2,18,L,P,p.L18P,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",3483255
+ACTA2,26,D,Y,p.D26Y,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",3483225
+ACTA2,321,A,T,p.A321T,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",3386935
+ACTA2,130,N,H,p.N130H,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",3386309
+ACTA2,150,T,K,p.T150K,Uncertain significance,uncertain,,"criteria provided, single submitter",3384648
+ACTA2,160,G,V,p.G160V,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Thoracic aortic aneurysm or dissection","criteria provided, multiple submitters, no conflicts",3374753
+ACTA2,289,I,T,p.I289T,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, multiple submitters, no conflicts",3369824
+ACTA2,292,R,S,p.R292S,Uncertain significance,uncertain,,"criteria provided, single submitter",3369112
+ACTA2,4,I,M,p.I4M,Uncertain significance,uncertain,Autoimmune lymphoproliferative syndrome type 1,"criteria provided, single submitter",3351821
+ACTA2,117,N,T,p.N117T,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",3338881
+ACTA2,358,W,R,p.W358R,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",3263618
+ACTA2,225,F,L,p.F225L,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",3263607
+ACTA2,12,C,Y,p.C12Y,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",3263596
+ACTA2,49,M,I,p.M49I,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",3263565
+ACTA2,48,G,R,p.G48R,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",3263535
+ACTA2,159,D,H,p.D159H,Uncertain significance,uncertain,,"criteria provided, single submitter",3251167
+ACTA2,229,M,I,p.M229I,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",3221763
+ACTA2,62,S,T,p.S62T,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",3075545
+ACTA2,213,D,G,p.D213G,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",3075542
+ACTA2,291,I,N,p.I291N,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",3075539
+ACTA2,315,M,I,p.M315I,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",3075538
+ACTA2,323,A,V,p.A323V,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, multiple submitters, no conflicts",3075536
+ACTA2,326,T,A,p.T326A,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",3075535
+ACTA2,372,V,A,p.V372A,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",3075533
+ACTA2,365,D,E,p.D365E,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",3074151
+ACTA2,335,P,L,p.P335L,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",3073497
+ACTA2,365,D,N,p.D365N,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",3073458
+ACTA2,274,A,V,p.A274V,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",3072721
+ACTA2,335,P,T,p.P335T,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, multiple submitters, no conflicts",3072594
+ACTA2,291,I,V,p.I291V,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",3071963
+ACTA2,30,R,K,p.R30K,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",3071908
+ACTA2,155,L,M,p.L155M,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",3071479
+ACTA2,28,A,D,p.A28D,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",3071301
+ACTA2,243,E,G,p.E243G,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",3070650
+ACTA2,57,G,S,p.G57S,Uncertain significance,uncertain,,"criteria provided, single submitter",3026861
+ACTA2,42,H,Y,p.H42Y,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",3021067
+ACTA2,7,S,N,p.S7N,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",3013379
+ACTA2,183,A,G,p.A183G,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",2995217
+ACTA2,318,E,K,p.E318K,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",2972665
+ACTA2,50,G,R,p.G50R,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",2892457
+ACTA2,307,M,V,p.M307V,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",2888842
+ACTA2,161,V,I,p.V161I,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",2880030
+ACTA2,353,T,I,p.T353I,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",2865935
+ACTA2,97,R,P,p.R97P,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",2865246
+ACTA2,370,S,Y,p.S370Y,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",2857913
+ACTA2,295,L,I,p.L295I,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",2832896
+ACTA2,237,S,Y,p.S237Y,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",2818211
+ACTA2,5,E,K,p.E5K,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, multiple submitters, no conflicts",2774847
+ACTA2,56,V,M,p.V56M,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, multiple submitters, no conflicts",2774787
+ACTA2,305,T,I,p.T305I,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",2772057
+ACTA2,205,T,A,p.T205A,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",2767190
+ACTA2,368,G,W,p.G368W,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",2764674
+ACTA2,306,T,N,p.T306N,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",2763903
+ACTA2,156,D,H,p.D156H,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",2756936
+ACTA2,304,G,S,p.G304S,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",2735445
+ACTA2,19,C,S,p.C19S,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",2717812
+ACTA2,330,K,T,p.K330T,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",2705209
+ACTA2,97,R,H,p.R97H,Uncertain significance,uncertain,Moyamoya disease 5,"criteria provided, multiple submitters, no conflicts",2672253
+ACTA2,196,T,S,p.T196S,Uncertain significance,uncertain,,"criteria provided, single submitter",2640667
+ACTA2,295,L,V,p.L295V,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",2624663
+ACTA2,48,G,E,p.G48E,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",2585754
+ACTA2,21,A,S,p.A21S,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",2585753
+ACTA2,92,F,L,p.F92L,Uncertain significance,uncertain,,"criteria provided, single submitter",2581210
+ACTA2,219,C,R,p.C219R,Pathogenic,pathogenic,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",2575106
+ACTA2,73,I,T,p.I73T,Conflicting classifications of pathogenicity,conflicting,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, conflicting classifications",2575105
+ACTA2,216,E,D,p.E216D,Conflicting classifications of pathogenicity,conflicting,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, conflicting classifications",2575103
+ACTA2,240,K,N,p.K240N,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, multiple submitters, no conflicts",2573657
+ACTA2,218,L,R,p.L218R,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",2565243
+ACTA2,337,R,H,p.R337H,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",2565241
+ACTA2,121,M,T,p.M121T,Uncertain significance,uncertain,,"criteria provided, single submitter",2500689
+ACTA2,226,E,A,p.E226A,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",2497611
+ACTA2,70,K,N,p.K70N,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",2450527
+ACTA2,230,A,T,p.A230T,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, multiple submitters, no conflicts",2450526
+ACTA2,60,A,G,p.A60G,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",2442996
+ACTA2,102,E,A,p.E102A,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",2419980
+ACTA2,26,D,N,p.D26N,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",2336982
+ACTA2,226,E,D,p.E226D,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",2196020
+ACTA2,5,W,C,p.W5C,Uncertain significance,uncertain,Autoimmune lymphoproliferative syndrome type 1,"criteria provided, single submitter",2195501
+ACTA2,250,I,V,p.I250V,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",2166039
+ACTA2,1,M,I,p.M1I,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",2151472
+ACTA2,321,A,G,p.A321G,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",2151008
+ACTA2,113,N,D,p.N113D,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",2129902
+ACTA2,358,W,R,p.W358R,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",2129526
+ACTA2,310,G,D,p.G310D,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",2111776
+ACTA2,261,E,G,p.E261G,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",2110458
+ACTA2,94,N,D,p.N94D,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",2071665
+ACTA2,253,G,R,p.G253R,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",2041051
+ACTA2,245,P,A,p.P245A,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",2036572
+ACTA2,138,I,V,p.I138V,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",2008086
+ACTA2,250,I,T,p.I250T,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",2004407
+ACTA2,356,Q,R,p.Q356R,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",1996983
+ACTA2,95,E,G,p.E95G,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",1996537
+ACTA2,188,T,I,p.T188I,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",1988978
+ACTA2,287,C,Y,p.C287Y,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",1983580
+ACTA2,332,I,V,p.I332V,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",1956427
+ACTA2,71,Y,C,p.Y71C,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",1786366
+ACTA2,69,L,Q,p.L69Q,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",1785362
+ACTA2,353,T,N,p.T353N,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",1779139
+ACTA2,51,Q,P,p.Q51P,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, multiple submitters, no conflicts",1774578
+ACTA2,48,G,V,p.G48V,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",1772684
+ACTA2,31,A,V,p.A31V,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",1766486
+ACTA2,270,G,V,p.G270V,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",1761983
+ACTA2,20,K,N,p.K20N,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",1751615
+ACTA2,178,M,T,p.M178T,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",1746933
+ACTA2,174,P,S,p.P174S,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, multiple submitters, no conflicts",1746090
+ACTA2,169,E,K,p.E169K,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",1745094
+ACTA2,127,E,Q,p.E127Q,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",1721845
+ACTA2,165,V,I,p.V165I,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",1714210
+ACTA2,136,V,M,p.V136M,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",1709864
+ACTA2,359,I,S,p.I359S,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",1700983
+ACTA2,262,T,A,p.T262A,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",1523708
+ACTA2,119,E,Q,p.E119Q,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",1518440
+ACTA2,226,E,K,p.E226K,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",1503050
+ACTA2,171,Y,N,p.Y171N,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",1491958
+ACTA2,272,E,Q,p.E272Q,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",1470765
+ACTA2,88,W,R,p.W88R,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",1469278
+ACTA2,243,E,K,p.E243K,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",1444968
+ACTA2,46,M,V,p.M46V,Likely pathogenic,likely_pathogenic,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",1421069
+ACTA2,211,V,D,p.V211D,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",1390864
+ACTA2,290,D,N,p.D290N,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",1380301
+ACTA2,324,P,S,p.P324S,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",1349015
+ACTA2,104,P,S,p.P104S,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",1332252
+ACTA2,27,D,N,p.D27N,Conflicting classifications of pathogenicity,conflicting,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, conflicting classifications",1329101
+ACTA2,125,M,K,p.M125K,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",1329100
+ACTA2,117,N,S,p.N117S,Conflicting classifications of pathogenicity,conflicting,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, conflicting classifications",1329099
+ACTA2,113,N,S,p.N113S,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6",no assertion criteria provided,1328395
+ACTA2,374,R,H,p.R374H,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",1310808
+ACTA2,77,I,V,p.I77V,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",1309274
+ACTA2,272,E,D,p.E272D,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, multiple submitters, no conflicts",1305287
+ACTA2,211,V,I,p.V211I,Uncertain significance,uncertain,,"criteria provided, single submitter",1302972
+ACTA2,175,H,D,p.H175D,Uncertain significance,uncertain,,"criteria provided, single submitter",1298493
+ACTA2,7,L,P,p.L7P,Likely pathogenic,likely_pathogenic,Autoimmune lymphoproliferative syndrome type 1,"criteria provided, multiple submitters, no conflicts",1213255
+ACTA2,337,R,C,p.R337C,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",1172384
+ACTA2,271,M,L,p.M271L,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",1172060
+ACTA2,94,N,S,p.N94S,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",1171477
+ACTA2,338,K,R,p.K338R,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",1171397
+ACTA2,22,G,S,p.G22S,Conflicting classifications of pathogenicity,conflicting,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, conflicting classifications",1171105
+ACTA2,307,M,T,p.M307T,Uncertain significance,uncertain,,"criteria provided, single submitter",1163329
+ACTA2,39,R,S,p.R39S,Likely pathogenic,likely_pathogenic,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",1066384
+ACTA2,217,K,E,p.K217E,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",1062131
+ACTA2,135,Y,C,p.Y135C,Conflicting classifications of pathogenicity,conflicting,"Aortic aneurysm, familial thoracic 6","criteria provided, conflicting classifications",1057228
+ACTA2,75,H,N,p.H75N,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",1054571
+ACTA2,19,C,R,p.C19R,Likely pathogenic,likely_pathogenic,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",1054067
+ACTA2,118,R,W,p.R118W,Conflicting classifications of pathogenicity,conflicting,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, conflicting classifications",1053987
+ACTA2,253,G,V,p.G253V,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",1052986
+ACTA2,253,G,R,p.G253R,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",1051381
+ACTA2,256,R,S,p.R256S,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",988545
+ACTA2,179,R,L,p.R179L,Pathogenic,pathogenic,Multisystemic smooth muscle dysfunction syndrome,no assertion criteria provided,986791
+ACTA2,192,M,I,p.M192I,Uncertain significance,uncertain,Isolated thoracic aortic aneurysm,"criteria provided, single submitter",982344
+ACTA2,231,T,A,p.T231A,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",979112
+ACTA2,171,Y,C,p.Y171C,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",971498
+ACTA2,2,C,S,p.C2S,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",962639
+ACTA2,35,S,Y,p.S35Y,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",951989
+ACTA2,371,I,N,p.I371N,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, multiple submitters, no conflicts",935538
+ACTA2,136,V,L,p.V136L,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",934622
+ACTA2,214,I,T,p.I214T,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection | Moyamoya disease 5,"criteria provided, multiple submitters, no conflicts",930272
+ACTA2,5,E,A,p.E5A,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, multiple submitters, no conflicts",928192
+ACTA2,26,D,H,p.D26H,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",927995
+ACTA2,233,A,V,p.A233V,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",927653
+ACTA2,291,I,M,p.I291M,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, multiple submitters, no conflicts",927130
+ACTA2,86,K,E,p.K86E,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",926430
+ACTA2,241,S,N,p.S241N,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, multiple submitters, no conflicts",925338
+ACTA2,193,K,R,p.K193R,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",923753
+ACTA2,304,G,D,p.G304D,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",923558
+ACTA2,250,I,L,p.I250L,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, multiple submitters, no conflicts",923224
+ACTA2,367,A,V,p.A367V,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, multiple submitters, no conflicts",923191
+ACTA2,192,M,V,p.M192V,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",922914
+ACTA2,316,Q,L,p.Q316L,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",921845
+ACTA2,374,R,C,p.R374C,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",921802
+ACTA2,253,G,E,p.G253E,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",921546
+ACTA2,161,V,D,p.V161D,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",920661
+ACTA2,36,I,V,p.I36V,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",919793
+ACTA2,230,A,G,p.A230G,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection | Moyamoya disease 5 | Multisystemic smooth muscle dysfunction syndrome","criteria provided, multiple submitters, no conflicts",919137
+ACTA2,370,S,C,p.S370C,Uncertain significance,uncertain,Cardiovascular phenotype | Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, multiple submitters, no conflicts",918694
+ACTA2,247,G,R,p.G247R,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",915575
+ACTA2,179,R,S,p.R179S,Pathogenic,pathogenic,Multisystemic smooth muscle dysfunction syndrome,no assertion criteria provided,911956
+ACTA2,57,G,R,p.G57R,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",863767
+ACTA2,115,K,N,p.K115N,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",845590
+ACTA2,368,G,R,p.G368R,Conflicting classifications of pathogenicity,conflicting,"Aortic aneurysm, familial thoracic 6 | Cardiovascular phenotype | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, conflicting classifications",841121
+ACTA2,161,V,A,p.V161A,Conflicting classifications of pathogenicity,conflicting,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, conflicting classifications",812016
+ACTA2,23,F,I,p.F23I,Uncertain significance,uncertain,,"criteria provided, single submitter",811477
+ACTA2,371,I,T,p.I371T,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",806544
+ACTA2,313,D,N,p.D313N,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",802616
+ACTA2,134,M,T,p.M134T,Conflicting classifications of pathogenicity,conflicting,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, conflicting classifications",766538
+ACTA2,46,M,I,p.M46I,Pathogenic/Likely pathogenic,likely_pathogenic,"Aortic aneurysm, familial thoracic 6","criteria provided, multiple submitters, no conflicts",664017
+ACTA2,84,M,T,p.M84T,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",662741
+ACTA2,300,V,I,p.V300I,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",649765
+ACTA2,152,G,D,p.G152D,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",649711
+ACTA2,36,I,T,p.I36T,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",636991
+ACTA2,52,K,E,p.K52E,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, multiple submitters, no conflicts",636606
+ACTA2,344,G,S,p.G344S,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, multiple submitters, no conflicts",636479
+ACTA2,59,E,K,p.E59K,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Connective tissue dysplasia | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",629459
+ACTA2,135,Y,H,p.Y135H,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",628908
+ACTA2,320,T,M,p.T320M,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",627744
+ACTA2,190,Y,S,p.Y190S,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, multiple submitters, no conflicts",618509
+ACTA2,318,E,G,p.E318G,Uncertain significance,uncertain,,no assertion criteria provided,591823
+ACTA2,47,V,M,p.V47M,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",591207
+ACTA2,26,D,E,p.D26E,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection | Moyamoya disease 5 | Multisystemic smooth muscle dysfunction syndrome","criteria provided, multiple submitters, no conflicts",580143
+ACTA2,314,R,Q,p.R314Q,Pathogenic,pathogenic,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",577891
+ACTA2,154,V,M,p.V154M,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",577503
+ACTA2,318,E,D,p.E318D,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",573994
+ACTA2,336,E,Q,p.E336Q,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",572632
+ACTA2,57,G,V,p.G57V,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, multiple submitters, no conflicts",571177
+ACTA2,30,R,W,p.R30W,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",570156
+ACTA2,86,K,R,p.K86R,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",536919
+ACTA2,82,D,E,p.D82E,Conflicting classifications of pathogenicity,conflicting,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, conflicting classifications",536918
+ACTA2,66,I,L,p.I66L,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",536917
+ACTA2,289,I,N,p.I289N,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",536916
+ACTA2,16,S,P,p.S16P,Likely pathogenic,likely_pathogenic,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",536915
+ACTA2,45,V,A,p.V45A,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",536914
+ACTA2,336,E,G,p.E336G,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",519582
+ACTA2,332,I,T,p.I332T,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, multiple submitters, no conflicts",519581
+ACTA2,149,R,H,p.R149H,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",519580
+ACTA2,272,E,G,p.E272G,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection | Isolated thoracic aortic aneurysm,"criteria provided, multiple submitters, no conflicts",519579
+ACTA2,363,E,Q,p.E363Q,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, multiple submitters, no conflicts",519578
+ACTA2,185,R,G,p.R185G,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",519577
+ACTA2,49,M,T,p.M49T,Likely pathogenic,likely_pathogenic,"Aortic aneurysm, familial thoracic 6 | Familial aortopathy | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",519576
+ACTA2,25,G,R,p.G25R,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",469086
+ACTA2,154,V,A,p.V154A,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",469085
+ACTA2,151,T,N,p.T151N,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",469084
+ACTA2,46,M,R,p.M46R,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",432639
+ACTA2,6,D,G,p.D6G,Uncertain significance,uncertain,,"criteria provided, single submitter",423733
+ACTA2,306,T,A,p.T306A,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, multiple submitters, no conflicts",423468
+ACTA2,95,E,K,p.E95K,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, multiple submitters, no conflicts",423463
+ACTA2,76,G,S,p.G76S,Uncertain significance,uncertain,,"criteria provided, single submitter",417997
+ACTA2,72,P,L,p.P72L,Conflicting classifications of pathogenicity,conflicting,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, conflicting classifications",404178
+ACTA2,137,A,V,p.A137V,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",404177
+ACTA2,68,T,I,p.T68I,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Moyamoya disease 5 | Multisystemic smooth muscle dysfunction syndrome","criteria provided, multiple submitters, no conflicts",404176
+ACTA2,172,A,V,p.A172V,Uncertain significance,uncertain,,"criteria provided, single submitter",391491
+ACTA2,208,R,C,p.R208C,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",389146
+ACTA2,210,I,N,p.I210N,Uncertain significance,uncertain,,"criteria provided, single submitter",388402
+ACTA2,204,T,I,p.T204I,Conflicting classifications of pathogenicity,conflicting,"Aortic aneurysm, familial thoracic 6","criteria provided, conflicting classifications",387686
+ACTA2,99,A,G,p.A99G,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Connective tissue disorder | Familial thoracic aortic aneurysm and aortic dissection | Moyamoya disease 5 | Multisystemic smooth muscle dysfunction syndrome","criteria provided, multiple submitters, no conflicts",384419
+ACTA2,208,R,H,p.R208H,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",383658
+ACTA2,320,T,P,p.T320P,Uncertain significance,uncertain,,"criteria provided, single submitter",383209
+ACTA2,185,R,Q,p.R185Q,Conflicting classifications of pathogenicity,conflicting,"Aortic aneurysm, familial thoracic 6","criteria provided, conflicting classifications",381615
+ACTA2,335,P,A,p.P335A,Uncertain significance,uncertain,"Aneurysm of descending aorta | Aortic aneurysm, familial thoracic 6 | Arterial tortuosity","criteria provided, multiple submitters, no conflicts",374148
+ACTA2,5,E,Q,p.E5Q,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Multisystemic smooth muscle dysfunction syndrome","criteria provided, multiple submitters, no conflicts",301511
+ACTA2,206,A,T,p.A206T,Conflicting classifications of pathogenicity,conflicting,"Aortic aneurysm, familial thoracic 6","criteria provided, conflicting classifications",284156
+ACTA2,179,R,C,p.R179C,Pathogenic,pathogenic,"Aortic aneurysm, familial thoracic 6 | Familial aortopathy | Familial thoracic aortic aneurysm and aortic dissection | Multisystemic smooth muscle dysfunction syndrome","criteria provided, multiple submitters, no conflicts",265026
+ACTA2,256,R,H,p.R256H,Conflicting classifications of pathogenicity,conflicting,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, conflicting classifications",264363
+ACTA2,198,R,H,p.R198H,Pathogenic/Likely pathogenic,likely_pathogenic,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection | Moyamoya disease 5 | Multisystemic smooth muscle dysfunction syndrome","criteria provided, multiple submitters, no conflicts",264311
+ACTA2,197,E,D,p.E197D,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",264095
+ACTA2,299,N,S,p.N299S,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",263843
+ACTA2,198,R,C,p.R198C,Pathogenic/Likely pathogenic,likely_pathogenic,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection | Thoracic aortic aneurysm or dissection","criteria provided, multiple submitters, no conflicts",263819
+ACTA2,166,P,T,p.P166T,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Cardiovascular phenotype | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",263639
+ACTA2,28,A,V,p.A28V,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",263583
+ACTA2,256,R,C,p.R256C,Conflicting classifications of pathogenicity,conflicting,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection | Moyamoya disease 5 | Multisystemic smooth muscle dysfunction syndrome","criteria provided, conflicting classifications",263578
+ACTA2,326,T,N,p.T326N,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection | Moyamoya disease 5 | Multisystemic smooth muscle dysfunction syndrome","criteria provided, multiple submitters, no conflicts",263430
+ACTA2,108,T,M,p.T108M,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Cardiovascular phenotype | Moyamoya disease 5 | Multisystemic smooth muscle dysfunction syndrome","criteria provided, multiple submitters, no conflicts",263402
+ACTA2,46,M,I,p.M46I,Pathogenic,pathogenic,"Aortic aneurysm, familial thoracic 6","criteria provided, single submitter",239036
+ACTA2,49,M,K,p.M49K,Uncertain significance,uncertain,Familial thoracic aortic aneurysm and aortic dissection,"criteria provided, single submitter",222480
+ACTA2,285,M,I,p.M285I,Uncertain significance,uncertain,,"criteria provided, single submitter",199677
+ACTA2,270,G,E,p.G270E,Conflicting classifications of pathogenicity,conflicting,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, conflicting classifications",199676
+ACTA2,270,G,R,p.G270R,Conflicting classifications of pathogenicity,conflicting,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, conflicting classifications",199675
+ACTA2,255,E,K,p.E255K,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",199674
+ACTA2,233,A,T,p.A233T,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",199673
+ACTA2,160,G,S,p.G160S,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",199672
+ACTA2,149,R,L,p.R149L,Pathogenic/Likely pathogenic,likely_pathogenic,"Aortic aneurysm, familial thoracic 6","criteria provided, multiple submitters, no conflicts",199671
+ACTA2,118,R,Q,p.R118Q,Pathogenic/Likely pathogenic,likely_pathogenic,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection | Moyamoya disease 5 | Multisystemic smooth muscle dysfunction syndrome","criteria provided, multiple submitters, no conflicts",199670
+ACTA2,115,K,R,p.K115R,Uncertain significance,uncertain,,"criteria provided, single submitter",199669
+ACTA2,83,D,N,p.D83N,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",199668
+ACTA2,60,A,T,p.A60T,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6","criteria provided, multiple submitters, no conflicts",199667
+ACTA2,39,R,H,p.R39H,Pathogenic/Likely pathogenic,likely_pathogenic,"Aortic aneurysm, familial thoracic 6 | Familial aortopathy | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",199666
+ACTA2,39,R,G,p.R39G,Pathogenic/Likely pathogenic,likely_pathogenic,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",199665
+ACTA2,1,M,V,p.M1V,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",199663
+ACTA2,240,K,N,p.K240N,Conflicting classifications of pathogenicity,conflicting,"Aortic aneurysm, familial thoracic 6 | Cardiovascular phenotype | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, conflicting classifications",162701
+ACTA2,49,M,V,p.M49V,Pathogenic,pathogenic,"Aortic aneurysm, familial thoracic 6",no assertion criteria provided,65450
+ACTA2,39,R,C,p.R39C,Pathogenic/Likely pathogenic,likely_pathogenic,"Aortic aneurysm, familial thoracic 6 | Familial aortopathy | Familial thoracic aortic aneurysm and aortic dissection | Moyamoya disease 5 | Multisystemic smooth muscle dysfunction syndrome | Thoracic aortic aneurysm or dissection","criteria provided, multiple submitters, no conflicts",65449
+ACTA2,212,R,Q,p.R212Q,Pathogenic/Likely pathogenic,likely_pathogenic,"ACTA2-related disorder | Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection | Isolated thoracic aortic aneurysm","criteria provided, multiple submitters, no conflicts",44219
+ACTA2,203,V,I,p.V203I,Uncertain significance,uncertain,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",44218
+ACTA2,140,A,V,p.A140V,Conflicting classifications of pathogenicity,conflicting,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, conflicting classifications",44217
+ACTA2,113,N,T,p.N113T,Uncertain significance,uncertain,Cardiovascular phenotype,"criteria provided, single submitter",44214
+ACTA2,179,R,H,p.R179H,Pathogenic,pathogenic,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection | Moyamoya disease 5 | Multisystemic smooth muscle dysfunction syndrome","criteria provided, multiple submitters, no conflicts",29598
+ACTA2,258,R,C,p.R258C,Pathogenic,pathogenic,"Aortic aneurysm, familial thoracic 6 | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",18278
+ACTA2,258,R,H,p.R258H,Pathogenic/Likely pathogenic,likely_pathogenic,"Aortic aneurysm, familial thoracic 6 | Cardiovascular phenotype | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",18277
+ACTA2,149,R,C,p.R149C,Pathogenic,pathogenic,"Aortic aneurysm, familial thoracic 6 | Cardiovascular phenotype | Familial thoracic aortic aneurysm and aortic dissection","criteria provided, multiple submitters, no conflicts",18276

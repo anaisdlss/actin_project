@@ -1,0 +1,20 @@
+{
+  "reference_sequence": "P60709",
+  "fit": "Global sequence alignment (BLOSUM62, gap open -10, extend -0.5), consensus across optimal alignments; C-alpha Kabsch fit of one actin. Neighbor RMSD under SAME transform. Best of two chain assignments per reference pair.",
+  "scope": "Representative structures only; does not establish steric clashes or classification of all interfaces.",
+  "sources": {
+    "3j8a": {
+      "url": "https://www.rcsb.org/structure/3J8A",
+      "sha256": "8884d0f3eb1868383022c3aa8fba41c936437b6efa838d6af274e3c4a03cde54"
+    },
+    "5yu8": {
+      "url": "https://www.rcsb.org/structure/5YU8",
+      "sha256": "4d8b22c6bb9b1a0bbabbc8448a79c5a6b61d7a09deedd345fdc5b841c58b0725"
+    },
+    "6vao": {
+      "url": "https://www.rcsb.org/structure/6VAO",
+      "sha256": "5448ab89a3511edb16ca2713bbda9c963667d85803988a9c9bd558002ba836cd"
+    }
+  },
+  "code_sha256": "b1b1168307082068dd2fd3dc85d202a069eb891e9dcff4f29c6d5817880301d7"
+}

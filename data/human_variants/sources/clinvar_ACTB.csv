@@ -1,0 +1,259 @@
+gene,pos,aa_ref,aa_alt,hgvsp,classification,classif_cat,maladies,review_status,clinvar_id
+ACTB,312,R,S,p.R312S,Likely pathogenic,likely_pathogenic,ACTB-associated syndromic thrombocytopenia,"criteria provided, single submitter",4857233
+ACTB,343,G,S,p.G343S,Uncertain significance,uncertain,ACTB-related disorder,"criteria provided, single submitter",4855352
+ACTB,162,T,S,p.T162S,Likely pathogenic,likely_pathogenic,Baraitser-Winter syndrome 1,"criteria provided, single submitter",4854319
+ACTB,282,I,V,p.I282V,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",4797720
+ACTB,224,E,K,p.E224K,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",4777241
+ACTB,85,I,T,p.I85T,Uncertain significance,uncertain,,"criteria provided, single submitter",4755799
+ACTB,69,Y,H,p.Y69H,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",4745453
+ACTB,327,I,M,p.I327M,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",4744324
+ACTB,136,I,L,p.I136L,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",4744247
+ACTB,366,G,S,p.G366S,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",4696128
+ACTB,265,S,T,p.S265T,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",4689977
+ACTB,305,M,I,p.M305I,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",4686181
+ACTB,301,G,S,p.G301S,Pathogenic,pathogenic,Baraitser-Winter syndrome 1,"criteria provided, single submitter",4685516
+ACTB,145,S,C,p.S145C,Likely pathogenic,likely_pathogenic,Baraitser-Winter syndrome 1,"criteria provided, multiple submitters, no conflicts",4681736
+ACTB,349,L,M,p.L349M,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",4681092
+ACTB,312,R,G,p.R312G,Uncertain significance,uncertain,,"criteria provided, single submitter",4541262
+ACTB,367,P,L,p.P367L,Uncertain significance,uncertain,,"criteria provided, single submitter",4538828
+ACTB,263,Q,P,p.Q263P,Uncertain significance,uncertain,,"criteria provided, single submitter",4533743
+ACTB,70,P,T,p.P70T,Pathogenic,pathogenic,,"criteria provided, single submitter",4530851
+ACTB,268,G,S,p.G268S,,other,,,4338512
+ACTB,336,K,R,p.K336R,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",4338510
+ACTB,245,G,R,p.G245R,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",4085964
+ACTB,3,D,H,p.D3H,Uncertain significance,uncertain,,"criteria provided, single submitter",4077827
+ACTB,331,A,D,p.A331D,Likely pathogenic,likely_pathogenic,Baraitser-Winter syndrome 1,"criteria provided, single submitter",4056392
+ACTB,296,N,S,p.N296S,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",4001542
+ACTB,355,M,I,p.M355I,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",4001531
+ACTB,292,D,N,p.D292N,Uncertain significance,uncertain,,"criteria provided, single submitter",3908070
+ACTB,265,S,A,p.S265A,Uncertain significance,uncertain,Dystonic disorder,"criteria provided, single submitter",3906891
+ACTB,220,A,V,p.A220V,Uncertain significance,uncertain,,"criteria provided, single submitter",3906652
+ACTB,372,R,C,p.R372C,Uncertain significance,uncertain,,"criteria provided, multiple submitters, no conflicts",3903341
+ACTB,351,T,A,p.T351A,Pathogenic,pathogenic,,"criteria provided, single submitter",3898883
+ACTB,72,E,K,p.E72K,Pathogenic,pathogenic,,"criteria provided, single submitter",3898858
+ACTB,141,S,C,p.S141C,Uncertain significance,uncertain,,"criteria provided, single submitter",3774067
+ACTB,371,H,R,p.H371R,Likely pathogenic,likely_pathogenic,ACTB-related disorder,"criteria provided, single submitter",3773846
+ACTB,318,T,S,p.T318S,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",3678772
+ACTB,307,P,S,p.P307S,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",3671734
+ACTB,219,V,L,p.V219L,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",3670579
+ACTB,274,I,V,p.I274V,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",3666123
+ACTB,309,I,M,p.I309M,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",3664015
+ACTB,22,A,V,p.A22V,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",3661890
+ACTB,26,A,P,p.A26P,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",3657079
+ACTB,166,Y,C,p.Y166C,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",3649524
+ACTB,289,I,V,p.I289V,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",3643700
+ACTB,12,N,S,p.N12S,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",3632540
+ACTB,283,M,T,p.M283T,Uncertain significance,uncertain,"ACTB-associated syndromic thrombocytopenia | Baraitser-Winter syndrome 1 | Becker nevus syndrome | Congenital smooth muscle hamartoma, with or without hemihypertrophy | Developmental malformations-deafness-dystonia syndrome","criteria provided, single submitter",3392494
+ACTB,264,P,H,p.P264H,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",3378018
+ACTB,84,K,E,p.K84E,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, multiple submitters, no conflicts",3377145
+ACTB,219,V,I,p.V219I,Likely pathogenic,likely_pathogenic,Neurodevelopmental disorder,"criteria provided, single submitter",3376709
+ACTB,93,E,Q,p.E93Q,Uncertain significance,uncertain,,"criteria provided, single submitter",3373102
+ACTB,252,N,S,p.N252S,Uncertain significance,uncertain,,"criteria provided, single submitter",3372234
+ACTB,335,R,H,p.R335H,Pathogenic,pathogenic,,"criteria provided, single submitter",3369117
+ACTB,194,T,A,p.T194A,Uncertain significance,uncertain,,"criteria provided, single submitter",3368521
+ACTB,298,V,M,p.V298M,Uncertain significance,uncertain,,"criteria provided, single submitter",3365363
+ACTB,108,A,V,p.A108V,Uncertain significance,uncertain,,"criteria provided, single submitter",3364055
+ACTB,2,D,V,p.D2V,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, multiple submitters, no conflicts",3360918
+ACTB,280,N,T,p.N280T,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, multiple submitters, no conflicts",3360405
+ACTB,111,N,S,p.N111S,Likely pathogenic,likely_pathogenic,ACTB-related disorder,no assertion criteria provided,3356875
+ACTB,44,M,I,p.M44I,Uncertain significance,uncertain,ACTB-associated syndromic thrombocytopenia,"criteria provided, single submitter",3344344
+ACTB,223,F,S,p.F223S,Uncertain significance,uncertain,,"criteria provided, single submitter",3343538
+ACTB,110,L,V,p.L110V,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",3342613
+ACTB,224,E,Q,p.E224Q,Uncertain significance,uncertain,,"criteria provided, single submitter",3340361
+ACTB,311,D,N,p.D311N,Uncertain significance,uncertain,,"criteria provided, single submitter",3338764
+ACTB,50,K,N,p.K50N,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",3336993
+ACTB,195,E,Q,p.E195Q,Uncertain significance,uncertain,ACTB-associated syndromic thrombocytopenia,"criteria provided, single submitter",3255176
+ACTB,123,M,V,p.M123V,Pathogenic,pathogenic,,"criteria provided, single submitter",3252291
+ACTB,272,C,R,p.C272R,Likely pathogenic,likely_pathogenic,Baraitser-Winter syndrome 1,"criteria provided, single submitter",3075720
+ACTB,119,M,V,p.M119V,Pathogenic,pathogenic,Baraitser-Winter syndrome 1,"criteria provided, single submitter",3075716
+ACTB,23,G,D,p.G23D,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",3061893
+ACTB,222,D,E,p.D222E,Uncertain significance,uncertain,ACTB-related disorder,no assertion criteria provided,3061510
+ACTB,365,S,C,p.S365C,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",3013715
+ACTB,296,N,D,p.N296D,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",2893461
+ACTB,370,V,G,p.V370G,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",2842305
+ACTB,258,P,A,p.P258A,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",2830597
+ACTB,172,P,R,p.P172R,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",2812809
+ACTB,8,L,V,p.L8V,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",2810155
+ACTB,309,I,F,p.I309F,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",2796886
+ACTB,129,T,I,p.T129I,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",2772669
+ACTB,1,M,R,p.M1R,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",2761601
+ACTB,319,A,T,p.A319T,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",2750509
+ACTB,46,G,R,p.G46R,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",2750125
+ACTB,89,T,A,p.T89A,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",2703587
+ACTB,40,H,Q,p.H40Q,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",2701640
+ACTB,201,T,A,p.T201A,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",2700400
+ACTB,147,R,H,p.R147H,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",2693728
+ACTB,82,M,I,p.M82I,Uncertain significance,uncertain,,"criteria provided, single submitter",2662129
+ACTB,101,H,Y,p.H101Y,Uncertain significance,uncertain,ACTB-related disorder,"criteria provided, multiple submitters, no conflicts",2637391
+ACTB,32,P,R,p.P32R,Likely pathogenic,likely_pathogenic,ACTB-related disorder,"criteria provided, single submitter",2635166
+ACTB,262,F,L,p.F262L,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",2620903
+ACTB,185,L,V,p.L185V,Uncertain significance,uncertain,,"criteria provided, single submitter",2580833
+ACTB,374,C,Y,p.C374Y,Uncertain significance,uncertain,,"criteria provided, single submitter",2580466
+ACTB,275,H,Q,p.H275Q,Uncertain significance,uncertain,,"criteria provided, single submitter",2578165
+ACTB,146,G,D,p.G146D,Pathogenic,pathogenic,"CONGENITAL SMOOTH MUSCLE HAMARTOMA, SOMATIC, MOSAIC",no assertion criteria provided,2575113
+ACTB,146,G,V,p.G146V,Pathogenic,pathogenic,"CONGENITAL SMOOTH MUSCLE HAMARTOMA, SOMATIC, MOSAIC",no assertion criteria provided,2575112
+ACTB,302,G,A,p.G302A,Pathogenic,pathogenic,,"criteria provided, single submitter",2574241
+ACTB,144,A,T,p.A144T,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",2501314
+ACTB,120,T,S,p.T120S,Uncertain significance,uncertain,,"criteria provided, single submitter",2499318
+ACTB,74,G,C,p.G74C,Pathogenic,pathogenic,Baraitser-Winter syndrome 1,"criteria provided, single submitter",2445203
+ACTB,362,Y,C,p.Y362C,Uncertain significance,uncertain,,"criteria provided, single submitter",2443462
+ACTB,353,Q,P,p.Q353P,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",2442085
+ACTB,125,E,K,p.E125K,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",2442032
+ACTB,47,M,T,p.M47T,Uncertain significance,uncertain,,"criteria provided, single submitter",2438839
+ACTB,371,H,Y,p.H371Y,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, multiple submitters, no conflicts",2438838
+ACTB,300,S,P,p.S300P,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",2431564
+ACTB,229,T,A,p.T229A,Uncertain significance,uncertain,Baraitser-Winter syndrome 1 | Inborn genetic diseases,"criteria provided, multiple submitters, no conflicts",2280571
+ACTB,297,T,I,p.T297I,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, multiple submitters, no conflicts",2191479
+ACTB,319,A,S,p.A319S,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",2177739
+ACTB,171,L,F,p.L171F,Pathogenic/Likely pathogenic,likely_pathogenic,Baraitser-Winter syndrome 1,"criteria provided, multiple submitters, no conflicts",2159436
+ACTB,128,N,T,p.N128T,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",2099181
+ACTB,123,M,I,p.M123I,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",2016917
+ACTB,42,G,A,p.G42A,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",2005422
+ACTB,83,E,D,p.E83D,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",2004354
+ACTB,372,R,H,p.R372H,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, multiple submitters, no conflicts",1919118
+ACTB,201,T,I,p.T201I,Likely pathogenic,likely_pathogenic,Baraitser-Winter syndrome 1,"criteria provided, single submitter",1805821
+ACTB,292,D,E,p.D292E,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",1718305
+ACTB,134,V,I,p.V134I,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, multiple submitters, no conflicts",1710843
+ACTB,247,V,F,p.V247F,Uncertain significance,uncertain,,"criteria provided, single submitter",1708686
+ACTB,57,E,K,p.E57K,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, multiple submitters, no conflicts",1708380
+ACTB,153,M,R,p.M153R,Uncertain significance,uncertain,Thrombocytopenia,"criteria provided, single submitter",1703850
+ACTB,60,S,R,p.S60R,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",1703499
+ACTB,212,I,V,p.I212V,Uncertain significance,uncertain,,"criteria provided, single submitter",1700883
+ACTB,209,V,L,p.V209L,Likely pathogenic,likely_pathogenic,Baraitser-Winter syndrome 1,"criteria provided, single submitter",1700136
+ACTB,257,C,Y,p.C257Y,Uncertain significance,uncertain,,"criteria provided, single submitter",1699807
+ACTB,241,E,K,p.E241K,Conflicting classifications of pathogenicity,conflicting,Baraitser-Winter syndrome 1,"criteria provided, conflicting classifications",1698347
+ACTB,130,P,L,p.P130L,Uncertain significance,uncertain,,"criteria provided, single submitter",1698064
+ACTB,130,P,R,p.P130R,Uncertain significance,uncertain,,"criteria provided, single submitter",1696947
+ACTB,159,V,A,p.V159A,Likely pathogenic,likely_pathogenic,ACTB-related disorder,"criteria provided, multiple submitters, no conflicts",1695182
+ACTB,47,M,I,p.M47I,Pathogenic,pathogenic,Baraitser-Winter syndrome 1,"criteria provided, single submitter",1685500
+ACTB,249,T,S,p.T249S,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",1684573
+ACTB,271,S,F,p.S271F,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",1684528
+ACTB,183,R,Q,p.R183Q,Conflicting classifications of pathogenicity,conflicting,Baraitser-Winter syndrome 1,"criteria provided, conflicting classifications",1676923
+ACTB,80,D,E,p.D80E,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",1508644
+ACTB,247,V,I,p.V247I,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",1501657
+ACTB,96,V,L,p.V96L,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",1474805
+ACTB,184,D,A,p.D184A,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",1390051
+ACTB,276,E,D,p.E276D,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",1385188
+ACTB,111,N,D,p.N111D,Likely pathogenic,likely_pathogenic,Congenital smooth muscle hamartoma,no assertion criteria provided,1344714
+ACTB,146,G,S,p.G146S,Pathogenic/Likely pathogenic,likely_pathogenic,"CONGENITAL SMOOTH MUSCLE HAMARTOMA, SOMATIC, MOSAIC | Congenital smooth muscle hamartoma",no assertion criteria provided,1344713
+ACTB,146,G,A,p.G146A,Pathogenic/Likely pathogenic,likely_pathogenic,"CONGENITAL SMOOTH MUSCLE HAMARTOMA, SOMATIC, MOSAIC | Congenital smooth muscle hamartoma",no assertion criteria provided,1344712
+ACTB,137,Q,H,p.Q137H,Likely pathogenic,likely_pathogenic,Congenital smooth muscle hamartoma,no assertion criteria provided,1344711
+ACTB,147,R,S,p.R147S,Pathogenic,pathogenic,Becker nevus syndrome,"criteria provided, single submitter",1344710
+ACTB,200,F,V,p.F200V,Likely pathogenic,likely_pathogenic,Baraitser-Winter syndrome 1 | Developmental malformations-deafness-dystonia syndrome,"criteria provided, single submitter",1334898
+ACTB,147,R,C,p.R147C,Pathogenic,pathogenic,Baraitser-Winter syndrome 1 | Becker nevus syndrome,"criteria provided, multiple submitters, no conflicts",1334712
+ACTB,287,V,A,p.V287A,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",1333774
+ACTB,20,G,D,p.G20D,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",1333448
+ACTB,28,R,Q,p.R28Q,Conflicting classifications of pathogenicity,conflicting,ACTB-related disorder | Baraitser-Winter syndrome 1,"criteria provided, conflicting classifications",1328552
+ACTB,56,D,Y,p.D56Y,Likely pathogenic,likely_pathogenic,Neurodevelopmental disorder,"criteria provided, single submitter",1321972
+ACTB,48,G,C,p.G48C,Likely pathogenic,likely_pathogenic,Baraitser-Winter syndrome 1,"criteria provided, single submitter",1320256
+ACTB,152,V,M,p.V152M,Conflicting classifications of pathogenicity,conflicting,Baraitser-Winter syndrome 1,"criteria provided, conflicting classifications",1319338
+ACTB,225,Q,E,p.Q225E,Uncertain significance,uncertain,,"criteria provided, single submitter",1310267
+ACTB,32,P,S,p.P32S,Conflicting classifications of pathogenicity,conflicting,Baraitser-Winter syndrome | Baraitser-Winter syndrome 1,"criteria provided, conflicting classifications",1309667
+ACTB,305,M,T,p.M305T,Uncertain significance,uncertain,,"criteria provided, single submitter",1309165
+ACTB,252,N,D,p.N252D,Uncertain significance,uncertain,,"criteria provided, single submitter",1308773
+ACTB,270,E,D,p.E270D,Uncertain significance,uncertain,,"criteria provided, single submitter",1305456
+ACTB,87,H,Y,p.H87Y,Uncertain significance,uncertain,,"criteria provided, single submitter",1303897
+ACTB,71,I,M,p.I71M,Uncertain significance,uncertain,,"criteria provided, single submitter",1301337
+ACTB,160,T,A,p.T160A,Likely pathogenic,likely_pathogenic,Baraitser-Winter syndrome 1,"criteria provided, multiple submitters, no conflicts",1251980
+ACTB,162,T,A,p.T162A,Pathogenic,pathogenic,,"criteria provided, single submitter",1202044
+ACTB,349,L,V,p.L349V,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",1200439
+ACTB,53,Y,C,p.Y53C,Pathogenic/Likely pathogenic,likely_pathogenic,Baraitser-Winter syndrome 1 | Developmental malformations-deafness-dystonia syndrome,"criteria provided, multiple submitters, no conflicts",1196724
+ACTB,196,R,G,p.R196G,Pathogenic,pathogenic,,"criteria provided, single submitter",1193058
+ACTB,356,W,R,p.W356R,Conflicting classifications of pathogenicity,conflicting,ACTB-related BAFopathy | Baraitser-Winter syndrome 1,"criteria provided, conflicting classifications",1177327
+ACTB,196,R,L,p.R196L,Likely pathogenic,likely_pathogenic,ACTB-related BAFopathy | Aminoacylase 1 deficiency | Baraitser-Winter syndrome 1,"criteria provided, multiple submitters, no conflicts",1177326
+ACTB,40,H,Y,p.H40Y,Pathogenic/Likely pathogenic,likely_pathogenic,ACTB-related BAFopathy | ACTB-related disorder,"criteria provided, multiple submitters, no conflicts",1177325
+ACTB,24,D,N,p.D24N,Likely pathogenic,likely_pathogenic,ACTB-related BAFopathy | Baraitser-Winter syndrome 1,"criteria provided, multiple submitters, no conflicts",1177309
+ACTB,7,A,V,p.A7V,Uncertain significance,uncertain,ACTB-related BAFopathy,"criteria provided, single submitter",1177308
+ACTB,108,A,D,p.A108D,Likely pathogenic,likely_pathogenic,Baraitser-Winter syndrome 1,"criteria provided, single submitter",1066727
+ACTB,243,P,L,p.P243L,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",1065516
+ACTB,335,R,P,p.R335P,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",1044904
+ACTB,294,Y,D,p.Y294D,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",1029077
+ACTB,183,R,G,p.R183G,Likely pathogenic,likely_pathogenic,ACTB-related disorder,"criteria provided, single submitter",989344
+ACTB,268,G,C,p.G268C,Likely pathogenic,likely_pathogenic,ACTB-related disorder,"criteria provided, single submitter",989343
+ACTB,215,K,N,p.K215N,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",986208
+ACTB,57,E,A,p.E57A,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",985415
+ACTB,341,I,V,p.I341V,Likely pathogenic,likely_pathogenic,Baraitser-Winter syndrome 1 | Inborn genetic diseases,"criteria provided, multiple submitters, no conflicts",985391
+ACTB,260,A,E,p.A260E,Likely pathogenic,likely_pathogenic,Inborn genetic diseases,"criteria provided, single submitter",985268
+ACTB,110,L,R,p.L110R,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",985086
+ACTB,92,N,S,p.N92S,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",982901
+ACTB,311,D,H,p.D311H,Likely pathogenic,likely_pathogenic,Baraitser-Winter syndrome 1,no assertion criteria provided,982395
+ACTB,2,D,Y,p.D2Y,Likely pathogenic,likely_pathogenic,Baraitser-Winter syndrome 1,"criteria provided, single submitter",976684
+ACTB,322,P,R,p.P322R,Likely pathogenic,likely_pathogenic,Baraitser-Winter syndrome 1,"criteria provided, single submitter",976006
+ACTB,164,P,H,p.P164H,Likely pathogenic,likely_pathogenic,Baraitser-Winter syndrome 1 | Developmental malformations-deafness-dystonia syndrome,"criteria provided, single submitter",973260
+ACTB,58,A,V,p.A58V,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",973113
+ACTB,3,D,F,p.D3F,Likely pathogenic,likely_pathogenic,Baraitser-Winter syndrome 1,"criteria provided, single submitter",968546
+ACTB,164,P,S,p.P164S,Conflicting classifications of pathogenicity,conflicting,Baraitser-Winter syndrome 1,"criteria provided, conflicting classifications",957167
+ACTB,245,G,S,p.G245S,Conflicting classifications of pathogenicity,conflicting,Baraitser-Winter syndrome 1,"criteria provided, conflicting classifications",950805
+ACTB,56,D,N,p.D56N,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",932625
+ACTB,75,I,M,p.I75M,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",930603
+ACTB,109,P,S,p.P109S,Likely pathogenic,likely_pathogenic,Baraitser-Winter syndrome 1,"criteria provided, multiple submitters, no conflicts",917875
+ACTB,25,D,N,p.D25N,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",916078
+ACTB,195,E,K,p.E195K,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",871390
+ACTB,335,R,C,p.R335C,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",871389
+ACTB,206,R,W,p.R206W,Pathogenic,pathogenic,Baraitser-Winter syndrome 1,"criteria provided, multiple submitters, no conflicts",860924
+ACTB,70,P,H,p.P70H,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,no assertion criteria provided,828115
+ACTB,210,R,C,p.R210C,Pathogenic,pathogenic,Baraitser-Winter syndrome 1,"criteria provided, single submitter",807362
+ACTB,60,S,N,p.S60N,Likely pathogenic,likely_pathogenic,Abnormal brain morphology | Microcephaly | Short stature,"criteria provided, single submitter",638167
+ACTB,192,I,N,p.I192N,Conflicting classifications of pathogenicity,conflicting,,"criteria provided, conflicting classifications",636913
+ACTB,73,H,Q,p.H73Q,Likely pathogenic,likely_pathogenic,Baraitser-Winter syndrome 1 | Developmental malformations-deafness-dystonia syndrome,"criteria provided, single submitter",620046
+ACTB,361,E,K,p.E361K,Uncertain significance,uncertain,,no assertion criteria provided,591451
+ACTB,7,A,T,p.A7T,Likely pathogenic,likely_pathogenic,Baraitser-Winter syndrome 1 | Intellectual disability,"criteria provided, multiple submitters, no conflicts",577358
+ACTB,229,T,M,p.T229M,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",565729
+ACTB,42,G,S,p.G42S,Conflicting classifications of pathogenicity,conflicting,Baraitser-Winter syndrome 1,"criteria provided, conflicting classifications",561793
+ACTB,165,I,M,p.I165M,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",561747
+ACTB,258,P,L,p.P258L,Likely pathogenic,likely_pathogenic,Baraitser-Winter syndrome 1 | Inborn genetic diseases,"criteria provided, multiple submitters, no conflicts",545067
+ACTB,15,G,A,p.G15A,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",534590
+ACTB,197,G,S,p.G197S,Pathogenic/Likely pathogenic,likely_pathogenic,Baraitser-Winter syndrome 1 | Inborn genetic diseases,"criteria provided, multiple submitters, no conflicts",522017
+ACTB,296,N,K,p.N296K,Likely pathogenic,likely_pathogenic,Inborn genetic diseases,"criteria provided, single submitter",521672
+ACTB,136,I,V,p.I136V,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",521314
+ACTB,87,H,D,p.H87D,Pathogenic,pathogenic,Inborn genetic diseases,"criteria provided, single submitter",521266
+ACTB,73,H,Y,p.H73Y,Pathogenic/Likely pathogenic,likely_pathogenic,Baraitser-Winter syndrome 1 | Neurodevelopmental delay,"criteria provided, multiple submitters, no conflicts",520411
+ACTB,38,P,L,p.P38L,Likely pathogenic,likely_pathogenic,Baraitser-Winter syndrome 1,"criteria provided, single submitter",466230
+ACTB,86,W,C,p.W86C,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",451798
+ACTB,276,E,K,p.E276K,Pathogenic/Likely pathogenic,likely_pathogenic,Baraitser-Winter syndrome 1 | Cleft palate,"criteria provided, multiple submitters, no conflicts",449190
+ACTB,176,L,P,p.L176P,Likely pathogenic,likely_pathogenic,Baraitser-Winter syndrome 1,"criteria provided, single submitter",446430
+ACTB,117,E,V,p.E117V,Pathogenic,pathogenic,Baraitser-Winter syndrome 1,no assertion criteria provided,438274
+ACTB,338,S,F,p.S338F,Likely pathogenic,likely_pathogenic,Baraitser-Winter syndrome 1,no assertion criteria provided,438273
+ACTB,117,E,D,p.E117D,Pathogenic,pathogenic,Baraitser-Winter syndrome 1,"criteria provided, single submitter",431099
+ACTB,72,E,G,p.E72G,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",429359
+ACTB,187,D,E,p.D187E,Uncertain significance,uncertain,,"criteria provided, single submitter",426872
+ACTB,179,D,H,p.D179H,Uncertain significance,uncertain,,"criteria provided, single submitter",423458
+ACTB,210,R,H,p.R210H,Pathogenic/Likely pathogenic,likely_pathogenic,ACTB-related BAFopathy | Baraitser-Winter syndrome 1,"criteria provided, multiple submitters, no conflicts",418804
+ACTB,103,V,M,p.V103M,Uncertain significance,uncertain,,"criteria provided, single submitter",418803
+ACTB,343,G,D,p.G343D,Uncertain significance,uncertain,,"criteria provided, single submitter",393092
+ACTB,340,W,C,p.W340C,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",372965
+ACTB,160,T,I,p.T160I,Likely pathogenic,likely_pathogenic,Baraitser-Winter syndrome 1,"criteria provided, multiple submitters, no conflicts",372917
+ACTB,206,R,G,p.R206G,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",372914
+ACTB,290,R,C,p.R290C,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",372616
+ACTB,340,W,C,p.W340C,Pathogenic,pathogenic,,"criteria provided, single submitter",280619
+ACTB,348,S,L,p.S348L,Pathogenic/Likely pathogenic,likely_pathogenic,Baraitser-Winter syndrome 1 | Intellectual disability,"criteria provided, multiple submitters, no conflicts",279997
+ACTB,341,I,L,p.I341L,Uncertain significance,uncertain,,"criteria provided, single submitter",279990
+ACTB,52,S,F,p.S52F,Uncertain significance,uncertain,,"criteria provided, single submitter",279943
+ACTB,28,R,G,p.R28G,Conflicting classifications of pathogenicity,conflicting,ACTB-related BAFopathy | Baraitser-Winter syndrome 1,"criteria provided, conflicting classifications",279942
+ACTB,48,G,D,p.G48D,Conflicting classifications of pathogenicity,conflicting,Baraitser-Winter syndrome 1,"criteria provided, conflicting classifications",279940
+ACTB,43,V,M,p.V43M,Pathogenic,pathogenic,,"criteria provided, single submitter",279939
+ACTB,199,S,R,p.S199R,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",279938
+ACTB,206,R,Q,p.R206Q,Pathogenic/Likely pathogenic,likely_pathogenic,Baraitser-Winter syndrome 1 | Inborn genetic diseases,"criteria provided, multiple submitters, no conflicts",265318
+ACTB,268,G,R,p.G268R,Pathogenic,pathogenic,Baraitser-Winter syndrome 1,no assertion criteria provided,264642
+ACTB,364,E,K,p.E364K,Conflicting classifications of pathogenicity,conflicting,ACTB-associated syndromic thrombocytopenia | Thrombocytopenia,no assertion criteria provided,218132
+ACTB,179,D,E,p.D179E,Uncertain significance,uncertain,Baraitser-Winter syndrome 1 | Inborn genetic diseases,"criteria provided, multiple submitters, no conflicts",208776
+ACTB,73,H,D,p.H73D,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",191218
+ACTB,22,A,T,p.A22T,Likely pathogenic,likely_pathogenic,ACTB-associated syndromic thrombocytopenia | Baraitser-Winter syndrome 1,"criteria provided, multiple submitters, no conflicts",128262
+ACTB,209,V,M,p.V209M,Pathogenic/Likely pathogenic,likely_pathogenic,ACTB-related BAFopathy | Baraitser-Winter syndrome 1 | Inborn genetic diseases,"criteria provided, multiple submitters, no conflicts",127172
+ACTB,204,A,G,p.A204G,Pathogenic,pathogenic,Baraitser-Winter syndrome 1,"criteria provided, single submitter",127171
+ACTB,196,R,S,p.R196S,Pathogenic,pathogenic,Baraitser-Winter syndrome 1,no assertion criteria provided,127170
+ACTB,149,T,I,p.T149I,Pathogenic,pathogenic,Baraitser-Winter syndrome 1,no assertion criteria provided,127169
+ACTB,120,T,I,p.T120I,Pathogenic,pathogenic,Baraitser-Winter syndrome 1,no assertion criteria provided,127168
+ACTB,119,M,T,p.M119T,Pathogenic,pathogenic,,"criteria provided, single submitter",127167
+ACTB,12,N,H,p.N12H,Pathogenic,pathogenic,Baraitser-Winter syndrome 1,no assertion criteria provided,127166
+ACTB,103,V,L,p.V103L,Conflicting classifications of pathogenicity,conflicting,Baraitser-Winter syndrome | Baraitser-Winter syndrome 1,"criteria provided, conflicting classifications",127165
+ACTB,75,I,T,p.I75T,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",127164
+ACTB,74,G,S,p.G74S,Likely pathogenic,likely_pathogenic,Baraitser-Winter syndrome 1,"criteria provided, multiple submitters, no conflicts",127163
+ACTB,70,P,L,p.P70L,Conflicting classifications of pathogenicity,conflicting,Baraitser-Winter syndrome 1,"criteria provided, conflicting classifications",127162
+ACTB,65,L,F,p.L65F,Conflicting classifications of pathogenicity,conflicting,Baraitser-Winter syndrome 1,"criteria provided, conflicting classifications",127161
+ACTB,117,E,K,p.E117K,Pathogenic,pathogenic,,"criteria provided, single submitter",66051
+ACTB,12,N,D,p.N12D,Pathogenic,pathogenic,Baraitser-Winter syndrome 1,no assertion criteria provided,29602
+ACTB,65,L,V,p.L65V,Pathogenic,pathogenic,Baraitser-Winter syndrome 1,no assertion criteria provided,29601
+ACTB,196,R,C,p.R196C,Pathogenic,pathogenic,Baraitser-Winter syndrome 1,"criteria provided, multiple submitters, no conflicts",29600
+ACTB,196,R,H,p.R196H,Pathogenic,pathogenic,Baraitser-Winter syndrome 1 | Inborn genetic diseases,"criteria provided, multiple submitters, no conflicts",29599
+ACTB,183,R,W,p.R183W,Pathogenic,pathogenic,ACTB-related BAFopathy | Baraitser-Winter syndrome 1 | Developmental malformations-deafness-dystonia syndrome | Inborn genetic diseases,"criteria provided, multiple submitters, no conflicts",18275

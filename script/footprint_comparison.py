@@ -21,13 +21,14 @@ def footprint_records(all_data, interactions, residues):
         partner_flag = m[f's{other}_actine'].astype(str).str.lower()
         for kind,flag in [('homo','true'),('abp','false')]:
             rows=m[actin & partner_flag.eq(flag)].copy()
-            rows['group'] = rows[f's{side}_binding_site_cluster_data_70'] if kind=='homo' else rows[f'subunit_{other}_title']
+            rows['site'] = rows[f's{side}_binding_site_cluster_data_70']
+            rows['group'] = rows['site'] if kind=='homo' else rows[f'subunit_{other}_title']
             rows=rows.rename(columns={f'subunit_{side}':'chain'})
-            joined=rows[['interaction_id','chain','group']].merge(residues,on=['interaction_id','chain'])
+            joined=rows[['interaction_id','chain','group','site']].merge(residues,on=['interaction_id','chain'])
             joined['position'] = numbering.uniprot_series(joined['residue_number_canon_mafft'])
             joined['asa'] = pd.to_numeric(joined['buried_ASA_percent'].astype(str).str.replace('%','',regex=False),errors='coerce')
             joined['kind']=kind
-            parts.append(joined[['kind','group','position','asa']])
+            parts.append(joined[['kind','group','site','interaction_id','chain','position','asa']])
     return pd.concat(parts,ignore_index=True).dropna(subset=['group','position','asa']).drop_duplicates()
 
 
@@ -57,6 +58,15 @@ def render_footprint_comparison():
                    'P60709 positions, not an average of structures.')
         records=load_footprints(tuple(p.stat().st_mtime_ns for p in FILES))
         sites=sorted(records.loc[records.kind.eq('homo'),'group'].unique(),key=lambda s:int(str(s).split('_')[-1]))
+        if st.button('Compare reference F-actin sites with observed 5YU8 cofilactin sites',key='fp_reference_preset'):
+            meta=pd.read_csv(FILES[0],low_memory=False)
+            subset=meta[meta.pdb_id.eq('5yu8') & meta.s1_actine & meta.s2_actine]
+            observed=set(subset.s1_binding_site_cluster_data_70.dropna())|set(subset.s2_binding_site_cluster_data_70.dropna())
+            st.session_state['fp_reference']=[p for p in ['6685_1','6685_2','6685_3','6685_4'] if p in sites]
+            st.session_state['fp_comparison']=[p for p in sites if p in observed]
+        st.caption('The 5YU8 preset uses sites observed in a published cofilin-decorated filament. '
+                   'Footprints still aggregate all observations belonging to each selected site; '
+                   'this is not a classification of all minor interfaces.')
         a=st.multiselect('Reference actin–actin sites',sites,
                          default=[p for p in ['6685_1','6685_2','6685_3','6685_4'] if p in sites],key='fp_reference')
         b=st.multiselect('Comparison actin–actin sites',sites,key='fp_comparison')

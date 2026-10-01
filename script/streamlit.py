@@ -2460,3 +2460,12 @@ with _sections["abp-conservation"]:
         _msa_section_s2_clusters()
 
 # End of legacy analysis views.
+
+# Source-validated research views (P60709 coordinates).
+from scientific_views import render_variants, render_conservation, render_interface_evidence
+with _sections["human-actin-variants"]:
+    render_variants()
+with _sections["actin-conservation"]:
+    render_conservation()
+with _sections["actin-actin-interfaces"]:
+    render_interface_evidence()

@@ -1,0 +1,42 @@
+{
+  "generated_utc": "2026-10-01T11:16:17.691022+00:00",
+  "variant_records": 3039,
+  "mapped_variant_records": 3022,
+  "analysis_eligible_records": 2864,
+  "positions": 375,
+  "ASA_threshold": 0,
+  "numbering": "P60709",
+  "scientific_status": "Exploratory; structure-state labels and clinical effects are not validated by these statistics.",
+  "source_sha256": {
+    "data/human_variants/clinvar_identity.json": "f0fd6729668d7756182575a790f79ee11171dd33d0b49ff80b306eac259a5196",
+    "data/filtered/filtered_all_data.csv": "2cc698166ffe50f9e0793289e6fbef470aaffbe52bbd44a9814789effa497574",
+    "data/filtered/details/1.interactions.csv": "ea101480359ff3a436093ebf9593004f7af4d8ae242e738fb01f29ee6238a893",
+    "data/filtered/details/3.interface_residues.csv": "e403fcda60c6df08b5a6298809c20f9c241991b32674fe2c1efc849531f69581",
+    "data/human_variants/sources/clinvar_ACTG1.csv": "c59fe2d507e940970772a5213907d88b5496662c576e16b42bb75da09d140097",
+    "data/human_variants/sources/clinvar_ACTG2.csv": "3e2468a07d9d8611da694fd072740c457efa403c191288241088edfe1a8d8dd7",
+    "data/human_variants/sources/clinvar_ACTA2.csv": "7feeedb31bb52befa521799d22b953b036bca486bfd8e312b9638a7eaf8e4c15",
+    "data/human_variants/sources/gnomad_ACTC1.csv": "8c708de62e1e8b79d5668a1eee51fb5ee88ebc142794f6f6f864b127549f3bde",
+    "data/human_variants/sources/clinvar_ACTA1.csv": "c64c34483b7c0d107f60dc97686331b0b19ce3807937c300ddd0381e708a6ec9",
+    "data/human_variants/sources/clinvar_ACTB.csv": "77f025e0d38e1775e40f9492039e496e191f5fbcaeab1c0b9c3af6a6df9be95c",
+    "data/human_variants/sources/gnomad_ACTA1.csv": "597a9fb690bfaa63df44bf1795d5e17c93ff33822c80acfbbdba37a62ae2b104",
+    "data/human_variants/sources/gnomad_ACTA2.csv": "8fbb2b56cb8799a3e7347761b805cbde8d065187315acb72961676b408f6b4c3",
+    "data/human_variants/sources/clinvar_ACTC1.csv": "aa8082d5ee80e36da66798f404075964cb8796dc6b8882a5844fe8d2aef52b4e",
+    "data/human_variants/sources/gnomad_ACTG2.csv": "ea0dd6858a9d5bb985987957d971d118c40d26533c232652dac8439aab35a0e0",
+    "data/human_variants/sources/gnomad_ACTG1.csv": "49fd44b3a355403a4c0b84f367deb583cf272779740237538681310511ec7c4f",
+    "data/human_variants/sources/gnomad_ACTB.csv": "99308bfd309c7819ec4f64e605e8962b425d04876b8569ad99f14c081baa70f8",
+    "data/human_variants/ref/P63267.fasta": "bc7ceabb775356315950f50072cc8677f7211e29d3e0ed48bbc934437ff9a636",
+    "data/human_variants/ref/P63261.fasta": "6bf63f586ca0af34a8b4c63dcf20902932b0c2035c2a0b43f1f3d383d426376a",
+    "data/human_variants/ref/P62736.fasta": "493e00a0c2d08af9952f3c8157ff26fa7e39eaba296b7f9bb9381523fd6cd155",
+    "data/human_variants/ref/P68133.fasta": "e89f133dcfeb900c555689ac80ed3dd6dd46d2b75a7005ad2f0fee0956e0ec3a",
+    "data/human_variants/ref/P60709.fasta": "50469aa3087cbb3679ce4167ab78ce1352cc07bd7fa6533e77ed9601dedcaa08",
+    "data/human_variants/ref/P68032.fasta": "9260f2621dbc656bfdedb7f81fee2a167107262735ba6b504b8b19ff4d1692cb",
+    "data/proteocast/actin/1.query.fasta": "350341f0efa6d0b5736714a0a5ec50721be5211481c8cfb8b4f44dd4267f311c",
+    "data/proteocast/actin/2.aliAF-P60709-F1-msa_v6.fasta": "e8bbcc7c1a7ea66d1fbe5272509c2496d591cbd573d6361c62781c9a14f9f7da",
+    "data/proteocast/actin/4.query_ProteoCast.csv": "909024144ba3aa29fe879bbdb4c2c661a74ee30d90d4b993406500e6d81cd4e4",
+    "data/proteocast/conservation_vs_asa_per_position.csv": "9e74b08cd8973d457cdd3cf1bf59c72332c02f3557f52b993f1b54e88780074e"
+  },
+  "code_sha256": {
+    "script/scientific_analysis.py": "a999fded4a95147f56c5724f4d1706a7f19c47f2a6ea15287b6e72e7c4a4ff29",
+    "script/footprint_comparison.py": "19f8cb803fc8b00ea2c2141f53b1ad6ff1ddc55f008f79644bbac1852c660ac5"
+  }
+}

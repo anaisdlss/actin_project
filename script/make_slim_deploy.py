@@ -51,6 +51,8 @@ def _keep(path: Path) -> bool:
         return False
     if path.suffix.lower() == ".fasta" and path.is_file() \
             and path.stat().st_size > FASTA_MAX:
+        if p == "data/proteocast/actin/2.aliAF-P60709-F1-msa_v6.fasta":
+            return True  # Requested downloadable actin alignment (about 7 MB).
         return False
     return True
 
@@ -99,6 +101,14 @@ def main():
     (deploy / "README.md").write_text(DEPLOY_README)
     if Path("GUIDE.md").exists():           # doc affichée dans l'app
         shutil.copy2("GUIDE.md", deploy / "GUIDE.md")
+    # Small structural audit displayed in the scientific interface section.
+    audit = Path("reports/scientific_audit")
+    for name in ("representative_geometry_summary.csv", "representative_geometry.csv",
+                 "representative_geometry_manifest.json"):
+        if (audit / name).exists():
+            target = deploy / audit / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(audit / name, target)
 
     print(f"deploy/data/ : {n_files} fichiers, {total/1e6:.0f} Mo")
     print("deploy/ = app autonome (code + data slim + requirements.txt).")

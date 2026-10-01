@@ -39,7 +39,7 @@ _PP_FILES = [
 def pp_mtimes():
     """Empreinte temporelle des fichiers sources (clé de cache)."""
     return tuple(os.path.getmtime(f) if os.path.exists(f) else 0.0
-                 for f in [*_PP_FILES, _REF_FASTA])
+                 for f in [*_PP_FILES, _REF_FASTA, "data/proteocast/actin/4.query_ProteoCast.csv", "data/proteocast/actin/1.query.fasta"])
 
 
 def _clean_abp_name(s: pd.Series) -> pd.Series:
@@ -157,7 +157,11 @@ def build_passport(mtimes):
 
     # ── pos : conservation par position + agrégats ABP ─────────────────────────
     if os.path.exists(f_cons):
-        pos = pd.read_csv(f_cons)
+        if os.path.exists("data/proteocast/actin/4.query_ProteoCast.csv"):
+            from scientific_analysis import canonical_conservation
+            pos = canonical_conservation()
+        else:
+            pos = pd.read_csv(f_cons)
     else:
         pos = pd.DataFrame({"canon": sorted(res_abp["canon"].unique())})
     pos["canon"] = pd.to_numeric(pos["canon"], errors="coerce")

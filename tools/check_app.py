@@ -40,4 +40,12 @@ app.selectbox(key='homo_site_link').set_value('6685_3')
 app.button(key='homo_site_open').click()
 check('mixed binding-site navigation')
 assert app.selectbox(key='sel_s1').value == '6685_3'
+if Path('data/human_variants/manifest.json').exists():
+    app.selectbox(key='hv_gene').set_value('ACTG2')
+    app.selectbox(key='hv_category').set_value('uncertain')
+    check('human ACTG2 uncertain variants and disease associations')
+    app.selectbox(key='hv_gene').set_value('ACTB')
+    app.selectbox(key='hv_category').set_value('conflicting')
+    app.slider(key='cons_asa').set_value(100.0)
+    check('conflicting variants and empty conservation footprints')
 print('All representative paths passed. Browser/3D and scientific validation remain separate.')

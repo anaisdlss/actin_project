@@ -35,9 +35,7 @@ def create_sections():
             st.header(title, anchor=key)
             if description:
                 st.caption(description)
-            if key == "human-actin-variants":
-                st.info("Human actin variant analyses are not included in this build yet.")
-            elif key in {"actin-conservation", "abp-conservation", "interface-properties", "homolog-search"}:
+            if key in {"actin-conservation", "abp-conservation", "interface-properties", "homolog-search"}:
                 if not Path("data/filtered/proteins_per_pdb.csv").exists():
                     st.info("Analysis data are not available in this local dataset yet.")
     return sections

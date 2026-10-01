@@ -1,0 +1,358 @@
+gene,pos,aa_ref,aa_alt,hgvsp,classification,classif_cat,maladies,review_status,clinvar_id
+ACTC1,312,A,S,p.A312S,Uncertain significance,uncertain,Cardiovascular phenotype,"criteria provided, single submitter",4844296
+ACTC1,224,D,N,p.D224N,Uncertain significance,uncertain,Cardiovascular phenotype,"criteria provided, single submitter",4844295
+ACTC1,304,G,S,p.G304S,Uncertain significance,uncertain,Cardiovascular phenotype,"criteria provided, single submitter",4844294
+ACTC1,307,M,L,p.M307L,Uncertain significance,uncertain,Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",4813130
+ACTC1,130,N,D,p.N130D,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",4793655
+ACTC1,62,S,G,p.S62G,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",4793349
+ACTC1,132,P,H,p.P132H,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",4793300
+ACTC1,47,V,L,p.V47L,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",4787195
+ACTC1,256,R,H,p.R256H,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",4783298
+ACTC1,37,V,L,p.V37L,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",4783297
+ACTC1,294,D,E,p.D294E,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",4783294
+ACTC1,239,E,V,p.E239V,Likely pathogenic,likely_pathogenic,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",4783293
+ACTC1,217,K,R,p.K217R,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",4783291
+ACTC1,134,M,V,p.M134V,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",4782957
+ACTC1,250,I,V,p.I250V,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",4782952
+ACTC1,326,T,S,p.T326S,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",4782766
+ACTC1,65,G,V,p.G65V,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",4782764
+ACTC1,355,Q,R,p.Q355R,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",4782630
+ACTC1,266,P,A,p.P266A,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",4782548
+ACTC1,121,M,R,p.M121R,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",4782527
+ACTC1,218,L,V,p.L218V,Uncertain significance,uncertain,Cardiomyopathy,"criteria provided, single submitter",4758880
+ACTC1,129,F,L,p.F129L,Uncertain significance,uncertain,Cardiomyopathy,"criteria provided, single submitter",4758748
+ACTC1,29,P,S,p.P29S,Uncertain significance,uncertain,Cardiomyopathy,"criteria provided, single submitter",4758029
+ACTC1,299,N,S,p.N299S,Uncertain significance,uncertain,Cardiomyopathy,"criteria provided, single submitter",4757820
+ACTC1,8,T,S,p.T8S,Uncertain significance,uncertain,Cardiomyopathy,"criteria provided, single submitter",4757615
+ACTC1,154,V,L,p.V154L,Uncertain significance,uncertain,Cardiomyopathy,"criteria provided, single submitter",4757611
+ACTC1,266,P,L,p.P266L,Uncertain significance,uncertain,Hypertrophic cardiomyopathy,reviewed by expert panel,4685466
+ACTC1,345,G,V,p.G345V,Uncertain significance,uncertain,Hypertrophic cardiomyopathy,reviewed by expert panel,4685465
+ACTC1,319,I,T,p.I319T,Uncertain significance,uncertain,,"criteria provided, single submitter",4682086
+ACTC1,172,A,V,p.A172V,Uncertain significance,uncertain,Cardiovascular phenotype,"criteria provided, single submitter",4613355
+ACTC1,89,H,R,p.H89R,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",4538310
+ACTC1,186,D,E,p.D186E,Uncertain significance,uncertain,Dilated cardiomyopathy 1R,"criteria provided, single submitter",4531497
+ACTC1,297,A,G,p.A297G,Uncertain significance,uncertain,Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",4531496
+ACTC1,294,D,Y,p.D294Y,,other,,,4401583
+ACTC1,60,A,V,p.A60V,Uncertain significance,uncertain,,"criteria provided, single submitter",4072650
+ACTC1,215,K,E,p.K215E,Likely pathogenic,likely_pathogenic,Atrial septal defect 5,"criteria provided, single submitter",4072043
+ACTC1,50,G,A,p.G50A,Uncertain significance,uncertain,Cardiovascular phenotype,"criteria provided, single submitter",3894778
+ACTC1,276,I,F,p.I276F,Uncertain significance,uncertain,Cardiomyopathy,"criteria provided, single submitter",3894292
+ACTC1,134,M,I,p.M134I,Uncertain significance,uncertain,Cardiovascular phenotype,"criteria provided, single submitter",3825800
+ACTC1,175,H,R,p.H175R,Uncertain significance,uncertain,Cardiovascular phenotype,"criteria provided, single submitter",3825756
+ACTC1,332,I,T,p.I332T,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",3776135
+ACTC1,1,M,I,p.M1I,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",3762787
+ACTC1,299,N,Y,p.N299Y,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",3758849
+ACTC1,232,A,S,p.A232S,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",3758630
+ACTC1,185,R,L,p.R185L,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",3757193
+ACTC1,279,T,K,p.T279K,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",3756230
+ACTC1,256,R,P,p.R256P,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",3755985
+ACTC1,36,I,L,p.I36L,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",3754757
+ACTC1,259,C,S,p.C259S,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",3754479
+ACTC1,37,V,M,p.V37M,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",3753198
+ACTC1,57,G,S,p.G57S,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",3752785
+ACTC1,300,V,I,p.V300I,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",3752689
+ACTC1,19,V,M,p.V19M,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",3752643
+ACTC1,307,M,T,p.M307T,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",3752492
+ACTC1,286,K,N,p.K286N,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",3751003
+ACTC1,263,L,V,p.L263V,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",3749971
+ACTC1,106,L,V,p.L106V,Uncertain significance,uncertain,,"criteria provided, single submitter",3393779
+ACTC1,78,I,V,p.I78V,Uncertain significance,uncertain,Hypertrophic cardiomyopathy,"criteria provided, single submitter",3387053
+ACTC1,108,T,K,p.T108K,Uncertain significance,uncertain,Hypertrophic cardiomyopathy,"criteria provided, single submitter",3387037
+ACTC1,242,Y,S,p.Y242S,Uncertain significance,uncertain,Hypertrophic cardiomyopathy,"criteria provided, single submitter",3386936
+ACTC1,279,T,A,p.T279A,Uncertain significance,uncertain,Hypertrophic cardiomyopathy,"criteria provided, single submitter",3386882
+ACTC1,108,T,P,p.T108P,Uncertain significance,uncertain,,"criteria provided, single submitter",3383773
+ACTC1,256,R,C,p.R256C,Likely pathogenic,likely_pathogenic,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",3382680
+ACTC1,57,G,D,p.G57D,Conflicting classifications of pathogenicity,conflicting,Dilated cardiomyopathy 1R,"criteria provided, conflicting classifications",3373581
+ACTC1,53,D,Y,p.D53Y,Uncertain significance,uncertain,,"criteria provided, single submitter",3371658
+ACTC1,9,A,T,p.A9T,Uncertain significance,uncertain,,"criteria provided, single submitter",3367796
+ACTC1,273,S,T,p.S273T,Uncertain significance,uncertain,,"criteria provided, single submitter",3364889
+ACTC1,265,Q,H,p.Q265H,Uncertain significance,uncertain,,"criteria provided, single submitter",3364826
+ACTC1,297,A,P,p.A297P,Uncertain significance,uncertain,,"criteria provided, single submitter",3364608
+ACTC1,14,N,H,p.N14H,Uncertain significance,uncertain,ACTC1-related disorder,no assertion criteria provided,3346868
+ACTC1,161,V,E,p.V161E,Uncertain significance,uncertain,Cardiovascular phenotype,"criteria provided, single submitter",3263746
+ACTC1,107,L,F,p.L107F,Uncertain significance,uncertain,Cardiovascular phenotype,"criteria provided, single submitter",3263703
+ACTC1,107,L,F,p.L107F,Uncertain significance,uncertain,Cardiovascular phenotype,"criteria provided, single submitter",3263694
+ACTC1,132,P,S,p.P132S,Uncertain significance,uncertain,,"criteria provided, single submitter",3257557
+ACTC1,87,I,V,p.I87V,Uncertain significance,uncertain,,"criteria provided, single submitter",3252322
+ACTC1,194,I,M,p.I194M,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",3224602
+ACTC1,60,A,S,p.A60S,Uncertain significance,uncertain,Cardiovascular phenotype,"criteria provided, single submitter",3224600
+ACTC1,370,S,P,p.S370P,Uncertain significance,uncertain,Cardiovascular phenotype,"criteria provided, single submitter",3224598
+ACTC1,368,G,D,p.G368D,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",3224597
+ACTC1,26,D,E,p.D26E,Uncertain significance,uncertain,Hypertrophic cardiomyopathy,"criteria provided, single submitter",3075659
+ACTC1,198,R,C,p.R198C,Uncertain significance,uncertain,Hypertrophic cardiomyopathy,"criteria provided, single submitter",3075654
+ACTC1,205,T,S,p.T205S,Uncertain significance,uncertain,Cardiomyopathy | Cardiovascular phenotype | Hypertrophic cardiomyopathy,"criteria provided, multiple submitters, no conflicts",3074667
+ACTC1,227,N,D,p.N227D,Uncertain significance,uncertain,Hypertrophic cardiomyopathy,"criteria provided, single submitter",3074105
+ACTC1,357,M,R,p.M357R,Uncertain significance,uncertain,Hypertrophic cardiomyopathy,"criteria provided, single submitter",3073459
+ACTC1,7,T,N,p.T7N,Uncertain significance,uncertain,Hypertrophic cardiomyopathy,"criteria provided, single submitter",3071564
+ACTC1,12,C,Y,p.C12Y,Uncertain significance,uncertain,Hypertrophic cardiomyopathy,"criteria provided, single submitter",3071498
+ACTC1,367,A,V,p.A367V,Uncertain significance,uncertain,Hypertrophic cardiomyopathy,"criteria provided, single submitter",3071494
+ACTC1,229,M,T,p.M229T,Uncertain significance,uncertain,Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",3068407
+ACTC1,360,S,N,p.S360N,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2954320
+ACTC1,285,M,R,p.M285R,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2953358
+ACTC1,181,D,N,p.D181N,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiomyopathy | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",2953352
+ACTC1,14,N,D,p.N14D,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2952343
+ACTC1,345,G,A,p.G345A,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2951057
+ACTC1,1,M,V,p.M1V,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2950970
+ACTC1,141,V,L,p.V141L,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2950652
+ACTC1,213,D,E,p.D213E,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2950438
+ACTC1,317,K,N,p.K317N,Likely pathogenic,likely_pathogenic,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2950148
+ACTC1,74,E,Q,p.E74Q,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2949091
+ACTC1,283,S,T,p.S283T,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",2948203
+ACTC1,96,L,F,p.L96F,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",2947441
+ACTC1,11,V,L,p.V11L,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2947021
+ACTC1,193,K,R,p.K193R,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2945285
+ACTC1,253,G,A,p.G253A,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2944752
+ACTC1,82,D,N,p.D82N,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2944561
+ACTC1,271,M,I,p.M271I,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2944417
+ACTC1,15,G,R,p.G15R,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2943996
+ACTC1,113,N,Y,p.N113Y,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2942411
+ACTC1,260,P,A,p.P260A,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2942164
+ACTC1,113,N,H,p.N113H,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2942146
+ACTC1,99,A,V,p.A99V,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2941506
+ACTC1,302,S,Y,p.S302Y,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2940781
+ACTC1,105,T,I,p.T105I,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2936878
+ACTC1,36,I,M,p.I36M,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiomyopathy | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",2935933
+ACTC1,245,P,S,p.P245S,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2935885
+ACTC1,321,A,V,p.A321V,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",2934988
+ACTC1,151,T,I,p.T151I,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",2932696
+ACTC1,122,T,I,p.T122I,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2932282
+ACTC1,31,A,V,p.A31V,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2929699
+ACTC1,230,A,V,p.A230V,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2925303
+ACTC1,370,S,C,p.S370C,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11 | Primary dilated cardiomyopathy,"criteria provided, multiple submitters, no conflicts",2924822
+ACTC1,317,K,R,p.K317R,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2921885
+ACTC1,285,M,I,p.M285I,Uncertain significance,uncertain,Cardiomyopathy,"criteria provided, single submitter",2774868
+ACTC1,220,Y,C,p.Y220C,Uncertain significance,uncertain,,"criteria provided, single submitter",2683287
+ACTC1,39,R,H,p.R39H,Likely benign,likely_benign,EBV-positive nodal T- and NK-cell lymphoma,no assertion criteria provided,2681695
+ACTC1,285,M,V,p.M285V,Uncertain significance,uncertain,Cardiovascular phenotype,"criteria provided, single submitter",2625263
+ACTC1,1,M,L,p.M1L,Uncertain significance,uncertain,Cardiovascular phenotype,"criteria provided, single submitter",2625261
+ACTC1,374,R,H,p.R374H,Likely pathogenic,likely_pathogenic,Arthrogryposis,"criteria provided, single submitter",2579718
+ACTC1,63,K,N,p.K63N,Uncertain significance,uncertain,Dilated cardiomyopathy 1R,"criteria provided, single submitter",2579649
+ACTC1,277,H,R,p.H277R,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",2575660
+ACTC1,208,R,S,p.R208S,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",2574201
+ACTC1,260,P,S,p.P260S,Uncertain significance,uncertain,Cardiovascular phenotype,"criteria provided, single submitter",2562965
+ACTC1,331,I,F,p.I331F,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",2486898
+ACTC1,374,R,C,p.R374C,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",2486608
+ACTC1,174,P,H,p.P174H,Uncertain significance,uncertain,ACTC1-related disorder | Cardiovascular phenotype,"criteria provided, multiple submitters, no conflicts",2447969
+ACTC1,283,S,R,p.S283R,Uncertain significance,uncertain,,"criteria provided, single submitter",2444739
+ACTC1,27,D,E,p.D27E,Uncertain significance,uncertain,,"criteria provided, single submitter",2438841
+ACTC1,53,D,N,p.D53N,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2162480
+ACTC1,174,P,T,p.P174T,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2157713
+ACTC1,110,A,V,p.A110V,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2137647
+ACTC1,220,Y,F,p.Y220F,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2129048
+ACTC1,161,V,I,p.V161I,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2116722
+ACTC1,18,L,M,p.L18M,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2107634
+ACTC1,126,F,I,p.F126I,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2094462
+ACTC1,32,V,L,p.V32L,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2078612
+ACTC1,151,T,A,p.T151A,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2055003
+ACTC1,100,P,T,p.P100T,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2051784
+ACTC1,21,A,T,p.A21T,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",2045899
+ACTC1,28,A,T,p.A28T,Conflicting classifications of pathogenicity,conflicting,Atrial septal defect 5 | Autosomal dominant ACTC1-related disorders | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, conflicting classifications",2044985
+ACTC1,147,S,C,p.S147C,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2044786
+ACTC1,357,M,T,p.M357T,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",2044191
+ACTC1,194,I,N,p.I194N,Likely pathogenic,likely_pathogenic,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2015662
+ACTC1,224,D,G,p.D224G,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",2005619
+ACTC1,182,L,M,p.L182M,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",2002755
+ACTC1,177,I,F,p.I177F,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",1996260
+ACTC1,197,E,G,p.E197G,Uncertain significance,uncertain,,"criteria provided, single submitter",1809768
+ACTC1,170,G,D,p.G170D,Uncertain significance,uncertain,Dilated cardiomyopathy 1R,"criteria provided, single submitter",1806247
+ACTC1,101,E,G,p.E101G,Uncertain significance,uncertain,Cardiovascular phenotype,"criteria provided, single submitter",1799000
+ACTC1,371,I,V,p.I371V,Uncertain significance,uncertain,Cardiovascular phenotype,"criteria provided, single submitter",1795245
+ACTC1,66,I,M,p.I66M,Uncertain significance,uncertain,Cardiovascular phenotype,"criteria provided, single submitter",1783928
+ACTC1,6,E,D,p.E6D,Uncertain significance,uncertain,Cardiovascular phenotype,"criteria provided, single submitter",1782285
+ACTC1,314,R,C,p.R314C,Conflicting classifications of pathogenicity,conflicting,Cardiomyopathy | Cardiovascular phenotype,"criteria provided, conflicting classifications",1766875
+ACTC1,292,R,P,p.R292P,Uncertain significance,uncertain,Cardiovascular phenotype,"criteria provided, single submitter",1764572
+ACTC1,251,T,I,p.T251I,Uncertain significance,uncertain,Cardiovascular phenotype,"criteria provided, single submitter",1759365
+ACTC1,185,R,Q,p.R185Q,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",1748233
+ACTC1,286,K,E,p.K286E,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",1721173
+ACTC1,142,L,V,p.L142V,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",1720738
+ACTC1,152,G,V,p.G152V,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",1719764
+ACTC1,97,R,H,p.R97H,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",1719755
+ACTC1,189,D,H,p.D189H,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",1718106
+ACTC1,82,D,E,p.D82E,Uncertain significance,uncertain,Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy,"criteria provided, multiple submitters, no conflicts",1709086
+ACTC1,134,M,T,p.M134T,Uncertain significance,uncertain,,"criteria provided, single submitter",1677379
+ACTC1,253,G,V,p.G253V,Uncertain significance,uncertain,Dilated cardiomyopathy 1R,"criteria provided, multiple submitters, no conflicts",1526140
+ACTC1,232,A,G,p.A232G,Uncertain significance,uncertain,Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",1526062
+ACTC1,322,L,V,p.L322V,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",1512610
+ACTC1,365,D,Y,p.D365Y,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",1511714
+ACTC1,377,F,V,p.F377V,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",1508692
+ACTC1,97,R,C,p.R97C,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",1508500
+ACTC1,133,A,P,p.A133P,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",1487032
+ACTC1,295,L,M,p.L295M,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",1477386
+ACTC1,242,Y,C,p.Y242C,Conflicting classifications of pathogenicity,conflicting,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, conflicting classifications",1476025
+ACTC1,367,A,G,p.A367G,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",1470228
+ACTC1,52,K,T,p.K52T,Likely pathogenic,likely_pathogenic,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",1469293
+ACTC1,218,L,M,p.L218M,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",1468944
+ACTC1,158,G,E,p.G158E,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",1437697
+ACTC1,42,H,Y,p.H42Y,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",1437046
+ACTC1,233,A,P,p.A233P,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",1430818
+ACTC1,356,Q,R,p.Q356R,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",1421370
+ACTC1,176,A,V,p.A176V,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",1402129
+ACTC1,362,Q,P,p.Q362P,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",1393320
+ACTC1,56,V,L,p.V56L,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",1357696
+ACTC1,189,D,A,p.D189A,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",1352174
+ACTC1,137,A,V,p.A137V,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",1346670
+ACTC1,115,K,R,p.K115R,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",1335942
+ACTC1,333,A,S,p.A333S,Uncertain significance,uncertain,Cardiomyopathy,"criteria provided, single submitter",1329279
+ACTC1,311,I,N,p.I311N,Uncertain significance,uncertain,,"criteria provided, single submitter",1319898
+ACTC1,201,S,P,p.S201P,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",1314000
+ACTC1,341,V,L,p.V341L,Uncertain significance,uncertain,,"criteria provided, single submitter",1310366
+ACTC1,222,A,S,p.A222S,Uncertain significance,uncertain,,"criteria provided, multiple submitters, no conflicts",1307279
+ACTC1,212,R,P,p.R212P,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",1306876
+ACTC1,174,P,L,p.P174L,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",1305594
+ACTC1,219,C,Y,p.C219Y,Uncertain significance,uncertain,,"criteria provided, single submitter",1304717
+ACTC1,271,M,V,p.M271V,Pathogenic,pathogenic,,no assertion criteria provided,1284894
+ACTC1,274,A,V,p.A274V,Uncertain significance,uncertain,,no assertion criteria provided,1284283
+ACTC1,72,P,S,p.P72S,Uncertain significance,uncertain,,"criteria provided, single submitter",1193017
+ACTC1,244,L,M,p.L244M,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",1191942
+ACTC1,323,A,S,p.A323S,Uncertain significance,uncertain,Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",1174874
+ACTC1,332,I,V,p.I332V,Uncertain significance,uncertain,Cardiomyopathy | Hypertrophic cardiomyopathy,"criteria provided, multiple submitters, no conflicts",1172066
+ACTC1,365,D,N,p.D365N,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiomyopathy | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",1171524
+ACTC1,268,F,L,p.F268L,Uncertain significance,uncertain,Cardiomyopathy | Hypertrophic cardiomyopathy,"criteria provided, multiple submitters, no conflicts",1171071
+ACTC1,128,T,N,p.T128N,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",1058569
+ACTC1,165,V,I,p.V165I,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",1057982
+ACTC1,121,M,T,p.M121T,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",1042787
+ACTC1,167,I,S,p.I167S,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",1040936
+ACTC1,305,T,I,p.T305I,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",1038874
+ACTC1,34,P,R,p.P34R,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",1038128
+ACTC1,128,T,A,p.T128A,Conflicting classifications of pathogenicity,conflicting,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, conflicting classifications",1031511
+ACTC1,323,A,T,p.A323T,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",1023541
+ACTC1,320,T,I,p.T320I,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",1001284
+ACTC1,137,A,T,p.A137T,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiomyopathy | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",999442
+ACTC1,238,L,P,p.L238P,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",986417
+ACTC1,285,M,K,p.M285K,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1A | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",978311
+ACTC1,152,G,D,p.G152D,Uncertain significance,uncertain,Dilated cardiomyopathy 1A,"criteria provided, single submitter",978310
+ACTC1,1,M,T,p.M1T,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",967017
+ACTC1,331,I,V,p.I331V,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",956465
+ACTC1,243,E,Q,p.E243Q,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",954779
+ACTC1,212,R,C,p.R212C,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",953784
+ACTC1,295,L,Q,p.L295Q,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",952949
+ACTC1,308,Y,H,p.Y308H,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",948806
+ACTC1,2,C,Y,p.C2Y,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiomyopathy | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",938099
+ACTC1,195,L,F,p.L195F,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiomyopathy | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",928440
+ACTC1,360,S,G,p.S360G,Uncertain significance,uncertain,Cardiomyopathy,"criteria provided, single submitter",926555
+ACTC1,367,A,T,p.A367T,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiomyopathy | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",925920
+ACTC1,133,A,V,p.A133V,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiomyopathy | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",925676
+ACTC1,126,F,C,p.F126C,Uncertain significance,uncertain,Cardiomyopathy,"criteria provided, single submitter",920907
+ACTC1,56,V,I,p.V56I,Uncertain significance,uncertain,Primary dilated cardiomyopathy,reviewed by expert panel,920028
+ACTC1,7,T,S,p.T7S,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiomyopathy | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",919640
+ACTC1,162,T,I,p.T162I,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiomyopathy | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",917758
+ACTC1,304,G,D,p.G304D,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",864416
+ACTC1,101,E,V,p.E101V,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",842324
+ACTC1,34,P,Q,p.P34Q,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",838163
+ACTC1,271,M,I,p.M271I,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",835562
+ACTC1,93,Y,C,p.Y93C,Uncertain significance,uncertain,Cardiomyopathy | Cardiovascular phenotype | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",810747
+ACTC1,125,M,I,p.M125I,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",659534
+ACTC1,298,N,D,p.N298D,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",658563
+ACTC1,361,K,E,p.K361E,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",656273
+ACTC1,125,M,T,p.M125T,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",653219
+ACTC1,229,M,I,p.M229I,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",652722
+ACTC1,130,N,S,p.N130S,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiomyopathy | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",652297
+ACTC1,236,S,F,p.S236F,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",642187
+ACTC1,35,S,A,p.S35A,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",642074
+ACTC1,220,Y,H,p.Y220H,Uncertain significance,uncertain,,"criteria provided, multiple submitters, no conflicts",636820
+ACTC1,104,P,L,p.P104L,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",636464
+ACTC1,280,T,S,p.T280S,Uncertain significance,uncertain,Cardiomyopathy,"criteria provided, single submitter",630098
+ACTC1,247,G,D,p.G247D,Pathogenic/Likely pathogenic,likely_pathogenic,Atrial septal defect 5 | Cardiomyopathy | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",626827
+ACTC1,133,A,T,p.A133T,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",570215
+ACTC1,175,H,P,p.H175P,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",566055
+ACTC1,241,S,R,p.S241R,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",565936
+ACTC1,308,Y,N,p.Y308N,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",560608
+ACTC1,34,P,L,p.P34L,Uncertain significance,uncertain,Left ventricular dilatation,no assertion criteria provided,560607
+ACTC1,152,G,S,p.G152S,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",538811
+ACTC1,4,D,N,p.D4N,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",538810
+ACTC1,325,S,G,p.S325G,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",538809
+ACTC1,32,V,I,p.V32I,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",538808
+ACTC1,4,D,E,p.D4E,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",538807
+ACTC1,98,V,A,p.V98A,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",538806
+ACTC1,60,A,T,p.A60T,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiomyopathy | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",538805
+ACTC1,208,R,H,p.R208H,Uncertain significance,uncertain,ACTC1-related disorder | Atrial septal defect 5 | Cardiomyopathy | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",520473
+ACTC1,50,G,S,p.G50S,Conflicting classifications of pathogenicity,conflicting,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, conflicting classifications",520472
+ACTC1,239,E,Q,p.E239Q,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",520471
+ACTC1,323,A,P,p.A323P,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",520303
+ACTC1,23,F,L,p.F23L,Uncertain significance,uncertain,Cardiovascular phenotype,"criteria provided, single submitter",520286
+ACTC1,53,D,V,p.D53V,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",518931
+ACTC1,178,M,L,p.M178L,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",517203
+ACTC1,315,M,K,p.M315K,Uncertain significance,uncertain,Wolff-Parkinson-White pattern,no assertion criteria provided,487590
+ACTC1,153,I,T,p.I153T,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",487204
+ACTC1,192,M,V,p.M192V,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",478618
+ACTC1,188,T,A,p.T188A,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",478617
+ACTC1,167,I,M,p.I167M,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",471457
+ACTC1,45,V,A,p.V45A,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",471455
+ACTC1,364,Y,N,p.Y364N,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",452611
+ACTC1,23,F,L,p.F23L,Uncertain significance,uncertain,,"criteria provided, single submitter",450168
+ACTC1,222,A,T,p.A222T,Conflicting classifications of pathogenicity,conflicting,ACTC1-related disorder | Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, conflicting classifications",444338
+ACTC1,232,A,T,p.A232T,Uncertain significance,uncertain,,"criteria provided, single submitter",430202
+ACTC1,361,K,N,p.K361N,Uncertain significance,uncertain,,"criteria provided, single submitter",423456
+ACTC1,231,T,I,p.T231I,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",410267
+ACTC1,166,P,S,p.P166S,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",410266
+ACTC1,161,V,A,p.V161A,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",410265
+ACTC1,21,A,V,p.A21V,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",410264
+ACTC1,203,V,I,p.V203I,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",410263
+ACTC1,262,T,S,p.T262S,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",410262
+ACTC1,144,L,R,p.L144R,Uncertain significance,uncertain,,"criteria provided, single submitter",391898
+ACTC1,110,A,T,p.A110T,Uncertain significance,uncertain,,"criteria provided, single submitter",389657
+ACTC1,318,E,D,p.E318D,Uncertain significance,uncertain,,"criteria provided, single submitter",379262
+ACTC1,103,H,Q,p.H103Q,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",377435
+ACTC1,303,G,V,p.G303V,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",373651
+ACTC1,159,D,E,p.D159E,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",264401
+ACTC1,324,P,S,p.P324S,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",263668
+ACTC1,172,A,T,p.A172T,Uncertain significance,uncertain,,no assertion criteria provided,234976
+ACTC1,100,P,L,p.P100L,Uncertain significance,uncertain,,"criteria provided, single submitter",234748
+ACTC1,73,I,V,p.I73V,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiomyopathy | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",228429
+ACTC1,375,K,R,p.K375R,Uncertain significance,uncertain,,"criteria provided, single submitter",222483
+ACTC1,285,M,T,p.M285T,Uncertain significance,uncertain,,"criteria provided, single submitter",222482
+ACTC1,64,R,K,p.R64K,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",222481
+ACTC1,298,N,K,p.N298K,Uncertain significance,uncertain,Dilated cardiomyopathy 1R,no assertion criteria provided,217889
+ACTC1,94,N,S,p.N94S,Conflicting classifications of pathogenicity,conflicting,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, conflicting classifications",217487
+ACTC1,63,K,R,p.K63R,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",196406
+ACTC1,329,I,T,p.I329T,Conflicting classifications of pathogenicity,conflicting,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, conflicting classifications",180778
+ACTC1,167,I,T,p.I167T,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiomyopathy | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",180776
+ACTC1,4,D,H,p.D4H,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",180775
+ACTC1,371,I,T,p.I371T,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiomyopathy | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",180774
+ACTC1,333,A,V,p.A333V,Conflicting classifications of pathogenicity,conflicting,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, conflicting classifications",180773
+ACTC1,323,A,V,p.A323V,Conflicting classifications of pathogenicity,conflicting,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy | Hypertrophic cardiomyopathy 11,"criteria provided, conflicting classifications",180771
+ACTC1,318,E,K,p.E318K,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",180770
+ACTC1,296,Y,H,p.Y296H,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",180769
+ACTC1,296,Y,N,p.Y296N,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",180768
+ACTC1,271,M,T,p.M271T,Conflicting classifications of pathogenicity,conflicting,Cardiomyopathy,"criteria provided, conflicting classifications",180767
+ACTC1,257,F,L,p.F257L,Uncertain significance,uncertain,Cardiomyopathy | Cardiovascular phenotype,"criteria provided, multiple submitters, no conflicts",180765
+ACTC1,252,I,T,p.I252T,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",180763
+ACTC1,234,S,P,p.S234P,Uncertain significance,uncertain,,"criteria provided, single submitter",180762
+ACTC1,232,A,V,p.A232V,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",180761
+ACTC1,193,K,N,p.K193N,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",180760
+ACTC1,188,T,I,p.T188I,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",180759
+ACTC1,181,D,H,p.D181H,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",180758
+ACTC1,177,I,V,p.I177V,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiomyopathy | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",180757
+ACTC1,54,S,F,p.S54F,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",180756
+ACTC1,8,T,A,p.T8A,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",180755
+ACTC1,251,T,A,p.T251A,Uncertain significance,uncertain,Cardiovascular phenotype,"criteria provided, multiple submitters, no conflicts",180256
+ACTC1,201,S,F,p.S201F,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",180255
+ACTC1,247,G,S,p.G247S,Uncertain significance,uncertain,Cardiovascular phenotype,"criteria provided, multiple submitters, no conflicts",180075
+ACTC1,347,I,V,p.I347V,Uncertain significance,uncertain,,"criteria provided, single submitter",179882
+ACTC1,208,R,C,p.R208C,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",179863
+ACTC1,26,D,N,p.D26N,Conflicting classifications of pathogenicity,conflicting,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, conflicting classifications",177917
+ACTC1,289,I,T,p.I289T,Pathogenic/Likely pathogenic,likely_pathogenic,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11 | Primary dilated cardiomyopathy,"criteria provided, multiple submitters, no conflicts",177886
+ACTC1,265,Q,E,p.Q265E,Conflicting classifications of pathogenicity,conflicting,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy | Hypertrophic cardiomyopathy 11,"criteria provided, conflicting classifications",177786
+ACTC1,128,T,I,p.T128I,Likely pathogenic,likely_pathogenic,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",177748
+ACTC1,252,I,M,p.I252M,Uncertain significance,uncertain,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy | Hypertrophic cardiomyopathy 11 | Primary dilated cardiomyopathy,"criteria provided, multiple submitters, no conflicts",162706
+ACTC1,28,A,V,p.A28V,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",50937
+ACTC1,10,L,M,p.L10M,Conflicting classifications of pathogenicity,conflicting,Atrial septal defect 5 | Cardiomyopathy | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy | Hypertrophic cardiomyopathy 11,"criteria provided, conflicting classifications",50936
+ACTC1,284,I,F,p.I284F,Likely pathogenic,likely_pathogenic,Hypertrophic cardiomyopathy,reviewed by expert panel,45191
+ACTC1,269,I,T,p.I269T,Conflicting classifications of pathogenicity,conflicting,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11 | Left ventricular noncompaction | Primary dilated cardiomyopathy,"criteria provided, conflicting classifications",45190
+ACTC1,3,D,H,p.D3H,Uncertain significance,uncertain,,"criteria provided, single submitter",45188
+ACTC1,212,R,H,p.R212H,Conflicting classifications of pathogenicity,conflicting,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, conflicting classifications",45186
+ACTC1,185,R,W,p.R185W,Likely pathogenic,likely_pathogenic,Inborn genetic diseases | Primary dilated cardiomyopathy,"criteria provided, multiple submitters, no conflicts",45183
+ACTC1,159,D,N,p.D159N,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",45180
+ACTC1,124,I,M,p.I124M,Uncertain significance,uncertain,Atrial septal defect 5 | Cardiomyopathy | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, multiple submitters, no conflicts",45177
+ACTC1,119,E,Q,p.E119Q,Uncertain significance,uncertain,Paediatric disorders,"criteria provided, single submitter",45176
+ACTC1,104,P,S,p.P104S,Conflicting classifications of pathogenicity,conflicting,Atrial septal defect 5 | Cardiomyopathy | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, conflicting classifications",45175
+ACTC1,77,I,V,p.I77V,Uncertain significance,uncertain,Cardiovascular phenotype,"criteria provided, multiple submitters, no conflicts",45173
+ACTC1,23,F,L,p.F23L,Conflicting classifications of pathogenicity,conflicting,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11 | Primary familial hypertrophic cardiomyopathy,"criteria provided, conflicting classifications",35647
+ACTC1,101,E,K,p.E101K,Pathogenic,pathogenic,Hypertrophic cardiomyopathy,reviewed by expert panel,18331
+ACTC1,166,P,A,p.P166A,Uncertain significance,uncertain,Cardiovascular phenotype,"criteria provided, single submitter",18330
+ACTC1,333,A,P,p.A333P,Pathogenic,pathogenic,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",18329
+ACTC1,125,M,V,p.M125V,Pathogenic,pathogenic,Atrial septal defect 5,no assertion criteria provided,18327
+ACTC1,90,H,Y,p.H90Y,Conflicting classifications of pathogenicity,conflicting,Atrial septal defect 5 | Cardiomyopathy | Cardiovascular phenotype | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy | Hypertrophic cardiomyopathy 11,"criteria provided, conflicting classifications",18326
+ACTC1,297,A,S,p.A297S,Pathogenic,pathogenic,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, single submitter",18325
+ACTC1,363,E,G,p.E363G,Conflicting classifications of pathogenicity,conflicting,Atrial septal defect 5 | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy 11,"criteria provided, conflicting classifications",18324
+ACTC1,314,R,H,p.R314H,Conflicting classifications of pathogenicity,conflicting,Atrial septal defect 5 | Cardiomyopathy | Dilated cardiomyopathy 1R | Hypertrophic cardiomyopathy | Hypertrophic cardiomyopathy 11,"criteria provided, conflicting classifications",18323

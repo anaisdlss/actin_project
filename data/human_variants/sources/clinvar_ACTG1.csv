@@ -1,0 +1,225 @@
+gene,pos,aa_ref,aa_alt,hgvsp,classification,classif_cat,maladies,review_status,clinvar_id
+ACTG1,318,T,S,p.T318S,Uncertain significance,uncertain,Baraitser-winter syndrome 2,"criteria provided, single submitter",4855908
+ACTG1,59,Q,R,p.Q59R,Uncertain significance,uncertain,Baraitser-winter syndrome 2,"criteria provided, single submitter",4855571
+ACTG1,372,R,S,p.R372S,Uncertain significance,uncertain,Baraitser-winter syndrome 2,"criteria provided, single submitter",4855378
+ACTG1,84,K,E,p.K84E,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20,"criteria provided, single submitter",4849617
+ACTG1,170,A,G,p.A170G,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20,"criteria provided, single submitter",4849616
+ACTG1,289,I,S,p.I289S,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",4838807
+ACTG1,221,L,V,p.L221V,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",4783167
+ACTG1,194,T,P,p.T194P,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",4783165
+ACTG1,59,Q,H,p.Q59H,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",4782817
+ACTG1,73,H,D,p.H73D,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",4782651
+ACTG1,163,V,A,p.V163A,Uncertain significance,uncertain,,"criteria provided, single submitter",4755869
+ACTG1,369,I,V,p.I369V,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",4566132
+ACTG1,107,E,K,p.E107K,Uncertain significance,uncertain,,"criteria provided, single submitter",4537272
+ACTG1,253,E,V,p.E253V,,other,,,4429021
+ACTG1,188,Y,H,p.Y188H,Uncertain significance,uncertain,Baraitser-winter syndrome 2,"criteria provided, single submitter",4292638
+ACTG1,280,N,S,p.N280S,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",4221010
+ACTG1,222,D,G,p.D222G,Uncertain significance,uncertain,,"criteria provided, single submitter",4085873
+ACTG1,26,A,G,p.A26G,Pathogenic,pathogenic,,"criteria provided, single submitter",4076592
+ACTG1,113,K,T,p.K113T,Uncertain significance,uncertain,,"criteria provided, single submitter",4055762
+ACTG1,335,R,L,p.R335L,Pathogenic,pathogenic,,"criteria provided, single submitter",3906505
+ACTG1,374,C,S,p.C374S,Uncertain significance,uncertain,,"criteria provided, single submitter",3903297
+ACTG1,121,Q,E,p.Q121E,Uncertain significance,uncertain,Baraitser-Winter syndrome 1,"criteria provided, single submitter",3773681
+ACTG1,109,P,S,p.P109S,Uncertain significance,uncertain,,"criteria provided, single submitter",3772617
+ACTG1,304,T,A,p.T304A,Uncertain significance,uncertain,,"criteria provided, single submitter",3766345
+ACTG1,10,I,V,p.I10V,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",3763494
+ACTG1,207,E,D,p.E207D,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",3758794
+ACTG1,350,S,F,p.S350F,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",3757921
+ACTG1,2,E,G,p.E2G,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",3757858
+ACTG1,255,F,L,p.F255L,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",3757386
+ACTG1,324,T,I,p.T324I,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",3751949
+ACTG1,148,T,A,p.T148A,Likely pathogenic,likely_pathogenic,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",3751495
+ACTG1,114,A,V,p.A114V,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",3751327
+ACTG1,230,A,T,p.A230T,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",3748715
+ACTG1,165,I,N,p.I165N,Likely pathogenic,likely_pathogenic,Autosomal dominant nonsyndromic hearing loss 20,"criteria provided, single submitter",3601143
+ACTG1,26,A,S,p.A26S,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",3583141
+ACTG1,59,Q,H,p.Q59H,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",3583140
+ACTG1,81,D,G,p.D81G,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",3583139
+ACTG1,82,M,V,p.M82V,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",3583138
+ACTG1,172,P,L,p.P172L,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",3583135
+ACTG1,192,I,V,p.I192V,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2 | Inborn genetic diseases,"criteria provided, multiple submitters, no conflicts",3583134
+ACTG1,231,A,T,p.A231T,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",3583133
+ACTG1,261,L,V,p.L261V,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",3583129
+ACTG1,295,A,T,p.A295T,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",3583127
+ACTG1,297,T,A,p.T297A,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",3583126
+ACTG1,319,A,T,p.A319T,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",3583124
+ACTG1,19,A,V,p.A19V,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20,"criteria provided, single submitter",3393393
+ACTG1,16,M,L,p.M16L,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20,"criteria provided, single submitter",3393389
+ACTG1,47,M,V,p.M47V,Uncertain significance,uncertain,,"criteria provided, single submitter",3391765
+ACTG1,229,T,A,p.T229A,Uncertain significance,uncertain,,"criteria provided, single submitter",3384436
+ACTG1,37,R,H,p.R37H,Uncertain significance,uncertain,Baraitser-winter syndrome 2,"criteria provided, single submitter",3376428
+ACTG1,291,K,E,p.K291E,Uncertain significance,uncertain,,"criteria provided, single submitter",3370628
+ACTG1,117,E,K,p.E117K,Uncertain significance,uncertain,Baraitser-winter syndrome 2,"criteria provided, single submitter",3370288
+ACTG1,181,A,S,p.A181S,Uncertain significance,uncertain,,"criteria provided, single submitter",3369696
+ACTG1,269,M,I,p.M269I,Uncertain significance,uncertain,,"criteria provided, single submitter",3365356
+ACTG1,264,P,S,p.P264S,Uncertain significance,uncertain,,"criteria provided, single submitter",3363734
+ACTG1,50,K,R,p.K50R,Uncertain significance,uncertain,,"criteria provided, single submitter",3361436
+ACTG1,28,R,G,p.R28G,Uncertain significance,uncertain,,"criteria provided, single submitter",3359682
+ACTG1,22,A,V,p.A22V,Uncertain significance,uncertain,ACTG1-related disorder,no assertion criteria provided,3353485
+ACTG1,5,I,V,p.I5V,Uncertain significance,uncertain,ACTG1-related disorder,no assertion criteria provided,3348450
+ACTG1,223,F,L,p.F223L,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",3263755
+ACTG1,69,Y,S,p.Y69S,,other,,,3257807
+ACTG1,193,L,F,p.L193F,Uncertain significance,uncertain,,"criteria provided, single submitter",3253199
+ACTG1,245,G,S,p.G245S,Uncertain significance,uncertain,,"criteria provided, single submitter",3253091
+ACTG1,316,E,K,p.E316K,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20,"criteria provided, single submitter",3248637
+ACTG1,32,P,H,p.P32H,Likely pathogenic,likely_pathogenic,Baraitser-winter syndrome 2,"criteria provided, single submitter",3238813
+ACTG1,131,A,D,p.A131D,Uncertain significance,uncertain,Baraitser-winter syndrome 2,"criteria provided, single submitter",3235183
+ACTG1,90,F,L,p.F90L,Uncertain significance,uncertain,,"criteria provided, single submitter",3063761
+ACTG1,316,E,D,p.E316D,Uncertain significance,uncertain,ACTG1-related disorder,no assertion criteria provided,3029257
+ACTG1,79,W,R,p.W79R,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, multiple submitters, no conflicts",2953695
+ACTG1,328,K,R,p.K328R,Conflicting classifications of pathogenicity,conflicting,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, conflicting classifications",2949562
+ACTG1,104,L,Q,p.L104Q,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",2949265
+ACTG1,2,E,V,p.E2V,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",2948958
+ACTG1,90,F,S,p.F90S,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",2947949
+ACTG1,366,G,D,p.G366D,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",2944175
+ACTG1,275,H,Y,p.H275Y,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",2941209
+ACTG1,374,C,Y,p.C374Y,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",2940767
+ACTG1,153,M,T,p.M153T,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",2936879
+ACTG1,233,S,F,p.S233F,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",2924802
+ACTG1,11,D,G,p.D11G,Uncertain significance,uncertain,,"criteria provided, single submitter",2663556
+ACTG1,29,A,T,p.A29T,Uncertain significance,uncertain,ACTG1-related disorder,"criteria provided, single submitter",2632597
+ACTG1,7,A,V,p.A7V,Conflicting classifications of pathogenicity,conflicting,ACTG1-related disorder | Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, conflicting classifications",2631014
+ACTG1,225,Q,R,p.Q225R,Uncertain significance,uncertain,ACTG1-related disorder,"criteria provided, single submitter",2630928
+ACTG1,311,D,V,p.D311V,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, multiple submitters, no conflicts",2581800
+ACTG1,190,M,T,p.M190T,Uncertain significance,uncertain,,"criteria provided, single submitter",2571882
+ACTG1,77,T,A,p.T77A,Uncertain significance,uncertain,,"criteria provided, single submitter",2446519
+ACTG1,51,D,N,p.D51N,Pathogenic/Likely pathogenic,likely_pathogenic,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, multiple submitters, no conflicts",2444245
+ACTG1,262,F,L,p.F262L,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20,"criteria provided, multiple submitters, no conflicts",2438842
+ACTG1,31,F,V,p.F31V,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",2404517
+ACTG1,29,A,V,p.A29V,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",2228543
+ACTG1,230,A,D,p.A230D,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",2196600
+ACTG1,220,A,T,p.A220T,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2 | Inborn genetic diseases,"criteria provided, multiple submitters, no conflicts",2194092
+ACTG1,145,S,C,p.S145C,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",2152294
+ACTG1,120,T,S,p.T120S,Uncertain significance,uncertain,,"criteria provided, single submitter",2136023
+ACTG1,126,T,A,p.T126A,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",2121662
+ACTG1,273,G,S,p.G273S,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",2098829
+ACTG1,315,K,E,p.K315E,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",2097785
+ACTG1,231,A,V,p.A231V,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, multiple submitters, no conflicts",2037789
+ACTG1,355,M,R,p.M355R,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",2005812
+ACTG1,300,S,A,p.S300A,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",2003319
+ACTG1,63,G,A,p.G63A,Likely pathogenic,likely_pathogenic,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",2003119
+ACTG1,144,A,V,p.A144V,Likely pathogenic,likely_pathogenic,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",1994494
+ACTG1,333,P,R,p.P333R,Conflicting classifications of pathogenicity,conflicting,ACTG1-related disorder,"criteria provided, conflicting classifications",1810558
+ACTG1,275,H,R,p.H275R,not provided,other,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,no classification provided,1810303
+ACTG1,142,L,V,p.L142V,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",1806648
+ACTG1,248,I,V,p.I248V,Uncertain significance,uncertain,,"criteria provided, single submitter",1800935
+ACTG1,162,T,A,p.T162A,Uncertain significance,uncertain,Baraitser-winter syndrome 2,"criteria provided, single submitter",1723898
+ACTG1,314,Q,R,p.Q314R,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",1718875
+ACTG1,276,E,D,p.E276D,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",1717250
+ACTG1,66,T,I,p.T66I,Conflicting classifications of pathogenicity,conflicting,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, conflicting classifications",1712330
+ACTG1,297,T,M,p.T297M,Uncertain significance,uncertain,,"criteria provided, single submitter",1711448
+ACTG1,56,D,N,p.D56N,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, multiple submitters, no conflicts",1709674
+ACTG1,42,G,S,p.G42S,Uncertain significance,uncertain,Baraitser-winter syndrome 2,"criteria provided, single submitter",1709112
+ACTG1,305,M,T,p.M305T,Conflicting classifications of pathogenicity,conflicting,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, conflicting classifications",1705652
+ACTG1,174,A,T,p.A174T,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20,"criteria provided, single submitter",1699119
+ACTG1,46,G,C,p.G46C,Uncertain significance,uncertain,,"criteria provided, single submitter",1695886
+ACTG1,77,T,S,p.T77S,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",1690354
+ACTG1,275,H,L,p.H275L,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",1687657
+ACTG1,145,S,F,p.S145F,Likely pathogenic,likely_pathogenic,Autosomal dominant nonsyndromic hearing loss 20,"criteria provided, single submitter",1685234
+ACTG1,165,I,T,p.I165T,Conflicting classifications of pathogenicity,conflicting,Autosomal dominant nonsyndromic hearing loss 20,"criteria provided, conflicting classifications",1683910
+ACTG1,283,M,T,p.M283T,Likely pathogenic,likely_pathogenic,Autosomal dominant nonsyndromic hearing loss 20,"criteria provided, multiple submitters, no conflicts",1526065
+ACTG1,130,P,Q,p.P130Q,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",1494566
+ACTG1,195,E,K,p.E195K,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",1493109
+ACTG1,338,S,W,p.S338W,Pathogenic,pathogenic,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",1483014
+ACTG1,132,M,T,p.M132T,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",1467395
+ACTG1,145,S,A,p.S145A,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",1462182
+ACTG1,54,V,M,p.V54M,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",1445569
+ACTG1,269,M,I,p.M269I,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",1414248
+ACTG1,87,H,L,p.H87L,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",1387533
+ACTG1,149,T,A,p.T149A,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, multiple submitters, no conflicts",1345334
+ACTG1,219,V,I,p.V219I,Uncertain significance,uncertain,ACTG1-related disorder | Baraitser-winter syndrome 2 | Inborn genetic diseases,"criteria provided, multiple submitters, no conflicts",1333818
+ACTG1,153,M,I,p.M153I,Likely pathogenic,likely_pathogenic,Baraitser-winter syndrome 2,"criteria provided, single submitter",1333817
+ACTG1,95,R,C,p.R95C,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20,"criteria provided, single submitter",1333682
+ACTG1,305,M,V,p.M305V,Uncertain significance,uncertain,,"criteria provided, single submitter",1315428
+ACTG1,331,A,T,p.A331T,Uncertain significance,uncertain,,"criteria provided, single submitter",1314228
+ACTG1,314,Q,E,p.Q314E,Uncertain significance,uncertain,,"criteria provided, single submitter",1313177
+ACTG1,269,M,V,p.M269V,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, multiple submitters, no conflicts",1312901
+ACTG1,240,Y,H,p.Y240H,Uncertain significance,uncertain,,"criteria provided, single submitter",1308836
+ACTG1,175,I,M,p.I175M,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, multiple submitters, no conflicts",1308489
+ACTG1,26,A,V,p.A26V,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",1306975
+ACTG1,351,T,A,p.T351A,Uncertain significance,uncertain,,"criteria provided, single submitter",1302950
+ACTG1,287,V,M,p.V287M,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, multiple submitters, no conflicts",1300756
+ACTG1,307,P,L,p.P307L,Uncertain significance,uncertain,,"criteria provided, single submitter",1299965
+ACTG1,234,S,F,p.S234F,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",1297686
+ACTG1,212,I,V,p.I212V,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, multiple submitters, no conflicts",1176366
+ACTG1,277,T,I,p.T277I,Conflicting classifications of pathogenicity,conflicting,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, conflicting classifications",1175712
+ACTG1,276,E,K,p.E276K,Conflicting classifications of pathogenicity,conflicting,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, conflicting classifications",1174527
+ACTG1,147,R,H,p.R147H,Likely pathogenic,likely_pathogenic,Autosomal dominant nonsyndromic hearing loss 20,"criteria provided, single submitter",1174523
+ACTG1,43,V,A,p.V43A,Likely benign,likely_benign,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",1082397
+ACTG1,70,P,L,p.P70L,Pathogenic,pathogenic,Baraitser-winter syndrome 2,"criteria provided, multiple submitters, no conflicts",1065444
+ACTG1,281,S,C,p.S281C,Conflicting classifications of pathogenicity,conflicting,Autosomal dominant nonsyndromic hearing loss 20 | Hearing impairment,"criteria provided, conflicting classifications",1065023
+ACTG1,162,T,M,p.T162M,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, multiple submitters, no conflicts",1029360
+ACTG1,147,R,C,p.R147C,Likely pathogenic,likely_pathogenic,Autosomal dominant nonsyndromic hearing loss 20,"criteria provided, single submitter",1012294
+ACTG1,179,D,Y,p.D179Y,Uncertain significance,uncertain,Lissencephaly,no assertion criteria provided,996564
+ACTG1,285,C,Y,p.C285Y,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",986274
+ACTG1,17,C,Y,p.C17Y,Conflicting classifications of pathogenicity,conflicting,ACTG1-related disorder | Inborn genetic diseases,"criteria provided, conflicting classifications",985561
+ACTG1,232,S,F,p.S232F,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",985276
+ACTG1,165,I,V,p.I165V,Likely pathogenic,likely_pathogenic,Autosomal dominant nonsyndromic hearing loss 20,"criteria provided, single submitter",978237
+ACTG1,118,K,N,p.K118N,Pathogenic,pathogenic,,"criteria provided, single submitter",871523
+ACTG1,206,R,W,p.R206W,Conflicting classifications of pathogenicity,conflicting,ACTG1-related disorder | Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, conflicting classifications",864856
+ACTG1,210,R,C,p.R210C,Pathogenic,pathogenic,Baraitser-winter syndrome 2,"criteria provided, multiple submitters, no conflicts",813525
+ACTG1,183,R,W,p.R183W,Pathogenic/Likely pathogenic,likely_pathogenic,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, multiple submitters, no conflicts",808333
+ACTG1,32,P,S,p.P32S,Pathogenic/Likely pathogenic,likely_pathogenic,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, multiple submitters, no conflicts",807364
+ACTG1,243,P,L,p.P243L,Likely pathogenic,likely_pathogenic,Baraitser-winter syndrome 2,"criteria provided, multiple submitters, no conflicts",807363
+ACTG1,203,T,M,p.T203M,Likely pathogenic,likely_pathogenic,Autosomal dominant nonsyndromic hearing loss 20,"criteria provided, single submitter",803470
+ACTG1,334,E,Q,p.E334Q,Uncertain significance,uncertain,Baraitser-winter syndrome 2,"criteria provided, single submitter",689622
+ACTG1,334,E,D,p.E334D,Likely pathogenic,likely_pathogenic,Rare genetic deafness,"criteria provided, single submitter",667399
+ACTG1,258,P,L,p.P258L,Conflicting classifications of pathogenicity,conflicting,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, conflicting classifications",639093
+ACTG1,176,L,V,p.L176V,Likely benign,likely_benign,,"criteria provided, single submitter",633502
+ACTG1,87,H,Y,p.H87Y,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, multiple submitters, no conflicts",618510
+ACTG1,70,P,S,p.P70S,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, multiple submitters, no conflicts",561781
+ACTG1,230,A,V,p.A230V,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",561768
+ACTG1,291,K,R,p.K291R,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, multiple submitters, no conflicts",561712
+ACTG1,94,L,V,p.L94V,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, multiple submitters, no conflicts",561708
+ACTG1,246,Q,L,p.Q246L,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, multiple submitters, no conflicts",561703
+ACTG1,93,E,K,p.E93K,Pathogenic,pathogenic,,"criteria provided, single submitter",561398
+ACTG1,71,I,M,p.I71M,Uncertain significance,uncertain,,"criteria provided, single submitter",561397
+ACTG1,335,R,C,p.R335C,Conflicting classifications of pathogenicity,conflicting,Autosomal dominant nonsyndromic hearing loss 20,"criteria provided, conflicting classifications",561396
+ACTG1,338,S,L,p.S338L,Conflicting classifications of pathogenicity,conflicting,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, conflicting classifications",561395
+ACTG1,283,M,V,p.M283V,Likely pathogenic,likely_pathogenic,Monogenic hearing loss,"criteria provided, multiple submitters, no conflicts",546156
+ACTG1,368,S,F,p.S368F,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",540214
+ACTG1,69,Y,C,p.Y69C,Likely pathogenic,likely_pathogenic,Inborn genetic diseases,"criteria provided, single submitter",522139
+ACTG1,23,G,R,p.G23R,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, single submitter",521162
+ACTG1,335,R,H,p.R335H,Pathogenic/Likely pathogenic,likely_pathogenic,Baraitser-winter syndrome 2 | Inborn genetic diseases | Neurodevelopmental delay,"criteria provided, multiple submitters, no conflicts",520655
+ACTG1,206,R,Q,p.R206Q,Pathogenic/Likely pathogenic,likely_pathogenic,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2 | Fetal anomalies with a likely genetic cause | Rare genetic deafness,"criteria provided, multiple submitters, no conflicts",517300
+ACTG1,183,R,Q,p.R183Q,Pathogenic,pathogenic,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, multiple submitters, no conflicts",505063
+ACTG1,153,M,V,p.M153V,Likely pathogenic,likely_pathogenic,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, single submitter",473006
+ACTG1,204,A,G,p.A204G,Likely pathogenic,likely_pathogenic,Baraitser-winter syndrome 2,"criteria provided, multiple submitters, no conflicts",452404
+ACTG1,210,R,H,p.R210H,Conflicting classifications of pathogenicity,conflicting,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, conflicting classifications",449191
+ACTG1,290,R,C,p.R290C,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",449184
+ACTG1,256,R,Q,p.R256Q,Pathogenic,pathogenic,,"criteria provided, single submitter",444419
+ACTG1,144,A,T,p.A144T,Conflicting classifications of pathogenicity,conflicting,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, conflicting classifications",434079
+ACTG1,347,A,S,p.A347S,Uncertain significance,uncertain,,"criteria provided, single submitter",434078
+ACTG1,32,P,L,p.P32L,Uncertain significance,uncertain,,"criteria provided, single submitter",432553
+ACTG1,213,K,Q,p.K213Q,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",392927
+ACTG1,40,H,Y,p.H40Y,Likely pathogenic,likely_pathogenic,Baraitser-winter syndrome 2,"criteria provided, single submitter",374385
+ACTG1,15,G,R,p.G15R,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",372937
+ACTG1,108,A,V,p.A108V,Uncertain significance,uncertain,,"criteria provided, single submitter",285803
+ACTG1,252,N,I,p.N252I,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",280720
+ACTG1,288,D,G,p.D288G,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",280578
+ACTG1,44,M,K,p.M44K,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",279955
+ACTG1,137,Q,E,p.Q137E,Uncertain significance,uncertain,,"criteria provided, single submitter",228433
+ACTG1,126,T,I,p.T126I,Uncertain significance,uncertain,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2 | Inborn genetic diseases,"criteria provided, multiple submitters, no conflicts",228432
+ACTG1,346,L,V,p.L346V,Conflicting classifications of pathogenicity,conflicting,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, conflicting classifications",228431
+ACTG1,181,A,V,p.A181V,Conflicting classifications of pathogenicity,conflicting,Autosomal dominant nonsyndromic hearing loss 20 | Inborn genetic diseases,"criteria provided, conflicting classifications",197198
+ACTG1,174,A,G,p.A174G,Uncertain significance,uncertain,,"criteria provided, single submitter",179428
+ACTG1,285,C,R,p.C285R,Uncertain significance,uncertain,,"criteria provided, single submitter",162714
+ACTG1,351,T,P,p.T351P,Uncertain significance,uncertain,,"criteria provided, single submitter",162710
+ACTG1,200,F,I,p.F200I,Likely pathogenic,likely_pathogenic,Baraitser-winter syndrome 2,"criteria provided, single submitter",128266
+ACTG1,174,A,S,p.A174S,Uncertain significance,uncertain,Inborn genetic diseases,"criteria provided, multiple submitters, no conflicts",128265
+ACTG1,122,I,V,p.I122V,Likely pathogenic,likely_pathogenic,Autosomal dominant nonsyndromic hearing loss 20,"criteria provided, single submitter",68787
+ACTG1,256,R,W,p.R256W,Pathogenic,pathogenic,Baraitser-winter syndrome 2,"criteria provided, single submitter",29590
+ACTG1,254,R,W,p.R254W,Pathogenic/Likely pathogenic,likely_pathogenic,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, multiple submitters, no conflicts",29589
+ACTG1,203,T,K,p.T203K,Pathogenic,pathogenic,Baraitser-winter syndrome 2,no assertion criteria provided,29588
+ACTG1,135,A,V,p.A135V,Pathogenic/Likely pathogenic,likely_pathogenic,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, multiple submitters, no conflicts",29587
+ACTG1,120,T,I,p.T120I,Pathogenic/Likely pathogenic,likely_pathogenic,Baraitser-winter syndrome 2,"criteria provided, multiple submitters, no conflicts",29586
+ACTG1,155,S,F,p.S155F,Pathogenic,pathogenic,Baraitser-winter syndrome 2 | Inborn genetic diseases,"criteria provided, multiple submitters, no conflicts",29585
+ACTG1,241,E,K,p.E241K,Pathogenic/Likely pathogenic,likely_pathogenic,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2 | Hearing impairment | Rare genetic deafness,"criteria provided, multiple submitters, no conflicts",18322
+ACTG1,118,K,N,p.K118N,Pathogenic,pathogenic,Autosomal dominant nonsyndromic hearing loss 20,no assertion criteria provided,18321
+ACTG1,370,V,A,p.V370A,Pathogenic,pathogenic,Autosomal dominant nonsyndromic hearing loss 20,no assertion criteria provided,18320
+ACTG1,278,T,I,p.T278I,Conflicting classifications of pathogenicity,conflicting,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, conflicting classifications",18319
+ACTG1,264,P,L,p.P264L,Pathogenic,pathogenic,Autosomal dominant nonsyndromic hearing loss 20,"criteria provided, multiple submitters, no conflicts",18318
+ACTG1,332,P,A,p.P332A,Pathogenic/Likely pathogenic,likely_pathogenic,Autosomal dominant nonsyndromic hearing loss 20 | Baraitser-winter syndrome 2,"criteria provided, multiple submitters, no conflicts",18317
+ACTG1,118,K,M,p.K118M,Pathogenic/Likely pathogenic,likely_pathogenic,Autosomal dominant nonsyndromic hearing loss 20 | Nonsyndromic genetic hearing loss,"criteria provided, multiple submitters, no conflicts",18316
+ACTG1,89,T,I,p.T89I,Likely pathogenic,likely_pathogenic,,"criteria provided, single submitter",18315

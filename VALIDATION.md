@@ -47,3 +47,10 @@ python tools/compare_actin_thresholds.py --output reports/actin_thresholds_full_
 Le filtre ≥3 retient 228 PDB contre 163 pour ≥5, et 76 contre 60 noms distincts de partenaires directs, avant les filtres ultérieurs. Ces noms ne sont pas une liste de 16 nouvelles ABP validées ; plusieurs sont des isoformes, fusions ou synonymes. Le seuil des analyses principales reste inchangé.
 
 La comparaison d’empreintes est testée avec le site 6685_17, un seuil d’ASA de 50 % et la matrice complète activée. Elle agrège les positions présentes au-dessus du seuil dans au moins une observation ; elle ne mesure pas une fréquence biologique. Une comparaison de groupes doit consigner la liste exacte des sites et le seuil utilisé.
+
+
+## Lot complémentaire : variants, conservation et interfaces (1 octobre 2026)
+
+Voir [SCIENTIFIC_ANALYSES.md](SCIENTIFIC_ANALYSES.md) pour les méthodes, résultats et limites actuels. Ce lot remplace le statut antérieur « variants non intégrés » et régénère les figures S1 répertoriées dans `reports/s1_figures_all.json`. Les catégories biologiques et conclusions cliniques ne sont pas déduites automatiquement.
+
+Validation du lot complémentaire : **30 tests unitaires passent** ; les **8 parcours AppTest passent** sur le jeu de ce dépôt, y compris ACTG2/VUS, conflits et empreintes vides au seuil ASA de 100 %. Inspection visuelle du navigateur sur le projet complet et de la figure S1 6685_17. Audit d’identité des 1 623 entrées ClinVar achevé. Ces contrôles ne remplacent pas la revue biologique des conclusions par les auteurs.

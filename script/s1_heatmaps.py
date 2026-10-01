@@ -25,9 +25,8 @@ def _build_s1_global_heatmap(mtimes):
     from collections import defaultdict
     if not all(os.path.exists(f) for f in _S1_GLOBAL_FILES):
         return None
-    area = pd.read_csv(_S1_GLOBAL_FILES[0], index_col="patch")
-    # colonnes MAFFT ayant un résidu P60709 (les insertions sont écartées)
-    positions = [int(p) for p in area.columns if numbering.to_uniprot(p) is not None]
+    # All 375 reference residues, independent of an old derived CSV.
+    positions = [numbering.to_canon(p) for p in range(1, 376)]
     pos_index = {p: i for i, p in enumerate(positions)}
     df = pd.read_csv(_S1_GLOBAL_FILES[1], low_memory=False)
     di = pd.read_csv(_S1_GLOBAL_FILES[2])[
@@ -211,8 +210,7 @@ def _s1_sources(mtimes):
     """Charge/fusionne les sources S1 une fois : (positions, m, res)."""
     if not all(os.path.exists(f) for f in _S1_GLOBAL_FILES):
         return None
-    area = pd.read_csv(_S1_GLOBAL_FILES[0], index_col="patch")
-    positions = [int(p) for p in area.columns if numbering.to_uniprot(p) is not None]
+    positions = [numbering.to_canon(p) for p in range(1, 376)]
     df = pd.read_csv(_S1_GLOBAL_FILES[1], low_memory=False)
     di = pd.read_csv(_S1_GLOBAL_FILES[2])[
         ["interaction_id", "chain_A_id", "chain_B_id"]]

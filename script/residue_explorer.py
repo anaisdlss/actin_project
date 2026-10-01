@@ -752,7 +752,7 @@ def render_sequence_tab(pp):
             "canon": canon,
             "Conservation": None if pr is None else pr.get("conservation"),
             "Mut. sens.": None if pr is None else pr.get("mean_vs"),
-            "at interface": "yes" if (pr is not None and bool(pr.get("at_interface"))) else "no",
+            "at interface": ("unknown" if pr is None or pd.isna(pr.get("at_interface")) else "yes" if bool(pr.get("at_interface")) else "no"),
             "# ABPs": len(sub),
             "ABPs involved": abps,
         })

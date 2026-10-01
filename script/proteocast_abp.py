@@ -300,8 +300,11 @@ def _render_abp_proteocast(sel_abp, abp_subunits):
 
 
 @st.cache_data(show_spinner=False)
-def _load_actin_conservation():
+def _load_actin_conservation(mtimes):
     p = _Path("data/proteocast/conservation_vs_asa_per_position.csv")
+    if p.exists() and _Path("data/proteocast/actin/4.query_ProteoCast.csv").exists():
+        from scientific_analysis import canonical_conservation
+        return canonical_conservation()
     return pd.read_csv(p) if p.exists() else None
 
 
@@ -327,7 +330,12 @@ def _abp_actin_footprint(sel_abp, mtime):
 
 def _render_abp_actin_conservation(sel_abp):
     """Côté actin : la conservation (ProteoCast actin) des résidus que cet ABP touche."""
-    cons = _load_actin_conservation()
+    _sources = [_Path("data/proteocast/conservation_vs_asa_per_position.csv"),
+                _Path("data/proteocast/actin/4.query_ProteoCast.csv"),
+                _Path("data/proteocast/actin/1.query.fasta"), _Path("data/P60709_ref.fasta")]
+    from footprint_comparison import FILES as _footprint_files
+    _sources += _footprint_files
+    cons = _load_actin_conservation(tuple(p.stat().st_mtime_ns if p.exists() else 0 for p in _sources))
     if cons is None:
         st.info(
             "Actin conservation unavailable (data/proteocast/conservation_vs_asa_per_position.csv).")
@@ -349,7 +357,7 @@ def _render_abp_actin_conservation(sel_abp):
     fpv = cons[cons.is_fp]["conservation"]
     other = cons[cons.is_surface & ~cons.is_fp]["conservation"]
 
-    _fp_cmp = "Higher" if fpv.mean() > other.mean() else "Lower"
+    _fp_cmp = ("Unavailable" if fpv.empty or other.empty else "Equal" if fpv.mean() == other.mean() else "Higher" if fpv.mean() > other.mean() else "Lower")
     c1, c2, c3 = st.columns(3)
     c1.metric("Actin residues contacted", len(fpv))
     # Footprint : on n'affiche plus le chiffre brut, mais s'il est plus/moins

@@ -133,3 +133,8 @@ Ajouts : téléchargements des alignements ABP par cluster ; FoldDisco affiche t
 Les commandes reproductibles et limites de validation sont documentées dans VALIDATION.md. Les fichiers reports/dataset_integrity.json enregistrent les sources par SHA-256. Les données Cloud restent distinctes du jeu complet ; aucune fusion dans main ni mise en production n’est effectuée ici.
 
 Comparaison des empreintes : la section actine–actine propose deux groupes de sites configurables (référence initiale 6685_1–4), une union des positions observées sur les deux côtés des contacts homo, les résidus propres/communs, un seuil local d’ASA, les scores Jaccard contre chaque ABP et la matrice ABP × ABP téléchargeable. Aucun groupe minoritaire ni clash stérique n’est inféré automatiquement. Les tests couvrent le rattachement d’une chaîne à son site et le cas de l’union vide.
+
+
+## Lot complémentaire : variants, conservation et interfaces (1 octobre 2026)
+
+Voir [SCIENTIFIC_ANALYSES.md](SCIENTIFIC_ANALYSES.md) pour les méthodes, résultats et limites actuels. Ce lot remplace le statut antérieur « variants non intégrés » et régénère les figures S1 répertoriées dans `reports/s1_figures_all.json`. Les catégories biologiques et conclusions cliniques ne sont pas déduites automatiquement.
