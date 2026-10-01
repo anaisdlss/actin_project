@@ -97,15 +97,27 @@ def render_footprint_comparison():
                                       'P60709 positions':[', '.join(map(str,sorted(x))) for x in [aa-bb,aa&bb,bb-aa]]}),
                          hide_index=True,width='stretch')
         import plotly.graph_objects as go
-        matrix=[[int(p in siteset) for p in range(1,376)] for siteset in groups.values()]
+        names=sorted(records.loc[records.kind.eq('abp'),'group'].unique(),key=str.casefold)
+        abps={name:positions('abp',[name]) for name in names}
+        selected_abps=st.multiselect('ABP footprints aligned with actin–actin sites',names,key='fp_aligned_abps')
+        displayed={**groups, **{f'ABP: {name}':abps[name] for name in selected_abps}}
+        matrix=[[int(p in siteset) for p in range(1,376)] for siteset in displayed.values()]
         fig=go.Figure(go.Heatmap(z=matrix,x=list(range(1,376)),y=list(groups),
                                  colorscale=[[0,'#f2f2f2'],[1,'#0072B2']],zmin=0,zmax=1,showscale=False,
                                  hovertemplate='%{y}<br>P60709 position %{x}<br>Observed: %{z}<extra></extra>'))
-        fig.update_layout(height=230,xaxis_title=numbering.AXIS_TITLE,margin=dict(l=5,r=5,t=10,b=40))
+        fig.data[0].y=list(displayed)
+        fig.update_layout(height=max(230,32*len(displayed)+100),xaxis_title=numbering.AXIS_TITLE,margin=dict(l=5,r=5,t=10,b=40))
         position_hover(fig)
         st.plotly_chart(fig,use_container_width=True,key='homo_footprint_comparison')
-        names=sorted(records.loc[records.kind.eq('abp'),'group'].unique(),key=str.casefold)
-        abps={name:positions('abp',[name]) for name in names}
+        with st.expander('Compare positive contacts with the selected ASA threshold'):
+            counts=[]
+            for label,kind,selected in [('Reference actin sites','homo',a),('Comparison actin sites','homo',b)]+[(f'ABP: {n}','abp',[n]) for n in selected_abps]:
+                if not selected: continue
+                subset=records[records.kind.eq(kind)&records.group.isin(selected)]
+                counts.append({'Group':label,'Positive ASA positions':subset.loc[subset.asa.gt(0),'position'].nunique(),
+                               'Positions above selected threshold':subset.loc[subset.asa.gt(cutoff),'position'].nunique(),
+                               'Threshold (%)':cutoff})
+            st.dataframe(pd.DataFrame(counts),hide_index=True,width='stretch')
         result=pd.DataFrame([{'Partner source name':name,'Footprint residues':len(fp),
                               **{label:jaccard(fp,group) for label,group in groups.items()}}
                              for name,fp in abps.items()])
@@ -116,8 +128,9 @@ def render_footprint_comparison():
         st.dataframe(result,hide_index=True,width='stretch')
         st.download_button('Download ABP–actin overlap (CSV)',result.to_csv(index=False).encode(),
                            file_name='abp_actin_jaccard.csv',mime='text/csv',key='fp_overlap_download')
-        if st.checkbox('Show the complete ABP × ABP Jaccard matrix',key='fp_all_matrix'):
-            matrix=pd.DataFrame([[jaccard(x,y) for y in abps.values()] for x in abps.values()],index=names,columns=names)
+        if st.checkbox('Show the complete ABP and selected actin-site Jaccard matrix',key='fp_all_matrix'):
+            all_groups={**groups,**{f'ABP: {name}':fp for name,fp in abps.items()}}
+            matrix=pd.DataFrame([[jaccard(x,y) for y in all_groups.values()] for x in all_groups.values()],index=all_groups,columns=all_groups)
             st.dataframe(matrix,width='stretch')
             st.download_button('Download complete Jaccard matrix (CSV)',matrix.to_csv().encode(),
                                file_name='abp_jaccard_matrix.csv',mime='text/csv',key='fp_matrix_download')

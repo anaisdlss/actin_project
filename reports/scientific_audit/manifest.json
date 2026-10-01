@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-10-01T11:16:17.691022+00:00",
+  "generated_utc": "2026-10-01T14:06:04.239802+00:00",
   "variant_records": 3039,
   "mapped_variant_records": 3022,
   "analysis_eligible_records": 2864,
@@ -12,6 +12,8 @@
     "data/filtered/filtered_all_data.csv": "2cc698166ffe50f9e0793289e6fbef470aaffbe52bbd44a9814789effa497574",
     "data/filtered/details/1.interactions.csv": "ea101480359ff3a436093ebf9593004f7af4d8ae242e738fb01f29ee6238a893",
     "data/filtered/details/3.interface_residues.csv": "e403fcda60c6df08b5a6298809c20f9c241991b32674fe2c1efc849531f69581",
+    "data/filtered/details/4.inter-residue_contacts.csv": "92b71491325131990c45a9f3e3a71af4b30b5926881147f0dfa31589acdb2c97",
+    "data/filtered/proteins_per_pdb.csv": "be97933d256e64017cba6e06cc93965866b167143727c1841b175f0edb57912f",
     "data/human_variants/sources/clinvar_ACTG1.csv": "c59fe2d507e940970772a5213907d88b5496662c576e16b42bb75da09d140097",
     "data/human_variants/sources/clinvar_ACTG2.csv": "3e2468a07d9d8611da694fd072740c457efa403c191288241088edfe1a8d8dd7",
     "data/human_variants/sources/clinvar_ACTA2.csv": "7feeedb31bb52befa521799d22b953b036bca486bfd8e312b9638a7eaf8e4c15",
@@ -35,8 +37,12 @@
     "data/proteocast/actin/4.query_ProteoCast.csv": "909024144ba3aa29fe879bbdb4c2c661a74ee30d90d4b993406500e6d81cd4e4",
     "data/proteocast/conservation_vs_asa_per_position.csv": "9e74b08cd8973d457cdd3cf1bf59c72332c02f3557f52b993f1b54e88780074e"
   },
+  "chemistry_weight": "Positive uncensored pair contact area; fractions per interface and position, equal interface means within PDB/ABP, equal PDB then ABP means",
   "code_sha256": {
-    "script/scientific_analysis.py": "a999fded4a95147f56c5724f4d1706a7f19c47f2a6ea15287b6e72e7c4a4ff29",
-    "script/footprint_comparison.py": "19f8cb803fc8b00ea2c2141f53b1ad6ff1ddc55f008f79644bbac1852c660ac5"
+    "script/scientific_analysis.py": "0f195f81d2ee48dac2e797349fe5777499d5da224b4229655c9a7a8ada7df3a9",
+    "script/footprint_comparison.py": "c426849ca45674b4419db8b08e3bdeaee8eb099fde73d288836462b2cc5d364d",
+    "script/interface_properties.py": "cdfc66c914761fbb320572b60635b4a5f519abdfdfdc814f8fb4c8f64d3adef6",
+    "script/residue_contacts.py": "9b4369da1b7982f794f1f777bc8795304c256b7f24f759154c2c096ba0333b28",
+    "tools/export_scientific_audit.py": "1b2a7d239beef4bca5abf8d9c14da24bff197e54769ba3c1e4181f37d13a9f20"
   }
 }

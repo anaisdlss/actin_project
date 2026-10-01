@@ -8,7 +8,8 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from plot_interaction import position_hover
 from scientific_analysis import (load_variants,load_actin_scores,conservation_summary,
-                                 interface_evidence,disease_associations,variant_footprint_summary,GENES)
+                                 interface_evidence,disease_associations,variant_footprint_summary,GENES,
+                                 abp_position_asa,cross_gene_footprint_analysis,conflicting_variant_counts)
 from footprint_comparison import FILES,load_footprints
 
 
@@ -77,6 +78,15 @@ def render_conservation():
     fig.update_layout(yaxis_title='ProteoCast sensitivity',height=330)
     st.plotly_chart(fig,use_container_width=True,key='cons_categories')
     st.dataframe(clusters,hide_index=True,width='stretch')
+    with st.expander('Conservation footprints: positive contacts versus selected ASA threshold'):
+        _,_,baseline=conservation_summary(scores,current_footprints(),0.0)
+        st.caption('The first table uses all positive buried-ASA observations. The second uses the selected '
+                   'strict threshold. Both retain the same source sequences and ProteoCast scores.')
+        st.markdown('**All positive contacts (0%)**')
+        st.dataframe(baseline,hide_index=True,width='stretch')
+        st.markdown(f'**ASA strictly above {cutoff:g}%**')
+        st.dataframe(clusters,hide_index=True,width='stretch')
+        download(baseline,'Download conservation without an additional ASA threshold','footprint_conservation_asa0.csv','cons_baseline_csv')
     with st.expander('Conservation within a selected ABP binding-site cluster'):
         records=current_footprints()
         names=sorted(records.loc[records.kind.eq('abp'),'group'].unique())
@@ -146,27 +156,69 @@ def render_variants():
     st.dataframe(detail,hide_index=True,width='stretch')
     download(detail,'Download selected gene records and research scores',f'{gene}_variants.csv','hv_gene_csv')
     with st.expander('Conflicting annotations, mapping audit and cross-gene observations'):
-        conflicts=valid[valid.classif_cat.eq('conflicting')]
+        conflicts=valid[valid.source.eq('clinvar')&valid.classif_cat.eq('conflicting')]
         st.markdown('**ClinVar records explicitly marked conflicting**')
         st.dataframe(conflicts,hide_index=True,width='stretch')
-        conflict_counts=conflicts.drop_duplicates(['gene','position','aa_ref','aa_alt']).groupby(['gene','position']).size().unstack(fill_value=0).reindex(index=sorted(GENES),columns=range(1,376),fill_value=0).fillna(0)
-        st.plotly_chart(position_hover(go.Figure(go.Heatmap(z=conflict_counts.values,x=conflict_counts.columns,y=conflict_counts.index,colorscale='Purples'))),use_container_width=True,key='hv_conflicts_heatmap')
-        keys=['position','aa_ref','aa_alt']
-        patho=valid[valid.source.eq('clinvar')&valid.classif_cat.isin(['pathogenic','likely_pathogenic'])][['gene',*keys]].drop_duplicates()
-        population=valid[valid.source.eq('gnomad')][['gene',*keys]].drop_duplicates()
-        # Exclude substitutions having ANY ClinVar record in the population gene.
-        cv=valid[valid.source.eq('clinvar')][['gene',*keys]].drop_duplicates()
-        population=population.merge(cv.assign(in_clinvar=True),on=['gene',*keys],how='left')
-        population=population[population.in_clinvar.isna()].drop(columns='in_clinvar')
-        cross=patho.merge(population,on=keys,suffixes=('_PL','_population'))
-        cross=cross[cross.gene_PL.ne(cross.gene_population)]
+        conflict_counts=conflicting_variant_counts(variants)
+        stats=abp_position_asa(fp)
+        names=sorted(fp.loc[fp.kind.eq('abp'),'group'].dropna().unique())
+        selected_abp=st.selectbox('ABP footprint aligned with conflicting annotations',names,key='hv_conflict_abp') if names else None
+        track=scores.set_index('position')[['aa','sensitivity']].reindex(range(1,376))
+        selected_stats=stats[stats.ABP.eq(selected_abp)].set_index('position')
+        track=track.join(selected_stats[['mean_ASA_percent','observed_interface_chains','observed_interactions']])
+        track['positive_contact_observed']=track.mean_ASA_percent.notna()
+        fig=make_subplots(rows=4,cols=1,shared_xaxes=True,row_heights=[.50,.10,.20,.20],vertical_spacing=.07,
+                          subplot_titles=('Conflicting ClinVar substitutions by gene',
+                                          f'Observed footprint: {selected_abp or "no ABP available"}',
+                                          'Mean buried ASA at observed positions (%)','P60709 ProteoCast sensitivity'))
+        fig.add_trace(go.Heatmap(z=conflict_counts.values,x=conflict_counts.columns,y=conflict_counts.index,
+                                colorscale='Purples',zmin=0,zmax=max(1,conflict_counts.values.max()),
+                                colorbar=dict(title='Substitutions',len=.35,y=.85),
+                                hovertemplate='%{y}<br>P60709 %{x}<br>Conflicting substitutions: %{z}<extra></extra>'),row=1,col=1)
+        fig.add_trace(go.Heatmap(z=[track.positive_contact_observed.astype(int).values],x=track.index,y=['Positive ASA observed'],
+                                colorscale=[[0,'#F2F2F2'],[1,'#E69F00']],zmin=0,zmax=1,showscale=False,
+                                hovertemplate='P60709 %{x}<br>Positive ASA observed: %{z}<extra></extra>'),row=2,col=1)
+        fig.add_trace(go.Scatter(x=track.index,y=track.mean_ASA_percent,mode='markers',name='Mean ASA',
+                                marker=dict(color='#E69F00',size=5),customdata=track.observed_interface_chains,
+                                hovertemplate='P60709 %{x}<br>Mean buried ASA: %{y:.2f}%<br>Interface chains: %{customdata}<extra></extra>'),row=3,col=1)
+        fig.add_trace(go.Scatter(x=track.index,y=track.sensitivity,mode='lines',name='ProteoCast sensitivity',
+                                line=dict(color='#884EA0')),row=4,col=1)
+        fig.update_layout(height=730,showlegend=False);fig.update_xaxes(title_text='P60709 position',row=4,col=1)
+        st.plotly_chart(position_hover(fig),use_container_width=True,key='hv_conflicts_heatmap')
+        st.caption('Tracks share aligned P60709 positions. Conflicting means the source annotation; VUS are unchanged. '
+                   'The footprint aggregates structural observations across the retained dataset, not structures '
+                   'of the selected human gene. A gray footprint cell means no positive ASA observation; it does '
+                   'not establish absence of binding. ASA averages distinct interface chains at each position.')
+        aligned=track.join(conflict_counts.T.add_prefix('conflicting_substitutions_'))
+        aligned.insert(0,'ABP',selected_abp or '')
+        download(aligned.reset_index(names='position'),'Download conflicting annotations and aligned ABP tracks',
+                 'conflicting_variants_abp_tracks.csv','hv_conflict_tracks_csv')
+        cross,pairs,footprints,cross_detail=cross_gene_footprint_analysis(variants,fp)
+        st.markdown('**Cross-gene P/LP and population observations**')
         st.caption('Same reference and alternate amino acid at the same aligned position: P/LP in one gene, '
-                   'gnomAD observation without a ClinVar record in another. This is a cross-gene observation, '
-                   'not a conflict within ClinVar and not evidence of tolerance.')
-        abp=fp[fp.kind.eq('abp')&fp.asa.gt(0)].groupby('position')['group'].agg(lambda s:'; '.join(sorted(set(s))))
-        cross['ABP_source_names']=cross.position.map(abp).fillna('')
-        st.dataframe(cross,hide_index=True,width='stretch')
+                   'gnomAD observation without a matching substitution in the verified local ClinVar snapshot '
+                   'of another gene. Any ClinVar category, including VUS, excludes that population substitution. '
+                   'This is not a conflicting ClinVar annotation and is not evidence of benignity or tolerance.')
+        if cross.empty:
+            st.info('No cross-gene substitutions meet these criteria in the eligible source snapshot.')
+        else:
+            st.dataframe(pairs,hide_index=True,width='stretch')
+            pair_options=list(pairs[['gene_PL','gene_population']].itertuples(index=False,name=None))
+            pair=st.selectbox('Gene pair for ABP footprint comparison',pair_options,
+                              format_func=lambda p:f'{p[0]} P/LP → {p[1]} population observation',key='hv_cross_pair')
+            subset=footprints[footprints.gene_PL.eq(pair[0])&footprints.gene_population.eq(pair[1])]
+            st.dataframe(subset,hide_index=True,width='stretch')
+            st.caption('Substitutions and positions have separate counts. For each ABP, the two fractions use '
+                       'the pair’s distinct positions and the ABP footprint’s distinct positions, respectively. '
+                       'ASA takes the maximum per interaction/actin chain/position, averages those chain values '
+                       'at each position, then averages contacted positions equally. Repeated substitutions do '
+                       'not add weight. Positions without a positive contact have missing ASA, not zero.')
+            st.dataframe(cross_detail[cross_detail.gene_PL.eq(pair[0])&cross_detail.gene_population.eq(pair[1])],
+                         hide_index=True,width='stretch')
         download(cross,'Download cross-gene observations','cross_gene_observations.csv','hv_cross_csv')
+        download(pairs,'Download all gene-pair counts and denominators','cross_gene_pair_counts.csv','hv_cross_pairs_csv')
+        download(footprints,'Download all gene-pair and ABP footprint summaries','cross_gene_abp_summaries.csv','hv_cross_abp_csv')
+        download(cross_detail,'Download substitutions with ABP positions and ASA evidence','cross_gene_abp_details.csv','hv_cross_details_csv')
         download(conflicts,'Download conflicting source records','conflicting_variants.csv','hv_conflicts_csv')
         download(mapping,'Download isoform-to-P60709 mapping','human_actin_mapping.csv','hv_mapping_csv')
         st.dataframe(variants[~variants.analysis_eligible],hide_index=True,width='stretch')

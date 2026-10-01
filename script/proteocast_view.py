@@ -237,12 +237,20 @@ def compute_abp_rsa(abp_title, _mtime):
 
 
 def _query_seq(slug):
-    """Séquence exacte soumise à ProteoCast (1.query.fasta) ou None."""
+    """Submitted query or reference reconstructed from a complete score grid.
+
+    Construction/isoform FASTAs in abp_inputs are not interchangeable with the
+    ProteoCast query. Contradictory/incomplete results yield no mapping sequence.
+    """
+    from abp_profile import read_query, score_sequence
     qf = os.path.join(_ABP_DIR, slug, "1.query.fasta")
-    if not os.path.exists(qf):
+    result = result_file(_ABP_DIR, slug)
+    try:
+        if result is not None:
+            return score_sequence(result, query_path=qf)
+        return read_query(qf)
+    except (ValueError, OSError, KeyError):
         return None
-    q = "".join(l.strip() for l in open(qf) if not l.startswith(">"))
-    return q or None
 
 
 def _align_map(src, q):
@@ -274,8 +282,18 @@ def _align_map(src, q):
     return mp
 
 
-@st.cache_data(show_spinner=False)
 def abp_interface_asa_on_query(abp_title, slug, _mtime):
+    """Revalidate query identity before reading any cached contact mapping."""
+    q = _query_seq(slug)
+    if not (q and os.path.exists(_ALL) and os.path.exists(_IFACE)):
+        return {}
+    signature = tuple((path, os.stat(path).st_mtime_ns, os.stat(path).st_size)
+                      for path in (_ALL, _IFACE))
+    return _abp_interface_asa_for_query(abp_title, q, signature)
+
+
+@st.cache_data(show_spinner=False)
+def _abp_interface_asa_for_query(abp_title, q, signature):
     """Empreinte d'interface de l'ABP DÉJÀ replacée sur la numérotation query
     ProteoCast : {position query : %ASA enfouie max}.
 
@@ -283,9 +301,6 @@ def abp_interface_asa_on_query(abp_title, slug, _mtime):
     on aligne donc la séquence de chaque chaîne sur la query, puis on remappe.
     C'est ce qui recale la piste « ABP contact actin » sur la heatmap et les
     domaines (ex. Adducin : construction PDB != UniProt query)."""
-    q = _query_seq(slug)
-    if not (q and os.path.exists(_ALL) and os.path.exists(_IFACE)):
-        return {}
     df = pd.read_csv(_ALL, low_memory=False)
     # chaîne (casse d'interface_residues) -> séquence de cette structure
     chain_seq = {}
@@ -317,16 +332,25 @@ def abp_interface_asa_on_query(abp_title, slug, _mtime):
     return out
 
 
-@st.cache_data(show_spinner="Computing RSA from the ABP structure…")
 def abp_rsa_on_query(abp_title, slug, _mtime):
+    """Cache RSA against the actual query and structural-source file versions."""
+    import glob
+    q = _query_seq(slug)
+    if not (q and os.path.exists(_ABP_REPS) and os.path.isdir(_ABP_CHAINS)):
+        return {}
+    slug50 = re.sub(r"[^A-Za-z0-9]+", "_", str(abp_title)).strip("_")[:50]
+    paths = [_ABP_REPS] + sorted(glob.glob(os.path.join(_ABP_CHAINS, f"{slug50}__*.pdb")))
+    signature = tuple((path, os.stat(path).st_mtime_ns, os.stat(path).st_size) for path in paths)
+    return _abp_rsa_for_query(abp_title, q, signature)
+
+
+@st.cache_data(show_spinner="Computing RSA from the ABP structure…")
+def _abp_rsa_for_query(abp_title, q, signature):
     """RSA de l'ABP replacé sur la numérotation query ProteoCast :
     {position query : RSA}. Le RSA est calculé sur la VRAIE chaîne ABP de nos
     structures (SASA Shrake-Rupley), puis la séquence extraite du PDB est alignée
     sur la query pour recaler les positions (comme l'empreinte)."""
     import glob
-    q = _query_seq(slug)
-    if not (q and os.path.exists(_ABP_REPS) and os.path.isdir(_ABP_CHAINS)):
-        return {}
     reps = pd.read_csv(_ABP_REPS)
     if reps[reps["abp_title"] == abp_title].empty:
         return {}

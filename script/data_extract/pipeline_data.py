@@ -96,6 +96,18 @@ def skip_step(label):
     print("Already up to date — Nothing to do")
 
 
+def refresh_structure_annotations():
+    """Refresh RCSB metadata on a user-requested data update, even if PPI3D is unchanged."""
+    updater = PROJECT_ROOT / 'tools' / 'update_structure_annotations.py'
+    if not updater.exists() or not (FILTERED / 'filtered_all_data.csv').exists():
+        return
+    print('Refreshing retained PDB annotations from RCSB…', flush=True)
+    result = subprocess.run([sys.executable, str(updater), '--refresh'], cwd=PROJECT_ROOT)
+    if result.returncode:
+        print('WARNING: RCSB annotation refresh incomplete. Previous cache preserved; '
+              'see data/annotations/manifest.json for failed IDs.', flush=True)
+
+
 def run_notebook(label, notebook_path):
     run_step(label, [sys.executable, str(notebook_path)], cwd=PROJECT_ROOT)
 
@@ -191,6 +203,7 @@ def main():
             print(f"  PPI3D inchangé (dernière mise à jour : {_now_update}), "
                   "jeu de données cohérent, détails complets et analyses à jour.")
             print("Aucune nouvelle donnée — rien à refaire.")
+            refresh_structure_annotations()
             print("\nPipeline terminé avec succès.")
             return
         if not _details_ok:
@@ -313,6 +326,7 @@ def main():
              lambda: _exec([py, "-m", "script.abp_site_domain.run_all"]), None),
         ])
 
+        refresh_structure_annotations()
         print("\nPipeline terminé avec succès.")
 
     except subprocess.CalledProcessError as e:

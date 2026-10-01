@@ -12,6 +12,7 @@ from pathlib import Path as _Path
 import proteocast_view
 from residue_metrics import surface_masks
 from plot_interaction import position_hover
+from abp_profile import load_abp_scores, annotate_profile, profile_figure, nonempty_alignment, query_file
 
 
 _PROTEOCAST_ABP_DIR = _Path("data/proteocast/abp")
@@ -27,12 +28,11 @@ def _find_proteocast_csv(slug):
 
 
 @st.cache_data(show_spinner=False)
-def _load_proteocast(path, mtime):
-    pc = pd.read_csv(path)
-    pc["aa"] = pc["Mutation"].astype(str).str[-1]
-    piv = pc.pivot_table(index="aa", columns="Residue", values="Variant_score",
-                         aggfunc="first").reindex(_AA_ORDER)
-    return piv
+def _load_proteocast(path, mtime, query_mtime=0):
+    pc, profile = load_abp_scores(path)
+    piv = pc.pivot(index="alternate_aa", columns="position", values="Variant_score")
+    piv = piv.reindex(index=_AA_ORDER, columns=profile.position)
+    return piv, profile
 
 
 def _render_proteocast_mutland(csv_path, iface_asa=None, title="", domains=None,
@@ -49,7 +49,14 @@ def _render_proteocast_mutland(csv_path, iface_asa=None, title="", domains=None,
     import numpy as np
     import plotly.graph_objects as go
     from plotly.subplots import make_subplots
-    piv = _load_proteocast(str(csv_path), _Path(csv_path).stat().st_mtime)
+    _query_path = query_file(csv_path)
+    try:
+        piv, _profile = _load_proteocast(
+            str(csv_path), _Path(csv_path).stat().st_mtime_ns,
+            _query_path.stat().st_mtime_ns if _query_path.exists() else 0)
+    except (ValueError, OSError) as exc:
+        st.warning(f"ProteoCast source validation failed: {exc}")
+        return
     positions = [int(p) for p in piv.columns]
     aa = list(piv.index)
     _dom = list(domains or [])
@@ -121,10 +128,10 @@ def _render_proteocast_mutland(csv_path, iface_asa=None, title="", domains=None,
     #    des colonnes masquées -> "l'ASA est là où c'est enfoui").
     _asa = {int(k): float(v) for k, v in (iface_asa or {}).items()}
     if surface_only:
-        _asa_row = [(_asa.get(p, 0.0) if exposed else np.nan)
+        _asa_row = [(_asa.get(p, np.nan) if exposed else np.nan)
                     for p, exposed in zip(positions, _exposed)]
     else:
-        _asa_row = [_asa.get(p, 0.0) for p in positions]
+        _asa_row = [_asa.get(p, np.nan) for p in positions]
     fig.add_trace(go.Heatmap(
         z=[_asa_row], x=positions, y=["ABP contact actin"], colorscale=_asa_green,
         zmin=0, zmax=100, showscale=False, hoverongaps=False,
@@ -133,9 +140,7 @@ def _render_proteocast_mutland(csv_path, iface_asa=None, title="", domains=None,
 
     # 3) piste domaines : un segment coloré par domaine (hover = nom + bornes)
     if _ndom:
-        _pal = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd",
-                "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf",
-                "#aec7e8", "#ffbb78", "#98df8a", "#ff9896", "#c5b0d5"]
+        _pal = ["#0072B2", "#E69F00", "#CC79A7", "#56B4E9", "#6A51A3", "#777777"]
         for _i, _d in enumerate(_dom):
             _c = _pal[_i % len(_pal)]
             _lab = f"{_d['name'][:30]} ({_d['db']})"
@@ -165,6 +170,35 @@ def _render_proteocast_mutland(csv_path, iface_asa=None, title="", domains=None,
     # Domain spans only carry endpoints; preserve the cell/domain hover there.
     position_hover(fig, unified=not bool(_ndom))
     st.plotly_chart(fig, use_container_width=True)
+
+    st.markdown("**ABP mutational sensitivity along the sequence**")
+    st.caption("Sensitivity is minus the mean of all 20 supplied ProteoCast scores at a "
+               "position, including the unchanged amino acid (same convention as actin). "
+               "A high value means greater model-predicted mutational sensitivity, not a "
+               "clinical classification or a sequence-identity percentage. Missing scores "
+               "and unmeasured contact ASA remain gaps; they are not replaced by zero.")
+    st.caption(f"Sequence source: {_profile.sequence_source.iloc[0]}. "
+               "The full protein is displayed unless the binding-region zoom is enabled.")
+    _missing = int((~_profile.complete_score_grid).sum())
+    if _missing:
+        st.warning(f"Sensitivity unavailable at {_missing} positions: all 20 finite scores are required.")
+    _annotated = annotate_profile(_profile, iface_asa=iface_asa, domains=_dom,
+                                 rsa=rsa, surface_only=surface_only)
+    if _annotated.buried_ASA_percent_max.notna().sum() == 0:
+        st.caption("Contact ASA could not be mapped to this query; an empty track does not mean zero contact.")
+    if not _dom:
+        st.caption("No domain annotation is available for this protein.")
+    _profile_fig = profile_figure(_annotated, domains=_dom, title=title, focus=focus)
+    st.plotly_chart(_profile_fig, use_container_width=True)
+    st.download_button("Download ABP sensitivity and contact profile (CSV)",
+                       _annotated.to_csv(index=False).encode(),
+                       file_name=f"{_query_path.parent.name}_sensitivity_profile.csv",
+                       mime="text/csv", key=f"pc_profile_download_{csv_path}")
+    _alignment = nonempty_alignment(_query_path.parent)
+    if _alignment:
+        st.download_button("Download the available ABP sequence alignment (FASTA)",
+                           _alignment.read_bytes(), file_name=_alignment.name,
+                           mime="text/plain", key=f"pc_alignment_download_{csv_path}")
 
 
 def _abp_actin_focus(sel_abp, slug):

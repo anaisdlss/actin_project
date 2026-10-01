@@ -32,6 +32,9 @@ import numbering
 from footprint_comparison import render_footprint_comparison
 from threshold_comparison import render_threshold_comparison
 from numbering_view import render_numbering_lookup
+from structure_annotations import render_structure_annotations
+from interface_properties import render_interface_properties
+from filament_accessibility import render_filament_accessibility
 import folddisco_view
 import proteocast_view
 from network_viz import (
@@ -337,6 +340,7 @@ with _sections["abp-conservation"]:
 with _sections["summary-tables"]:
     st.divider()
     st.markdown("<span id='donnees-filtrees-s1-actin'></span>", unsafe_allow_html=True)
+    render_structure_annotations()
 
 
     TABLES = {
@@ -2549,5 +2553,8 @@ with _sections["human-actin-variants"]:
     render_variants()
 with _sections["actin-conservation"]:
     render_conservation()
+    render_filament_accessibility()
 with _sections["actin-actin-interfaces"]:
     render_interface_evidence()
+with _sections["interface-properties"]:
+    render_interface_properties()

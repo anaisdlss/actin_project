@@ -1,0 +1,4 @@
+context,n_positions,points_fine,points_coarse,mean_absolute_RSA_difference,max_absolute_RSA_difference,surface_threshold,surface_classification_disagreements
+isolated,370,960,480,0.0031728996925278795,0.01847495955719794,0.2,5
+actin_fragment,370,960,480,0.0031411534697113664,0.01847495955719794,0.2,6
+with_abp,370,960,480,0.003151108445597013,0.01847495955719794,0.2,7

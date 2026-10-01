@@ -218,3 +218,122 @@ def variant_footprint_summary(variants,records,gene):
         row['mean_ASA_at_PL_positions']=per.reindex(sorted(sets['PL']&footprint)).mean()
         rows.append(row)
     return pd.DataFrame(rows)
+
+
+def abp_position_asa(records):
+    """Positive contacts: one ASA maximum per interface chain, then a position mean."""
+    columns=['ABP','position','mean_ASA_percent','observed_interface_chains','observed_interactions']
+    abp=records.loc[records.kind.eq('abp')].copy()
+    abp['asa']=pd.to_numeric(abp.asa,errors='coerce')
+    abp=abp[np.isfinite(abp.asa)&abp.asa.gt(0)].dropna(subset=['group','position','interaction_id','chain'])
+    if abp.empty:return pd.DataFrame(columns=columns)
+    chains=abp.groupby(['group','position','interaction_id','chain'],as_index=False).asa.max()
+    result=chains.groupby(['group','position']).agg(
+        mean_ASA_percent=('asa','mean'),observed_interface_chains=('asa','size'),
+        observed_interactions=('interaction_id','nunique')).reset_index().rename(columns={'group':'ABP'})
+    result['position']=result.position.astype(int)
+    return result[columns]
+
+
+def _variant_analysis_rows(variants):
+    """Keep the audited analysis cohort without changing source annotations."""
+    return variants[variants.analysis_eligible.fillna(False)&variants.mapping_valid.fillna(False)].copy()
+
+
+def _joined_values(values):
+    return '; '.join(sorted({str(v) for v in values if pd.notna(v) and str(v)}))
+
+
+def cross_gene_observations(variants):
+    """Match P/LP to population observations; absence is local and substitution-specific."""
+    valid=_variant_analysis_rows(variants)
+    keys=['gene','position','aa_ref','aa_alt']
+    clinical=valid[valid.source.eq('clinvar')]
+    pl=clinical[clinical.classif_cat.isin(['pathogenic','likely_pathogenic'])].copy()
+    population=valid[valid.source.eq('gnomad')].copy()
+    # Any admissible ClinVar category, including VUS, prevents this designation.
+    present=clinical[keys].drop_duplicates().assign(in_ClinVar=True)
+    population=population.merge(present,on=keys,how='left',validate='many_to_one')
+    population=population[population.in_ClinVar.isna()].drop(columns='in_ClinVar')
+
+    def unique_substitutions(frame,source_columns):
+        for column in source_columns:
+            if column not in frame:frame[column]=''
+        if frame.empty:return frame[keys+source_columns].copy()
+        return frame.groupby(keys,as_index=False)[source_columns].agg(_joined_values)
+
+    pl_positions=pl.groupby('gene').position.nunique()
+    pop_positions=population.groupby('gene').position.nunique()
+    pl=unique_substitutions(pl,['clinvar_id','classification','pos']).rename(columns={
+        'clinvar_id':'ClinVar_ids','classification':'PL_source_classifications','pos':'PL_gene_positions'})
+    population=unique_substitutions(population,['variant_id','population_dataset','pos']).rename(columns={
+        'variant_id':'gnomAD_variant_ids','population_dataset':'gnomAD_datasets','pos':'population_gene_positions'})
+    result=pl.merge(population,on=keys[1:],suffixes=('_PL','_population'),validate='many_to_many')
+    result=result[result.gene_PL.ne(result.gene_population)].copy()
+    result['PL_gene_positions_total']=result.gene_PL.map(pl_positions)
+    result['population_gene_unannotated_positions_total']=result.gene_population.map(pop_positions)
+    result['position']=result.position.astype(int)
+    return result.sort_values(['gene_PL','gene_population','position','aa_ref','aa_alt']).reset_index(drop=True)
+
+
+def cross_gene_footprint_analysis(variants,records):
+    """Return substitutions, gene-pair counts, ABP counts and contact-detail export.
+
+    ASA is first averaged across distinct interface chains at a position, then
+    equally across contacted positions. Repeated substitutions never add weight.
+    Positions without positive contacts retain missing ASA in the detail export.
+    """
+    cross=cross_gene_observations(variants)
+    stats=abp_position_asa(records)
+    pair_columns=['gene_PL','gene_population','shared_substitutions','cross_gene_positions_total',
+                  'PL_gene_positions_total','population_gene_unannotated_positions_total',
+                  'positions_with_any_ABP_contact','P60709_positions']
+    summary_columns=['gene_PL','gene_population','ABP','shared_substitutions','cross_gene_positions_total',
+                     'footprint_positions','shared_substitutions_in_footprint','cross_gene_positions_in_footprint',
+                     'fraction_cross_gene_positions_contacted','fraction_footprint_positions_cross_gene',
+                     'mean_ASA_at_cross_gene_positions','positions_contributing_to_ASA',
+                     'observed_chain_position_records','contacted_P60709_positions',
+                     'footprint_P60709_positions']
+    pairs=[];summaries=[]
+    names=sorted(records.loc[records.kind.eq('abp'),'group'].dropna().unique())
+    for (gene_pl,gene_pop),group in cross.groupby(['gene_PL','gene_population']):
+        positions=set(group.position)
+        pairs.append(dict(gene_PL=gene_pl,gene_population=gene_pop,shared_substitutions=len(group),
+                          cross_gene_positions_total=len(positions),
+                          PL_gene_positions_total=int(group.PL_gene_positions_total.iloc[0]),
+                          population_gene_unannotated_positions_total=int(group.population_gene_unannotated_positions_total.iloc[0]),
+                          positions_with_any_ABP_contact=len(positions&set(stats.position)),
+                          P60709_positions='; '.join(map(str,sorted(positions)))))
+        for name in names:
+            abp=stats[stats.ABP.eq(name)]
+            footprint=set(abp.position);observed=abp[abp.position.isin(positions)]
+            summaries.append(dict(gene_PL=gene_pl,gene_population=gene_pop,ABP=name,
+                shared_substitutions=len(group),cross_gene_positions_total=len(positions),
+                footprint_positions=len(footprint),shared_substitutions_in_footprint=int(group.position.isin(footprint).sum()),
+                cross_gene_positions_in_footprint=len(observed),
+                fraction_cross_gene_positions_contacted=len(observed)/len(positions),
+                fraction_footprint_positions_cross_gene=len(observed)/len(footprint) if footprint else np.nan,
+                mean_ASA_at_cross_gene_positions=observed.mean_ASA_percent.mean(),
+                positions_contributing_to_ASA=len(observed),
+                observed_chain_position_records=int(observed.observed_interface_chains.sum()),
+                contacted_P60709_positions='; '.join(map(str,sorted(observed.position))),
+                footprint_P60709_positions='; '.join(map(str,sorted(footprint)))))
+    pairs=pd.DataFrame(pairs,columns=pair_columns)
+    summary=pd.DataFrame(summaries,columns=summary_columns)
+    details=cross.merge(stats,on='position',how='left',validate='many_to_many')
+    details['positive_ABP_contact_observed']=details.ABP.notna()
+    if not pairs.empty:
+        details=details.merge(pairs[['gene_PL','gene_population','cross_gene_positions_total']],
+                              on=['gene_PL','gene_population'],how='left',validate='many_to_one')
+    else:details['cross_gene_positions_total']=pd.Series(dtype='int64')
+    details['footprint_positions']=details.ABP.map(stats.groupby('ABP').position.nunique())
+    return cross,pairs,summary,details
+
+
+def conflicting_variant_counts(variants):
+    """Count distinct substitutions explicitly annotated conflicting in ClinVar."""
+    valid=_variant_analysis_rows(variants)
+    conflicts=valid[valid.source.eq('clinvar')&valid.classif_cat.eq('conflicting')]
+    conflicts=conflicts.drop_duplicates(['gene','position','aa_ref','aa_alt'])
+    counts=conflicts.groupby(['gene','position']).size().unstack(fill_value=0)
+    return counts.reindex(index=sorted(GENES),columns=range(1,376),fill_value=0).fillna(0).astype(int)

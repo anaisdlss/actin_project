@@ -9,6 +9,7 @@ import shutil
 import subprocess
 from pathlib import Path as _Path
 from collections import Counter as _Counter, defaultdict
+from msa_contact_stats import oriented_pairs, scoped_contacts, conditional_area_profile
 from Bio import AlignIO, SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
@@ -735,13 +736,13 @@ def _buried_asa_lookup():
     if not p.exists():
         return {}
     i3 = pd.read_csv(p, usecols=["interaction_id", "chain",
-                                 "residue_number_structure", "buried_ASA_Å²"])
-    i3["ba"] = pd.to_numeric(
-        i3["buried_ASA_Å²"].astype(str).str.replace("<", "", regex=False), errors="coerce")
-    i3["rn"] = pd.to_numeric(i3["residue_number_structure"], errors="coerce")
-    i3 = i3.dropna(subset=["rn"])
-    return {(int(a), b, int(c)): d
-            for a, b, c, d in zip(i3.interaction_id, i3.chain, i3.rn, i3.ba)}
+                                 "residue_number_structure", "buried_ASA_Å²"],
+                    dtype={"residue_number_structure": str})
+    i3["ba"] = pd.to_numeric(i3["buried_ASA_Å²"], errors="coerce")
+    i3["ba"] = i3.ba.where(np.isfinite(i3.ba) & i3.ba.gt(0))
+    i3 = i3.dropna(subset=["residue_number_structure"])
+    return {(int(a), b, str(c)): d
+            for a, b, c, d in zip(i3.interaction_id, i3.chain, i3.residue_number_structure, i3.ba)}
 
 
 # Classes physicochimiques de résidus (code 1 lettre) pour dériver des
@@ -763,19 +764,20 @@ def _contact_props(aa_a, aa_b, contact_type):
     return {
         "salt":  ct.str.contains("Salt bridge"),
         "hbond": ct.str.contains("H-bond"),
-        "vdw":   (ct == ""),
+        "vdw":   (ct == ""),  # Unspecified in source; not proof of van der Waals bonding.
         "hydro": a_hy & b_hy,                                   # 2 apolaires
         "arom":  (a_ar & b_ar) | (a_ar & b_ca) | (a_ca & b_ar),  # π-π ou π-cation
     }
 
 
 @st.cache_data(show_spinner=False)
-def _s1_cluster_contact_type_profiles():
+def _s1_cluster_contact_type_profiles(source_versions=()):
     """Profil physicochimique des contacts pour CHAQUE cluster S1 de site de
     liaison (s1_binding_site_cluster_data_70), normalisé sur ses propres contacts.
 
     Colonnes : pct_salt, pct_hbond, pct_vdw, pct_hydro, pct_arom, n.
-    - salt/hbond/vdw : d'après contact_type
+    - salt/hbond : d'après contact_type ; pct_vdw conserve le nom historique
+      pour la fraction de types non renseignés (sans attribution chimique).
     - hydro : 2 résidus apolaires · arom : empilement π (π-π ou π-cation)
     """
     _cols = ["pct_salt", "pct_hbond", "pct_vdw", "pct_hydro", "pct_arom", "n"]
@@ -783,14 +785,12 @@ def _s1_cluster_contact_type_profiles():
     cf = _Path("data/filtered/filtered_all_data.csv")
     if not c4.exists() or not cf.exists():
         return pd.DataFrame(columns=_cols)
-    df = pd.read_csv(c4, usecols=["chain_B_id", "contact_type",
-                                  "residue_A_name", "residue_B_name"])
-    fmap = pd.read_csv(cf, low_memory=False,
-                       usecols=["subunit_2", "s1_binding_site_cluster_data_70"])
-    fmap = fmap.dropna(subset=["s1_binding_site_cluster_data_70"]).copy()
-    fmap["s1_binding_site_cluster_data_70"] = fmap["s1_binding_site_cluster_data_70"].astype(str)
-    fmap = fmap.drop_duplicates(["subunit_2", "s1_binding_site_cluster_data_70"])
-    m = df.merge(fmap, left_on="chain_B_id", right_on="subunit_2", how="inner")
+    c1 = _Path("data/filtered/details/1.interactions.csv")
+    if not c1.exists():
+        return pd.DataFrame(columns=_cols)
+    pairs = oriented_pairs(pd.read_csv(cf, low_memory=False), pd.read_csv(c1))
+    m = scoped_contacts(_read_interface(c4, dtype={"residue_A_structure":str, "residue_B_structure":str}), pairs)
+    m = m.dropna(subset=["site", "canon_a", "canon_b"]).rename(columns={"site":"s1_binding_site_cluster_data_70"})
     if m.empty:
         return pd.DataFrame(columns=_cols)
     _p = _contact_props(m["residue_A_name"], m["residue_B_name"], m["contact_type"])
@@ -829,44 +829,42 @@ def _msa_contact_analysis(filter_fn, group_key, rigor_pdbs=None,
         st.warning("Missing 4.inter-residue_contacts.csv file.")
         return
 
-    if _ch2seq is not None and _ch2title is not None:
-        ch2seq   = _ch2seq
-        ch2title = _ch2title
-    else:
-        filt_path = _Path("data/filtered/filtered_all_data.csv")
-        if not filt_path.exists():
-            st.warning("filtered_all_data.csv missing.")
-            return
-        df_filt = pd.read_csv(filt_path, low_memory=False)
-        if rigor_pdbs:
-            df_filt = df_filt[df_filt["pdb_id"].isin(rigor_pdbs)]
-        mask = df_filt["subunit_2_title"].apply(lambda t: filter_fn(str(t)))
-        df_grp = df_filt[mask][["subunit_2", "subunit_2_title", "s2_sequence"]].drop_duplicates("subunit_2")
-        if df_grp.empty:
-            st.info("No matching sequence.")
-            return
-        ch2seq   = {r["subunit_2"]: str(r["s2_sequence"]).strip().lower() for _, r in df_grp.iterrows()}
-        ch2title = {r["subunit_2"]: str(r["subunit_2_title"]) for _, r in df_grp.iterrows()}
-
-    df4 = _read_interface(int4_path)
-    df4 = df4[df4["chain_B_id"].isin(ch2seq)].copy()
-    if df4.empty:
-        st.info("No contact found for this group.")
+    filt_path = _Path("data/filtered/filtered_all_data.csv")
+    int1_path = _Path("data/filtered/details/1.interactions.csv")
+    if not filt_path.exists() or not int1_path.exists():
+        st.warning("Retained interaction metadata is missing.")
         return
-
-    df4["area_f"]  = pd.to_numeric(
-        df4["contact_area"].astype(str).str.replace("<", "", regex=False),
-        errors="coerce",
-    ).fillna(0.05)
-    df4["canon_b"] = pd.to_numeric(df4["residue_B_canon_mafft"], errors="coerce")
-    df4["canon_a"] = pd.to_numeric(df4["residue_A_canon_mafft"], errors="coerce")
-    df4["aa_b"]    = df4["residue_B_name"].str.strip().str.upper()   # résidu ABP
-    df4["aa_a"]    = df4["residue_A_name"].str.strip().str.upper()   # résidu actin
-    df4["seq_low"] = df4["chain_B_id"].map(ch2seq)
-    df4["title"]   = df4["chain_B_id"].map(ch2title)
-    df4 = df4.dropna(subset=["canon_b", "canon_a", "seq_low"])
+    pairs = oriented_pairs(pd.read_csv(filt_path, low_memory=False), pd.read_csv(int1_path))
+    site = str(group_key)[4:] if str(group_key).startswith("s1c_") else None
+    df4 = scoped_contacts(_read_interface(int4_path, dtype={"residue_A_structure": str, "residue_B_structure": str}),
+                          pairs, site=site, filter_fn=filter_fn,
+                          chains=_ch2seq, rigor_pdbs=rigor_pdbs)
+    if df4.empty:
+        st.info("No contact found for the exact retained interactions in this group.")
+        return
+    _n_selected = len(df4)
+    _n_unmapped = int(df4[["canon_a", "canon_b", "seq_low"]].isna().any(axis=1).sum())
+    df4 = df4.dropna(subset=["canon_b", "canon_a", "seq_low"]).copy()
+    if df4.empty:
+        st.info("Contacts exist, but no aligned residue coordinates are available for these views.")
+        return
     df4["canon_b"] = df4["canon_b"].astype(int)
     df4["canon_a"] = df4["canon_a"].astype(int)
+    _n_bad_area = int(df4.area_f.isna().sum())
+    partner_label = "Partner" if df4.partner_is_actin.any() else "ABP"
+    st.caption(f"{df4.pdb.nunique():,} distinct PDB structures · "
+               f"{df4.chain_B_id.nunique():,} partner chains with mapped contacts.")
+    st.caption(f"{_n_selected:,} oriented residue-contact records from exact retained interaction/chain pairs; "
+               f"{_n_unmapped:,} records excluded for missing alignment coordinates. "
+               f"{_n_bad_area:,} further records excluded from area-weighted views because contact area is "
+               "missing, censored, nonfinite or nonpositive. No area is imputed.")
+    st.caption("Area profiles sum contacts per chain and observed residue position, then average equally "
+               "over observed chains within each PDB and over PDBs with that position. "
+               "Positions absent from a structure are not assigned zero. Percentages normalize these "
+               "conditional position means; amino-acid composition retains every AA contribution.")
+    if partner_label == "Partner":
+        st.caption("This selection includes actin partners: Partner denotes actin or an ABP. "
+                   "Both orientations of an actin–actin interaction may contribute to their respective sites.")
 
     # Labels uniques (dédupliqués si plusieurs chaînes avec le même titre)
     seen_cnt: dict = {}
@@ -897,45 +895,15 @@ def _msa_contact_analysis(filter_fn, group_key, rigor_pdbs=None,
     if not _label_rank:
         _label_rank = {lbl: i for i, lbl in enumerate(sorted(title_to_label.values()))}
 
-    # ── Agrégations corrigées ─────────────────────────────────────────────────
-    # Moyenne corrigée : somme par structure PDB, puis division par n_structures TOTAL
-    # (inclut les structures sans contact à cette position = zéros implicites)
-    n_struct_map: dict = df4.groupby("seq_low")["chain_B_id"].nunique().to_dict()
-
-    # ABP : somme par (seq, chain, canon_b) → somme sur toutes les chaînes / n_struct
-    _ps_b = df4.groupby(["seq_low", "label", "chain_B_id", "canon_b"])["area_f"].sum().reset_index()
-    corr_b = _ps_b.groupby(["seq_low", "label", "canon_b"])["area_f"].sum().reset_index()
-    corr_b["corr_mean"] = corr_b["area_f"] / corr_b["seq_low"].map(n_struct_map)
-    _tot_b = corr_b.groupby("seq_low")["corr_mean"].sum().to_dict()
-    corr_b["pct"] = corr_b.apply(
-        lambda r: r["corr_mean"] / _tot_b.get(r["seq_low"], 1) * 100, axis=1
-    )
-
-    # Actin : idem pour canon_a
-    _ps_a = df4.groupby(["seq_low", "label", "chain_B_id", "canon_a"])["area_f"].sum().reset_index()
-    corr_a = _ps_a.groupby(["seq_low", "label", "canon_a"])["area_f"].sum().reset_index()
-    corr_a["corr_mean"] = corr_a["area_f"] / corr_a["seq_low"].map(n_struct_map)
-    _tot_a = corr_a.groupby("seq_low")["corr_mean"].sum().to_dict()
-    corr_a["pct"] = corr_a.apply(
-        lambda r: r["corr_mean"] / _tot_a.get(r["seq_low"], 1) * 100, axis=1
-    )
-
-    # AA dominant à chaque (seq, position) — pour les tooltips et la classification
-    agg_b_aa = (
-        df4.groupby(["seq_low", "label", "canon_b", "aa_b"])["area_f"]
-        .sum().reset_index()
-        .sort_values("area_f", ascending=False)
-        .drop_duplicates(["seq_low", "canon_b"])
-    )
-    agg_a_aa = (
-        df4.groupby(["seq_low", "label", "canon_a", "aa_a"])["area_f"]
-        .sum().reset_index()
-        .sort_values("area_f", ascending=False)
-        .drop_duplicates(["seq_low", "canon_a"])
-    )
-    # garder aussi agg_b / agg_a pour le tab C classification (besoin du n_contacts)
-    agg_b = agg_b_aa.rename(columns={"area_f": "mean_area"}).copy()
-    agg_a = agg_a_aa.rename(columns={"area_f": "mean_area"}).copy()
+    # Conditional area means and additive AA mixtures share the same denominators.
+    n_struct_map = df4.groupby("seq_low")["pdb"].nunique().to_dict()
+    corr_b, aa_contrib_b = conditional_area_profile(df4, "b")
+    corr_a, aa_contrib_a = conditional_area_profile(df4, "a")
+    # Dominant AA is used only as a compact tooltip label, never for composition.
+    agg_b_aa = (aa_contrib_b.sort_values("corr_mean", ascending=False)
+                .drop_duplicates(["seq_low", "canon_b"]))
+    agg_a_aa = (aa_contrib_a.sort_values("corr_mean", ascending=False)
+                .drop_duplicates(["seq_low", "canon_a"]))
 
     # AA actin majoritaire à chaque position canonical ABP (tous ABPs confondus)
     aa_maj_actin_for_abp: dict = (
@@ -998,9 +966,9 @@ document.querySelectorAll('[data-tt]').forEach(function(el){
             f'<div style="font-weight:600;font-size:12px;margin-bottom:3px">{title_str}</div>',
             f'<div style="font-size:10px;color:#888;margin-bottom:8px">{subtitle_str}</div>',
             '<div style="display:flex;align-items:center;gap:3px;margin-bottom:10px;font-size:10px;color:#666">',
-            '<span style="margin-right:3px">0 Å²</span>',
+            '<span style="margin-right:3px">0%</span>',
             grad_cells,
-            f'<span style="margin-left:3px">{max_area:.1f} Å²</span></div>',
+            f'<span style="margin-left:3px">{max_area:.1f}%</span></div>',
             js,
             '<table style="border-collapse:collapse;table-layout:fixed"><thead><tr>',
             f'<th style="width:{LABEL_W}px;min-width:{LABEL_W}px"></th>',
@@ -1033,11 +1001,11 @@ document.querySelectorAll('[data-tt]').forEach(function(el){
                 )
             parts.append("</tr>")
         parts.append("</tbody></table></div>")
-        return "".join(parts)
+        return "".join(parts).replace("ABP", partner_label)
 
     _ALL_TAB_KEYS  = ["A", "B", "C", "D", "E"]
     _ALL_TAB_NAMES = [
-        "Heatmap ABP",
+        f"Heatmap {partner_label}",
         "Heatmap Actin",
         "AA classification",
         "AA pairs",
@@ -1095,14 +1063,14 @@ document.querySelectorAll('[data-tt]').forEach(function(el){
                 aa  = aa_b_lut.get((rl, cb), "?")
                 aaa = aa_maj_actin_for_abp.get(cb, "?")
                 if pd.isna(v) or v == 0:
-                    return f"ABP pos: {cb}\nNo contact"
+                    return f"ABP pos: {cb}\nNo quantified contact area"
                 cm = cm_b_lut.get((rl, cb), 0.0)
                 return (
                     f"Pos ABP : {cb}\n"
                     f"ABP residue ({rl[:22]}): {aa}\n"
                     f"Actin residue freq.  : {aaa}\n"
                     f"% interface          : {v:.2f}%\n"
-                    f"Mean corrected area  : {cm:.1f} Å²"
+                    f"Mean area over observed chains/PDBs  : {cm:.1f} Å²"
                 )
 
             _h_a = _html_interactive_heatmap(
@@ -1138,14 +1106,14 @@ document.querySelectorAll('[data-tt]').forEach(function(el){
                 sl        = next((s for s, lb in title_to_label.items() if lb == rl), None)
                 aa_b_spec = aa_b_specific.get((sl, ca), "?") if sl else "?"
                 if pd.isna(v) or v == 0:
-                    return f"Actin residue (P60709): {numbering.label(ca)}\nNo contact"
+                    return f"Actin residue (P60709): {numbering.label(ca)}\nNo quantified contact area"
                 cm = cm_a_lut.get((rl, ca), 0.0)
                 return (
                     f"Actin residue (P60709): {numbering.label(ca)}\n"
                     f"Actin residue        : {aa_a_val}\n"
                     f"ABP residue ({rl[:18]}): {aa_b_spec}\n"
                     f"% interface          : {v:.2f}%\n"
-                    f"Mean corrected area  : {cm:.1f} Å²"
+                    f"Mean area over observed chains/PDBs  : {cm:.1f} Å²"
                 )
 
             _h_b = _html_interactive_heatmap(
@@ -1178,17 +1146,12 @@ document.querySelectorAll('[data-tt]').forEach(function(el){
                         return c
                 return "Other"
 
-            agg_b["class"] = agg_b["aa_b"].apply(_cls)
-            agg_a["class"] = agg_a["aa_a"].apply(_cls)
-
             col_left, col_right = st.columns(2)
 
-            for side, corr_s, aa_s, aa_col, lbl in [
-                ("ABP",    corr_b, agg_b_aa, "aa_b", col_left),
-                ("Actin", corr_a, agg_a_aa, "aa_a", col_right),
+            for side, cls_data, aa_col, lbl in [
+                (partner_label, aa_contrib_b.copy(), "aa_b", col_left),
+                ("Actin", aa_contrib_a.copy(), "aa_a", col_right),
             ]:
-                cls_data = corr_s.merge(aa_s[["seq_low", aa_col.replace("aa_","canon_"), aa_col]],
-                                        on=["seq_low", aa_col.replace("aa_","canon_")], how="left")
                 cls_data["class"] = cls_data[aa_col].apply(_cls)
                 tot_corr = cls_data["corr_mean"].sum() or 1.0
                 cls_sum = (
@@ -1209,12 +1172,12 @@ document.querySelectorAll('[data-tt]').forEach(function(el){
                     fig_c, axes = plt.subplots(1, 2, figsize=(8, 4.5))
                     colors_c = [_CLASS_COL.get(c, "#aaa") for c in cls_sum["class"]]
                     axes[0].barh(cls_sum["class"], cls_sum["pct"], color=colors_c)
-                    axes[0].set_xlabel("% of total interface", fontsize=8)
+                    axes[0].set_xlabel("% of conditional mean contact area", fontsize=8)
                     axes[0].tick_params(labelsize=8)
                     axes[0].set_title("By family", fontsize=9)
                     colors_aa = [_CLASS_COL.get(c, "#aaa") for c in aa_sum["class"]]
                     axes[1].barh(aa_sum[aa_col], aa_sum["pct"], color=colors_aa)
-                    axes[1].set_xlabel("% of total interface", fontsize=8)
+                    axes[1].set_xlabel("% of conditional mean contact area", fontsize=8)
                     axes[1].tick_params(labelsize=8)
                     axes[1].set_title("By AA", fontsize=9)
                     from matplotlib.patches import Patch
@@ -1225,8 +1188,8 @@ document.querySelectorAll('[data-tt]').forEach(function(el){
                     plt.close(fig_c)
                     st.dataframe(
                         cls_sum[["class","pct","n_contacts"]].rename(
-                            columns={"class":"Family","pct":"% interface","n_contacts":"Contacts"}
-                        ).assign(**{"% interface": lambda d: d["% interface"].round(1)}),
+                            columns={"class":"Family","pct":"% mean contact area","n_contacts":"Sequence-position-AA contributions"}
+                        ).assign(**{"% mean contact area": lambda d: d["% mean contact area"].round(1)}),
                         use_container_width=True, hide_index=True,
                     )
 
@@ -1259,6 +1222,7 @@ document.querySelectorAll('[data-tt2]').forEach(function(el){
 
             def _aa_pct_grid(_dfm):
                 """Grille des % d'interface (part de l'aire de contact) pour une matrice."""
+                _dfm = _dfm[np.isfinite(_dfm.area_f) & _dfm.area_f.gt(0)]
                 _pa = (_dfm.groupby(["aa_b", "aa_a"])
                        .agg(aire_tot=("area_f", "sum"), n=("area_f", "count")).reset_index())
                 _pa = _pa[_pa["aa_b"].isin(_AA_ORDER) & _pa["aa_a"].isin(_AA_ORDER)]
@@ -1305,8 +1269,11 @@ document.querySelectorAll('[data-tt2]').forEach(function(el){
                             P.append(f'<td style="width:{CELL}px;height:{CELL}px;background:#f8f8f8;color:#ddd;text-align:center;font-size:8px">&middot;</td>')
                     P.append('</tr>')
                 P.append('</tbody></table></div>')
-                return "".join(P), CELL
+                return "".join(P).replace("ABP", partner_label), CELL
 
+            st.caption("AA-pair matrices pool measured positive contact areas (not the chain/PDB-normalized "
+                       "position means above). Contact-property percentages count all mapped contact records, "
+                       "including records without a quantified area.")
             # Seuil d'ASA enfouie RELATIVE : buried ASA de chaque résidu rapportée
             # à SA PROPRE surface (asa_pct_A/B, 0-100 %), pas à un max de cluster.
             # Une seule heatmap, filtrée par le seuil (0 % = tous les contacts).
@@ -1338,12 +1305,14 @@ document.querySelectorAll('[data-tt2]').forEach(function(el){
                     ("hbond", "H-bonds",               int(_pr["hbond"].sum()), "pct_hbond"),
                     ("hydro", "Hydrophobic (2 apolar)", int(_pr["hydro"].sum()), "pct_hydro"),
                     ("arom",  "Aromatic (π)",           int(_pr["arom"].sum()),  "pct_arom"),
-                    ("vdw",   "van der Waals",            int(_pr["vdw"].sum()),   "pct_vdw"),
+                    ("vdw",   "Unspecified source type",            int(_pr["vdw"].sum()),   "pct_vdw"),
                 ]
                 st.markdown("**Physicochemical properties of the contacts**")
                 # Médiane des AUTRES clusters S1 par catégorie → l'écart s'affiche
                 # en delta sous chaque %, ce qui remplace l'ancien gros boxplot.
-                _prof = _s1_cluster_contact_type_profiles()
+                _profile_sources = [int4_path, filt_path, int1_path]
+                _prof = _s1_cluster_contact_type_profiles(tuple(
+                    (str(path), path.stat().st_mtime_ns, path.stat().st_size) for path in _profile_sources))
                 _cur_cid = group_key[4:] if str(group_key).startswith("s1c_") else None
                 _others = _prof.drop(index=_cur_cid, errors="ignore") if _cur_cid else _prof
                 _mcols = st.columns(len(_defs))
@@ -1529,7 +1498,7 @@ document.querySelectorAll('[data-sp]').forEach(function(el){
 
             parts_sp.append('</div>')
             _ht_sp = max(n_seqs * CELL_SP + 120, 250)
-            st.components.v1.html("".join(parts_sp), height=_ht_sp, scrolling=True)
+            st.components.v1.html("".join(parts_sp).replace("ABP", partner_label), height=_ht_sp, scrolling=True)
 
             st.divider()
             st.markdown("#### Actin side — residues (P60709) specifically contacted")
@@ -1633,7 +1602,7 @@ document.querySelectorAll('[data-sp]').forEach(function(el){
                 parts_spa.append('</tr>')
             parts_spa.append('</tbody></table></div>')
 
-            _html_spa = "".join(parts_spa).replace("data-sp\"", "data-spa\"")
+            _html_spa = "".join(parts_spa).replace("ABP", partner_label).replace("data-sp\"", "data-spa\"")
             st.components.v1.html(_html_spa, height=max(n_seqs * CELL_SP + 120, 250), scrolling=True)
 
             # ── Vue fusionnée : résidus ABP alignés sur l'interface actin ────────
@@ -1812,9 +1781,9 @@ document.querySelectorAll('[data-sp]').forEach(function(el){
             parts_spm.append('</tbody></table></div>')
             _n_rows_spm = n_seqs + len(variant_labels)
             with _merged_slot:
-                st.markdown("#### Merged view — ABP residues projected onto the actin interface")
+                st.markdown(f"#### Merged view — {partner_label} residues projected onto the actin interface")
                 st.components.v1.html(
-                    "".join(parts_spm),
+                    "".join(parts_spm).replace("ABP", partner_label),
                     height=max(_n_rows_spm * CELL_SP + 140, 250),
                     scrolling=True,
                 )
@@ -1828,22 +1797,19 @@ document.querySelectorAll('[data-sp]').forEach(function(el){
 def _s1_get_ch_maps(cid: str):
     """Retourne (ch2seqlow, ch2title) pour un cluster S1 donné.
     Utilisé par streamlit.py pour afficher les onglets B–E dans la section Binding Site.
-    Inclut tous les partenaires subunit_2 sans filtre (actin pour clusters homo,
-    ABP pour clusters hetero, les deux pour clusters mixed).
+    Inclut les partenaires de chaque côté actin retenu dans ce site (actin
+    pour les clusters homo, ABP pour les hetero, les deux pour les mixed).
     """
     filt_path = _Path("data/filtered/filtered_all_data.csv")
     if not filt_path.exists():
         return {}, {}
-    df_filt = pd.read_csv(filt_path, low_memory=False)
-
-    df_pairs = df_filt[df_filt["s1_binding_site_cluster_data_70"].astype(str) == str(cid)][
-        ["subunit_2", "subunit_2_title", "s2_sequence"]
-    ].drop_duplicates("subunit_2")
-    if df_pairs.empty:
+    int1_path = _Path("data/filtered/details/1.interactions.csv")
+    if not int1_path.exists():
         return {}, {}
-    ch2seqlow = {r["subunit_2"]: str(r["s2_sequence"]).strip().lower() for _, r in df_pairs.iterrows()}
-    ch2title  = {r["subunit_2"]: str(r["subunit_2_title"])             for _, r in df_pairs.iterrows()}
-    return ch2seqlow, ch2title
+    pairs = oriented_pairs(pd.read_csv(filt_path, low_memory=False), pd.read_csv(int1_path))
+    selected = pairs[pairs.site.astype(str).eq(str(cid))].drop_duplicates("partner_chain")
+    return (selected.set_index("partner_chain").seq_low.to_dict(),
+            selected.set_index("partner_chain").title.to_dict())
 
 
 def _msa_blast_celegans():
@@ -2844,4 +2810,3 @@ def _msa_section_s1_clusters():
                 partners=crow["partners"], include_contacts=True,
                 as_expander=True,
             )
-
