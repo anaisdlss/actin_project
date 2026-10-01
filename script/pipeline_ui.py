@@ -49,7 +49,7 @@ def render():
         _pill = {
             "running": ("running…", "#1a56db", "#e8f0fe"),
             "done":    ("done",      "#137333", "#e6f4ea"),
-            "skipped": ("up to date","#5f6368", "#f1f3f4"),
+            "skipped": ("output exists","#5f6368", "#f1f3f4"),
             "error":   ("error",     "#c5221f", "#fce8e6"),
             "pending": ("waiting",   "#9aa0a6", "#f8f9fa"),
         }.get(state, ("", "#000", "#fff"))
@@ -129,10 +129,13 @@ def render():
         clicked = st.button("Run / update", type="primary",
                             width="stretch")
     with _c_prog:
-        _ptxt = (f"Pipeline up to date — {_n_done}/{TOTAL} steps"
+        _ptxt = (f"Expected outputs present — {_n_done}/{TOTAL} steps"
                  if all_done else
-                 f"{_n_done}/{TOTAL} steps up to date — click to complete")
+                 f"Expected outputs present — {_n_done}/{TOTAL} steps")
         st.progress(_n_done / TOTAL, text=_ptxt)
+
+    st.caption("File presence does not verify freshness, completeness or scientific validity. "
+               "Existing outputs may need regeneration after source data or calculation changes.")
 
     progress_bar = st.empty()
 

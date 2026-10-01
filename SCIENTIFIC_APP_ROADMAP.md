@@ -121,3 +121,15 @@ Le projet complet possède désormais des données : son sélecteur présente 16
 ## Correspondance des résidus (1 octobre 2026)
 
 Summary tables propose une recherche par PDB et chaîne d’actine avec export CSV : numéro structural (insertions conservées), position de séquence, acide aminé observé, colonne MAFFT et position P60709 utilisée dans l’application. Seuls les résidus d’interface présents dans les sources sont couverts. Les positions sans correspondance restent vides ; la casse des chaînes est préservée. Cette vue expose la conversion existante, sans recalculer les données ni utiliser les résultats heuristiques de l’audit des offsets.
+
+## Contrôle direct et poursuite des demandes (1 octobre 2026)
+
+Le navigateur intégré fonctionne : erreur d’import d’un module ancien résolue par redémarrage du serveur ; réseau de résidus rétabli en distinguant les fichiers requis et l’annotation facultative des rôles. Les 375 positions sont sélectionnables. Les RSA inconnues restent non classées dans le filtre de surface. La fiche expose les contacts actine–actine dans les deux sens et actine–ABP, les ASA des deux résidus, le type source et un export CSV. Les fréquences affichent leurs effectifs et dénominateurs. Des clés de cache ignorées par Streamlit (arguments préfixés par _) sont corrigées dans les vues concernées.
+
+Le contrôle des heatmaps identifie une contamination entre interactions : deux listes indépendantes de chaînes et d’identifiants permettaient de retenir le mauvais côté d’un contact homo. La sélection se fait désormais sur le couple exact interaction–chaîne, dans l’app et les scripts de régénération. Le bilan avant/après sur le jeu complet est consigné dans VALIDATION.md.
+
+Ajouts : téléchargements des alignements ABP par cluster ; FoldDisco affiche toutes les catégories par défaut et explicite ses seuils ; comparaison exploratoire ≥3/≥5 actines connectées dans Summary tables lorsque les données brutes sont présentes. Les filtres des analyses existantes ne sont pas modifiés.
+
+Les commandes reproductibles et limites de validation sont documentées dans VALIDATION.md. Les fichiers reports/dataset_integrity.json enregistrent les sources par SHA-256. Les données Cloud restent distinctes du jeu complet ; aucune fusion dans main ni mise en production n’est effectuée ici.
+
+Comparaison des empreintes : la section actine–actine propose deux groupes de sites configurables (référence initiale 6685_1–4), une union des positions observées sur les deux côtés des contacts homo, les résidus propres/communs, un seuil local d’ASA, les scores Jaccard contre chaque ABP et la matrice ABP × ABP téléchargeable. Aucun groupe minoritaire ni clash stérique n’est inféré automatiquement. Les tests couvrent le rattachement d’une chaîne à son site et le cas de l’union vide.

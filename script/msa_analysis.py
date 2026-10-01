@@ -2586,6 +2586,8 @@ def _msa_section_s2_clusters():
                             st.error(f"Could not read the alignment: {_e2}")
                         else:
                             _ns2 = len(_aln2); _al2 = _aln2.get_alignment_length()
+                            st.download_button("Download ABP alignment (FASTA)", aln_path.read_bytes(),
+                                               file_name=aln_path.name, mime="text/plain", key=f"msa_download_{ckey}")
                             st.success(f"**{_ns2} seq. × {_al2} col.**")
                             _html2 = _msa_render_full(_aln2, core_c, var_c, 9999)
                             _height2 = min(_ns2 * 18 + 80, 6000)
@@ -2739,6 +2741,8 @@ def _msa_one_s1_cluster(cid, df_h, _df1_s1, _df3_s1, partners="",
                                 abp_rows_s1,
                                 key=lambda r: _rank_fresh.get(r.get("s2seq", ""), 9999),
                             )
+                        st.download_button("Download ABP alignment (FASTA)", _aln_path_s1c.read_bytes(),
+                                           file_name=_aln_path_s1c.name, mime="text/plain", key=f"msa_download_{wkey}")
                         n_iface_total = sum(u["n_iface"] for u in uniq_s2)
                         _html_s2c = _msa_render_full(_aln_s1c, core_by_seqlow, var_by_seqlow, 9999)
                         _h_s2c    = min(_ns1c * 18 + 80, 6000)

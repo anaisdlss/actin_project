@@ -10,6 +10,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from pathlib import Path as _Path
 import proteocast_view
+from residue_metrics import surface_masks
 
 
 _PROTEOCAST_ABP_DIR = _Path("data/proteocast/abp")
@@ -61,12 +62,16 @@ def _render_proteocast_mutland(csv_path, iface_asa=None, title="", domains=None,
     _z = piv.values.astype(float).copy()
     _z_bur = None                                # couche « cœur enfoui » en gris
     if surface_only:
-        _rsa = dict(rsa or {})
-        _exposed = np.array([_rsa.get(p, 1.0) >= 0.2 for p in positions])
-        if _exposed.any():
-            _z_bur = _z.copy()
-            _z_bur[:, _exposed] = np.nan         # gris : seulement l'enfoui
-            _z[:, ~_exposed] = np.nan            # vert : seulement l'exposé
+        _exposed, _buried = surface_masks(positions, rsa)
+        _z_bur = _z.copy()
+        _z_bur[:, ~_buried] = np.nan
+        _z[:, ~_exposed] = np.nan
+        _unknown = int((~(_exposed | _buried)).sum())
+        if _unknown:
+            st.caption(f"RSA unavailable for {_unknown} positions: these positions are "
+                       "excluded from the surface filter, not classified as exposed or buried.")
+        if not _exposed.any():
+            st.info("No residue with known RSA ≥ 0.2 in this selection.")
     # gradient RELATIF : bornes = min/max des scores affichés. Si zoom sur la zone
     # de liaison, on calcule les bornes sur cette zone (sinon un pic ailleurs dans
     # les 2500 résidus hors-sujet écraserait le contraste de l'interface).
@@ -75,8 +80,9 @@ def _render_proteocast_mutland(csv_path, iface_asa=None, title="", domains=None,
         _fm = np.array([focus[0] <= p <= focus[1] for p in positions])
         if _fm.any():
             _zg = _z[:, _fm]
-    _zmin = float(np.nanmin(_zg)) if np.isfinite(np.nanmin(_zg)) else -8
-    _zmax = float(np.nanmax(_zg)) if np.isfinite(np.nanmax(_zg)) else 1
+    _finite = _zg[np.isfinite(_zg)]
+    _zmin = float(_finite.min()) if _finite.size else -8
+    _zmax = float(_finite.max()) if _finite.size else 1
 
     # colorscale ProteoCast vert, ancres RÉGULIÈRES (clair/foncé ~50/50) :
     # noir(-8, très délétère) -> vert -> blanc(+1, toléré)
@@ -118,9 +124,8 @@ def _render_proteocast_mutland(csv_path, iface_asa=None, title="", domains=None,
     #    des colonnes masquées -> "l'ASA est là où c'est enfoui").
     _asa = {int(k): float(v) for k, v in (iface_asa or {}).items()}
     if surface_only:
-        _rsa2 = dict(rsa or {})
-        _asa_row = [(_asa.get(p, 0.0) if _rsa2.get(p, 1.0) >= 0.2 else np.nan)
-                    for p in positions]
+        _asa_row = [(_asa.get(p, 0.0) if exposed else np.nan)
+                    for p, exposed in zip(positions, _exposed)]
     else:
         _asa_row = [_asa.get(p, 0.0) for p in positions]
     fig.add_trace(go.Heatmap(

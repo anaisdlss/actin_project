@@ -42,7 +42,7 @@ def _reading(n_used, frac, sn, rmsd):
 
 
 @st.cache_data(show_spinner=False)
-def _load_folddisco(_mtime):
+def _load_folddisco(mtime):
     if not os.path.exists(_FD_CSV):
         return None
     return pd.read_csv(_FD_CSV)
@@ -176,7 +176,7 @@ def _dedup_by_name(sub):
 
 def _interp_filter_ui(key):
     """Filter radio; default = 'same motif (strong)' (strict)."""
-    return st.radio("Keep only", list(_FILTERS), index=0, horizontal=True,
+    return st.radio("Keep only", list(_FILTERS), index=2, horizontal=True,
                     key=key)
 
 
@@ -200,6 +200,7 @@ def _render_db_table(sub, db, filt):
     if keep is not None:
         d = d[d["interpretation"].isin(keep)]
     if d.empty:
+        st.info("No FoldDisco hit matches this filter.")
         return
     d["Source"] = (d["target_id"].str.upper()
                    + (" / " + d["target_chain"].fillna("") if db == "pdb" else ""))
@@ -223,6 +224,18 @@ def _render_db_table(sub, db, filt):
 def render_discovery(sel_abp):
     """Per-ABP view, broken down by cluster: one motif per site, 2 dbs (PDB/AFDB)."""
     st.markdown("#### Discovery — interface motif per cluster (FoldDisco)")
+    with st.expander("How FoldDisco scores are interpreted"):
+        st.markdown("Coverage is the fraction of query residues matched. The normalised score "
+                    "is relative to the query self-match. RMSD (Å) describes the geometric "
+                    "deviation after superposition; smaller values mean a closer fit.")
+        st.markdown("The current app uses exploratory thresholds: fewer than 5 matched residues "
+                    "is inconclusive; at least 75% coverage, RMSD ≤ 4 Å and normalised score "
+                    "≥ 0.15 gives the ‘strong’ category. Other hits with at least 75% coverage "
+                    "are grouped as broadly shared, and 50–75% as partially shared. These "
+                    "categories do not establish homology, actin binding or biological function.")
+        st.caption("All categories are shown by default. The chart shows the first 15 hits "
+                   "after filtering and deduplication by protein name; the table contains all "
+                   "retained names. Inspect source identifiers for specific structures.")
     mt = os.path.getmtime(_DISCO_CSV) if os.path.exists(_DISCO_CSV) else 0.0
     df = _load_discovery(mt)
     if df is None:

@@ -1,0 +1,3753 @@
+{
+  "source_repository": "actin_project",
+  "source_sha256": {
+    "pdb_entry_results.csv": "d52ecda157bd56063984fde0bc7407375dd3a321c422eb0397af4af78dd5f7bc",
+    "ppi3d_actin_summary.csv": "3f58663c6393ed8d6c83b5688975d879943dcec7389f7023eab863c2bbe010c8"
+  },
+  "method": "Same actin title annotation (Expect value = 0) and graph connectivity as current pipeline; PDB 4b1z excluded. Counts precede the domain/fragment and cluster-55649 filters. Partners are distinct source names directly contacting an annotated actin, not curated ABP identities.",
+  "thresholds": [
+    {
+      "threshold": 3,
+      "pdb_count": 228,
+      "partner_name_count": 76,
+      "additional_pdbs": [
+        "2yje",
+        "2yjf",
+        "3tpq",
+        "4m63",
+        "6av9",
+        "6avb",
+        "6djm",
+        "6djn",
+        "6djo",
+        "6kll",
+        "6kln",
+        "6tu7",
+        "6w17",
+        "7k20",
+        "7k21",
+        "7plu",
+        "7plz",
+        "7pm3",
+        "7pm6",
+        "7pme",
+        "7r91",
+        "7rb8",
+        "7rb9",
+        "7udt",
+        "8d13",
+        "8d14",
+        "8dmx",
+        "8dmy",
+        "8dnf",
+        "8dnh",
+        "8j9b",
+        "8oi6",
+        "8rtt",
+        "8ru0",
+        "8ru2",
+        "8rv2",
+        "8trm",
+        "8trn",
+        "8vo5",
+        "8vo6",
+        "8vo7",
+        "8vo8",
+        "8vo9",
+        "8voa",
+        "8xdl",
+        "8xdm",
+        "9b3q",
+        "9b3r",
+        "9bph",
+        "9bpm",
+        "9cfu",
+        "9cfv",
+        "9cfw",
+        "9cfx",
+        "9dfs",
+        "9dfv",
+        "9fjm",
+        "9fjo",
+        "9fju",
+        "9fjy",
+        "9jus",
+        "9kbx",
+        "9m5e",
+        "9m64",
+        "9ug2"
+      ],
+      "additional_partner_names": [
+        "Cell division control protein 12",
+        "Deoxyribonuclease-1",
+        "Fascin",
+        "Growth arrest-specific protein 2",
+        "Isoform 2 of Inverted formin-2",
+        "Isoform 3 of Unconventional myosin-XV",
+        "MAL",
+        "MKL/MYOCARDIN-LIKE PROTEIN 1",
+        "Methylated-DNA--protein-cysteine methyltransferase,Protein diaphanous homolog 1",
+        "T3SS2 effector VopL nucleation of actin polymerization",
+        "Type IV secretion protein Dot",
+        "Unconventional myosin-Ic",
+        "Unconventional myosin-VIIa",
+        "Unconventional myosin-Va",
+        "Unconventional myosin-XV",
+        "villin"
+      ]
+    },
+    {
+      "threshold": 5,
+      "pdb_count": 163,
+      "partner_name_count": 60,
+      "additional_pdbs": [],
+      "additional_partner_names": []
+    }
+  ],
+  "structures": [
+    {
+      "pdb": "12bw",
+      "largest_actin_component": 8,
+      "partner_names": [
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "12bx",
+      "largest_actin_component": 8,
+      "partner_names": [
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "12by",
+      "largest_actin_component": 8,
+      "partner_names": [
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "12bz",
+      "largest_actin_component": 8,
+      "partner_names": [
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "12rv",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "1atn",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "DEOXYRIBONUCLEASE I"
+      ]
+    },
+    {
+      "pdb": "1c0f",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "GELSOLIN SEGMENT 1"
+      ]
+    },
+    {
+      "pdb": "1c0g",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "PROTEIN (GELSOLIN SEGMENT 1)"
+      ]
+    },
+    {
+      "pdb": "1d4x",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "GELSOLIN"
+      ]
+    },
+    {
+      "pdb": "1dej",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "GELSOLIN"
+      ]
+    },
+    {
+      "pdb": "1eqy",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "GELSOLIN"
+      ]
+    },
+    {
+      "pdb": "1esv",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "GELSOLIN"
+      ]
+    },
+    {
+      "pdb": "1h1v",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "GELSOLIN"
+      ]
+    },
+    {
+      "pdb": "1hlu",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "PROFILIN"
+      ]
+    },
+    {
+      "pdb": "1k8k",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "1kxp",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "HUMAN VITAMIN D-BINDING PROTEIN"
+      ]
+    },
+    {
+      "pdb": "1lcu",
+      "largest_actin_component": 2,
+      "partner_names": []
+    },
+    {
+      "pdb": "1lot",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Vitamin D-binding protein"
+      ]
+    },
+    {
+      "pdb": "1ma9",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Vitamin D-binding protein"
+      ]
+    },
+    {
+      "pdb": "1mdu",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "gelsolin precursor"
+      ]
+    },
+    {
+      "pdb": "1nlv",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "1nm1",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "1nmd",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "1p8z",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gelsolin precursor, plasma"
+      ]
+    },
+    {
+      "pdb": "1rdw",
+      "largest_actin_component": 1,
+      "partner_names": []
+    },
+    {
+      "pdb": "1rfq",
+      "largest_actin_component": 2,
+      "partner_names": []
+    },
+    {
+      "pdb": "1rgi",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "1sqk",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "CIBOULOT"
+      ]
+    },
+    {
+      "pdb": "1t44",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Chimera of Gelsolin domain 1 and C-Terminal domain of thymosin Beta-4"
+      ]
+    },
+    {
+      "pdb": "1tyq",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "1u2v",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "1y64",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "BNI1 protein"
+      ]
+    },
+    {
+      "pdb": "1yag",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "PROTEIN (GELSOLIN)"
+      ]
+    },
+    {
+      "pdb": "1yvn",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "PROTEIN (GELSOLIN)"
+      ]
+    },
+    {
+      "pdb": "23il",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "2a3z",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Deoxyribonuclease-1"
+      ]
+    },
+    {
+      "pdb": "2a40",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Deoxyribonuclease-1",
+        "Wiskott-Aldrich syndrome protein family member 2"
+      ]
+    },
+    {
+      "pdb": "2a41",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Deoxyribonuclease-1",
+        "Wiskott-Aldrich syndrome protein interacting protein"
+      ]
+    },
+    {
+      "pdb": "2a42",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Deoxyribonuclease-1"
+      ]
+    },
+    {
+      "pdb": "2a5x",
+      "largest_actin_component": 1,
+      "partner_names": []
+    },
+    {
+      "pdb": "2btf",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "PROFILIN"
+      ]
+    },
+    {
+      "pdb": "2d1k",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Deoxyribonuclease-1",
+        "Metastasis suppressor protein 1"
+      ]
+    },
+    {
+      "pdb": "2ff3",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "2ff6",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "2gwk",
+      "largest_actin_component": 2,
+      "partner_names": []
+    },
+    {
+      "pdb": "2hmp",
+      "largest_actin_component": 2,
+      "partner_names": []
+    },
+    {
+      "pdb": "2oan",
+      "largest_actin_component": 2,
+      "partner_names": []
+    },
+    {
+      "pdb": "2p9i",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "2p9k",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "2p9l",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "2p9n",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "2p9p",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "2p9s",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "2p9u",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "2pav",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Profilin-1"
+      ]
+    },
+    {
+      "pdb": "2pbd",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Profilin-1",
+        "Vasodilator-stimulated phosphoprotein"
+      ]
+    },
+    {
+      "pdb": "2q1n",
+      "largest_actin_component": 1,
+      "partner_names": []
+    },
+    {
+      "pdb": "2q31",
+      "largest_actin_component": 1,
+      "partner_names": []
+    },
+    {
+      "pdb": "2q36",
+      "largest_actin_component": 1,
+      "partner_names": []
+    },
+    {
+      "pdb": "2q97",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Toxofilin"
+      ]
+    },
+    {
+      "pdb": "2v51",
+      "largest_actin_component": 2,
+      "partner_names": [
+        "MKL/MYOCARDIN-LIKE PROTEIN 1"
+      ]
+    },
+    {
+      "pdb": "2v52",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "MKL/MYOCARDIN-LIKE PROTEIN 1"
+      ]
+    },
+    {
+      "pdb": "2vcp",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "NEURAL WISKOTT-ALDRICH SYNDROME PROTEIN"
+      ]
+    },
+    {
+      "pdb": "2yje",
+      "largest_actin_component": 3,
+      "partner_names": [
+        "MKL/MYOCARDIN-LIKE PROTEIN 1"
+      ]
+    },
+    {
+      "pdb": "2yjf",
+      "largest_actin_component": 3,
+      "partner_names": [
+        "MKL/MYOCARDIN-LIKE PROTEIN 1"
+      ]
+    },
+    {
+      "pdb": "38jl",
+      "largest_actin_component": 8,
+      "partner_names": [
+        "Actin-interacting protein 1",
+        "Cofilin (UNC-60B)"
+      ]
+    },
+    {
+      "pdb": "38kl",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Actin-interacting protein 1",
+        "Cofilin"
+      ]
+    },
+    {
+      "pdb": "38km",
+      "largest_actin_component": 8,
+      "partner_names": [
+        "Actin-interacting protein 1",
+        "Cofilin"
+      ]
+    },
+    {
+      "pdb": "38kn",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Cofilin"
+      ]
+    },
+    {
+      "pdb": "38ko",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Actin-interacting protein 1",
+        "Cofilin"
+      ]
+    },
+    {
+      "pdb": "38kp",
+      "largest_actin_component": 7,
+      "partner_names": [
+        "Cofilin"
+      ]
+    },
+    {
+      "pdb": "38kq",
+      "largest_actin_component": 8,
+      "partner_names": [
+        "Actin-interacting protein 1",
+        "Cofilin"
+      ]
+    },
+    {
+      "pdb": "3a5l",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "3a5m",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "3a5n",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "3a5o",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "3buz",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Iota toxin component Ia"
+      ]
+    },
+    {
+      "pdb": "3chw",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Profilin-1"
+      ]
+    },
+    {
+      "pdb": "3ci5",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "3cip",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "3cjb",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "3cjc",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Deoxyribonuclease-1",
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "3daw",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Twinfilin-1"
+      ]
+    },
+    {
+      "pdb": "3dwl",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "3dxk",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "3dxm",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "3ffk",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "plasma gelsolin"
+      ]
+    },
+    {
+      "pdb": "3j8a",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "3m1f",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Putative uncharacterized protein VPA1370"
+      ]
+    },
+    {
+      "pdb": "3mn5",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Protein spire"
+      ]
+    },
+    {
+      "pdb": "3mn7",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Spire DDD"
+      ]
+    },
+    {
+      "pdb": "3rse",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "3sjh",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Ciboulot/Thymosin beta-4 chimeric protein"
+      ]
+    },
+    {
+      "pdb": "3tpq",
+      "largest_actin_component": 4,
+      "partner_names": [
+        "MAL"
+      ]
+    },
+    {
+      "pdb": "3tu5",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gelsolin, Protein cordon-bleu, Thymosin beta-4"
+      ]
+    },
+    {
+      "pdb": "3u4l",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Profilin-1"
+      ]
+    },
+    {
+      "pdb": "3u8x",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Thymosin beta-4"
+      ]
+    },
+    {
+      "pdb": "3u9d",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Thymosin beta-4, Chimeric protein"
+      ]
+    },
+    {
+      "pdb": "3u9z",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Ciboulot, isoform A"
+      ]
+    },
+    {
+      "pdb": "3ub5",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Profilin-1"
+      ]
+    },
+    {
+      "pdb": "3ue5",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Protein spire"
+      ]
+    },
+    {
+      "pdb": "3ukr",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "3uku",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "3ule",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "3w3d",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Deoxyribonuclease-1"
+      ]
+    },
+    {
+      "pdb": "3wee",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "4b1u",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "PHOSPHATASE AND ACTIN REGULATOR 1"
+      ]
+    },
+    {
+      "pdb": "4b1v",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "PHOSPHATASE AND ACTIN REGULATOR 1"
+      ]
+    },
+    {
+      "pdb": "4b1w",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "PHOSPHATASE AND ACTIN REGULATOR 1"
+      ]
+    },
+    {
+      "pdb": "4b1x",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "PHOSPHATASE AND ACTIN REGULATOR 1"
+      ]
+    },
+    {
+      "pdb": "4b1y",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "PHOSPHATASE AND ACTIN REGULATOR 1"
+      ]
+    },
+    {
+      "pdb": "4cbu",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "GELSOLIN"
+      ]
+    },
+    {
+      "pdb": "4cbw",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "GELSOLIN"
+      ]
+    },
+    {
+      "pdb": "4cbx",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "GELSOLIN"
+      ]
+    },
+    {
+      "pdb": "4ci6",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "PROTEIN KINASE YOPO"
+      ]
+    },
+    {
+      "pdb": "4eah",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Formin-like protein 3"
+      ]
+    },
+    {
+      "pdb": "4efh",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Protein spire"
+      ]
+    },
+    {
+      "pdb": "4fo0",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "4gy2",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Iota toxin component Ia"
+      ]
+    },
+    {
+      "pdb": "4h03",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Iota toxin component Ia"
+      ]
+    },
+    {
+      "pdb": "4h0t",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Iota toxin component Ia"
+      ]
+    },
+    {
+      "pdb": "4h0v",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Iota toxin component Ia"
+      ]
+    },
+    {
+      "pdb": "4h0x",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Iota toxin component Ia"
+      ]
+    },
+    {
+      "pdb": "4h0y",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Iota toxin component Ia"
+      ]
+    },
+    {
+      "pdb": "4i6m",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "4jd2",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "4jhd",
+      "largest_actin_component": 2,
+      "partner_names": [
+        "Protein cordon-bleu"
+      ]
+    },
+    {
+      "pdb": "4m63",
+      "largest_actin_component": 3,
+      "partner_names": [
+        "T3SS2 effector VopL nucleation of actin polymerization"
+      ]
+    },
+    {
+      "pdb": "4pkg",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gelsolin,Tropomodulin-1 chimera"
+      ]
+    },
+    {
+      "pdb": "4pkh",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gelsolin,Tropomodulin-1 chimera"
+      ]
+    },
+    {
+      "pdb": "4pki",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gelsolin,Tropomodulin-1 chimera"
+      ]
+    },
+    {
+      "pdb": "4pl8",
+      "largest_actin_component": 2,
+      "partner_names": [
+        "Thymosin beta-4,Protein cordon-bleu,Thymosin beta-4"
+      ]
+    },
+    {
+      "pdb": "4rwt",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Leiomodin-2"
+      ]
+    },
+    {
+      "pdb": "4wyb",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Bud site selection protein 6"
+      ]
+    },
+    {
+      "pdb": "4xei",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "4z94",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gelsolin, Tropomodulin-1, Leiomodin-1 chimera"
+      ]
+    },
+    {
+      "pdb": "5adx",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "ACTIN RELATED PROTEIN 1",
+        "ACTIN RELATED PROTEIN 11"
+      ]
+    },
+    {
+      "pdb": "5afu",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "DYNACTIN"
+      ]
+    },
+    {
+      "pdb": "5ce3",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Protein kinase YopO"
+      ]
+    },
+    {
+      "pdb": "5i9e",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-related protein 4",
+        "Helicase SWR1"
+      ]
+    },
+    {
+      "pdb": "5jlf",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "5jlh",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Myosin-14,Alpha-actinin A"
+      ]
+    },
+    {
+      "pdb": "5mvv",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "5nbl",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-related protein 4",
+        "nAct-Nanobody"
+      ]
+    },
+    {
+      "pdb": "5nbm",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-related protein 4",
+        "nAct-Nanobody"
+      ]
+    },
+    {
+      "pdb": "5nbn",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-like protein ARP8",
+        "Actin-related protein 4",
+        "Putative DNA helicase INO80"
+      ]
+    },
+    {
+      "pdb": "5ogw",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "5ooc",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "5ood",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "5ooe",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "5oof",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "5tgc",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "5ubo",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "5wfn",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Leiomodin-2"
+      ]
+    },
+    {
+      "pdb": "5yee",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Uncharacterized protein"
+      ]
+    },
+    {
+      "pdb": "5ypu",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Cordon-Bleu WH2 motif"
+      ]
+    },
+    {
+      "pdb": "5yu8",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Cofilin-2"
+      ]
+    },
+    {
+      "pdb": "5zza",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Uncharacterized protein"
+      ]
+    },
+    {
+      "pdb": "5zzb",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Uncharacterized protein"
+      ]
+    },
+    {
+      "pdb": "6av9",
+      "largest_actin_component": 3,
+      "partner_names": []
+    },
+    {
+      "pdb": "6avb",
+      "largest_actin_component": 3,
+      "partner_names": []
+    },
+    {
+      "pdb": "6c1d",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Unconventional myosin-Ib"
+      ]
+    },
+    {
+      "pdb": "6c1g",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Unconventional myosin-Ib"
+      ]
+    },
+    {
+      "pdb": "6c1h",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Unconventional myosin-Ib"
+      ]
+    },
+    {
+      "pdb": "6d8c",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Filamin-A"
+      ]
+    },
+    {
+      "pdb": "6djm",
+      "largest_actin_component": 4,
+      "partner_names": []
+    },
+    {
+      "pdb": "6djn",
+      "largest_actin_component": 4,
+      "partner_names": []
+    },
+    {
+      "pdb": "6djo",
+      "largest_actin_component": 4,
+      "partner_names": []
+    },
+    {
+      "pdb": "6f1t",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "ARP1 actin related protein 1 homolog A",
+        "Actin related protein 10 homolog",
+        "Cytoplasmic dynein 1 heavy chain 1,Cytoplasmic dynein 1 heavy chain 1,Cytoplasmic dynein 1 heavy chain 1,Dynein Heavy Chain,Cytoplasmic dynein 1 heavy chain 1,Cytoplasmic dynein 1 heavy chain 1,Cytoplasmic dynein 1 heavy chain 1,Cytoplasmic dynein 1 heavy chain 1,Dynein Heavy Chain,Cytoplasmic dynein 1 heavy chain 1,Cytoplasmic dynein 1 heavy chain 1"
+      ]
+    },
+    {
+      "pdb": "6f1u",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "6fhl",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "6fhs",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "6fm2",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Adenylyl cyclase-associated protein 1"
+      ]
+    },
+    {
+      "pdb": "6gej",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "6gen",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "6gvc",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Rho GTPase-activating protein 12"
+      ]
+    },
+    {
+      "pdb": "6i4d",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "6i4e",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "6i4f",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "6i4g",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "6i4h",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "6i4i",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "6i4j",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "6i4k",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "6i4l",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "6i4m",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "6igm",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "6iug",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "6jbk",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Peptide from Protein cordon-bleu"
+      ]
+    },
+    {
+      "pdb": "6jcu",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Peptide from Protein cordon-bleu"
+      ]
+    },
+    {
+      "pdb": "6jh8",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Cordon-Bleu MIM chimeric peptide"
+      ]
+    },
+    {
+      "pdb": "6jh9",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Cordon-Bleu MIM chimeric peptide"
+      ]
+    },
+    {
+      "pdb": "6kll",
+      "largest_actin_component": 4,
+      "partner_names": []
+    },
+    {
+      "pdb": "6kln",
+      "largest_actin_component": 4,
+      "partner_names": []
+    },
+    {
+      "pdb": "6ltj",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-like protein 6A",
+        "Transcription activator BRG1"
+      ]
+    },
+    {
+      "pdb": "6m5g",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Utrophin"
+      ]
+    },
+    {
+      "pdb": "6nas",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "N-alpha-acetyltransferase 80",
+        "Profilin-1"
+      ]
+    },
+    {
+      "pdb": "6nbe",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "N-alpha-acetyltransferase 80",
+        "Profilin-1"
+      ]
+    },
+    {
+      "pdb": "6nbw",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "N-alpha-acetyltransferase 80",
+        "Profilin-1"
+      ]
+    },
+    {
+      "pdb": "6rsw",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Adenylyl cyclase-associated protein 1",
+        "Twinfilin-1"
+      ]
+    },
+    {
+      "pdb": "6t1y",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "6t20",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "6t23",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "6t24",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "6t25",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "6tu4",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "6tu7",
+      "largest_actin_component": 4,
+      "partner_names": [
+        "Myosin-A"
+      ]
+    },
+    {
+      "pdb": "6u96",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "6uhc",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "6upv",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Catenin alpha-1"
+      ]
+    },
+    {
+      "pdb": "6upw",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Vinculin"
+      ]
+    },
+    {
+      "pdb": "6vao",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Cofilin-1"
+      ]
+    },
+    {
+      "pdb": "6vau",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "6vec",
+      "largest_actin_component": 11,
+      "partner_names": [
+        "Epididymis secretory protein Li 37"
+      ]
+    },
+    {
+      "pdb": "6vz4",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "6w17",
+      "largest_actin_component": 4,
+      "partner_names": [
+        "Actin-related protein 2",
+        "Actin-related protein 3"
+      ]
+    },
+    {
+      "pdb": "6wvt",
+      "largest_actin_component": 6,
+      "partner_names": [
+        "Catenin alpha-1"
+      ]
+    },
+    {
+      "pdb": "6yp9",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Twinfilin-1"
+      ]
+    },
+    {
+      "pdb": "6znl",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "ARP1 actin related protein 1 homolog A",
+        "Arp11",
+        "Dynactin subunit 4"
+      ]
+    },
+    {
+      "pdb": "7ad9",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "7ahn",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "7ahq",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "7aln",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Myosin-A"
+      ]
+    },
+    {
+      "pdb": "7bt7",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "7bti",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "7c2f",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gelsolin-like domain-containing protein"
+      ]
+    },
+    {
+      "pdb": "7c2g",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "2DGel3"
+      ]
+    },
+    {
+      "pdb": "7c2h",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "2DGel3"
+      ]
+    },
+    {
+      "pdb": "7c4j",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "7ccc",
+      "largest_actin_component": 2,
+      "partner_names": [
+        "F-actin-capping protein subunit alpha",
+        "F-actin-capping protein subunit beta",
+        "Twinfilin-1"
+      ]
+    },
+    {
+      "pdb": "7jh7",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Myosin-7"
+      ]
+    },
+    {
+      "pdb": "7jpn",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "7ju4",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "28 kDa inner dynein arm light chain, axonemal"
+      ]
+    },
+    {
+      "pdb": "7k20",
+      "largest_actin_component": 4,
+      "partner_names": []
+    },
+    {
+      "pdb": "7k21",
+      "largest_actin_component": 4,
+      "partner_names": []
+    },
+    {
+      "pdb": "7nvm",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Phosducin-like protein 3",
+        "T-complex protein 1 subunit alpha",
+        "T-complex protein 1 subunit eta",
+        "T-complex protein 1 subunit gamma",
+        "T-complex protein 1 subunit theta",
+        "T-complex protein 1 subunit zeta"
+      ]
+    },
+    {
+      "pdb": "7nxv",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Deoxyribonuclease-1",
+        "Protein phosphatase 1 regulatory subunit 15A"
+      ]
+    },
+    {
+      "pdb": "7nzm",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Deoxyribonuclease-1",
+        "Eukaryotic translation initiation factor 2 subunit 1",
+        "Protein phosphatase 1 regulatory subunit 15A,Maltose/maltodextrin-binding periplasmic protein",
+        "Serine/threonine-protein phosphatase PP1-alpha catalytic subunit"
+      ]
+    },
+    {
+      "pdb": "7p1g",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Maltose/maltodextrin-binding periplasmic protein,Adenylate cyclase ExoY"
+      ]
+    },
+    {
+      "pdb": "7p1h",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Maltose/maltodextrin-binding periplasmic protein,RTX-toxin",
+        "Profilin-1"
+      ]
+    },
+    {
+      "pdb": "7pdz",
+      "largest_actin_component": 6,
+      "partner_names": [
+        "F-actin-capping protein subunit alpha-1",
+        "Isoform 2 of F-actin-capping protein subunit beta"
+      ]
+    },
+    {
+      "pdb": "7plt",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Unconventional myosin-Va"
+      ]
+    },
+    {
+      "pdb": "7plu",
+      "largest_actin_component": 3,
+      "partner_names": [
+        "Unconventional myosin-Va"
+      ]
+    },
+    {
+      "pdb": "7plv",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Unconventional myosin-Va"
+      ]
+    },
+    {
+      "pdb": "7plw",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Unconventional myosin-Va"
+      ]
+    },
+    {
+      "pdb": "7plx",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Unconventional myosin-Va"
+      ]
+    },
+    {
+      "pdb": "7ply",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Unconventional myosin-Va"
+      ]
+    },
+    {
+      "pdb": "7plz",
+      "largest_actin_component": 3,
+      "partner_names": [
+        "Unconventional myosin-Va"
+      ]
+    },
+    {
+      "pdb": "7pm0",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Unconventional myosin-Va"
+      ]
+    },
+    {
+      "pdb": "7pm1",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Unconventional myosin-Va"
+      ]
+    },
+    {
+      "pdb": "7pm2",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Unconventional myosin-Va"
+      ]
+    },
+    {
+      "pdb": "7pm3",
+      "largest_actin_component": 3,
+      "partner_names": []
+    },
+    {
+      "pdb": "7pm5",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Unconventional myosin-Va"
+      ]
+    },
+    {
+      "pdb": "7pm6",
+      "largest_actin_component": 3,
+      "partner_names": [
+        "Unconventional myosin-Va"
+      ]
+    },
+    {
+      "pdb": "7pm7",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Unconventional myosin-Va"
+      ]
+    },
+    {
+      "pdb": "7pm8",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Unconventional myosin-Va"
+      ]
+    },
+    {
+      "pdb": "7pm9",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Unconventional myosin-Va"
+      ]
+    },
+    {
+      "pdb": "7pma",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Unconventional myosin-Va"
+      ]
+    },
+    {
+      "pdb": "7pmb",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Unconventional myosin-Va"
+      ]
+    },
+    {
+      "pdb": "7pmc",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Unconventional myosin-Va"
+      ]
+    },
+    {
+      "pdb": "7pmd",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Unconventional myosin-Va"
+      ]
+    },
+    {
+      "pdb": "7pme",
+      "largest_actin_component": 3,
+      "partner_names": [
+        "Unconventional myosin-Va"
+      ]
+    },
+    {
+      "pdb": "7pmf",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Unconventional myosin-Va"
+      ]
+    },
+    {
+      "pdb": "7pmg",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Unconventional myosin-Va"
+      ]
+    },
+    {
+      "pdb": "7pmh",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Unconventional myosin-Va"
+      ]
+    },
+    {
+      "pdb": "7pmi",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Unconventional myosin-Va"
+      ]
+    },
+    {
+      "pdb": "7pmj",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Unconventional myosin-Va"
+      ]
+    },
+    {
+      "pdb": "7pml",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Unconventional myosin-Va"
+      ]
+    },
+    {
+      "pdb": "7q8b",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "7q8c",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "7q8s",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "ADF/Cofilin"
+      ]
+    },
+    {
+      "pdb": "7r8v",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "7r91",
+      "largest_actin_component": 3,
+      "partner_names": [
+        "Isoform 3 of Unconventional myosin-XV"
+      ]
+    },
+    {
+      "pdb": "7r94",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Plastin-3"
+      ]
+    },
+    {
+      "pdb": "7rb8",
+      "largest_actin_component": 3,
+      "partner_names": [
+        "Isoform 3 of Unconventional myosin-XV"
+      ]
+    },
+    {
+      "pdb": "7rb9",
+      "largest_actin_component": 3,
+      "partner_names": [
+        "Isoform 3 of Unconventional myosin-XV"
+      ]
+    },
+    {
+      "pdb": "7t5q",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-related protein 2",
+        "Actin-related protein 3",
+        "F-actin-capping protein subunit alpha-1/Actin nucleation-promoting factor WASL chimera",
+        "F-actin-capping protein subunit beta/Actin nucleation-promoting factor WASL chimera"
+      ]
+    },
+    {
+      "pdb": "7tpt",
+      "largest_actin_component": 10,
+      "partner_names": [
+        "Actin-related protein 2",
+        "Actin-related protein 2/3 complex subunit 1B",
+        "Actin-related protein 2/3 complex subunit 2",
+        "Actin-related protein 2/3 complex subunit 3",
+        "Actin-related protein 2/3 complex subunit 4",
+        "Actin-related protein 3"
+      ]
+    },
+    {
+      "pdb": "7udt",
+      "largest_actin_component": 3,
+      "partner_names": [
+        "Unconventional myosin-XV"
+      ]
+    },
+    {
+      "pdb": "7utj",
+      "largest_actin_component": 6,
+      "partner_names": [
+        "Catenin alpha-1"
+      ]
+    },
+    {
+      "pdb": "7uuw",
+      "largest_actin_component": 6,
+      "partner_names": [
+        "Alpha-catenin-like protein hmp-1"
+      ]
+    },
+    {
+      "pdb": "7uxf",
+      "largest_actin_component": 6,
+      "partner_names": []
+    },
+    {
+      "pdb": "7vdv",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-like protein 6A",
+        "Isoform 2 of Transcription activator BRG1"
+      ]
+    },
+    {
+      "pdb": "7vvy",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-related protein 4",
+        "Chromatin modification-related protein EAF1",
+        "Enhancer of polycomb-like protein 1",
+        "SWR1-complex protein 4"
+      ]
+    },
+    {
+      "pdb": "7w4z",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-binding protein fragmin P"
+      ]
+    },
+    {
+      "pdb": "7w50",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-binding protein fragmin P"
+      ]
+    },
+    {
+      "pdb": "7w51",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-binding protein fragmin P"
+      ]
+    },
+    {
+      "pdb": "7w52",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-binding protein fragmin P"
+      ]
+    },
+    {
+      "pdb": "7whf",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Heimdallarchaeota Gelsolin domain-containing protein 2DGel"
+      ]
+    },
+    {
+      "pdb": "7whg",
+      "largest_actin_component": 2,
+      "partner_names": [
+        "Lokiarchaeota gelsolin (2DGel)"
+      ]
+    },
+    {
+      "pdb": "7yfn",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "ARP4 isoform 1",
+        "Chromatin modification-related protein EAF1",
+        "Enhancer of polycomb-like protein 1",
+        "SWR1-complex protein 4"
+      ]
+    },
+    {
+      "pdb": "7yfp",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "ARP4 isoform 1",
+        "Chromatin modification-related protein EAF1",
+        "Enhancer of polycomb-like protein 1",
+        "SWR1-complex protein 4"
+      ]
+    },
+    {
+      "pdb": "7yne",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-binding protein fragmin P"
+      ]
+    },
+    {
+      "pdb": "7z7h",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Maltose/maltodextrin-binding periplasmic protein,TccC3"
+      ]
+    },
+    {
+      "pdb": "7z7i",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "7z8i",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "7z8m",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "ARP1 actin related protein 1 homolog A",
+        "Arp11",
+        "Dynactin subunit 4"
+      ]
+    },
+    {
+      "pdb": "7zi4",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "7ztc",
+      "largest_actin_component": 8,
+      "partner_names": []
+    },
+    {
+      "pdb": "7zvw",
+      "largest_actin_component": 2,
+      "partner_names": [
+        "Chromatin modification-related protein EAF1",
+        "Enhancer of polycomb-like protein",
+        "SWR1-complex protein 4"
+      ]
+    },
+    {
+      "pdb": "8a2r",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "8a2s",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "8a2t",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "8a2u",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "8a2y",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "8a2z",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "8a5a",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-like protein ARP8",
+        "Actin-related protein 4",
+        "Chromatin-remodeling ATPase INO80",
+        "Ino eighty subunit 4"
+      ]
+    },
+    {
+      "pdb": "8a5d",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin related protein 4 (Arp4)",
+        "Actin-related protein 8",
+        "Ies4",
+        "Ino80 ATPase"
+      ]
+    },
+    {
+      "pdb": "8a5o",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-like protein ARP8",
+        "Actin-related protein 4",
+        "Chromatin-remodeling ATPase INO80",
+        "Ino eighty subunit 4"
+      ]
+    },
+    {
+      "pdb": "8a5p",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin related protein 4 (Arp4)",
+        "Actin-related protein 8",
+        "Ies4",
+        "Ino80 ATPase"
+      ]
+    },
+    {
+      "pdb": "8a5q",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin related protein 4 (Arp4)",
+        "Actin-related protein 8",
+        "Ies4",
+        "Ino80 ATPase"
+      ]
+    },
+    {
+      "pdb": "8bjh",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Putative Adenylate cyclase,Profilin-1"
+      ]
+    },
+    {
+      "pdb": "8bji",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Putative Adenylate cyclase,Profilin-1"
+      ]
+    },
+    {
+      "pdb": "8bjj",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Profilin-1",
+        "Putative Adenylate cyclase"
+      ]
+    },
+    {
+      "pdb": "8bo1",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Putative Adenylate cyclase"
+      ]
+    },
+    {
+      "pdb": "8br0",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Putative Adenylate cyclase,Profilin-1"
+      ]
+    },
+    {
+      "pdb": "8br1",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Putative Adenylate cyclase"
+      ]
+    },
+    {
+      "pdb": "8c47",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Profilin"
+      ]
+    },
+    {
+      "pdb": "8c4c",
+      "largest_actin_component": 8,
+      "partner_names": [
+        "Cell invasion protein SipA"
+      ]
+    },
+    {
+      "pdb": "8c4e",
+      "largest_actin_component": 8,
+      "partner_names": [
+        "Cell invasion protein SipA"
+      ]
+    },
+    {
+      "pdb": "8ccn",
+      "largest_actin_component": 6,
+      "partner_names": []
+    },
+    {
+      "pdb": "8cco",
+      "largest_actin_component": 6,
+      "partner_names": []
+    },
+    {
+      "pdb": "8d13",
+      "largest_actin_component": 3,
+      "partner_names": []
+    },
+    {
+      "pdb": "8d14",
+      "largest_actin_component": 3,
+      "partner_names": []
+    },
+    {
+      "pdb": "8d15",
+      "largest_actin_component": 7,
+      "partner_names": []
+    },
+    {
+      "pdb": "8d16",
+      "largest_actin_component": 7,
+      "partner_names": []
+    },
+    {
+      "pdb": "8d17",
+      "largest_actin_component": 7,
+      "partner_names": []
+    },
+    {
+      "pdb": "8d18",
+      "largest_actin_component": 7,
+      "partner_names": []
+    },
+    {
+      "pdb": "8dd0",
+      "largest_actin_component": 6,
+      "partner_names": [
+        "Tropomyosin alpha-1 chain",
+        "Troponin T2, cardiac type"
+      ]
+    },
+    {
+      "pdb": "8dmx",
+      "largest_actin_component": 4,
+      "partner_names": []
+    },
+    {
+      "pdb": "8dmy",
+      "largest_actin_component": 4,
+      "partner_names": []
+    },
+    {
+      "pdb": "8dnf",
+      "largest_actin_component": 4,
+      "partner_names": []
+    },
+    {
+      "pdb": "8dnh",
+      "largest_actin_component": 4,
+      "partner_names": []
+    },
+    {
+      "pdb": "8e9b",
+      "largest_actin_component": 6,
+      "partner_names": [
+        "Actin-related protein 2",
+        "Actin-related protein 2/3 complex subunit 1",
+        "Actin-related protein 2/3 complex subunit 2",
+        "Actin-related protein 2/3 complex subunit 3",
+        "Actin-related protein 2/3 complex subunit 4",
+        "Actin-related protein 3"
+      ]
+    },
+    {
+      "pdb": "8efh",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Tropomyosin alpha-1 chain",
+        "beta-cardiac myosin II"
+      ]
+    },
+    {
+      "pdb": "8efi",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Myosin-7",
+        "Tropomyosin alpha-1 chain"
+      ]
+    },
+    {
+      "pdb": "8enc",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Myosin-7",
+        "Tropomyosin alpha-1 chain"
+      ]
+    },
+    {
+      "pdb": "8esc",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-related protein 4",
+        "Chromatin modification-related protein EAF1",
+        "Enhancer of polycomb-like protein 1",
+        "SWR1-complex protein 4"
+      ]
+    },
+    {
+      "pdb": "8ets",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "8etu",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "8etw",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "8eu9",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "8euf",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "8f8p",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "8f8q",
+      "largest_actin_component": 6,
+      "partner_names": [
+        "F-actin-capping protein subunit alpha-1",
+        "F-actin-capping protein subunit beta"
+      ]
+    },
+    {
+      "pdb": "8f8r",
+      "largest_actin_component": 7,
+      "partner_names": []
+    },
+    {
+      "pdb": "8f8s",
+      "largest_actin_component": 7,
+      "partner_names": []
+    },
+    {
+      "pdb": "8f8t",
+      "largest_actin_component": 7,
+      "partner_names": [
+        "Tropomodulin-1"
+      ]
+    },
+    {
+      "pdb": "8gsu",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-binding protein fragmin P"
+      ]
+    },
+    {
+      "pdb": "8gsw",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-binding protein fragmin P"
+      ]
+    },
+    {
+      "pdb": "8gt1",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-binding protein fragmin P"
+      ]
+    },
+    {
+      "pdb": "8gt2",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-binding protein fragmin P"
+      ]
+    },
+    {
+      "pdb": "8gt3",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-binding protein fragmin P"
+      ]
+    },
+    {
+      "pdb": "8gt4",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-binding protein fragmin P"
+      ]
+    },
+    {
+      "pdb": "8gt5",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-binding protein fragmin P"
+      ]
+    },
+    {
+      "pdb": "8iah",
+      "largest_actin_component": 12,
+      "partner_names": [
+        "Adducin 1",
+        "Beta-adducin",
+        "Dematin actin binding protein",
+        "SH3 domain-binding glutamic acid-rich-like protein",
+        "Spectrin beta chain",
+        "Tropomodulin-1",
+        "Tropomyosin-1.9"
+      ]
+    },
+    {
+      "pdb": "8iai",
+      "largest_actin_component": 11,
+      "partner_names": [
+        "Adducin 1",
+        "Beta-adducin",
+        "Dematin actin binding protein",
+        "SH3 domain-binding glutamic acid-rich-like protein",
+        "Spectrin beta chain",
+        "Tropomodulin-1",
+        "Tropomyosin-1.9"
+      ]
+    },
+    {
+      "pdb": "8ib2",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Dematin actin binding protein"
+      ]
+    },
+    {
+      "pdb": "8j9b",
+      "largest_actin_component": 3,
+      "partner_names": [
+        "Type IV secretion protein Dot"
+      ]
+    },
+    {
+      "pdb": "8jo3",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Substrate of the Dot/Icm secretion system"
+      ]
+    },
+    {
+      "pdb": "8jo4",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Substrate of the Dot/Icm secretion system"
+      ]
+    },
+    {
+      "pdb": "8k6e",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Legionella effector LnaB"
+      ]
+    },
+    {
+      "pdb": "8k6f",
+      "largest_actin_component": 2,
+      "partner_names": [
+        "Legionella effector LnaB",
+        "Ubiquitin"
+      ]
+    },
+    {
+      "pdb": "8k6i",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Legionella effector LnaB",
+        "ubiquitin"
+      ]
+    },
+    {
+      "pdb": "8k6r",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "LnaB"
+      ]
+    },
+    {
+      "pdb": "8k6v",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "LnaB"
+      ]
+    },
+    {
+      "pdb": "8oi6",
+      "largest_actin_component": 4,
+      "partner_names": []
+    },
+    {
+      "pdb": "8oi8",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "8oid",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "8oo7",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "8ooc",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "8oof",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "8oop",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "8oor",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "8oot",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "8ord",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "8p94",
+      "largest_actin_component": 6,
+      "partner_names": [
+        "Actin-related protein 2",
+        "Actin-related protein 2/3 complex subunit 1B",
+        "Actin-related protein 2/3 complex subunit 2",
+        "Actin-related protein 2/3 complex subunit 3",
+        "Actin-related protein 2/3 complex subunit 4",
+        "Actin-related protein 2/3 complex subunit 5-like protein",
+        "Actin-related protein 3",
+        "F-actin-capping protein subunit alpha-1",
+        "Isoform 2 of F-actin-capping protein subunit beta",
+        "Src substrate cortactin"
+      ]
+    },
+    {
+      "pdb": "8pr4",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "8pvx",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "8qku",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "8qr1",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-like protein 6A",
+        "DNA methyltransferase 1-associated protein 1",
+        "E1A-binding protein p400",
+        "Enhancer of polycomb homolog 1"
+      ]
+    },
+    {
+      "pdb": "8qyv",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "8qz0",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "8r2n",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "8r3h",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "8rtt",
+      "largest_actin_component": 4,
+      "partner_names": [
+        "Cell division control protein 12"
+      ]
+    },
+    {
+      "pdb": "8ru0",
+      "largest_actin_component": 4,
+      "partner_names": []
+    },
+    {
+      "pdb": "8ru2",
+      "largest_actin_component": 3,
+      "partner_names": [
+        "Methylated-DNA--protein-cysteine methyltransferase,Protein diaphanous homolog 1"
+      ]
+    },
+    {
+      "pdb": "8rv2",
+      "largest_actin_component": 4,
+      "partner_names": [
+        "Isoform 2 of Inverted formin-2"
+      ]
+    },
+    {
+      "pdb": "8rx1",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Gamma-tubulin complex component 6",
+        "Mitotic-spindle organizing protein 1"
+      ]
+    },
+    {
+      "pdb": "8tah",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "8thx",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "8thy",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "8trm",
+      "largest_actin_component": 3,
+      "partner_names": []
+    },
+    {
+      "pdb": "8trn",
+      "largest_actin_component": 3,
+      "partner_names": []
+    },
+    {
+      "pdb": "8uee",
+      "largest_actin_component": 7,
+      "partner_names": [
+        "Cell invasion protein SipA"
+      ]
+    },
+    {
+      "pdb": "8uxw",
+      "largest_actin_component": 6,
+      "partner_names": [
+        "Actin-related protein 2",
+        "Actin-related protein 2/3 complex subunit 1",
+        "Actin-related protein 2/3 complex subunit 2",
+        "Actin-related protein 2/3 complex subunit 3",
+        "Actin-related protein 2/3 complex subunit 4",
+        "Actin-related protein 3"
+      ]
+    },
+    {
+      "pdb": "8uxx",
+      "largest_actin_component": 6,
+      "partner_names": [
+        "Actin-related protein 2",
+        "Actin-related protein 2/3 complex subunit 1",
+        "Actin-related protein 2/3 complex subunit 2",
+        "Actin-related protein 2/3 complex subunit 3",
+        "Actin-related protein 2/3 complex subunit 4",
+        "Actin-related protein 3"
+      ]
+    },
+    {
+      "pdb": "8uz0",
+      "largest_actin_component": 9,
+      "partner_names": []
+    },
+    {
+      "pdb": "8uz1",
+      "largest_actin_component": 9,
+      "partner_names": []
+    },
+    {
+      "pdb": "8v2o",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "8v2z",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "8v30",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "8vaa",
+      "largest_actin_component": 10,
+      "partner_names": [
+        "F-actin-binding Coiled-Coil domain of LFAT1"
+      ]
+    },
+    {
+      "pdb": "8vfm",
+      "largest_actin_component": 8,
+      "partner_names": [
+        "Cell invasion protein SipA"
+      ]
+    },
+    {
+      "pdb": "8viz",
+      "largest_actin_component": 6,
+      "partner_names": [
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "8vkh",
+      "largest_actin_component": 6,
+      "partner_names": [
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "8vo5",
+      "largest_actin_component": 3,
+      "partner_names": [
+        "Fascin"
+      ]
+    },
+    {
+      "pdb": "8vo6",
+      "largest_actin_component": 3,
+      "partner_names": [
+        "Fascin"
+      ]
+    },
+    {
+      "pdb": "8vo7",
+      "largest_actin_component": 3,
+      "partner_names": [
+        "Fascin"
+      ]
+    },
+    {
+      "pdb": "8vo8",
+      "largest_actin_component": 3,
+      "partner_names": [
+        "Fascin"
+      ]
+    },
+    {
+      "pdb": "8vo9",
+      "largest_actin_component": 3,
+      "partner_names": [
+        "Fascin"
+      ]
+    },
+    {
+      "pdb": "8voa",
+      "largest_actin_component": 3,
+      "partner_names": [
+        "Fascin"
+      ]
+    },
+    {
+      "pdb": "8w36",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "8x15",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-like protein 6A",
+        "Actin-related protein 6",
+        "DNA methyltransferase 1-associated protein 1",
+        "Helicase SRCAP"
+      ]
+    },
+    {
+      "pdb": "8x19",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-like protein 6A",
+        "DNA methyltransferase 1-associated protein 1",
+        "Helicase SRCAP"
+      ]
+    },
+    {
+      "pdb": "8x1c",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-like protein 6A",
+        "DNA methyltransferase 1-associated protein 1",
+        "Helicase SRCAP"
+      ]
+    },
+    {
+      "pdb": "8xdl",
+      "largest_actin_component": 3,
+      "partner_names": []
+    },
+    {
+      "pdb": "8xdm",
+      "largest_actin_component": 3,
+      "partner_names": []
+    },
+    {
+      "pdb": "8xvt",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-like protein 6A",
+        "DNA methyltransferase 1-associated protein 1",
+        "Isoform 2 of E1A-binding protein p400",
+        "Isoform 2 of Enhancer of polycomb homolog 1"
+      ]
+    },
+    {
+      "pdb": "8zb7",
+      "largest_actin_component": 6,
+      "partner_names": [
+        "Myosin-7",
+        "Tropomyosin alpha-1 chain"
+      ]
+    },
+    {
+      "pdb": "8zbm",
+      "largest_actin_component": 6,
+      "partner_names": [
+        "Myosin heavy chain 4",
+        "Tropomyosin beta chain"
+      ]
+    },
+    {
+      "pdb": "8zbn",
+      "largest_actin_component": 6,
+      "partner_names": [
+        "Myosin-6",
+        "Tropomyosin alpha-1 chain"
+      ]
+    },
+    {
+      "pdb": "8zi9",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Myosin-7"
+      ]
+    },
+    {
+      "pdb": "8ziu",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Myosin-6"
+      ]
+    },
+    {
+      "pdb": "8zix",
+      "largest_actin_component": 6,
+      "partner_names": []
+    },
+    {
+      "pdb": "9az4",
+      "largest_actin_component": 6,
+      "partner_names": [
+        "Inverted formin-2"
+      ]
+    },
+    {
+      "pdb": "9az6",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Talin-1"
+      ]
+    },
+    {
+      "pdb": "9azp",
+      "largest_actin_component": 7,
+      "partner_names": [
+        "Inverted formin-2",
+        "Profilin-1"
+      ]
+    },
+    {
+      "pdb": "9azq",
+      "largest_actin_component": 7,
+      "partner_names": [
+        "Inverted formin-2"
+      ]
+    },
+    {
+      "pdb": "9b03",
+      "largest_actin_component": 6,
+      "partner_names": [
+        "Inverted formin-2"
+      ]
+    },
+    {
+      "pdb": "9b0k",
+      "largest_actin_component": 6,
+      "partner_names": [
+        "Inverted formin-2"
+      ]
+    },
+    {
+      "pdb": "9b1d",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "9b27",
+      "largest_actin_component": 6,
+      "partner_names": [
+        "Protein diaphanous homolog 1"
+      ]
+    },
+    {
+      "pdb": "9b2z",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Type IV secretion protein Dot"
+      ]
+    },
+    {
+      "pdb": "9b3d",
+      "largest_actin_component": 6,
+      "partner_names": [
+        "Protein diaphanous homolog 1"
+      ]
+    },
+    {
+      "pdb": "9b3q",
+      "largest_actin_component": 3,
+      "partner_names": []
+    },
+    {
+      "pdb": "9b3r",
+      "largest_actin_component": 3,
+      "partner_names": []
+    },
+    {
+      "pdb": "9b7j",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-related protein 10",
+        "Alpha-centractin",
+        "Dynactin subunit 4"
+      ]
+    },
+    {
+      "pdb": "9b85",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-related protein 10",
+        "Alpha-centractin",
+        "Dynactin subunit 4"
+      ]
+    },
+    {
+      "pdb": "9bph",
+      "largest_actin_component": 4,
+      "partner_names": []
+    },
+    {
+      "pdb": "9bpm",
+      "largest_actin_component": 4,
+      "partner_names": []
+    },
+    {
+      "pdb": "9c21",
+      "largest_actin_component": 6,
+      "partner_names": []
+    },
+    {
+      "pdb": "9c57",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-like protein 6A",
+        "DNA methyltransferase 1-associated protein 1",
+        "E1A-binding protein p400",
+        "Enhancer of polycomb homolog 1"
+      ]
+    },
+    {
+      "pdb": "9c6n",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-like protein 6A",
+        "DNA methyltransferase 1-associated protein 1",
+        "E1A-binding protein p400",
+        "Enhancer of polycomb homolog 1"
+      ]
+    },
+    {
+      "pdb": "9c9g",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "9c9s",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "9c9t",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "9c9z",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "9ca7",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "9ca8",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "9ca9",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "9cab",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "9cac",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-like protein 6A",
+        "DNA methyltransferase 1-associated protein 1",
+        "E1A-binding protein p400",
+        "Enhancer of polycomb homolog 1"
+      ]
+    },
+    {
+      "pdb": "9cae",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-like protein 6A",
+        "DNA methyltransferase 1-associated protein 1",
+        "E1A-binding protein p400,E1A-binding protein p400/Haloalkane dehalogenase chimera",
+        "Enhancer of polycomb homolog 1"
+      ]
+    },
+    {
+      "pdb": "9can",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "9cat",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "9ccd",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "9cfu",
+      "largest_actin_component": 3,
+      "partner_names": [
+        "Unconventional myosin-Ic"
+      ]
+    },
+    {
+      "pdb": "9cfv",
+      "largest_actin_component": 3,
+      "partner_names": [
+        "Unconventional myosin-Ic"
+      ]
+    },
+    {
+      "pdb": "9cfw",
+      "largest_actin_component": 3,
+      "partner_names": [
+        "Unconventional myosin-Ic"
+      ]
+    },
+    {
+      "pdb": "9cfx",
+      "largest_actin_component": 3,
+      "partner_names": [
+        "Unconventional myosin-Ic"
+      ]
+    },
+    {
+      "pdb": "9dfs",
+      "largest_actin_component": 3,
+      "partner_names": [
+        "Unconventional myosin-VIIa"
+      ]
+    },
+    {
+      "pdb": "9dfv",
+      "largest_actin_component": 3,
+      "partner_names": [
+        "Unconventional myosin-VIIa"
+      ]
+    },
+    {
+      "pdb": "9dgs",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-related protein 10",
+        "Alpha-centractin",
+        "Cytoplasmic dynein 1 heavy chain 1",
+        "Dynactin subunit 4"
+      ]
+    },
+    {
+      "pdb": "9dlx",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "9dlz",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "9duu",
+      "largest_actin_component": 6,
+      "partner_names": []
+    },
+    {
+      "pdb": "9duv",
+      "largest_actin_component": 6,
+      "partner_names": []
+    },
+    {
+      "pdb": "9dva",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Afadin",
+        "Catenin alpha-1"
+      ]
+    },
+    {
+      "pdb": "9e2e",
+      "largest_actin_component": 6,
+      "partner_names": [
+        "Isoform A2 of Troponin T, cardiac muscle",
+        "Tropomyosin alpha-1 chain"
+      ]
+    },
+    {
+      "pdb": "9eam",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "9fjm",
+      "largest_actin_component": 4,
+      "partner_names": []
+    },
+    {
+      "pdb": "9fjo",
+      "largest_actin_component": 4,
+      "partner_names": []
+    },
+    {
+      "pdb": "9fju",
+      "largest_actin_component": 4,
+      "partner_names": [
+        "Deoxyribonuclease-1"
+      ]
+    },
+    {
+      "pdb": "9fjy",
+      "largest_actin_component": 4,
+      "partner_names": [
+        "Deoxyribonuclease-1"
+      ]
+    },
+    {
+      "pdb": "9gcg",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "9ge5",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "9gev",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "9gfb",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "9go5",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "9gob",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Inositol-trisphosphate 3-kinase A"
+      ]
+    },
+    {
+      "pdb": "9hm9",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Inositol-trisphosphate 3-kinase A"
+      ]
+    },
+    {
+      "pdb": "9i2b",
+      "largest_actin_component": 2,
+      "partner_names": [
+        "Actin-related protein 2",
+        "Actin-related protein 2/3 complex subunit 5-like protein",
+        "Actin-related protein 3"
+      ]
+    },
+    {
+      "pdb": "9jus",
+      "largest_actin_component": 3,
+      "partner_names": [
+        "villin"
+      ]
+    },
+    {
+      "pdb": "9jvt",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Villin"
+      ]
+    },
+    {
+      "pdb": "9jw0",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Villin"
+      ]
+    },
+    {
+      "pdb": "9kbx",
+      "largest_actin_component": 4,
+      "partner_names": [
+        "Growth arrest-specific protein 2"
+      ]
+    },
+    {
+      "pdb": "9l2n",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-binding protein fragmin P"
+      ]
+    },
+    {
+      "pdb": "9m5e",
+      "largest_actin_component": 3,
+      "partner_names": [
+        "Actin-related protein 2",
+        "Actin-related protein 3"
+      ]
+    },
+    {
+      "pdb": "9m64",
+      "largest_actin_component": 4,
+      "partner_names": [
+        "Actin-related protein 2",
+        "Actin-related protein 3"
+      ]
+    },
+    {
+      "pdb": "9nb9",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Deoxyribonuclease-1",
+        "Eukaryotic translation initiation factor 2 subunit 1",
+        "Protein DP71L",
+        "Serine/threonine-protein phosphatase PP1-alpha catalytic subunit"
+      ]
+    },
+    {
+      "pdb": "9nfv",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "9nfw",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "9nfx",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "9nfy",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "9nfz",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "9ng0",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "9ob1",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "9p1i",
+      "largest_actin_component": 12,
+      "partner_names": [
+        "VopV"
+      ]
+    },
+    {
+      "pdb": "9p3d",
+      "largest_actin_component": 11,
+      "partner_names": [
+        "Vibrio VopV"
+      ]
+    },
+    {
+      "pdb": "9pgc",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "9pgd",
+      "largest_actin_component": 0,
+      "partner_names": []
+    },
+    {
+      "pdb": "9q7k",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Cofilin-2"
+      ]
+    },
+    {
+      "pdb": "9q7l",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Cofilin-2"
+      ]
+    },
+    {
+      "pdb": "9q7m",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Cofilin-2"
+      ]
+    },
+    {
+      "pdb": "9q7n",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Cofilin-2"
+      ]
+    },
+    {
+      "pdb": "9q7o",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Adenylyl cyclase-associated protein 1"
+      ]
+    },
+    {
+      "pdb": "9qew",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "9qey",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Coronin-1B,Methylated-DNA--protein-cysteine methyltransferase"
+      ]
+    },
+    {
+      "pdb": "9qf2",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Coronin-1B,Methylated-DNA--protein-cysteine methyltransferase"
+      ]
+    },
+    {
+      "pdb": "9qfb",
+      "largest_actin_component": 7,
+      "partner_names": [
+        "Coronin-1B,Methylated-DNA--protein-cysteine methyltransferase"
+      ]
+    },
+    {
+      "pdb": "9qfd",
+      "largest_actin_component": 7,
+      "partner_names": [
+        "Cofilin-1"
+      ]
+    },
+    {
+      "pdb": "9qfe",
+      "largest_actin_component": 7,
+      "partner_names": [
+        "Cofilin-1",
+        "Coronin-1B,Methylated-DNA--protein-cysteine methyltransferase"
+      ]
+    },
+    {
+      "pdb": "9qfg",
+      "largest_actin_component": 7,
+      "partner_names": [
+        "Cofilin-1",
+        "Coronin-1B,Methylated-DNA--protein-cysteine methyltransferase"
+      ]
+    },
+    {
+      "pdb": "9qfj",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Cofilin-1"
+      ]
+    },
+    {
+      "pdb": "9qfk",
+      "largest_actin_component": 7,
+      "partner_names": [
+        "Cofilin-1",
+        "Coronin-1B,Methylated-DNA--protein-cysteine methyltransferase"
+      ]
+    },
+    {
+      "pdb": "9qfo",
+      "largest_actin_component": 6,
+      "partner_names": [
+        "Cofilin-1"
+      ]
+    },
+    {
+      "pdb": "9qfq",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Cofilin-1",
+        "WD repeat-containing protein 1,Methylated-DNA--protein-cysteine methyltransferase"
+      ]
+    },
+    {
+      "pdb": "9qfw",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Cofilin-1",
+        "WD repeat-containing protein 1,Methylated-DNA--protein-cysteine methyltransferase"
+      ]
+    },
+    {
+      "pdb": "9qgk",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Inositol-trisphosphate 3-kinase A"
+      ]
+    },
+    {
+      "pdb": "9rl4",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-like protein 6A",
+        "Transcription activator BRG1"
+      ]
+    },
+    {
+      "pdb": "9sgk",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "9tg8",
+      "largest_actin_component": 2,
+      "partner_names": [
+        "Drebrin"
+      ]
+    },
+    {
+      "pdb": "9tg9",
+      "largest_actin_component": 2,
+      "partner_names": [
+        "Drebrin"
+      ]
+    },
+    {
+      "pdb": "9tga",
+      "largest_actin_component": 2,
+      "partner_names": [
+        "Drebrin"
+      ]
+    },
+    {
+      "pdb": "9ug2",
+      "largest_actin_component": 4,
+      "partner_names": [
+        "Gelsolin"
+      ]
+    },
+    {
+      "pdb": "9uxa",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-like protein 6A",
+        "B-cell CLL/lymphoma 7 protein family member B",
+        "SWI/SNF-related matrix-associated actin-dependent regulator of chromatin subfamily A member 4"
+      ]
+    },
+    {
+      "pdb": "9uxb",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-like protein 6A",
+        "B-cell CLL/lymphoma 7 protein family member B",
+        "Transcription activator BRG1"
+      ]
+    },
+    {
+      "pdb": "9uxc",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-like protein 6A",
+        "B-cell CLL/lymphoma 7 protein family member B",
+        "Transcription activator BRG1"
+      ]
+    },
+    {
+      "pdb": "9wbz",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-like protein 6A",
+        "B-cell CLL/lymphoma 7 protein family member A",
+        "Isoform 2 of SWI/SNF-related matrix-associated actin-dependent regulator of chromatin subfamily A member 4"
+      ]
+    },
+    {
+      "pdb": "9wc1",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Actin-like protein 6A",
+        "B-cell CLL/lymphoma 7 protein family member A",
+        "Isoform 2 of SWI/SNF-related matrix-associated actin-dependent regulator of chromatin subfamily A member 4"
+      ]
+    },
+    {
+      "pdb": "9xcm",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Ceg14"
+      ]
+    },
+    {
+      "pdb": "9xfh",
+      "largest_actin_component": 1,
+      "partner_names": [
+        "Ceg14"
+      ]
+    },
+    {
+      "pdb": "9xye",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Adenylyl cyclase-associated protein 1"
+      ]
+    },
+    {
+      "pdb": "9y52",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Adenylyl cyclase-associated protein 1",
+        "Cofilin-2"
+      ]
+    },
+    {
+      "pdb": "9y9j",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Adenylyl cyclase-associated protein 1",
+        "Cofilin-2"
+      ]
+    },
+    {
+      "pdb": "9y9l",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Cofilin-2",
+        "F-actin-capping protein subunit alpha-1",
+        "F-actin-capping protein subunit beta"
+      ]
+    },
+    {
+      "pdb": "9y9m",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Cofilin-2",
+        "F-actin-capping protein subunit alpha-1",
+        "F-actin-capping protein subunit beta"
+      ]
+    },
+    {
+      "pdb": "9y9p",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Cofilin-2"
+      ]
+    },
+    {
+      "pdb": "9yim",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "F-actin-capping protein subunit alpha-1",
+        "F-actin-capping protein subunit beta"
+      ]
+    },
+    {
+      "pdb": "9zbl",
+      "largest_actin_component": 6,
+      "partner_names": []
+    },
+    {
+      "pdb": "9zbp",
+      "largest_actin_component": 6,
+      "partner_names": []
+    },
+    {
+      "pdb": "9zzi",
+      "largest_actin_component": 5,
+      "partner_names": []
+    },
+    {
+      "pdb": "9zzj",
+      "largest_actin_component": 5,
+      "partner_names": [
+        "Leiomodin-2"
+      ]
+    },
+    {
+      "pdb": "9zzm",
+      "largest_actin_component": 6,
+      "partner_names": [
+        "Leiomodin-2"
+      ]
+    }
+  ]
+}

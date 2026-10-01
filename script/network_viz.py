@@ -13,9 +13,9 @@ _BIP_CACHE_VERSION = 5
 
 _ACTIN_COLOR_NET = "#5B9BD5"
 _ABP_PALETTE_NET = [
-    "#E8735A", "#F0A500", "#7DBF6E", "#C580C3", "#70B8D4",
-    "#A0522D", "#DB7093", "#8FBC8F", "#FF7F50", "#9370DB",
-    "#20B2AA", "#DAA520", "#BA55D3", "#2E8B57", "#CD853F",
+    "#0072B2", "#E69F00", "#CC79A7", "#56B4E9", "#332288",
+    "#AA4499", "#882255", "#DDCC77", "#666666", "#1177AA",
+    "#AA7744", "#8866AA", "#999999", "#EEBB66", "#665577",
 ]
 _BIPARTITE_FILES = [
     "data/filtered/details/3.interface_residues.csv",
@@ -29,17 +29,20 @@ _BIPARTITE_FILES = [
 ]
 
 
+# Optional role annotations have a documented fallback in the network builders.
+_BIP_REQUIRED_FILES = _BIPARTITE_FILES[:-1]
+
 def _bip_mtimes():
     return tuple(os.path.getmtime(f) if os.path.exists(f) else 0.0 for f in _BIPARTITE_FILES)
 
 
 @st.cache_data(show_spinner="Loading network data…")
-def _load_bipartite_base(_v, *_mtimes):
+def _load_bipartite_base(version, *mtimes):
     """Load & pre-process all data for S1 bipartite networks (cached per file state)."""
     import re as _re
     from collections import defaultdict as _dd
 
-    if not all(os.path.exists(f) for f in _BIPARTITE_FILES):
+    if not all(os.path.exists(f) for f in _BIP_REQUIRED_FILES):
         return None
 
     df_res3 = pd.read_csv(_BIPARTITE_FILES[0])
@@ -218,7 +221,7 @@ def _load_bipartite_base(_v, *_mtimes):
 
 
 @st.cache_data(show_spinner="Generating the network…")
-def _build_bipartite_html(patch, _v, *_mtimes):
+def _build_bipartite_html(patch, version, *mtimes):
     """Build PyVis interactive network HTML for one S1 patch (physics layout, white bg).
 
     Returns (html_str, n_residues, n_proteins, n_total) or (None, 0, 0, 0).
@@ -226,7 +229,7 @@ def _build_bipartite_html(patch, _v, *_mtimes):
     import matplotlib.colors as _mc
     import matplotlib as _mpl_inner  # noqa: F841
 
-    bip = _load_bipartite_base(_v, *_mtimes)
+    bip = _load_bipartite_base(version, *mtimes)
     if bip is None:
         return None, 0, 0, 0
     df_res, df_int_meta, id_to_c70, patch_clusters = bip
@@ -521,7 +524,7 @@ def _build_bipartite_html(patch, _v, *_mtimes):
 
 
 @st.cache_data(show_spinner="Loading inter-residue contacts…")
-def _load_res4(_v, *_mtimes):
+def _load_res4(version, *mtimes):
     """Charge et pre-traite 4.inter-residue_contacts.csv une seule fois."""
     p = _BIPARTITE_FILES[6]
     if not os.path.exists(p):
@@ -554,7 +557,7 @@ _AA_RESTYPE_HEX = {
 
 
 @st.cache_data(show_spinner="Generating C70 network…")
-def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
+def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, version, *mtimes):
     """Réseau bipartite interactif pour un patch C70 : résidus actin (S1) ↔ résidus ABP (S2)."""
     import matplotlib.colors as _mc
     import matplotlib as _mpl_c70
@@ -572,7 +575,7 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
             int(255 * (1 - t) + b * t),
         )
 
-    if not all(os.path.exists(f) for f in _BIPARTITE_FILES):
+    if not all(os.path.exists(f) for f in _BIP_REQUIRED_FILES):
         return None, 0, 0, 0, None
 
     df_int = pd.read_csv(_BIPARTITE_FILES[1])
@@ -759,7 +762,7 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, _v, *_mtimes):
         )
 
     # Charger table 4 (contient asa_pct_A et asa_pct_B)
-    df_res4 = _load_res4(_v, *_mtimes)
+    df_res4 = _load_res4(version, *mtimes)
     if df_res4 is None:
         return None, 0, 0, 0, None
     t4 = df_res4[df_res4["interaction_id"].isin(all_iids)].copy()
@@ -1413,7 +1416,7 @@ _BFACTOR_CLUSTER_DIR = "data/filtered/details/structures_files/bfactor_cluster"
 
 
 @st.cache_data(show_spinner="Generating S1 3D interface…")
-def _build_s1_3d_html(patch_s1, _v, *_mtimes):
+def _build_s1_3d_html(patch_s1, version, *mtimes):
     """Vue 3D pour un patch S1 binding site.
 
     Utilise le PDB pré-calculé bfactor_cluster/{patch}.pdb (chaîne A,

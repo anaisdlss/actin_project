@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 import numbering
+from residue_metrics import select_interaction_chains
 
 
 
@@ -17,7 +18,7 @@ _S1_GLOBAL_FILES = [
 
 
 @st.cache_data(show_spinner="Computing S1 heatmap (fair C70)…")
-def _build_s1_global_heatmap(_mtimes):
+def _build_s1_global_heatmap(mtimes):
     """Réplique regenerate_s1_global_heatmap : profil équitable-C70 par cluster S1,
     séparé HOMO (actin/actin) et HÉTÉRO (actin/ABP). Renvoie
     (positions, homo_labels, homo_mat, hetero_labels, hetero_mat) en % ASA absolu."""
@@ -56,8 +57,7 @@ def _build_s1_global_heatmap(_mtimes):
         c70_profiles = []
         for _c70, iid_ch in by_c70.items():
             iids = list(iid_ch)
-            chains = set(iid_ch.values())
-            s = res[(res.interaction_id.isin(iids)) & (res.chain.isin(chains))]
+            s = select_interaction_chains(res, iid_ch)
             if s.empty:
                 continue
             prof = (s.groupby(["interaction_id", "canon"])["basa"].max()
@@ -207,7 +207,7 @@ def _render_s1_global_plotly(data, relative, valid_clusters=None):
 
 
 @st.cache_data(show_spinner=False)
-def _s1_sources(_mtimes):
+def _s1_sources(mtimes):
     """Charge/fusionne les sources S1 une fois : (positions, m, res)."""
     if not all(os.path.exists(f) for f in _S1_GLOBAL_FILES):
         return None
@@ -235,11 +235,11 @@ def _s1_sources(_mtimes):
 
 
 @st.cache_data(show_spinner="Profil du cluster…")
-def _build_s1_patch_detail(patch, _mtimes):
+def _build_s1_patch_detail(patch, mtimes):
     """Profil équitable-C70 du patch + décomposition par sous-cluster C70.
     Recalculé depuis les données -> toujours complet (tous les C70) et à jour."""
     import re as _re_ab
-    src = _s1_sources(_mtimes)
+    src = _s1_sources(mtimes)
     if src is None:
         return None
     positions, m, res = src
@@ -250,9 +250,7 @@ def _build_s1_patch_detail(patch, _mtimes):
 
     def _prof(rows):
         iids = set(int(i) for i in rows["interaction_id"])
-        chains = set(rows["subunit_1"])
-        s = res[(res["interaction_id"].isin(iids))
-                & (res["chain"].isin(chains))]
+        s = select_interaction_chains(res, dict(zip(rows["interaction_id"], rows["subunit_1"])))
         if s.empty:
             return None
         pr = (s.groupby(["interaction_id", "canon"])["basa"].max()
@@ -361,7 +359,7 @@ _S1_TAXID_NAMES = {
 
 
 @st.cache_data(show_spinner="Per-position detail…")
-def _s1_position_detail(patch, _mtimes):
+def _s1_position_detail(patch, mtimes):
     """Pour un cluster S1 : par position canonical, aa d'actin par organisme et
     aa d'ABP en contact (+ %ASA). Renvoie (positions, res_actin, con_abp)."""
     if not all(os.path.exists(f) for f in _S1_GLOBAL_FILES):

@@ -82,8 +82,7 @@ for patch, g in m.groupby("s1_binding_site_cluster_data_70"):
         continue
     rows, labels = [], []
     for c70, iids in sorted(c70_iids.items(), key=lambda x: -len(x[1])):
-        chains = {iid_chain[i] for i in iids}
-        sub = res[(res.interaction_id.isin(iids)) & (res.chain.isin(chains))]
+        sub = res[res.interaction_id.isin(iids) & res.chain.eq(res.interaction_id.map(iid_chain))]
         if sub.empty:
             continue
         prof = (sub.groupby(["interaction_id", "canon"])["basa"].max()

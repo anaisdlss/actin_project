@@ -23,6 +23,7 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 import numbering
+from residue_metrics import complete_actin_positions
 
 _REF_FASTA = "data/P60709_ref.fasta"
 
@@ -38,7 +39,7 @@ _PP_FILES = [
 def pp_mtimes():
     """Empreinte temporelle des fichiers sources (clé de cache)."""
     return tuple(os.path.getmtime(f) if os.path.exists(f) else 0.0
-                 for f in _PP_FILES)
+                 for f in [*_PP_FILES, _REF_FASTA])
 
 
 def _clean_abp_name(s: pd.Series) -> pd.Series:
@@ -56,7 +57,7 @@ def _join_semicol(vals) -> str:
 
 
 @st.cache_data(show_spinner="Building the residue-passport table…")
-def build_passport(_mtimes):
+def build_passport(mtimes):
     """Renvoie un dict de DataFrames, ou None si les sources manquent.
 
     Clés :
@@ -162,6 +163,11 @@ def build_passport(_mtimes):
     pos["canon"] = pd.to_numeric(pos["canon"], errors="coerce")
     pos = pos[pos["canon"].notna()].copy()
     pos["canon"] = pos["canon"].astype(int)
+
+    pos = complete_actin_positions(pos)
+    for col in ("rsa", "conservation", "residue_class"):
+        if col not in pos:
+            pos[col] = np.nan
 
     # lettre affichée = résidu de la référence P60709 (les aa observés par
     # organisme restent dans la fiche) ; à défaut, aa majoritaire observé

@@ -1,0 +1,21 @@
+{
+  "homo": {
+    "changed_cells": 216,
+    "max_absolute_difference_percentage_points": 46.37755102040816,
+    "changed_sites": [
+      "6685_1",
+      "6685_2",
+      "6685_3",
+      "6685_4",
+      "6685_17",
+      "6685_115",
+      "6685_275",
+      "6685_293"
+    ]
+  },
+  "hetero": {
+    "changed_cells": 0,
+    "max_absolute_difference_percentage_points": 0.0,
+    "changed_sites": []
+  }
+}

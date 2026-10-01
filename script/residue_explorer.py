@@ -14,6 +14,8 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 import numbering
+from residue_metrics import pdb_residue_frequencies
+from residue_contacts import render_contacts
 
 from residue_passport import pp_mtimes
 
@@ -30,7 +32,7 @@ _TAXID_NAMES = {
 
 
 @st.cache_data(show_spinner=False)
-def _actin_aa_by_organism(_mtimes):
+def _actin_aa_by_organism(mtimes):
     """Par position canonical : aa d'actin observé, avec organisme (taxid) et PDB.
     Global (tous clusters). Renvoie un DataFrame (canon, residue_name, taxid, pdb_id)."""
     f_all = "data/filtered/filtered_all_data.csv"
@@ -90,7 +92,10 @@ def render_residue_fiche(pp, canon):
         _cls = row.get("residue_class")
         # h4 (pas h2) : c'est un sous-titre du détail résidu, pas une grande
         # section — sinon il prend le bandeau de section (style h2 global).
-        st.markdown(f"#### ProteoCast class: {_cls}")
+        if pd.notna(_cls):
+            st.markdown(f"#### ProteoCast class: {_cls}")
+        else:
+            st.caption("ProteoCast classification unavailable for this position.")
 
         # Conservation (positif, intuitif : PLUS HAUT = PLUS CONSERVÉ = plus
         # sensible aux mutations). Référence = moyenne des résidus de SURFACE
@@ -102,7 +107,10 @@ def render_residue_fiche(pp, canon):
         avg_surf = float(_cons[_rsa >= _SURF].mean())
         this_c = pd.to_numeric(pd.Series([row.get("conservation")]),
                                errors="coerce").iloc[0]
-        c1, c2 = st.columns(2)
+        c1, c2, c3 = st.columns(3)
+        _rsa_value = pd.to_numeric(pd.Series([row.get("rsa")]), errors="coerce").iloc[0]
+        c3.metric("RSA in source table (%)", _fmt(_rsa_value * 100, 1),
+                  help="Solvent accessibility from the conservation source table. This is distinct from interface buried ASA; the structure and method must be checked before treating it as filament accessibility.")
         c1.metric(
             "Residue conservation", _fmt(this_c),
             delta=(f"{float(this_c) - avg_surf:+.2f} vs mean surface"
@@ -118,21 +126,19 @@ def render_residue_fiche(pp, canon):
     if aa_g is not None:
         _a = aa_g[aa_g["canon"] == canon]
         if not _a.empty:
-            _tot = _a["pdb_id"].nunique()
-            _agg = (_a.groupby("residue_name")
-                    .agg(nb=("pdb_id", "nunique"),
-                         orgs=("taxid", lambda s: ", ".join(sorted({
-                             _TAXID_NAMES.get(int(t), f"TaxID {int(t)}")
-                             for t in s.dropna()}))))
-                    .reset_index().sort_values("nb", ascending=False))
-            _agg["pct"] = (_agg["nb"] / max(_tot, 1) * 100).round(0).astype(int)
-            st.markdown("**actin aa at this position (by organism)**")
-            st.dataframe(
-                _agg.rename(columns={
-                    "residue_name": "actin aa", "pct": "% of structures",
-                    "orgs": "Organisms"})[
-                    ["actin aa", "% of structures", "Organisms"]],
-                hide_index=True, use_container_width=True)
+            _agg, _tot = pdb_residue_frequencies(_a)
+            _orgs = _a.groupby("residue_name")["taxid"].agg(
+                lambda s: ", ".join(sorted({_TAXID_NAMES.get(int(t), f"TaxID {int(t)}")
+                                            for t in s.dropna()})))
+            _agg["Organisms"] = _agg["residue_name"].map(_orgs)
+            st.markdown("**Observed actin residues at this position**")
+            st.caption(f"Denominator: {_tot} distinct PDBs with an actin interface residue "
+                       "recorded at this position. Repeated chains and interactions do not "
+                       "increase a PDB count. A PDB containing different residue identities "
+                       "can count in several rows, so percentages need not sum to 100%.")
+            st.dataframe(_agg.rename(columns={"residue_name": "actin aa", "nb": "# PDBs",
+                                              "pct": "% of observed PDBs"}),
+                         hide_index=True, use_container_width=True)
 
     # ── ABP qui utilisent ce résidu (+ aa d'ABP + % ASA côté ACTINE) ─────────
     ra = pp["res_abp"]
@@ -164,6 +170,8 @@ def render_residue_fiche(pp, canon):
             })[_cols],
             hide_index=True, use_container_width=True,
         )
+
+    render_contacts(canon)
 
 
 

@@ -55,8 +55,7 @@ def _profile(sub_rows):
     c70_profiles = []
     for c70, iid_ch in by_c70.items():
         iids = list(iid_ch)
-        chains = set(iid_ch.values())
-        s = res[(res.interaction_id.isin(iids)) & (res.chain.isin(chains))]
+        s = res[res.chain.eq(res.interaction_id.map(iid_ch))]
         if s.empty:
             continue
         prof = (s.groupby(["interaction_id", "canon"])["basa"].max()

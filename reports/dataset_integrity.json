@@ -1,0 +1,131 @@
+{
+  "source_sha256": {
+    "data/filtered/details/1.interactions.csv": "ea101480359ff3a436093ebf9593004f7af4d8ae242e738fb01f29ee6238a893",
+    "data/filtered/details/3.interface_residues.csv": "e403fcda60c6df08b5a6298809c20f9c241991b32674fe2c1efc849531f69581",
+    "data/filtered/details/4.inter-residue_contacts.csv": "92b71491325131990c45a9f3e3a71af4b30b5926881147f0dfa31589acdb2c97",
+    "data/filtered/proteins_per_pdb.csv": "be97933d256e64017cba6e06cc93965866b167143727c1841b175f0edb57912f",
+    "data/filtered/filtered_pdb_entry.csv": "960b0869480338fc0bf5ae7262cc2c7f3eaf05438027dbb9a956cbb95040ae31"
+  },
+  "timestamp_utc": "2026-10-01T09:51:36.858735+00:00",
+  "repository": "actin_project",
+  "interaction_count": 2325,
+  "pdbs_listed": 163,
+  "pdbs_with_details": 159,
+  "checks": [
+    {
+      "check": "Duplicate interaction identifiers",
+      "status": "PASS",
+      "count": 0,
+      "detail": ""
+    },
+    {
+      "check": "Interface residues: unknown interaction IDs",
+      "status": "PASS",
+      "count": 0,
+      "detail": ""
+    },
+    {
+      "check": "Residue contacts: unknown interaction IDs",
+      "status": "PASS",
+      "count": 0,
+      "detail": ""
+    },
+    {
+      "check": "Contact chain A differs from interaction source",
+      "status": "PASS",
+      "count": 0,
+      "detail": ""
+    },
+    {
+      "check": "Contact chain B differs from interaction source",
+      "status": "PASS",
+      "count": 0,
+      "detail": ""
+    },
+    {
+      "check": "Interaction chains without protein annotation",
+      "status": "PASS",
+      "count": 0,
+      "detail": ""
+    },
+    {
+      "check": "Conflicting actin annotations for one chain",
+      "status": "PASS",
+      "count": 0,
+      "detail": ""
+    },
+    {
+      "check": "buried_ASA_percent: values outside 0–100",
+      "status": "PASS",
+      "count": 0,
+      "detail": ""
+    },
+    {
+      "check": "buried_ASA_percent: missing or nonnumeric measurements",
+      "status": "PASS",
+      "count": 0,
+      "detail": ""
+    },
+    {
+      "check": "asa_pct_A: values outside 0–100",
+      "status": "PASS",
+      "count": 0,
+      "detail": ""
+    },
+    {
+      "check": "asa_pct_A: missing or nonnumeric measurements",
+      "status": "PASS",
+      "count": 0,
+      "detail": ""
+    },
+    {
+      "check": "asa_pct_B: values outside 0–100",
+      "status": "PASS",
+      "count": 0,
+      "detail": ""
+    },
+    {
+      "check": "asa_pct_B: missing or nonnumeric measurements",
+      "status": "PASS",
+      "count": 0,
+      "detail": ""
+    },
+    {
+      "check": "Structure-list PDBs outside retained interaction scope",
+      "status": "WARN",
+      "count": 4,
+      "detail": "7q8b, 7q8c, 7q8s, 8oid"
+    },
+    {
+      "check": "Expected interaction identifiers without details",
+      "status": "PASS",
+      "count": 0,
+      "detail": ""
+    },
+    {
+      "check": "Retained PDBs without interaction details",
+      "status": "PASS",
+      "count": 0,
+      "detail": ""
+    },
+    {
+      "check": "Duplicate source contact rows",
+      "status": "PASS",
+      "count": 0,
+      "detail": ""
+    },
+    {
+      "check": "Optional analysis folder absent: data/proteocast/abp",
+      "status": "WARN",
+      "count": 1,
+      "detail": ""
+    },
+    {
+      "check": "Optional analysis folder absent: data/alignments",
+      "status": "PASS",
+      "count": 0,
+      "detail": ""
+    }
+  ],
+  "limitation": "Integrity checks do not validate biological interpretation, RSA provenance, or freshness of derived figures."
+}

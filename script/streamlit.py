@@ -27,6 +27,8 @@ from data_analysis import (
 from residue_passport import build_passport, pp_mtimes
 import residue_explorer
 import numbering
+from footprint_comparison import render_footprint_comparison
+from threshold_comparison import render_threshold_comparison
 from numbering_view import render_numbering_lookup
 import folddisco_view
 import proteocast_view
@@ -34,7 +36,7 @@ from network_viz import (
     _bip_mtimes, _load_bipartite_base, _build_bipartite_html,
     _load_res4, _build_bipartite_c70_html, _build_s1_3d_html,
     _build_tripartite_graph_html, _build_global_graph_html,
-    _global_bfac_max, _BIP_CACHE_VERSION, _BIPARTITE_FILES,
+    _global_bfac_max, _BIP_CACHE_VERSION, _BIPARTITE_FILES, _BIP_REQUIRED_FILES,
     _AA_RESTYPE_HEX,
 )
 import matplotlib.pyplot as plt
@@ -282,6 +284,7 @@ with _sections["summary-tables"]:
             st.dataframe(df[cols_to_show], width="stretch")
 
     render_numbering_lookup(read_csv)
+    render_threshold_comparison(read_csv)
 
     # Métrique PDB
     METRICS_FILES = {
@@ -322,7 +325,13 @@ with _sections["summary-tables"]:
         if _detail_pdb_count != df_pdb["pdb_id"].nunique():
             st.caption(f"The structure list contains {df_pdb['pdb_id'].nunique()} PDBs; "
                        f"the downloaded interaction details cover {_detail_pdb_count}. "
-                       "The counts describe different source tables.")
+                       "The counts describe different source tables and filtering stages.")
+            with st.expander("Interaction filtering rules"):
+                st.markdown("After the connected-actin screen, the current pipeline retains "
+                            "interactions with actin in S1 (swapping reversed pairs), excludes "
+                            "titles containing domain or fragment, excludes actin sequence "
+                            "cluster 55649, and excludes PDB 4b1z. These are dataset-selection "
+                            "rules, not evidence that excluded structures are invalid.")
 
         # Transparency funnel: how many structures PPI3D returned vs how many are kept
         # after the "≥ 5 connected actin subunits" filter (makes the counts explicit,
@@ -340,13 +349,15 @@ with _sections["summary-tables"]:
                 # silently (the pipeline now auto-completes on the next run).
                 _fsum = "data/filtered/filtered_summary.csv"
                 if os.path.exists(_fsum):
-                    _n_expected = int(read_csv(_fsum)["interaction_id"].nunique())
-                    if len(df_int) < _n_expected:
+                    _expected_ids = set(read_csv(_fsum)["interaction_id"])
+                    _n_expected = len(_expected_ids)
+                    _missing_ids = _expected_ids - set(df_int["interaction_id"])
+                    if _missing_ids:
                         _got = f"{len(df_int):,}".replace(",", " ")
                         _exp = f"{_n_expected:,}".replace(",", " ")
                         st.warning(
-                            f"Interface details look incomplete: only {_got} of {_exp} "
-                            "interactions were downloaded (interrupted run?). Click "
+                            f"Interface details are missing for {len(_missing_ids)} of {_exp} "
+                            "expected interaction identifiers. Click "
                             "**Run / update** — the pipeline will fetch the missing ones.")
             except Exception:
                 pass
@@ -384,6 +395,14 @@ with _sections["summary-tables"]:
             )
 
         sub = df_entry[df_entry["pdb_id"].str.upper() == selected_pdb]
+        _retained_file = "data/filtered/filtered_all_data.csv"
+        if os.path.exists(_retained_file):
+            _retained_pdbs = set(read_csv(_retained_file)["pdb_id"].astype(str).str.upper())
+            if selected_pdb not in _retained_pdbs:
+                st.info("This structure passed the connected-actin screen, but has no "
+                        "interaction retained by the subsequent analysis filters. It is "
+                        "shown for transparency and is not included in residue-contact totals.")
+
 
         # Reset de l'interaction sélectionnée quand on change de PDB
         if st.session_state.get("last_pdb") != selected_pdb:
@@ -872,6 +891,7 @@ with _sections["residue-level"]:
     render_cluster_table("all")
 with _sections["actin-actin-interfaces"]:
     render_cluster_table("homo")
+    render_footprint_comparison()
 with _sections["abp-actin-interfaces"]:
     render_cluster_table("hetero")
 
@@ -1045,7 +1065,7 @@ with _sections["comparative-binding-sites"]:
                 with col_net_s1:
                     st.markdown(
                         "**Interactive network — actin residues ↔ partners**")
-                    _bip_ok = all(os.path.exists(f) for f in _BIPARTITE_FILES)
+                    _bip_ok = all(os.path.exists(f) for f in _BIP_REQUIRED_FILES)
                     if _bip_ok:
                         _html_bip, _n_r, _n_p, _n_t = _build_bipartite_html(
                             sel_s1, _BIP_CACHE_VERSION, *_bip_mtimes())
@@ -1206,7 +1226,7 @@ with _sections["comparative-binding-sites"]:
 
                 st.markdown(
                     "**Interactive network — actin residues ↔ ABP residues**")
-                _bip_ok = all(os.path.exists(f) for f in _BIPARTITE_FILES)
+                _bip_ok = all(os.path.exists(f) for f in _BIP_REQUIRED_FILES)
                 if _bip_ok:
                     _color_mode = "restype" if st.toggle(
                         "Physicochemical colouring (hydrophobic/polar/charged…)",
