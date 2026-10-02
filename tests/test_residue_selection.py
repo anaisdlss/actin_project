@@ -23,7 +23,7 @@ pp = {
                              "asa_max": [1., 8., 4., 2.]}),
 }
 with patch.object(view, "render_residue_fiche", lambda pp, p: st.text(f"detail:{p}")), \
-     patch.object(view, "_render_actin_overview_3d", lambda pp, p: st.text(f"surface:{p}")), \
+     patch.object(view, "_render_actin_overview_3d", lambda pp, p, mode: st.text(f"surface:{p}")), \
      patch.object(view, "_render_actin_3d", lambda pp, p: st.text(f"surface:{p}")):
     RENDER(pp)
 st.checkbox("Unrelated control", key="other")

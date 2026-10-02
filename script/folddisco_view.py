@@ -252,43 +252,53 @@ def _query_coordinates(path,chain,mtime):
 
 def _render_local_query(catalog,abp,cluster):
     selected=catalog[catalog.query_abp.eq(abp)&catalog.query_cluster.eq(cluster)]
-    with st.expander('Inspect the local query motif in 3D or prepare edited positions'):
-        if selected.empty:
-            st.info('No current local source-table motif is available for this saved result.');return
-        row=selected.iloc[0].to_dict();path=structure_path(row)
-        st.caption('This motif is reconstructed from the current source tables using the best-resolution '
-                   'interaction for this ABP/site. Historical result files did not retain the exact submitted '
-                   'positions or structure hash, so agreement with the historical query is not established. '
-                   'Positions below are PDB residue identifiers of the ABP chain, not P60709 actin positions.')
-        st.write(f"Source: {row['source_pdb'].upper()} / chain {row['source_chain']} · "
-                 f"interaction {row['interaction_id']} · {row['reconstructed_size']} distinct contact positions")
-        st.code(row['contact_positions'] or 'No contact positions in the current source tables')
-        if row['unparsed_contact_positions']:
-            st.warning('Unparsed source residue identifiers: '+row['unparsed_contact_positions'])
-        if path is None:
-            st.info('The corresponding structure is not present locally. Position validation and 3D preparation are unavailable.');return
-        try:coords=_query_coordinates(str(path),row['source_chain'],path.stat().st_mtime_ns)
-        except (ValueError,KeyError) as exc:
-            st.warning(str(exc));return
-        text=st.text_area('ABP query positions to prepare (comma-separated PDB residue identifiers)',
-                          value=row['contact_positions'],key=f'fd_query_positions_{abp}_{cluster}',height=90)
-        checked=validate_motif(text,coords.position,row['source_chain'])
-        for error in checked['errors']:st.warning(error)
-        if checked['duplicate_tokens_removed']:st.caption('Repeated position tokens are counted once.')
-        picked=coords[coords.position.isin(checked['positions'])]
-        fig=go.Figure()
-        fig.add_trace(go.Scatter3d(x=coords.x,y=coords.y,z=coords.z,mode='markers',name='Resolved C-alpha atoms',
-                                 marker=dict(color='#BBBBBB',size=3,opacity=.45),customdata=coords[['residue','position']],
-                                 hovertemplate='%{customdata[0]} %{customdata[1]}<extra></extra>'))
-        fig.add_trace(go.Scatter3d(x=picked.x,y=picked.y,z=picked.z,mode='markers',name='Prepared motif',
-                                 marker=dict(color='#E69F00',size=6),customdata=picked[['residue','position']],
-                                 hovertemplate='%{customdata[0]} %{customdata[1]}<extra></extra>'))
-        fig.update_layout(height=460,scene=dict(aspectmode='data',xaxis_visible=False,yaxis_visible=False,zaxis_visible=False),
-                          margin=dict(l=0,r=0,t=0,b=0),legend=dict(orientation='h'))
-        st.plotly_chart(fig,use_container_width=True,key=f'fd_query_3d_{abp}_{cluster}')
-        st.caption('Local C-alpha representation: gray = resolved chain residues; orange = prepared motif. '
-                   'Editing this selection does not recalculate or change the saved discovery results below.')
-        if not checked['errors']:
+    if selected.empty:
+        st.info('No current local source-table motif is available for this saved result.');return
+    row=selected.iloc[0].to_dict()
+    from folddisco_jobs import combine_sites
+    options = sorted(set(catalog.loc[catalog.query_abp.eq(abp), 'query_cluster']) - {cluster})
+    extras = st.multiselect('Combine with other binding sites of this ABP', options,
+                           key=f'fd_combination_{abp}_{cluster}') if options else []
+    if extras:
+        try:
+            row = combine_sites(pd.read_csv(CATALOG_FILES[0]), pd.read_csv(CATALOG_FILES[1]), abp, [cluster, *extras])
+        except ValueError as exc:
+            st.info(str(exc)); return
+    path=structure_path(row)
+    st.caption('This motif is reconstructed from the current source tables using the best-resolution '
+               'interaction for this ABP/site; combinations use one observed PDB chain containing every selected site. Historical result files did not retain the exact submitted '
+               'positions or structure hash, so agreement with the historical query is not established. '
+               'Positions below are PDB residue identifiers of the ABP chain, not P60709 actin positions.')
+    st.write(f"Source: {row['source_pdb'].upper()} / chain {row['source_chain']} · "
+             f"interaction {row['interaction_id']} · {row['reconstructed_size']} distinct contact positions")
+    st.code(row['contact_positions'] or 'No contact positions in the current source tables')
+    if row['unparsed_contact_positions']:
+        st.warning('Unparsed source residue identifiers: '+row['unparsed_contact_positions'])
+    if path is None:
+        st.info('The corresponding structure is not present locally. Position validation and 3D preparation are unavailable.');return
+    try:coords=_query_coordinates(str(path),row['source_chain'],path.stat().st_mtime_ns)
+    except (ValueError,KeyError) as exc:
+        st.warning(str(exc));return
+    text=st.text_area('ABP query positions to prepare (comma-separated PDB residue identifiers)',
+                      value=row['contact_positions'],key=f'fd_query_positions_{abp}_{row["query_cluster"]}',height=90)
+    checked=validate_motif(text,coords.position,row['source_chain'])
+    for error in checked['errors']:st.warning(error)
+    if checked['duplicate_tokens_removed']:st.caption('Repeated position tokens are counted once.')
+    picked=coords[coords.position.isin(checked['positions'])]
+    fig=go.Figure()
+    fig.add_trace(go.Scatter3d(x=coords.x,y=coords.y,z=coords.z,mode='markers',name='Resolved C-alpha atoms',
+                             marker=dict(color='#BBBBBB',size=3,opacity=.45),customdata=coords[['residue','position']],
+                             hovertemplate='%{customdata[0]} %{customdata[1]}<extra></extra>'))
+    fig.add_trace(go.Scatter3d(x=picked.x,y=picked.y,z=picked.z,mode='markers',name='Prepared motif',
+                             marker=dict(color='#E69F00',size=6),customdata=picked[['residue','position']],
+                             hovertemplate='%{customdata[0]} %{customdata[1]}<extra></extra>'))
+    fig.update_layout(height=460,scene=dict(aspectmode='data',xaxis_visible=False,yaxis_visible=False,zaxis_visible=False),
+                      margin=dict(l=0,r=0,t=0,b=0),legend=dict(orientation='h'))
+    st.plotly_chart(fig,use_container_width=True,key=f'fd_query_3d_{abp}_{cluster}')
+    st.caption('Local C-alpha representation: gray = resolved chain residues; orange = prepared motif. '
+               'Editing this selection does not recalculate or change the saved discovery results below.')
+    if not checked['errors']:
+        with st.expander('Export prepared motif and coordinates'):
             st.download_button('Download prepared motif and structure fingerprint (JSON)',prepared_query_json(row,checked,path),
                                file_name='folddisco_prepared_motif.json',mime='application/json',key=f'fd_query_json_{abp}_{cluster}')
             st.download_button('Download prepared residue coordinates (CSV)',picked.to_csv(index=False).encode(),
@@ -300,6 +310,66 @@ def _render_local_query(catalog,abp,cluster):
             else:
                 st.info('Insertion codes or multi-character chain identifiers are preserved in JSON. '
                         'The existing pipeline does not support their unambiguous FoldDisco text serialization.')
+
+    if not checked['errors'] and checked['query']:
+        _render_query_jobs(row, checked, path)
+
+
+def _render_query_jobs(row, checked, path):
+    import json
+    import hashlib
+    from folddisco_jobs import JOBS, DATABASES, prepare, submit, refresh, result_table, chain_pdb_text, retry
+    current_hash = hashlib.sha256(chain_pdb_text(path, row['source_chain']).encode()).hexdigest()
+    matches = []
+    for file in JOBS.glob('*/job.json'):
+        try:
+            record = json.loads(file.read_text())
+        except (ValueError, OSError):
+            continue
+        if (record.get('motif') == checked['query']
+                and record.get('databases') == DATABASES
+                and record.get('structure_sha256') == current_hash):
+            matches.append((file.parent, record))
+    current = max(matches, key=lambda item: item[1]['created_utc']) if matches else None
+    with st.expander('Run this motif or inspect its new results', expanded=current is not None):
+        if Path('data/.slim_deploy').exists():
+            st.caption('New searches run from the full research project. This public version displays saved results.')
+        elif len(checked['positions']) > 32:
+            st.info('The public FoldDisco server accepts at most 32 residues. Edit the motif or export it for a local search; the app does not truncate it automatically.')
+        elif st.button('Search this motif in PDB and AlphaFold', key='fd_submit_motif',
+                       disabled=current is not None and current[1]['state'] != 'prepared'):
+            try:
+                folder, record = prepare(row, ','.join(checked['positions']), path)
+                record = submit(folder)
+                current = folder, record
+            except (ValueError, OSError) as exc:
+                st.error(str(exc))
+        if current is None:
+            st.caption('No tracked search matches this selection yet. Editing a motif never changes historical results.')
+            return
+        folder, record = current
+        source = record.get('source', {})
+        if (source.get('query_abp'), source.get('query_cluster')) != (row['query_abp'], row['query_cluster']):
+            st.caption(f"Reusing the exact same structure, motif and databases submitted for {source.get('query_abp')} / {source.get('query_cluster')}. The original provenance is retained.")
+        if record['state'] in {'pending', 'results_pending'}:
+            if st.button('Check search progress', key='fd_refresh_motif'):
+                record = refresh(folder)
+        if record['state'] in {'failed', 'submission_uncertain'} and not Path('data/.slim_deploy').exists():
+            if st.button('Retry this search', key='fd_retry_motif'):
+                record = retry(folder)
+        st.write(record.get('message', record['state']))
+        st.caption(f"State: {record['state']} · saved {record['updated_utc']} · exact submitted structure and motif retained.")
+        if record['state'] == 'complete':
+            frame = result_table(folder)
+            if frame.empty:
+                st.info('Search completed with no returned alignments.')
+            else:
+                st.dataframe(frame, hide_index=True, width='stretch')
+                st.download_button('Download new search results', frame.to_csv(index=False).encode(),
+                                   file_name='folddisco_new_results.csv', key='fd_fresh_csv')
+            st.caption('These are the alignments returned by the service, which can limit the number of hits. They belong to the displayed submitted motif. They are separate from the historical search below; no homology or binding-function classification is inferred.')
+        st.download_button('Download search provenance', json.dumps(record, indent=2),
+                           file_name='folddisco_search.json', key='fd_fresh_manifest')
 
 
 def render_discovery(sel_abp):
@@ -331,6 +401,18 @@ def render_discovery(sel_abp):
     discovery=df if df is not None else pd.DataFrame()
     local=_load_folddisco(os.path.getmtime(_FD_CSV) if os.path.exists(_FD_CSV) else 0)
     with st.expander('Dataset coverage: ABPs, local motifs and saved results'):
+        from folddisco_jobs import JOBS
+        import json
+        ledger = []
+        for file in JOBS.glob('*/job.json'):
+            item = json.loads(file.read_text()); source = item.get('source', {})
+            ledger.append({'ABP': source.get('query_abp'), 'Sites': source.get('query_cluster'),
+                           'State': item.get('state'), 'Returned alignments': item.get('hit_rows'),
+                           'Updated': item.get('updated_utc')})
+        if ledger:
+            st.markdown('**Tracked searches with exact query provenance**')
+            st.dataframe(pd.DataFrame(ledger), hide_index=True, width='stretch')
+            st.caption('A complete search with zero returned alignments is distinct from a missing or failed search. The historical inventory below describes the original result files only.')
         coverage,details=coverage_tables(catalog,discovery,local if local is not None else pd.DataFrame())
         if coverage.empty:
             st.info('No local motif source tables or saved FoldDisco queries are present.')
@@ -354,7 +436,8 @@ def render_discovery(sel_abp):
         clusters, key=f"disco_cl_{sel_abp}")
     _render_local_query(catalog,sel_abp,cl)
     if abp.empty or not abp.query_cluster.eq(cl).any():
-        st.info('No saved discovery rows for this ABP/site; preparing a motif does not run a search.');return
+        st.caption('No historical result rows for this ABP/site. Any tracked search is shown above.');return
+    st.subheader("Historical results for the original single-site search")
     filt = _interp_filter_ui(f"disco_filt_{sel_abp}_{cl}")
     sub = abp[(abp["query_cluster"] == cl) & (~abp["is_source"])]
     tabs = st.tabs([lbl for _, lbl in _DB_TABS])

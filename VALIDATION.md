@@ -157,3 +157,48 @@ sont supprimés. Les tableaux homo/hétéro, le réseau ABP sélectionné et les
 résultats Structural evidence s'affichent directement. Les onze rubriques et
 les choix entre analyses distinctes sont conservés. Ce lot modifie uniquement
 la présentation, sans changer les données ni les formules.
+
+## Suivi des demandes de Rémi — 2 octobre 2026
+
+Les détails des sites sont accessibles dans leurs pages actine–actine ou
+ABP–actine. La comparaison des empreintes s'affiche directement ; la
+conservation d'un résidu se consulte dans la page Conservation en gardant la
+sélection. La nouvelle surface homo/hétéro/mixte utilise les contacts à ASA
+positive et un mapping de séquence P60709. Une seule surface est colorée par
+atome ; les positions sans observation ou non mappées restent grises.
+
+Validation finale sur les deux dépôts : **95 tests unitaires réussis** chacun,
+puis **toutes les pages, leurs vues et les interactions de `tools/check_app.py`
+réussies** avec les jeux respectifs. Le test ciblé `tools/check_followup.py`
+vérifie l'affichage des 2 000 alignements sauvegardés pour Inverted formin-2 /
+6685_213, la combinaison de sites sur 9AZ4 G (41 positions, limite serveur
+signalée), et l'ouverture de la conservation de M47 sans perte de sélection.
+Aucune soumission distante n'est lancée par ces tests.
+
+Les empreintes SHA-256 de toutes les requêtes sauvegardées sont conformes aux
+coordonnées exportées ; chaque position du motif possède un C-alpha exporté.
+Les rapports géométriques correspondent aux tableaux sources actuels :
+1 418 paires / 23 clusters dans le complet, 1 340 / 21 dans le public.
+Les comptes ProteoCast et les résultats des nouvelles recherches FoldDisco
+sont détaillés dans SCIENTIFIC_ANALYSES.md et les rapports d'audit datés.
+Un résultat vide, un échec et un motif non pris en charge restent distingués.
+
+Le contrôle visuel du navigateur n'a pas pu être refait pour ce lot : l'outil
+a refusé l'accès faute de pouvoir vérifier une règle de sécurité administrateur.
+Ce contrôle n'a pas été contourné. AppTest vérifie l'exécution et les interactions
+Streamlit, pas le rendu JavaScript effectif de la nouvelle surface 3D. Une
+inspection visuelle de cette surface reste donc à faire.
+
+Reproduire les contrôles depuis chaque dépôt, avec l'environnement Python du projet :
+
+```bash
+python -m unittest discover -s tests
+python tools/check_app.py
+python tools/check_followup.py
+```
+
+Les nouveaux calculs ProteoCast restent bloqués par des alignements distants
+vides, et deux entrées du manifeste complet n'ont pas d'accession. La validation
+biologique des interfaces et des candidats ABD reste du ressort des auteurs ;
+les mesures et leurs limites sont disponibles pour cette revue. Aucun
+redéploiement de l'application Cloud n'est réalisé par ce lot.

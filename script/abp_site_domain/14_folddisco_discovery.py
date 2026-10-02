@@ -33,6 +33,7 @@ Usage :
   pixi run python script/abp_site_domain/14_folddisco_discovery.py --limit 3   # test
 """
 import argparse
+import sys
 import os
 import re
 import time
@@ -43,6 +44,8 @@ import requests
 from Bio.PDB import PDBParser, MMCIFParser, PDBIO, Select
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / 'script'))
+from folddisco_jobs import alignment_rows
 OUT = ROOT / "data/exports/abp_site_domain"
 ASM = ROOT / "data/filtered/details/structures_files/assembly"
 CHAINS = OUT / "abp_chains_disco"          # chaînes ABP extraites par (pdb, chaîne)
@@ -135,6 +138,8 @@ def _get(url):
 
 def submit(pdb_path, motif):
     """POST structure + motif -> id du ticket ; rouvre le fichier à chaque essai."""
+    if len(set(motif.split(','))) > 32:
+        raise ValueError("The public FoldDisco server accepts at most 32 motif residues; no automatic truncation is performed.")
     data = [("database[]", db) for db in DBS] + [("motif", motif)]
     delay = 15
     for k in range(RETRY_TRIES):
@@ -183,7 +188,7 @@ def fetch_hits(tid, query_size, top):
     for res in d.get("results", []):
         dbname = res.get("db", "")
         best = {}
-        for a in res.get("alignments", []):
+        for a in alignment_rows(res.get("alignments")):
             kind, tgt = _parse_target(dbname, a["target"])
             chain = _target_chain(a.get("targetresidues", "")) if kind == "pdb" else ""
             key = (tgt, chain)

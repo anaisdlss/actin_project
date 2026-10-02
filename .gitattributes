@@ -3,3 +3,6 @@ pixi.lock merge=binary linguist-language=YAML linguist-generated=true -diff
 
 # Preserve original source CSV bytes and recognize their CRLF line endings.
 data/human_variants/sources/*.csv -text whitespace=cr-at-eol
+
+# Keep exact submitted PDB bytes, including fixed-width trailing columns.
+data/exports/folddisco_jobs/*/query.pdb -text -whitespace

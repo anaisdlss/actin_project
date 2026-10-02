@@ -1,0 +1,492 @@
+[
+  {
+    "abp": "Actin-related protein 2",
+    "uniprot": "A7MB62",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Actin_related_protein_2/4.query_ProteoCast.csv",
+    "sha256": "e8bbba4a9130fd0c1d40e48bb0b41d5cd7e5ba9c3aad58030a2dd0f26287f6af",
+    "positions": 394,
+    "scores": 7880,
+    "state": "imported"
+  },
+  {
+    "abp": "Actin-related protein 2/3 complex subunit 1",
+    "uniprot": "P78774",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Actin_related_protein_2_3_complex_subunit_1/4.query_ProteoCast.csv",
+    "sha256": "2e93a278388e8df125319278d1911db97a10b885911bfdbecac7a1bc3db0eb08",
+    "positions": 377,
+    "scores": 7540,
+    "state": "imported"
+  },
+  {
+    "abp": "Actin-related protein 2/3 complex subunit 1B",
+    "uniprot": "Q58CQ2",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Actin_related_protein_2_3_complex_subunit_1B/4.query_ProteoCast.csv",
+    "sha256": "0a62e6f9b4ac33225e6fa71ce0b3277992e63be4ccc3e4bb85f577e25beb6914",
+    "positions": 372,
+    "scores": 7440,
+    "state": "imported"
+  },
+  {
+    "abp": "Actin-related protein 2/3 complex subunit 2",
+    "uniprot": "Q3MHR7",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Actin_related_protein_2_3_complex_subunit_2/4.query_ProteoCast.csv",
+    "sha256": "d6266210b56eac5caebc8584c46fc9edae683063983317a1c0dec1a80b30ae14",
+    "positions": 300,
+    "scores": 6000,
+    "state": "imported"
+  },
+  {
+    "abp": "Actin-related protein 2/3 complex subunit 3",
+    "uniprot": "Q3T035",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Actin_related_protein_2_3_complex_subunit_3/4.query_ProteoCast.csv",
+    "sha256": "56bd82757771585bb7a85b07b569492ee3ac01d36f3e95f45917601d16faaea5",
+    "positions": 178,
+    "scores": 3560,
+    "state": "imported"
+  },
+  {
+    "abp": "Actin-related protein 2/3 complex subunit 4",
+    "uniprot": "Q148J6",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Actin_related_protein_2_3_complex_subunit_4/4.query_ProteoCast.csv",
+    "sha256": "9ecda0044b4830af2114fd2a1d0e6bdf4b79b3d4b608b335d5dc6ff0f4823ec4",
+    "positions": 168,
+    "scores": 3360,
+    "state": "imported"
+  },
+  {
+    "abp": "Actin-related protein 2/3 complex subunit 5-like protein",
+    "uniprot": "Q9BPX5",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Actin_related_protein_2_3_complex_subunit_5_like_p/4.query_ProteoCast.csv",
+    "sha256": "d9c713a11a692d70398e9f1fb0b468745f1d96ff582dace790e6186df431f421",
+    "positions": 153,
+    "scores": 3060,
+    "state": "imported"
+  },
+  {
+    "abp": "Actin-related protein 3",
+    "uniprot": "P61157",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Actin_related_protein_3/4.query_ProteoCast.csv",
+    "sha256": "f686d5fdfd89b0243c208071c17ad2910349a7443f5f49920b0021f430341f3a",
+    "positions": 418,
+    "scores": 8360,
+    "state": "imported"
+  },
+  {
+    "abp": "Adducin 1",
+    "uniprot": "A0A8D1Q0D0",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Adducin_1/4.query_ProteoCast.csv",
+    "sha256": "5b4cbccd0dd1d7cb273bd384bb5017205118174d8dd7d71fcfc77567d6e2c304",
+    "positions": 754,
+    "scores": 15080,
+    "state": "imported"
+  },
+  {
+    "abp": "Adenylyl cyclase-associated protein 1",
+    "uniprot": "Q01518",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Adenylyl_cyclase_associated_protein_1/4.query_ProteoCast.csv",
+    "sha256": "fcbfbc0f65ca86827125c04840699f2d165f220a97a6baab4005e9830ce1fd44",
+    "positions": 475,
+    "scores": 9500,
+    "state": "imported"
+  },
+  {
+    "abp": "Afadin",
+    "uniprot": "Q9QZQ1",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Afadin/4.query_ProteoCast.csv",
+    "sha256": "e58e6c86eae989b45c47fed1a7f2e9e6814d93b556291e6072cada1da1dc0c96",
+    "positions": 1820,
+    "scores": 36400,
+    "state": "imported"
+  },
+  {
+    "abp": "Alpha-catenin-like protein hmp-1",
+    "uniprot": "P90947",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Alpha_catenin_like_protein_hmp_1/4.query_ProteoCast.csv",
+    "sha256": "71a8852a7c8bc9571a9d614eb2a3dee9ee994b2762fdbce081014f9b20ae1add",
+    "positions": 927,
+    "scores": 18540,
+    "state": "imported"
+  },
+  {
+    "abp": "Beta-adducin",
+    "uniprot": "I3L5B0",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Beta_adducin/4.query_ProteoCast.csv",
+    "sha256": "9480d4b9031cebe7d989a0e93f757a1557941bba84ae19f2ce476da845fe6e82",
+    "positions": 725,
+    "scores": 14500,
+    "state": "imported"
+  },
+  {
+    "abp": "Catenin alpha-1",
+    "uniprot": "P26231",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Catenin_alpha_1/4.query_ProteoCast.csv",
+    "sha256": "c1de2a77a1cc602e9f9f4dc3d88a09a793114b665744e74dc6d339f1fadf6c0e",
+    "positions": 906,
+    "scores": 18120,
+    "state": "imported"
+  },
+  {
+    "abp": "Cell invasion protein SipA",
+    "uniprot": "P0CL52",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Cell_invasion_protein_SipA/4.query_ProteoCast.csv",
+    "sha256": "8d203a91e1a51f51242639c1fb2748e9a10cfeea97abf21cee2cafed74da1321",
+    "positions": 685,
+    "scores": 13700,
+    "state": "imported"
+  },
+  {
+    "abp": "Cofilin-1",
+    "uniprot": "P23528",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Cofilin_1/4.query_ProteoCast.csv",
+    "sha256": "c412e72e8e90d4f5a50fc9e155fe9e57fd5030cddd76449672c3303fc187ae74",
+    "positions": 166,
+    "scores": 3320,
+    "state": "imported"
+  },
+  {
+    "abp": "Cofilin-2",
+    "uniprot": "Q9Y281",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Cofilin_2/4.query_ProteoCast.csv",
+    "sha256": "66773a09b65dcd7aefdcdac4e1b2c0f7d37eb7c2671f40aa744cd79c36e140c0",
+    "positions": 166,
+    "scores": 3320,
+    "state": "imported"
+  },
+  {
+    "abp": "Coronin-1B,Methylated-DNA--protein-cysteine methyltransferase",
+    "uniprot": "Q9BR76;P16455",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Coronin_1B_Methylated_DNA_protein_cysteine_methylt/4.query_ProteoCast.csv",
+    "sha256": "7b150f863a3248f037cafd2666d84e0efc78c6d3ef91774761fd4948a2bb4a7b",
+    "positions": 489,
+    "scores": 9780,
+    "state": "imported"
+  },
+  {
+    "abp": "Dematin actin binding protein",
+    "uniprot": "F1RMC1",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Dematin_actin_binding_protein/4.query_ProteoCast.csv",
+    "sha256": "3a8ccdd4f2cb1bbfec28c06746345477064a5d6ec2e29a19e159fa2da64d5908",
+    "positions": 405,
+    "scores": 8100,
+    "state": "imported"
+  },
+  {
+    "abp": "Epididymis secretory protein Li 37",
+    "uniprot": "P13796",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Epididymis_secretory_protein_Li_37/4.query_ProteoCast.csv",
+    "sha256": "02ccb74155c79a4051e82c5dd34242279e3f012338fa97b5174b85a9d2b0e96e",
+    "positions": 627,
+    "scores": 12540,
+    "state": "imported"
+  },
+  {
+    "abp": "F-actin-capping protein subunit alpha-1",
+    "uniprot": "P52907",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/F_actin_capping_protein_subunit_alpha_1/4.query_ProteoCast.csv",
+    "sha256": "90168bcb4d954294fdb4d904e0cf544675aeb4e6936af3855a982a1e6dfa63c0",
+    "positions": 286,
+    "scores": 5720,
+    "state": "imported"
+  },
+  {
+    "abp": "F-actin-capping protein subunit beta",
+    "uniprot": "P47756",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/F_actin_capping_protein_subunit_beta/4.query_ProteoCast.csv",
+    "sha256": "cd6bbd97d0d2c7297bc9ac773a0a5f9bfe856c17ab691edf38a7daea29ee75f5",
+    "positions": 272,
+    "scores": 5440,
+    "state": "imported"
+  },
+  {
+    "abp": "Filamin-A",
+    "uniprot": "P21333",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Filamin_A/4.query_ProteoCast.csv",
+    "sha256": "4a562dd54e31e39f55088de0d5e926361c8f58845bf3d73293addd03891831ab",
+    "positions": 2647,
+    "scores": 52940,
+    "state": "imported"
+  },
+  {
+    "abp": "Gelsolin",
+    "uniprot": "P06396",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Gelsolin/4.query_ProteoCast.csv",
+    "sha256": "70e8eb37eab128956574d36e0b00227a7e4a03aa04c46de570ddf961526467e1",
+    "positions": 782,
+    "scores": 15640,
+    "state": "imported"
+  },
+  {
+    "abp": "Inositol-trisphosphate 3-kinase A",
+    "uniprot": "P17105",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Inositol_trisphosphate_3_kinase_A/4.query_ProteoCast.csv",
+    "sha256": "7249c4e7d9571a5022701390c2c299639f9799512ed0904a107752e57d422fd7",
+    "positions": 459,
+    "scores": 9180,
+    "state": "imported"
+  },
+  {
+    "abp": "Inverted formin-2",
+    "uniprot": "Q27J81",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Inverted_formin_2/4.query_ProteoCast.csv",
+    "sha256": "8a515072a670a5258ebf626669acdfbe2cf06c49da7be70546031b3a606303ce",
+    "positions": 1249,
+    "scores": 24980,
+    "state": "imported"
+  },
+  {
+    "abp": "Isoform 2 of F-actin-capping protein subunit beta",
+    "uniprot": "P47757",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Isoform_2_of_F_actin_capping_protein_subunit_beta/4.query_ProteoCast.csv",
+    "sha256": "0c2dae0c1c183a1910a1d7827e27d8a3f5011d2a0fea1366759ab23bfaa0054f",
+    "positions": 277,
+    "scores": 5540,
+    "state": "imported"
+  },
+  {
+    "abp": "Isoform A2 of Troponin T, cardiac muscle",
+    "uniprot": "P50752",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Isoform_A2_of_Troponin_T_cardiac_muscle/4.query_ProteoCast.csv",
+    "sha256": "76cda0df54e5a6619a535006cdc5bf6fb5ea3c1afb1bb6c858b2aa087bf7c5d2",
+    "positions": 301,
+    "scores": 6020,
+    "state": "imported"
+  },
+  {
+    "abp": "Leiomodin-2",
+    "uniprot": "Q6P5Q4",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Leiomodin_2/4.query_ProteoCast.csv",
+    "sha256": "99e6ad6edceb453fde0db77eac24e9919035573bfc79ac4397b4bb23c83b279f",
+    "positions": 547,
+    "scores": 10940,
+    "state": "imported"
+  },
+  {
+    "abp": "Maltose/maltodextrin-binding periplasmic protein,Adenylate cyclase ExoY",
+    "uniprot": "P0AEX9;Q9I1S4",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Maltose_maltodextrin_binding_periplasmic_protein_A/4.query_ProteoCast.csv",
+    "sha256": "58398fb312abc11a60e7a1760c7048c7418227954a28d870813cd92913355b8b",
+    "positions": 396,
+    "scores": 7920,
+    "state": "imported"
+  },
+  {
+    "abp": "Maltose/maltodextrin-binding periplasmic protein,TccC3",
+    "uniprot": "P0AEX9;Q8GF97",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Maltose_maltodextrin_binding_periplasmic_protein_T/4.query_ProteoCast.csv",
+    "sha256": "6d0639185ffa6d320b0d5445b16e1711c5d04c66838f5c406fb3929a91dee476",
+    "positions": 396,
+    "scores": 7920,
+    "state": "imported"
+  },
+  {
+    "abp": "Myosin-14,Alpha-actinin A",
+    "uniprot": "Q7Z406;P05095",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Myosin_14_Alpha_actinin_A/4.query_ProteoCast.csv",
+    "sha256": "12be6f529ec364339ba2eb41ead0f73691455456c5e60261e8a9476b9ee93029",
+    "positions": 1995,
+    "scores": 39900,
+    "state": "imported"
+  },
+  {
+    "abp": "Myosin-6",
+    "uniprot": "Q02566",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Myosin_6/4.query_ProteoCast.csv",
+    "sha256": "bbc71ff64f637c0c4f47fc5918d860ca7a4dca7e6a75f2646ddf020066aef9a1",
+    "positions": 1938,
+    "scores": 38760,
+    "state": "imported"
+  },
+  {
+    "abp": "Myosin-7",
+    "uniprot": "P79293",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Myosin_7/4.query_ProteoCast.csv",
+    "sha256": "5dad32de741459271d4b1efbf92875b761f0785051efd327f5b1b25fafdf9e31",
+    "positions": 1935,
+    "scores": 38700,
+    "state": "imported"
+  },
+  {
+    "abp": "Myosin-A",
+    "uniprot": "Q8IDR3",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Myosin_A/4.query_ProteoCast.csv",
+    "sha256": "76f0b51e72c672fe285c64298062091d7e9d3a0f6c9e762ff811aa6d868b9b89",
+    "positions": 818,
+    "scores": 16360,
+    "state": "imported"
+  },
+  {
+    "abp": "Plastin-3",
+    "uniprot": "P13797",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Plastin_3/4.query_ProteoCast.csv",
+    "sha256": "d27300b3b91d92d264bdd2aca0bfb6c9b966fccbf1576652269f507d550bb88e",
+    "positions": 630,
+    "scores": 12600,
+    "state": "imported"
+  },
+  {
+    "abp": "Profilin-1",
+    "uniprot": "P07737",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Profilin_1/4.query_ProteoCast.csv",
+    "sha256": "5bf165f80080265a18da350924a4299b64997645800a0c4153fbdd7db78ae112",
+    "positions": 140,
+    "scores": 2800,
+    "state": "imported"
+  },
+  {
+    "abp": "Protein diaphanous homolog 1",
+    "uniprot": "O08808",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Protein_diaphanous_homolog_1/4.query_ProteoCast.csv",
+    "sha256": "c3dc5411e3bddfa649d36b8240c16cffee6f060dc06cac2c73c29d119274dc7d",
+    "positions": 1255,
+    "scores": 25100,
+    "state": "imported"
+  },
+  {
+    "abp": "Src substrate cortactin",
+    "uniprot": "Q60598",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Src_substrate_cortactin/4.query_ProteoCast.csv",
+    "sha256": "73e7d7886a23cf4976a8c6d8ddc1b0fe22be116d44db0cc2169739b253680021",
+    "positions": 546,
+    "scores": 10920,
+    "state": "imported"
+  },
+  {
+    "abp": "Talin-1",
+    "uniprot": "P26039",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Talin_1/4.query_ProteoCast.csv",
+    "sha256": "fd9967f37bed5ff53535c330af5c72a253bd29b96e3b89fec33c07af92e44574",
+    "positions": 2541,
+    "scores": 50820,
+    "state": "imported"
+  },
+  {
+    "abp": "Tropomodulin-1",
+    "uniprot": "A0A4X1UDZ5",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Tropomodulin_1/4.query_ProteoCast.csv",
+    "sha256": "2d570e2220fe439edfb3347990e5b704a54f1e5937de72cdc1ebc65d44d4b5af",
+    "positions": 359,
+    "scores": 7180,
+    "state": "imported"
+  },
+  {
+    "abp": "Tropomyosin alpha-1 chain",
+    "uniprot": "P09493",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Tropomyosin_alpha_1_chain/4.query_ProteoCast.csv",
+    "sha256": "0a821554b0d5a7bd8e1a8c8cb5ef48bdb2869287a924e4ea5a301783f5965523",
+    "positions": 284,
+    "scores": 5680,
+    "state": "imported"
+  },
+  {
+    "abp": "Tropomyosin beta chain",
+    "uniprot": "P58775",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Tropomyosin_beta_chain/4.query_ProteoCast.csv",
+    "sha256": "15e542aaac1d287b9eb89db4628c02b979d0ec0ff3d4ec8e4ac1f5b72772fc2f",
+    "positions": 284,
+    "scores": 5680,
+    "state": "imported"
+  },
+  {
+    "abp": "Tropomyosin-1.9",
+    "uniprot": "A0AA82WPI2",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Tropomyosin_1_9/4.query_ProteoCast.csv",
+    "sha256": "eca9e24ce6100b4348f67996e5e0266b3507db72453ce91e34063292ec73fc1b",
+    "positions": 248,
+    "scores": 4960,
+    "state": "imported"
+  },
+  {
+    "abp": "Troponin T2, cardiac type",
+    "uniprot": "I3LS66",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Troponin_T2_cardiac_type/4.query_ProteoCast.csv",
+    "sha256": "4e4cbc3ec1161c05cb6c2574277827cc8060285383e7064628240e0ade629a1a",
+    "positions": 295,
+    "scores": 5900,
+    "state": "imported"
+  },
+  {
+    "abp": "Unconventional myosin-Ib",
+    "uniprot": "Q05096",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Unconventional_myosin_Ib/4.query_ProteoCast.csv",
+    "sha256": "c67400af48e63481b67b62a0510afdbdd094c92ec04f61a5187f1ebc64fc523a",
+    "positions": 1136,
+    "scores": 22720,
+    "state": "imported"
+  },
+  {
+    "abp": "Vinculin",
+    "uniprot": "P18206",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/Vinculin/4.query_ProteoCast.csv",
+    "sha256": "99ba70e5c7b475066adcacbddf64e9865e7e0278e828df902169d19fa3b62112",
+    "positions": 1134,
+    "scores": 22680,
+    "state": "imported"
+  },
+  {
+    "abp": "WD repeat-containing protein 1,Methylated-DNA--protein-cysteine methyltransferase",
+    "uniprot": "O75083;P16455",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/WD_repeat_containing_protein_1_Methylated_DNA_prot/4.query_ProteoCast.csv",
+    "sha256": "62c7e5896e9c0f38b49e64a24e95adc8ff25fa06972bdead378ebe6400d3b843",
+    "positions": 606,
+    "scores": 12120,
+    "state": "imported"
+  },
+  {
+    "abp": "beta-cardiac myosin II",
+    "uniprot": "P12883",
+    "source_project": "actin-abp-app",
+    "file": "data/proteocast/abp/beta_cardiac_myosin_II/4.query_ProteoCast.csv",
+    "sha256": "38733c5a94d10352f8169356f1f73ccfe1cc29f56fbd7d84c05044b81e01b4ce",
+    "positions": 1935,
+    "scores": 38700,
+    "state": "imported"
+  }
+]

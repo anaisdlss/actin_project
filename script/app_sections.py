@@ -72,7 +72,7 @@ def _readable_cluster_table(table):
     return view.rename(columns=CLUSTER_COLUMN_LABELS)
 
 
-def render_cluster_table(kind):
+def render_cluster_table(kind, show_selector=True):
     path = Path("data/filtered/patches_infos_s1_binding_site.csv")
     if not path.exists():
         st.info("Binding-site tables will be available after data generation.")
@@ -86,7 +86,7 @@ def render_cluster_table(kind):
     else:
         with st.expander("Show binding-site table"):
             st.dataframe(_readable_cluster_table(table), hide_index=True, width="stretch")
-    if kind in {"homo", "hetero"} and not table.empty:
+    if show_selector and kind in {"homo", "hetero"} and not table.empty:
         cluster = st.selectbox("Binding site to explore", sorted(table["patch"].astype(str), key=str.casefold), key=f"{kind}_site_link")
         if st.button("Explore selected cluster", key=f"{kind}_site_open"):
             from app_navigation import request_page
@@ -102,7 +102,7 @@ def render_cluster_table(kind):
         st.plotly_chart(fig, key="homo_pdb_counts", use_container_width=True)
         st.caption("PDB counts measure representation in this dataset, not physiological prevalence. "
                    "Major/minor interface labels have not been assigned. "
-                   "Cluster heatmaps, contact details and 3D views are available under Comparative analyses of binding sites.")
+                   "Select a binding site below to inspect its contacts, heatmap and 3D structure.")
 
 
 TABLE_DESCRIPTIONS = {

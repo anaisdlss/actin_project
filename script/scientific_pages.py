@@ -50,14 +50,14 @@ def render(section):
             render_cluster_table("all")
     elif section == "actin-actin-interfaces":
         view = page_view(section, ["Binding sites", "Compare footprints", "Structural evidence"])
-        if view == "Binding sites": render_cluster_table("homo")
+        if view == "Binding sites": views.render_s1_cluster(kind="homo")
         elif view == "Compare footprints": views.render_footprint_comparison()
         else: views.render_interface_evidence()
     elif section == "abp-actin-interfaces":
         view = page_view(section, ["By protein", "Overview and heatmap", "Binding sites"])
         if view == "By protein": views.render_abp_details()
         elif view == "Overview and heatmap": views.render_abp_overview()
-        else: render_cluster_table("hetero")
+        else: views.render_s1_cluster(kind="hetero")
     elif section == "comparative-binding-sites":
         view = page_view(section, ["Binding-site clusters", "Interaction clusters", "ABP networks", "ABP pairs and sequences"])
         if view == "Binding-site clusters": views.render_s1_cluster()

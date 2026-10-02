@@ -150,6 +150,8 @@ def prepared_query_json(row,validation,path):
     return json.dumps(dict(status='Prepared locally; not submitted or recalculated',
         query_abp=row['query_abp'],query_cluster=row['query_cluster'],source_pdb=row['source_pdb'],
         source_chain=row['source_chain'],interaction_id=int(row['interaction_id']),
+        selected_sites=row.get('clusters',[row['query_cluster']]),
+        interaction_ids=row.get('interaction_ids',[int(row['interaction_id'])]),
         numbering='PDB author residue identifiers in the selected chain; not P60709',
         original_reconstructed_positions=row['contact_positions'],edited_positions=validation['positions'],
         folddisco_query=validation['query'],structure_file=Path(path).name,

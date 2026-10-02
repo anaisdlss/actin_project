@@ -2007,10 +2007,17 @@ def render_s1_heatmap():
             valid_clusters=set(df_s1["patch"].astype(str)))
 
 
-def render_s1_cluster():
+def render_s1_cluster(kind="all"):
     if os.path.exists(PATCHES_S1_CSV):
 
         df_s1 = read_csv(PATCHES_S1_CSV)
+        if kind != "all":
+            from app_sections import select_cluster_types, render_cluster_table
+            df_s1 = select_cluster_types(df_s1, kind)
+            render_cluster_table(kind, show_selector=False)
+        if df_s1.empty:
+            st.info("No binding sites of this type are available.")
+            return
 
         df_s1_display = df_s1.drop(
             columns=["ids_interactions"], errors="ignore").copy()
@@ -2043,18 +2050,19 @@ def render_s1_cluster():
             df_s1_display['c70_clusters'] = c70_clusters_col
 
         df_s1_display.index = range(1, len(df_s1_display) + 1)
-        with st.expander("All binding sites: network and table"):
-            if os.path.exists(_all_data_path) and os.path.exists(_summary_path):
-                _use_super = st.toggle(
-                    "Group actin sites into super-clusters",
-                    value=False, key="global_graph_superclusters",
-                    help="Merges actin binding sites whose residues "
-                         "canonical se chevauchent (colonnes s1/s2_supercluster) "
-                         "into a single representative node.",
-                )
-                st.components.v1.html(_build_global_graph_html(
-                    _all_data_path, _summary_path, _use_super), height=780)
-            st.dataframe(df_s1_display, width="stretch")
+        if kind == "all":
+            with st.expander("All binding sites: network and table"):
+                if os.path.exists(_all_data_path) and os.path.exists(_summary_path):
+                    _use_super = st.toggle(
+                        "Group actin sites into super-clusters",
+                        value=False, key="global_graph_superclusters",
+                        help="Merges actin binding sites whose residues "
+                             "canonical se chevauchent (colonnes s1/s2_supercluster) "
+                             "into a single representative node.",
+                    )
+                    st.components.v1.html(_build_global_graph_html(
+                        _all_data_path, _summary_path, _use_super), height=780)
+                st.dataframe(df_s1_display, width="stretch")
 
         # --- Cluster sélectionné ---
         all_s1 = sorted(df_s1["patch"].astype(str), key=str.casefold)
@@ -2084,7 +2092,9 @@ def render_s1_cluster():
                 request_page("abp-actin-interfaces", "By protein", sel_abp_detail=_abpn)
                 st.rerun()
 
-        sel_s1 = st.selectbox("Patch S1 binding site", all_s1, key="sel_s1",
+        if st.session_state.get("sel_s1") not in all_s1:
+            st.session_state["sel_s1"] = all_s1[0]
+        sel_s1 = st.selectbox("Binding site to explore", all_s1, key="sel_s1",
                               format_func=lambda p: f"{p} — {int(df_s1[df_s1['patch'].astype(str) == p]['n_interactions'].values[0])} interactions")
 
         row_s1 = df_s1[df_s1["patch"].astype(str) == sel_s1].iloc[0]
@@ -2351,6 +2361,8 @@ def render_abp_proteocast(view="Profiles"):
     _pc_status = proteocast_view.load_status(_pc_mt)
     _pc_all = set(_pc_status["slug"].astype(str)) if _pc_status is not None else set()
     st.markdown("#### ABP ProteoCast — mutational landscape + 3D structure")
+    if _pc_status is not None:
+        st.caption(f"Scores available for {int(_pc_status['fait'].sum())} / {len(_pc_status)} ABPs in this dataset. Missing results remain unavailable; updates are managed in Documentation.")
     _pc_selected = st.selectbox("ABP for conservation", sorted(abp_global["Protein"].tolist(), key=str.casefold), key="conservation_abp")
     _pc_chains = set(merged[merged["protein"] == _pc_selected]["_abp_chain"])
     if _pc_selected:

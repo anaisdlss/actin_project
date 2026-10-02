@@ -104,7 +104,9 @@ def main():
     # Small structural audit displayed in the scientific interface section.
     audit = Path("reports/scientific_audit")
     for name in ("representative_geometry_summary.csv", "representative_geometry.csv",
-                 "representative_geometry_manifest.json"):
+                 "representative_geometry_manifest.json", "all_interface_geometry.csv",
+                 "all_interface_geometry_summary.csv", "all_interface_geometry_coverage.csv",
+                 "all_interface_geometry_manifest.json"):
         if (audit / name).exists():
             target = deploy / audit / name
             target.parent.mkdir(parents=True, exist_ok=True)

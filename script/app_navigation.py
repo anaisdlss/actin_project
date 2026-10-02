@@ -44,6 +44,7 @@ def run_navigation():
 PERSISTENT_SELECTIONS = {
     'actin_conservation_abp',
     'actin_ov_selbox',
+    'actin_surface_mode',
     'all_site_link',
     'chemistry_s1',
     'cons_asa',
@@ -92,4 +93,4 @@ PERSISTENT_SELECTIONS = {
     'surface_chem_site',
     'surface_chem_weight',
 }
-PERSISTENT_PREFIXES = ('abp3d_v2_', 'd_asa_thr_rel_', 'disco_cl_', 'fd_query_positions_', 'page_view_', 'pc3d_whole_', 'pc_surface_', 'pc_view_', 'pc_whole_', 'restype_toggle_', 's1posdet_')
+PERSISTENT_PREFIXES = ('abp3d_v2_', 'd_asa_thr_rel_', 'disco_cl_', 'fd_query_positions_', 'fd_combination_', 'page_view_', 'pc3d_whole_', 'pc_surface_', 'pc_view_', 'pc_whole_', 'restype_toggle_', 's1posdet_')

@@ -83,13 +83,15 @@ def _fmt(v, nd=2):
         return "—" if v is None else str(v)
 
 
-def render_residue_fiche(pp, canon):
-    """Fiche complète d'un résidu d'actin (position canonical)."""
+def render_residue_conservation(pp):
+    positions = pp["pos"].dropna(subset=["canon"]).canon.astype(int).tolist()
+    if not positions:
+        return
+    if st.session_state.get("actin_ov_selbox") not in positions:
+        st.session_state["actin_ov_selbox"] = positions[0]
+    canon = st.selectbox("Residue for conservation", positions, key="actin_ov_selbox",
+                         format_func=lambda c: f"{_pos_row(pp, c)['actin_aa']}{numbering.label(c)}")
     row = _pos_row(pp, canon)
-    aa = row["actin_aa"] if row is not None and pd.notna(row.get("actin_aa")) else "?"
-    st.markdown(f"### Residue **{aa}{numbering.label(canon)}**  (UniProt P60709 numbering)")
-
-    # ── Classe ProteoCast (en gros) + sensibilité vs moyenne ────────────────
     if row is not None:
         _cls = row.get("residue_class")
         # h4 (pas h2) : c'est un sous-titre du détail résidu, pas une grande
@@ -99,9 +101,7 @@ def render_residue_fiche(pp, canon):
         else:
             st.caption("ProteoCast classification unavailable for this position.")
 
-        # Conservation (positif, intuitif : PLUS HAUT = PLUS CONSERVÉ = plus
-        # sensible aux mutations). Référence = moyenne des résidus de SURFACE
-        # (RSA >= 0.20), pas le cœur enfoui (comparaison surface/surface).
+        # Model-derived sensitivity and the historical RSA-defined surface mean.
         _SURF = 0.20
         _p = pp["pos"]
         _rsa = pd.to_numeric(_p["rsa"], errors="coerce")
@@ -114,14 +114,28 @@ def render_residue_fiche(pp, canon):
         c3.metric("RSA in source table (%)", _fmt(_rsa_value * 100, 1),
                   help="Solvent accessibility from the conservation source table. This is distinct from interface buried ASA; the structure and method must be checked before treating it as filament accessibility.")
         c1.metric(
-            "Residue conservation", _fmt(this_c),
+            "Mutational sensitivity", _fmt(this_c),
             delta=(f"{float(this_c) - avg_surf:+.2f} vs mean surface"
                    if pd.notna(this_c) and pd.notna(avg_surf) else None))
-        c2.metric("Mean actin surface", _fmt(avg_surf))
-        if pd.notna(this_c) and pd.notna(avg_surf):
-            _more = float(this_c) > avg_surf
-    else:
-        pass
+        c2.metric("Mean sensitivity, RSA ≥ 0.2", _fmt(avg_surf))
+
+    st.caption("ProteoCast class and sensitivity describe the supplied model scores. The surface mean uses the legacy RSA source, whose structural context remains to be established.")
+
+
+def render_residue_fiche(pp, canon):
+    """Fiche complète d'un résidu d'actin (position canonical)."""
+    row = _pos_row(pp, canon)
+    aa = row["actin_aa"] if row is not None and pd.notna(row.get("actin_aa")) else "?"
+    st.markdown(f"### Residue **{aa}{numbering.label(canon)}**  (UniProt P60709 numbering)")
+
+    if row is not None:
+        rsa = pd.to_numeric(pd.Series([row.get("rsa")]), errors="coerce").iloc[0]
+        st.metric("RSA in source table (%)", _fmt(rsa * 100, 1),
+                  help="Legacy structural source; monomer/filament provenance is unresolved. See Conservation → Solvent accessibility for a separately documented calculation.")
+    from app_navigation import request_page
+    st.button("Conservation of this residue", key=f"residue_conservation_{canon}",
+              on_click=request_page, args=("actin-conservation", "Overview"),
+              kwargs={"actin_ov_selbox": canon})
 
     # ── aa d'actin à cette position (% + organismes) ───────────────────────
     aa_g = _actin_aa_by_organism(pp_mtimes())
@@ -864,7 +878,11 @@ def _actin_nabp_pdb(pp):
     return "\n".join(out), mx
 
 
-def _render_actin_overview_3d(pp, sel):
+def _render_actin_overview_3d(pp, sel, mode="Interaction type"):
+    if mode == "Interaction type":
+        from actin_contact_surface import render_contact_surface
+        render_contact_surface(_actin_pdb_text(), numbering.to_uniprot(sel))
+        return
     """Surface de l'actin colorée par nb d'ABP + résidu sélectionné surligné en vert."""
     pdb_nabp, mx = _actin_nabp_pdb(pp)
     if pdb_nabp is None:
@@ -915,6 +933,8 @@ def render_actin_overview(pp):
         st.session_state["actin_ov_selbox"] = x[0]
     sel = st.session_state["actin_ov_selbox"]
 
+    mode = st.radio("Surface colour", ["Interaction type", "Number of ABPs"],
+                    horizontal=True, key="actin_surface_mode")
     col3d, colbar = st.columns([1, 2])
 
     # Barre cliquable (rendue avant le 3D pour lire le clic, mais affichée à droite)
@@ -940,7 +960,7 @@ def render_actin_overview(pp):
 
     # 3D à gauche, avec le résidu sélectionné surligné
     with col3d:
-        _render_actin_overview_3d(pp, sel)
+        _render_actin_overview_3d(pp, sel, mode)
 
     # Sélecteur (repli / choix manuel) — piloté par la même clé que le clic
     st.selectbox(

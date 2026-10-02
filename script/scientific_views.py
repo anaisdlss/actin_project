@@ -46,6 +46,11 @@ def render_conservation():
     if not Path('data/proteocast/actin/4.query_ProteoCast.csv').exists():
         st.info('Import the actin ProteoCast source results to enable the complete profile.');return
     raw,scores=current_scores()
+    from residue_passport import build_passport, pp_mtimes
+    from residue_explorer import render_residue_conservation
+    passport = build_passport(pp_mtimes())
+    if passport is not None:
+        render_residue_conservation(passport)
     st.subheader('Actin mutational sensitivity and interface use')
     st.caption('Sensitivity = minus the mean of the 20 supplied ProteoCast scores at a position (including the unchanged amino acid). This is a model-derived '
                'mutational sensitivity proxy, not a clinical classification or a direct sequence-identity percentage. '
@@ -285,20 +290,45 @@ def render_interface_evidence():
                'BH correction is separate for sites and C70 clusters. PDB entries need not be independent '
                'experiments. Statistical association supports prioritization, not a validated major/minor '
                'biological label. The proposed 6685_1–4 reference group must also be checked structurally.')
-    download(sites,'Download site evidence','actin_interface_site_evidence.csv','ie_sites')
-    download(c70,'Download C70 evidence','actin_interface_c70_evidence.csv','ie_c70')
-    download(occurrences,'Download PDB–site–C70 correspondence','interface_occurrences.csv','ie_occurrences')
-    st.markdown('**Source names defining the context cohort**')
-    st.dataframe(matches,hide_index=True,width='stretch')
-    geometry=Path('reports/scientific_audit/representative_geometry_summary.csv')
-    if geometry.exists():
-        st.markdown('**Representative structural check**')
-        st.caption('One actin subunit is superimposed by its mapped C-alpha atoms; the neighbor is measured '
-                   'under the same transform, without refitting. 3J8A is the F-actin/tropomyosin reference; '
-                   '5YU8 and 6VAO are cofilin-decorated references. These examples support distinct pair '
-                   'geometries; they do not validate every cluster or prove a clash.')
-        st.dataframe(pd.read_csv(geometry),hide_index=True,width='stretch')
-        st.markdown('[3J8A](https://www.rcsb.org/structure/3J8A) · '
-                    '[5YU8](https://www.rcsb.org/structure/5YU8) · '
-                    '[6VAO](https://www.rcsb.org/structure/6VAO)')
-        download(pd.read_csv(geometry),'Download representative geometry check','representative_geometry.csv','ie_geometry')
+    with st.expander('Cohort definitions and evidence downloads'):
+        st.markdown('**Source names defining the context cohort**')
+        st.dataframe(matches,hide_index=True,width='stretch')
+        download(sites,'Download site evidence','actin_interface_site_evidence.csv','ie_sites')
+        download(c70,'Download C70 evidence','actin_interface_c70_evidence.csv','ie_c70')
+        download(occurrences,'Download PDB–site–C70 correspondence','interface_occurrences.csv','ie_occurrences')
+    audit = Path('reports/scientific_audit')
+    global_summary = audit/'all_interface_geometry_summary.csv'
+    global_manifest = audit/'all_interface_geometry_manifest.json'
+    if global_summary.exists() and global_manifest.exists():
+        manifest = json.loads(global_manifest.read_text())
+        import hashlib
+        if manifest.get('source_table_sha256') != hashlib.sha256(p.read_bytes()).hexdigest():
+            st.warning('The structural audit predates the current interaction dataset. The following results describe its saved snapshot and must be regenerated before interpreting the updated dataset.')
+        st.markdown('**Geometry across retained actin–actin interfaces**')
+        st.caption(f"{manifest['measured_pairs']} / {manifest['expected_pairs']} chain pairs measured; "
+                   f"{manifest['measured_clusters']} / {manifest['expected_clusters']} interface clusters. "
+                   'One actin is aligned to the reference; the neighbor is measured under the same transform. '
+                   'The nearest pair geometry is retained separately for 3J8A (with tropomyosin) and 5YU8 (with cofilin). '
+                   'Summaries use one median per PDB, so repeated chains do not increase a PDB weight.')
+        st.dataframe(pd.read_csv(global_summary), hide_index=True, width='stretch')
+        st.caption('Smaller RMSD indicates closer pair geometry. These descriptive measurements do not automatically assign major/minor labels, validate every assembly, or test steric compatibility with an ABP.')
+        with st.expander('Geometry measurements, coverage and methods'):
+            for name, label in [('all_interface_geometry.csv', 'All pair measurements'),
+                                ('all_interface_geometry_coverage.csv', 'Measured and unavailable pairs'),
+                                ('all_interface_geometry_summary.csv', 'Summary by cluster and reference')]:
+                download(pd.read_csv(audit/name), label, name, f'ie_{name}')
+            st.download_button('Reference structures, method and source fingerprints', global_manifest.read_bytes(),
+                               file_name=global_manifest.name, key='ie_global_manifest')
+    with st.expander('Original three-structure example'):
+        geometry=Path('reports/scientific_audit/representative_geometry_summary.csv')
+        if geometry.exists():
+            st.markdown('**Representative structural check**')
+            st.caption('One actin subunit is superimposed by its mapped C-alpha atoms; the neighbor is measured '
+                       'under the same transform, without refitting. 3J8A is the F-actin/tropomyosin reference; '
+                       '5YU8 and 6VAO are cofilin-decorated references. These examples support distinct pair '
+                       'geometries; they do not validate every cluster or prove a clash.')
+            st.dataframe(pd.read_csv(geometry),hide_index=True,width='stretch')
+            st.markdown('[3J8A](https://www.rcsb.org/structure/3J8A) · '
+                        '[5YU8](https://www.rcsb.org/structure/5YU8) · '
+                        '[6VAO](https://www.rcsb.org/structure/6VAO)')
+            download(pd.read_csv(geometry),'Download representative geometry check','representative_geometry.csv','ie_geometry')

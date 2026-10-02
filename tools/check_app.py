@@ -68,6 +68,8 @@ assert not any(e.label == 'Show the network graph' for e in app.expander)
 
 page('residue-level', 'Residue explorer')
 assert len(app.selectbox(key='actin_ov_selbox').options) == 375
+assert not any('ProteoCast class:' in m.value for m in app.markdown)
+assert app.radio(key='actin_surface_mode').value == 'Interaction type'
 app.selectbox(key='actin_ov_selbox').set_value(51)  # P60709 M47
 check('manual residue M47')
 page('summary-tables', 'Structures')
@@ -92,14 +94,16 @@ app.multiselect(key='fp_aligned_abps').set_value(['Cofilin-1'])
 check('aligned ABP footprints')
 choose_view('actin-actin-interfaces', 'Binding sites')
 assert not any(e.label == 'Show binding-site table' for e in app.expander)
-app.selectbox(key='homo_site_link').set_value('6685_3')
-app.button(key='homo_site_open').click()
-check('mixed binding-site navigation')
+app.selectbox(key='sel_s1').set_value('6685_3')
+check('mixed binding-site details stay in actin–actin page')
 assert app.selectbox(key='sel_s1').value == '6685_3'
-assert app.radio(key='page_view_comparative-binding-sites').value == 'Binding-site clusters'
-# AppTest doesn't update its page hash after an application's st.switch_page;
-# synchronize it with the already asserted destination before the next event.
-app.switch_page('views/comparative-binding-sites.py')
+assert app.header[0].value == 'Actin-actin interfaces'
+assert not any(b.key == 'homo_site_open' for b in app.button)
+assert len(app.get('plotly_chart')) > 0
+page('abp-actin-interfaces', 'Binding sites')
+assert app.selectbox(key='sel_s1').value == '6685_3'
+assert app.header[0].value == 'ABP-actin interfaces'
+page('comparative-binding-sites', 'Binding-site clusters')
 # The existing graph's hidden bridge must now open the actual ABP page.
 bridge = next(b for b in app.button if b.key and b.key.startswith('__ab_') and b.label == 'Cofilin-1')
 bridge.click()
@@ -144,6 +148,8 @@ if Path('data/human_variants/manifest.json').exists():
     app.selectbox(key='hv_cross_pair').set_value(('ACTG2', 'ACTA1'))
     check('cross-gene observations and aligned conflicting-variant tracks')
 page('actin-conservation', 'Overview')
+assert app.selectbox(key='actin_ov_selbox').value == 380
+assert any('ProteoCast class:' in m.value for m in app.markdown)
 app.slider(key='cons_asa').set_value(100.0)
 check('empty conservation footprints')
 page('summary-tables', 'Dataset checks')

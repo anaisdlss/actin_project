@@ -9,13 +9,12 @@ reference for the methods and the vocabulary.
 ## 1. What this app is
 
 A structural analysis of **actin** and its **actin-binding proteins (ABPs)**,
-built from every 3D co-structure of actin available in
+built from the retained snapshot of actin co-structures retrieved from
 [PPI3D](https://bioinformatics.lt/ppi3d) (actin = UniProt **P60709**).
 
 For each 3D structure the app looks at **who touches actin, where, and how** —
 which residues form the interface, how buried they are, how the binding sites
-group together, whether partners compete or cooperate, and how conserved the
-contacted positions are.
+group together, where partner footprints overlap, which partners occur in the same structures, and the model-derived mutational sensitivity of contacted positions.
 
 ---
 
@@ -67,11 +66,11 @@ The full dataset is regenerated locally by a **9-step pipeline** (button
 | **Buried %ASA** | For one residue: the fraction of its surface **buried** at the interface. **0 % = fully exposed, 100 % = fully buried.** The more buried, the more central to the contact. In heatmaps: pale = little buried, dark red = strongly buried. |
 | **Buried contact area (Å²)** | The physical contact surface between **two** specific residues (one on each side). |
 | **Binding site (S1) cluster** | Groups of actin surface patches used by partners (labels like `6685_2`). Two partners on the same binding-site cluster use the **same region of actin**. |
-| **C70 cluster** (`cluster_data_70`) | Structural clustering of whole **interactions** at a 70 % threshold — interactions in the same C70 cluster have the **same 3D interface geometry** (labels like `0_7797_0`). |
+| **C70 cluster** (`cluster_data_70`) | Interface-cluster identifier from the existing PPI3D workflow (for example `0_7797_0`). Membership does not establish identical geometry; the structural audit measures pair geometry separately. |
 | **Actin residue number (UniProt P60709)** | Actin residues are numbered as in human beta-actin (UniProt P60709, 1–375), whatever the PDB's own numbering. Internally, the app aligns every actin chain (MAFFT) and converts the alignment column to the P60709 residue; the few alignment columns absent from P60709 (N-terminal insertion of alpha-actins, one internal insertion) are shown as "ins.". Partner (ABP) positions are still alignment columns of their own sequence cluster. |
-| **Conservation** | Evolutionary conservation of an actin position (ProteoCast/GEMME): higher = more conserved = less tolerant to mutation. |
-| **Competition** | Two ABPs **compete** if their footprints on actin overlap (their C70 clusters cover the same region beyond a chosen %). |
-| **Cooperation** | Two ABPs **cooperate** if they are **co-present in the same PDB** (they coexist on actin at the same time). |
+| **ProteoCast sensitivity** | Negative mean of the 20 supplied substitution scores at a position, including the unchanged amino acid. A model-derived measure of mutational constraint, not sequence identity or a clinical classification. |
+| **Competition network** | Overlap of observed ABP footprints. This suggests possible competition but does not prove a steric clash or competitive binding. |
+| **Cooperation network** | Co-presence of ABPs in a retained PDB entry. This describes structural co-occurrence, not demonstrated cooperative binding. |
 | **Footprint** | The set of actin residues a given ABP contacts. |
 | **Representative pair** | For a cluster, the single most frequent structure shown in the 3D viewer / sequences (so you look at one clear example, not an average). |
 
@@ -99,9 +98,9 @@ same browser session. Reloading the browser starts a new Streamlit session.
 | **Human actin variants** | Gene/category selection, substitution maps, footprint summaries and exploratory associations. |
 | **ABP conservation** | **Profiles**, **3D structure**, **Sequence alignments**. Missing results are identified explicitly. |
 | **Physico-chemical properties of the interface** | **Actin surface chemistry**, **By binding site** (contact chemistry, alignments and structural comparisons). |
-| **Homolog search** | Existing FoldDisco candidates, query motifs and annotations for the selected ABP. |
+| **Homolog search** | Historical results and tracked searches for single or combined ABP motifs; motif coordinates and provenance are retained. New submissions run in the full project. |
 
-**Explore selected cluster** opens the matching comparative view. Clicking a
+Selecting a binding site in **Actin–actin interfaces** or **ABP–actin interfaces** displays its contact details, heatmap, network and 3D view on that same page. Clicking a
 binding-site heatmap cell opens that cluster with the clicked residue selected
 when that position has contact details in the cluster.
 In the global binding-site network, a site node selects its details and an ABP
@@ -154,24 +153,15 @@ Because the interface is kept clean, the meaning of every element is listed here
   canonical position, %ASA and interaction count.
 - **Interface sequences coloured by %ASA** — the linear version of the same
   information: each interface residue is shaded by how buried it is.
-- **Conservation plot (ProteoCast on actin)** — grey line = conservation along
-  the whole actin sequence; red dots = the positions the ABP contacts. Tells you
-  whether a partner binds **conserved** (functionally important) or **variable**
-  regions of actin.
-- **Footprint vs surface** (ProteoCast panel) — *higher* / *lower*: is the
-  actin footprint of this ABP more or less conserved than the rest of the actin
-  surface? A Mann-Whitney p-value quantifies it.
-- **Residue conservation … vs mean surface** — for one actin position: its
-  conservation and how far it sits above/below the average surface residue.
-- **ProteoCast mutational landscape** — per position of the ABP, how sensitive
-  it is to mutation (dark = deleterious/constrained). The green track marks the
-  positions that touch actin, so you see if the binding interface is under
-  constraint.
-- **Competition / Cooperation networks** — an edge means two ABPs compete
-  (overlapping footprints) or cooperate (co-present in a PDB).
-- **FoldDisco "same motif" reading** — whether two ABPs (or an ABP vs the PDB)
-  share the same 3D interface geometry: coverage (% shared), normalised score
-  (quality 0-1), RMSD (fit). A low RMSD on few residues is *inconclusive*.
+- **Conservation profiles** — model-derived sensitivity along actin, with the selected ABP footprint and structural accessibility shown separately. Comparisons and p-values are exploratory; residues are not independent observations.
+- **Residue sensitivity vs surface mean** — located in **Actin binding sites conservation**. The selected residue is retained when opening **Conservation of this residue** from the contact explorer. The legacy surface mean uses RSA ≥ 0.2; that source's monomer/filament provenance remains unresolved.
+- **Interaction-type surface** — orange: positive buried-ASA observations with actin only; blue: ABPs only; purple: both; gray: no observed positive contact or unmapped atoms. Both sides of actin–actin interactions are included. Black sticks locate the selected residue. Absence of an observed contact does not establish absence of binding.
+- **ABP landscape** — scores cover the whole supplied query, with observed contacts and annotated domains on aligned tracks. Missing scores remain missing.
+- **Competition / Cooperation networks** — observed footprint overlap / co-presence, respectively. Neither establishes a functional mechanism by itself.
+- **FoldDisco results** — coverage, raw score and RMSD describe a structural-motif match. Historical normalized scores use the stated source-labelled or best-hit denominator, can exceed one, and are not probabilities. A low RMSD on few residues is inconclusive.
+- **Combined FoldDisco motifs** — choose additional sites observed on one ABP chain. Coordinates from different structures are never joined. Edit the PDB residue list explicitly when necessary. The [public server](https://github.com/soedinglab/MMseqs2-App/blob/master/frontend/FoldDiscoSearch.vue) limits motifs to 32 residues; larger motifs remain exportable for a local search. Searches never launch just by changing a selector.
+- **Tracked searches** — new results retain the exact submitted PDB, residue list, database names, ticket and timestamps. Complete with no returned alignments, failed, pending and unsupported are distinct states. Saved historical results remain separate. Returned hits may be capped by the service and are not proof of homology or actin binding.
+- **Interface geometry audit** — all retained homo pairs with sufficient local coordinates are compared to 3J8A (with tropomyosin) and 5YU8 (with cofilin). One subunit is fitted; the second is measured under that transform. Results are summarized once per PDB and remain descriptive until biological interpretation is reviewed.
 
 ---
 
