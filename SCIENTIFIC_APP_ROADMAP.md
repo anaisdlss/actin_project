@@ -1,5 +1,7 @@
 # Diagnostic et première réorganisation de l’application Actin–ABP
 
+> **Statut actuel :** ce fichier conserve le diagnostic historique. Le [bilan final du 2 octobre](SCIENTIFIC_ANALYSES.md) et les [contrôles](VALIDATION.md) priment sur les tâches indiquées comme manquantes ci-dessous. Ils recensent les corrections FoldDisco, les calculs locaux sur toutes les ABP et les limites scientifiques restantes.
+
 Diagnostic du 29 septembre 2026, fondé sur les deux dépôts du Bureau et sur le document de Rémi du 28 septembre 2026. Le présent lot commence la réorganisation demandée ; il ne réalise pas l’ensemble du programme scientifique du document.
 
 ## Organisation des deux dépôts

@@ -41,11 +41,11 @@ from pathlib import Path
 
 import pandas as pd
 import requests
-from Bio.PDB import PDBParser, MMCIFParser, PDBIO, Select
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'script'))
-from folddisco_jobs import alignment_rows
+from folddisco_jobs import alignment_rows, chain_pdb_text
+from folddisco_audit import query_chain, residue_token, validate_motif, read_chain_ca
 OUT = ROOT / "data/exports/abp_site_domain"
 ASM = ROOT / "data/filtered/details/structures_files/assembly"
 CHAINS = OUT / "abp_chains_disco"          # chaînes ABP extraites par (pdb, chaîne)
@@ -65,40 +65,17 @@ RETRY_TRIES = 6              # tentatives sur 429/5xx (backoff exponentiel)
 
 
 # ── extraction de la chaîne ABP depuis l'assembly (cache) ────────────────────
-class _ChainSel(Select):
-    def __init__(self, cid):
-        self.cid = cid
-
-    def accept_chain(self, chain):
-        return chain.id == self.cid
-
-    def accept_residue(self, residue):
-        return residue.id[0] == " "        # acides aminés seulement
-
-
-_io = PDBIO()
-
-
 def chain_pdb(iid, pdb, chain):
     """Renvoie le chemin de la chaîne ABP (extraite/caché) ; None si échec."""
-    dest = CHAINS / f"{pdb}_{chain}.pdb"
-    if dest.exists():
-        return dest
+    dest = CHAINS / f"{pdb}_{chain}_query.pdb"
     base = f"{pdb}"
     f = ASM / (base + ".pdb")
-    parser = PDBParser(QUIET=True)
     if not f.exists():
         f = ASM / (base + ".cif")
-        parser = MMCIFParser(QUIET=True)
     if not f.exists():
         return None
     try:
-        struct = parser.get_structure(base, str(f))
-        model = next(iter(struct))
-        if chain not in [c.id for c in model]:
-            return None
-        _io.set_structure(struct)
-        _io.save(str(dest), _ChainSel(chain))
+        dest.write_text(chain_pdb_text(f,str(chain)))
         return dest
     except Exception:
         return None
@@ -229,11 +206,13 @@ def build_motifs():
         r = g.sort_values("res_num").iloc[0]          # meilleure résolution
         sub = res[(res.interaction_id == int(r.interaction_id))
                   & (res.chain == r.chain)]
-        contacts = sorted(set(pd.to_numeric(
-            sub.residue_number_structure, errors="coerce").dropna().astype(int)))
-        if len(contacts) < 3:
+        contacts = [residue_token(value) for value in sub.residue_number_structure]
+        checked = validate_motif(','.join(p if p is not None else '?' for p in contacts),
+                                 [p for p in contacts if p is not None],str(r.abp_chain))
+        if not checked['query']:
+            print(f"Skipped unsupported motif {abp}/{cl}: {checked['errors']}")
             continue
-        motif = ",".join(f"{r.abp_chain}{c}" for c in contacts)
+        contacts=checked['positions']; motif=checked['query']
         out.append((abp, cl, str(r.pdb).lower(), uni.get(abp), len(contacts),
                     motif, int(r.interaction_id), r.pdb, r.abp_chain))
     return out
@@ -267,12 +246,20 @@ def main():
         if (abp, cl) in done:
             print(f"[{i}/{len(jobs)}] {abp} @ {cl} — déjà fait, saut")
             continue
+        if qsize > 32:
+            print(f"[{i}/{len(jobs)}] {abp} @ {cl}: {qsize} residues exceeds the public limit; export for local search.")
+            continue
         print(f"[{i}/{len(jobs)}] {abp} @ {cl} ({qsize} rés.) — soumission…",
               flush=True)
         try:
             cpath = chain_pdb(iid, pdb, ab_chain)     # extraction paresseuse
             if cpath is None:
                 print("    chaîne introuvable — ignoré", flush=True)
+                continue
+            positions=[token[1:] for token in motif.split(',')]
+            checked=validate_motif(','.join(positions),read_chain_ca(cpath,query_chain(str(ab_chain))).position,str(ab_chain))
+            if checked['errors']:
+                print(f"Invalid motif: {checked['errors']}",flush=True)
                 continue
             tid = submit(cpath, motif)
             status = wait_complete(tid)

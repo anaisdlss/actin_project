@@ -1,0 +1,138 @@
+[
+  {
+    "abp": "Adducin 1",
+    "site": "6685_152",
+    "old_request": "074b8ab8dc0cb06dbe208f7951cfc72f32d9236fd146667ed8fae02572a773df",
+    "new_request": "aa53f4da97cc3d34903eb40d47fd82c93088f19d357dee96e9061c94d0b76db7",
+    "state": "complete",
+    "hit_rows": 2000
+  },
+  {
+    "abp": "Adducin 1",
+    "site": "6685_153",
+    "old_request": "08da6f4864cc151d26a67ff0904d45ab3b9328e9f5a7705415a1045e8a47b609",
+    "new_request": "2450f23fd193f00772ed980fafa4a9614c4155533ae856c45178cb66b1575b2c",
+    "state": "complete",
+    "hit_rows": 2000
+  },
+  {
+    "abp": "Adducin 1",
+    "site": "6685_150",
+    "old_request": "0c06d5c890b1321f8dda1e3d19041010622b31cafca823c28e06ddebbab009ea",
+    "new_request": "57a23cd82cd076dfb27990d5ce3e30fe259377c9856ccab6681a5a94277eea1a",
+    "state": "complete",
+    "hit_rows": 2000
+  },
+  {
+    "abp": "Beta-adducin",
+    "site": "6685_151",
+    "old_request": "11152bf1e2ce6f4ed60e8c9a9327a470a3e1368581fb1710540042dbde49fbf4",
+    "new_request": "dd6addcd2e431973a97204d336935011bd169990c47ee688b8ddb25fceeff01f",
+    "state": "complete",
+    "hit_rows": 2000
+  },
+  {
+    "abp": "Beta-adducin",
+    "site": "6685_150",
+    "old_request": "11227db06823f1eb9fd09ee03183b15abdcc64b9ca20eaaf2998e37f8c74f7fd",
+    "new_request": "7df056d80236a4d61809ff1e07f4ad8cd6bb07e0c1bfc2092827281c6ae79c12",
+    "state": "complete",
+    "hit_rows": 2000
+  },
+  {
+    "abp": "Adducin 1",
+    "site": "6685_151",
+    "old_request": "25f559d263b9aa3df1a9cf8502eae4a2dcadd3a3b381ff7f63cc206d908992c6",
+    "new_request": "6f20c817cd69385d9bc857ee470d767b97c21769484bae42d2b103466fa5c732",
+    "state": "complete",
+    "hit_rows": 2000
+  },
+  {
+    "abp": "Dematin actin binding protein",
+    "site": "6685_167",
+    "old_request": "2c01328182ba4bbb2a58e30695a39e06316a19e18c3fc576360b429ec17fac0e",
+    "new_request": "14f7a5c1ab10e0b13bf6d05a6aadc925657cef34f6e6e310c0163718e1c48bce",
+    "state": "complete",
+    "hit_rows": 2000
+  },
+  {
+    "abp": "Dematin actin binding protein",
+    "site": "6685_159",
+    "old_request": "37bb457e12a00a8d61761811713138e995cb4a9bd8ba7641b4012f11ae25cb7c",
+    "new_request": "3ba5bdcaf5d73f944aaa7d009d40a69f1af4238c54f64fb3c38aed3b9317fe4a",
+    "state": "complete",
+    "hit_rows": 2000
+  },
+  {
+    "abp": "Dematin actin binding protein",
+    "site": "6685_160",
+    "old_request": "3f2ff2531a809977655365d1bc06014366e5d29162191744b7a7e6cc30b24a7c",
+    "new_request": "b06c1bff46842c6666b52f066d009034a2e90f56ee5e0aa43e00b84a535a7fba",
+    "state": "complete",
+    "hit_rows": 2000
+  },
+  {
+    "abp": "Adducin 1",
+    "site": "6685_154",
+    "old_request": "85fe97e3c38f74db3f8e520eee9d4186540e93ba14a335c2eecab405fe6e72ca",
+    "new_request": "bc921d7f2d118d0fc41a7eb0e09b392f9ddb0d1dc81bb83983249b8b8a8e0ce3",
+    "state": "complete",
+    "hit_rows": 2000
+  },
+  {
+    "abp": "Beta-adducin",
+    "site": "6685_152",
+    "old_request": "8839d318568fd37326d80885cad07df358ef9f7f475f6d17e5949efe29177372",
+    "new_request": "6a267ec7639512a923a3e23baf53ce3cb85f2ba7d721eb29705aaa2044510941",
+    "state": "complete",
+    "hit_rows": 2000
+  },
+  {
+    "abp": "Dematin actin binding protein",
+    "site": "6685_168",
+    "old_request": "9abbc8c2be70c6e1c9f0d66ca509acb53fd5fde84527716b5ff921a9962fec03",
+    "new_request": "121cd0894c6324b9d81ad75e2d235f1d445227ba1e316538cc67b4015fa6ba9d",
+    "state": "complete",
+    "hit_rows": 2000
+  },
+  {
+    "abp": "Beta-adducin",
+    "site": "6685_166",
+    "old_request": "9b8553563f7d8d42ee9caddea111e615569219fcf37f62f1e5aa0a8edd6a7b3a",
+    "new_request": "2a5a96bb8280b9bedd58d1a251ab8a38c60a212762f93923ab3e1e8ca09d5522",
+    "state": "complete",
+    "hit_rows": 2000
+  },
+  {
+    "abp": "Beta-adducin",
+    "site": "6685_156",
+    "old_request": "adce18bf5ff34a54069a105ecedb8c759214e891699de9777e680e8242913fbc",
+    "new_request": "a1b01577ce2fe7638485bfc234a99b18a4127b390c3d3a72f9b5ba3081d260f1",
+    "state": "complete",
+    "hit_rows": 2000
+  },
+  {
+    "abp": "Beta-adducin",
+    "site": "6685_155",
+    "old_request": "ee35d66493ded229758ad85d5322847043bc1f79ab5b4b36150dea86c3a6aaeb",
+    "new_request": "d09add662f8b364c43bdaeb102091242ad2b09fc85f75be1b1973f80d46e13a5",
+    "state": "unsupported",
+    "hit_rows": null
+  },
+  {
+    "abp": "Dematin actin binding protein",
+    "site": "6685_158",
+    "old_request": "f2d4082784232202d8bb60c75eb516e77665d2806f41cf649cc390a420185009",
+    "new_request": "6ba45e93bc0b0b54ce949eb77a6f9bd2f65f583dfb9267b6252861c886db3ef5",
+    "state": "complete",
+    "hit_rows": 2000
+  },
+  {
+    "abp": "Beta-adducin",
+    "site": "6685_157",
+    "old_request": "faab3e965c87589879abf04179f02526c2a1f9d79b22a443478fc0bc1f8aa44e",
+    "new_request": "8e409c954a0413781b38ac9c29f8bf24dce73a65ba574445eaad554227cf0f3d",
+    "state": "complete",
+    "hit_rows": 2000
+  }
+]

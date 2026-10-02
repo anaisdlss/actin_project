@@ -10,7 +10,7 @@ import re
 import pandas as pd
 import requests
 
-from folddisco_audit import residue_token, residue_order, read_chain_ca, validate_motif
+from folddisco_audit import residue_token, residue_order, read_chain_ca, validate_motif, query_chain
 
 BASE = 'https://search.foldseek.com'
 DATABASES = ['pdb_folddisco', 'afdb-proteome_folddisco']
@@ -50,16 +50,18 @@ def combine_sites(sites, residues, abp, clusters):
 def chain_pdb_text(path, chain):
     from Bio.PDB import PDBParser, MMCIFParser, PDBIO, Select
     from Bio.PDB.Polypeptide import protein_letters_3to1_extended
+    export_chain = query_chain(chain)
     class Chain(Select):
-        def accept_chain(self, c): return c.id == chain
+        def accept_chain(self, c): return c.id == export_chain
         def accept_residue(self, r): return r.resname in protein_letters_3to1_extended
         def accept_atom(self, a): return a.element not in {'H', 'D'} and (not a.is_disordered() or a.get_altloc() in {' ', 'A'})
-    if len(chain) != 1:
-        raise ValueError('The FoldDisco PDB export requires a one-character chain identifier.')
     parser = MMCIFParser(QUIET=True) if Path(path).suffix == '.cif' else PDBParser(QUIET=True)
     model = next(iter(parser.get_structure('query', str(path))))
     if chain not in model: raise ValueError('Selected chain is absent from the structure.')
-    io = PDBIO(); io.set_structure(model); target = StringIO(); io.save(target, Chain())
+    # Isolate first, so remapping a numeric chain to A cannot collide with an
+    # actin chain A from the original assembly.
+    selected = model[chain].copy(); selected.detach_parent(); selected.id = export_chain
+    io = PDBIO(); io.set_structure(selected); target = StringIO(); io.save(target, Chain())
     return target.getvalue()
 
 
@@ -78,6 +80,7 @@ def prepare(row, positions, path, root=JOBS):
     if file.exists(): return folder, json.loads(file.read_text())
     source = {k: None if isinstance(v, float) and not math.isfinite(v) else v for k, v in row.items()}
     record = dict(**request, request_id=identity, source=source, positions=checked['positions'],
+                  submitted_chain=checked['submitted_chain'],
                   state='prepared', endpoint=BASE, created_utc=datetime.now(timezone.utc).isoformat())
     (folder/'query.pdb').write_text(text)
     save(folder, record)
@@ -167,6 +170,13 @@ def result_table(folder):
     for result in json.loads(path.read_text()).get('results', []):
         for hit in alignment_rows(result.get('alignments')):
             row = {'database': result.get('db'), **hit}
+            target_name = Path(str(hit.get('target', ''))).name
+            accession = re.fullmatch(r'AF-(.+)-F\d+-model_v\d+\.pdb', target_name)
+            pdb = re.fullmatch(r'([A-Za-z0-9]{4})\.(?:ent|pdb|cif)', target_name)
+            row['db'] = 'afdb' if str(result.get('db', '')).startswith('afdb') else 'pdb' if str(result.get('db', '')).startswith('pdb') else ''
+            row['target_id'] = accession[1] if accession and row['db']=='afdb' else pdb[1].upper() if pdb and row['db']=='pdb' else ''
+            row['Record'] = (f"https://alphafold.ebi.ac.uk/entry/{row['target_id']}" if row['db']=='afdb'
+                             else f"https://www.rcsb.org/structure/{row['target_id']}") if row['target_id'] else None
             row['query_size'] = len(record['positions'])
             try: row['coverage'] = float(hit['nodecount']) / len(record['positions'])
             except (KeyError, ValueError, TypeError): row['coverage'] = None

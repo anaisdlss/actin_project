@@ -2213,6 +2213,7 @@ def render_s1_cluster(kind="all"):
 
 
 def render_c70_cluster():
+    st.caption('C70 refers to the PPI3D sequence-identity clustering level (70%), followed by interface clustering. It does not mean 70% identical contacts or an identical partner orientation. Binding-site clusters compare one protein surface; interface clusters describe both partners.')
     if os.path.exists(PATCHES_C70_CSV):
         df_c70 = read_csv(PATCHES_C70_CSV)
 

@@ -1,0 +1,31 @@
+{
+  "audit_utc": "2026-10-02T13:52:45.911751+00:00",
+  "records": [
+    {
+      "pdb": "38JL",
+      "entity": 3,
+      "source_url": "https://data.rcsb.org/rest/v1/core/polymer_entity/38JL/3",
+      "sequence": "MASGVKVDPSCKNAYDLLHNKHQHSYIIFKIDKNDTAIVVEKVGEKNAPYAEFVEEMKKLVEDGKECRYAAVDVEVTVQRQGAEGTSTLNKVIFVQYCPDNAPVRRRMLYASSVRALKASLGLESLFQVQASEMSDLDEKSVKSDLMSNQRI",
+      "sequence_length": 152,
+      "sha256": "0a0a581d84f59730adeb18366dbf70bb9f041b15d57a5eada4e10c11402c6b2a",
+      "rcsb_uniprot_ids": []
+    },
+    {
+      "pdb": "38KL",
+      "entity": 3,
+      "source_url": "https://data.rcsb.org/rest/v1/core/polymer_entity/38KL/3",
+      "sequence": "MASGVKVDPSCKNAYDLLHNKHQHSYIIFKIDKNDTAIVVEKVGEKNAPYAEFVEEMKKLVEDGKECRYAAVDVEVTVQRQGAEGTSTLNKVIFVQYCPDNAPVRRRMLYASSVRALKASLGLESLFQVQASEMSDLDEKSVKSDLMSNQRI",
+      "sequence_length": 152,
+      "sha256": "c65005fe3fb25043e4580d06ef48385c0bd7fb1a6e8dc43c2099edbd24c626bd",
+      "rcsb_uniprot_ids": []
+    }
+  ],
+  "candidate": {
+    "accession": "Q07750",
+    "source_url": "https://rest.uniprot.org/uniprotkb/Q07750.json",
+    "sequence": "MSSGVMVDPDVQTSFQKLSEGRKEYRYIIFKIDENKVIVEAAVTQDQLGITGDDYDDSSKAAFDKFVEDVKSRTDNLTDCRYAVFDFKFTCSRVGAGTSKMDKIIFLQICPDGASIKKKMVYASSAAAIKTSLGTGKILQFQVSDESEMSHKELLNKLGEKYGDH",
+    "sequence_length": 165,
+    "sha256": "acd8d7e2bd9a9a6540cb5253c4a8b5cb1ecca72c4521c548cf98b135b3b8c65d"
+  },
+  "decision": "Unresolved: RCSB entity sequences are 152 aa; the current candidate UniProt sequence is 165 aa and differs. Do not assign an accession or reuse sensitivity scores without exact construct/isoform mapping. Existing manifests are unchanged."
+}

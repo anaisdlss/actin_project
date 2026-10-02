@@ -66,7 +66,7 @@ The full dataset is regenerated locally by a **9-step pipeline** (button
 | **Buried %ASA** | For one residue: the fraction of its surface **buried** at the interface. **0 % = fully exposed, 100 % = fully buried.** The more buried, the more central to the contact. In heatmaps: pale = little buried, dark red = strongly buried. |
 | **Buried contact area (Å²)** | The physical contact surface between **two** specific residues (one on each side). |
 | **Binding site (S1) cluster** | Groups of actin surface patches used by partners (labels like `6685_2`). Two partners on the same binding-site cluster use the **same region of actin**. |
-| **C70 cluster** (`cluster_data_70`) | Interface-cluster identifier from the existing PPI3D workflow (for example `0_7797_0`). Membership does not establish identical geometry; the structural audit measures pair geometry separately. |
+| **C70 cluster** (`cluster_data_70`) | Interface cluster from PPI3D (for example `0_7797_0`). The 70 refers to the upstream sequence-identity clustering level, not 70% identical contacts. Interfaces are then grouped by contact-area similarity. Membership does not establish identical geometry. |
 | **Actin residue number (UniProt P60709)** | Actin residues are numbered as in human beta-actin (UniProt P60709, 1–375), whatever the PDB's own numbering. Internally, the app aligns every actin chain (MAFFT) and converts the alignment column to the P60709 residue; the few alignment columns absent from P60709 (N-terminal insertion of alpha-actins, one internal insertion) are shown as "ins.". Partner (ABP) positions are still alignment columns of their own sequence cluster. |
 | **ProteoCast sensitivity** | Negative mean of the 20 supplied substitution scores at a position, including the unchanged amino acid. A model-derived measure of mutational constraint, not sequence identity or a clinical classification. |
 | **Competition network** | Overlap of observed ABP footprints. This suggests possible competition but does not prove a steric clash or competitive binding. |
@@ -187,3 +187,14 @@ Because the interface is kept clean, the meaning of every element is listed here
 - FoldDisco query positions refer to the selected ABP's PDB chain. The resolved sequence and 3D motif identify the selected residues. Distant sequence positions may be neighbours in 3D. The public server limit remains 32 residues; the app never truncates motifs automatically.
 
 These display changes do not resolve the remaining scientific validations: biological interpretation of major/minor interfaces, provenance of the legacy RSA reference, unavailable ProteoCast results, and positive/negative control validation of FoldDisco candidates. Sequence conservation, model sensitivity, structural similarity and clinical annotation remain distinct concepts.
+
+
+## Accessing FoldDisco results
+
+In **Homolog search**, select an ABP and its actin site. **Saved results** shows a tracked result when available, with a downloadable CSV, links to PDB/AlphaFold records and the exact query provenance. Editing the preparation below does not overwrite results. **Historical results** contains the original exports; exact historical query provenance is incomplete. An empty inventory does not mean a negative search.
+
+**Local validation: known ABPs and observed actin contacts** displays the completed searches against representative ABP chains already in this dataset. This includes motifs longer than the public server's 32-residue limit. It is a finite local control panel, not a search of the full PDB or AlphaFold databases. The contact columns test whether matched target residues fall on the target's observed actin interface at the same site or at any recorded site. Partial self-matches are flagged. These checks do not establish evolutionary homology or negative-control specificity.
+
+**Prepare or edit a new motif** shows the resolved sequence, selected residues and 3D motif. The research version can submit a new motif of at most 32 residues; the public version displays saved results. Export both the motif text and its matching prepared PDB: a numeric source chain is renamed A in this export because the FoldDisco query parser only accepts letter chain prefixes. Coordinates and residue numbers are unchanged. Invalid old queries are retained for audit and are not negative results.
+
+In **Actin-actin interfaces → Compare footprints**, the **3D screening** panel reports distances from rigidly placed ABPs to neighbouring actins in two finite reference filaments. Proximity counts are warning signals, not validated predictions of steric competition. Their cutoffs, fit quality, source structures and limitations accompany the table and downloads.

@@ -71,6 +71,15 @@ def read_chain_ca(path,chain):
     return pd.DataFrame(rows,columns=['position','residue','x','y','z'])
 
 
+def query_chain(chain):
+    """FoldDisco's parser only recognizes ASCII letters as chain prefixes.
+
+    A single extracted numeric/symbol chain is exported as A. Residue numbers
+    and coordinates are unchanged, and the original chain is kept in provenance.
+    """
+    return chain if re.fullmatch(r'[A-Za-z]', str(chain)) else 'A'
+
+
 def validate_motif(text,available,chain):
     """Validate local PDB positions without claiming external FoldDisco execution."""
     parts=[part for part in re.split(r'[,;\s]+',str(text).strip()) if part]
@@ -82,11 +91,13 @@ def validate_motif(text,available,chain):
     absent=sorted(set(positions)-set(available),key=residue_order)
     if absent:errors.append('No resolved C-alpha atom in the selected chain: '+', '.join(absent))
     if len(positions)<3:errors.append('At least three distinct resolved residues are required to prepare a motif.')
-    compatible=len(chain)==1 and all(re.fullmatch(r'-?\d+',p) for p in positions)
-    # Scripts13/14 only serialize one-character chains followed by integer positions.
-    # Preserve insertion codes in the JSON instead of silently changing the query.
-    query=','.join(f'{chain}{p}' for p in positions) if compatible and not errors else None
+    compatible=all(re.fullmatch(r'\d+',p) for p in positions)
+    # Negative numbers and insertion codes are not supported by the upstream
+    # unsigned-integer/range parser. Never silently strip or renumber them.
+    export_chain=query_chain(chain)
+    query=','.join(f'{export_chain}{p}' for p in positions) if compatible and not errors else None
     return {'positions':positions,'errors':errors,'query':query,
+            'submitted_chain':export_chain,
             'text_export_supported':compatible and not errors,'duplicate_tokens_removed':len(parsed)-len(set(parsed))}
 
 
@@ -150,6 +161,7 @@ def prepared_query_json(row,validation,path):
     return json.dumps(dict(status='Prepared locally; not submitted or recalculated',
         query_abp=row['query_abp'],query_cluster=row['query_cluster'],source_pdb=row['source_pdb'],
         source_chain=row['source_chain'],interaction_id=int(row['interaction_id']),
+        submitted_chain=validation['submitted_chain'],
         selected_sites=row.get('clusters',[row['query_cluster']]),
         interaction_ids=row.get('interaction_ids',[int(row['interaction_id'])]),
         numbering='PDB author residue identifiers in the selected chain; not P60709',

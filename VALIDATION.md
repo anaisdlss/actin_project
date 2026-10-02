@@ -1,5 +1,21 @@
 # Vérifier l’application Actin–ABP
 
+## Contrôle final du 2 octobre 2026
+
+Ce statut prime sur les nombres et constats historiques ci-dessous.
+
+- **106 tests unitaires passent dans chaque dépôt**, avec les données propres à chacun. Les nouveaux cas couvrent les chaînes numériques FoldDisco, la préservation des coordonnées et des identifiants, l'exclusion des anciennes requêtes invalides, les liens de résultats et le placement rigide sans réajustement de l'ABP.
+- **Les parcours AppTest des onze pages et de leurs vues passent dans chaque dépôt.** Le parcours complémentaire vérifie les résultats Inverted formin-2, les motifs combinés, les résultats Adducin 1 après modification du motif, l'accès au contrôle local Beta-adducin de 44 résidus, les mesures de proximité de la vinculine, les catégories pathogenic/likely_pathogenic et la conservation de la sélection du résidu. Aucune soumission externe n'est lancée par ces tests.
+- **Résultats calculés :** 16 recherches publiques FoldDisco corrigées, toutes terminées avec des correspondances ; 206/206 motifs locaux dans le complet et 197/197 dans le public ; mesures de proximité dans deux références pour chacun de ces motifs. Les résultats, versions, paramètres et empreintes sont consignés dans les manifestes. Une exécution terminée n'établit pas la validité biologique d'un candidat.
+- La reconstruction des 206 motifs du pipeline complet conserve les identifiants de résidus et utilise un préfixe de chaîne accepté par FoldDisco. Les insertions/numéros négatifs ne sont pas supprimés pour rendre une requête artificiellement admissible ; le pipeline public saute explicitement les motifs dépassant 32 résidus.
+- **Limite du contrôle d'interface :** cette passe a vérifié le rendu côté Streamlit et les données des graphiques, pas leur affichage interactif WebGL dans un navigateur. L'accès automatisé au navigateur a été bloqué par le contrôle de sécurité de l'outil ; il n'a pas été contourné. Les inspections visuelles historiques ci-dessous ne valent pas une nouvelle inspection de cette version.
+
+Pour reproduire : `python -m unittest discover -s tests -v`, `python tools/check_app.py`, `python tools/check_followup.py`. Les contrôles de calcul sont reproductibles avec `python tools/audit_folddisco_controls.py` (FoldDisco local requis) et `python tools/audit_steric_proximity.py`. `tools/repair_folddisco_queries.py` est une campagne de réparation des anciens jobs invalides, avec sauvegarde de l'état précédent, et non un test hors ligne.
+
+Le [bilan scientifique](SCIENTIFIC_ANALYSES.md) donne le chemin vers les résultats et les points restant à discuter avec Rémi.
+
+---
+
 Une validation comporte trois niveaux : cohérence du logiciel, cohérence des données, puis validité scientifique. Un démarrage réussi ne valide pas les calculs ni les choix biologiques.
 
 ## Contrôles reproductibles

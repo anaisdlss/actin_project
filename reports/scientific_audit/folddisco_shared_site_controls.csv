@@ -1,0 +1,209 @@
+query_abp,query_cluster,query_size,source_pdb,source_chain,target_abp,returned_match,target_pdb,target_chain,matched_residues,coverage,idfscore,rmsd_A,observed_contact_count_same_site,matched_contact_count_same_site,fraction_matched_on_observed_contacts
+Actin-interacting protein 1,6685_266,16,38jl,X,"WD repeat-containing protein 1,Methylated-DNA--protein-cysteine methyltransferase",True,9qfq,P,10.0,0.625,71.8167,9.1548,24.0,6.0,0.6666666666666666
+Actin-interacting protein 1,6685_267,35,38kl,Y,"WD repeat-containing protein 1,Methylated-DNA--protein-cysteine methyltransferase",True,9qfq,P,20.0,0.5714285714285714,169.2849,14.4445,37.0,9.0,0.45
+Actin-related protein 2,6685_3,35,8uxw,B,Actin-related protein 3,True,8uxw,A,27.0,0.7714285714285715,233.689,14.8532,51.0,16.0,0.64
+Actin-related protein 2/3 complex subunit 1,6685_144,10,8uxw,C,Actin-related protein 2/3 complex subunit 1B,True,8p94,C,5.0,0.5,15.9674,3.2356,8.0,4.0,0.8
+Actin-related protein 2/3 complex subunit 1,6685_144,10,8uxw,C,Inositol-trisphosphate 3-kinase A,True,9qgk,A,4.0,0.4,17.2938,4.3678,12.0,4.0,1.0
+Actin-related protein 2/3 complex subunit 1,6685_145,5,8e9b,C,Actin-related protein 2/3 complex subunit 1B,True,8p94,C,3.0,0.6,12.3527,0.3966,3.0,2.0,0.6666666666666666
+Actin-related protein 2/3 complex subunit 1,6685_193,4,8uxw,C,Myosin heavy chain 4,True,8zbm,A,3.0,0.75,6.9837,1.361,8.0,0.0,0.0
+Actin-related protein 2/3 complex subunit 1,6685_193,4,8uxw,C,Myosin-6,True,8zbn,A,3.0,0.75,6.9837,1.2629,8.0,0.0,0.0
+Actin-related protein 2/3 complex subunit 1B,6685_144,8,8p94,C,Actin-related protein 2/3 complex subunit 1,True,8uxw,C,4.0,0.5,15.9674,2.0854,10.0,4.0,1.0
+Actin-related protein 2/3 complex subunit 1B,6685_144,8,8p94,C,Inositol-trisphosphate 3-kinase A,True,9qgk,A,3.0,0.375,8.9837,1.9885,12.0,3.0,1.0
+Actin-related protein 2/3 complex subunit 1B,6685_145,3,8p94,C,Actin-related protein 2/3 complex subunit 1,True,8e9b,C,2.0,0.6666666666666666,6.9837,0.0382,5.0,2.0,1.0
+Actin-related protein 2/3 complex subunit 1B,6685_15,7,7tpt,C,Epididymis secretory protein Li 37,True,6vec,e,2.0,0.2857142857142857,4.9837,0.043,12.0,0.0,0.0
+Actin-related protein 2/3 complex subunit 1B,6685_15,7,7tpt,C,Filamin-A,False,,,,,,,,,
+Actin-related protein 2/3 complex subunit 1B,6685_15,7,7tpt,C,Utrophin,True,6m5g,F,4.0,0.5714285714285714,10.3527,1.5433,12.0,0.0,0.0
+Actin-related protein 2/3 complex subunit 2,6685_168,19,8p94,D,Dematin actin binding protein,True,8ib2,5,6.0,0.3157894736842105,3.6578,6.7685,9.0,1.0,0.16666666666666666
+Actin-related protein 3,6685_3,51,8uxw,A,Actin-related protein 2,True,8uxw,B,34.0,0.6666666666666666,371.4252,16.2639,35.0,13.0,0.38235294117647056
+Adducin 1,6685_150,32,8iai,9,Beta-adducin,True,8iah,9,26.0,0.8125,718.9869,5.1121,32.0,22.0,0.88
+Adducin 1,6685_151,27,8iai,1,Beta-adducin,True,8iai,3,20.0,0.7407407407407407,340.5458,4.496,23.0,17.0,0.8947368421052632
+Adducin 1,6685_152,20,8iai,1,Beta-adducin,True,8iah,3,13.0,0.65,179.5927,8.9374,14.0,10.0,0.8333333333333334
+Adducin 1,6685_154,12,8iah,2,Cell invasion protein SipA,True,8uee,C,5.0,0.4166666666666667,18.7975,3.3611,8.0,0.0,0.0
+Alpha-catenin-like protein hmp-1,6685_0,19,7uuw,G,Catenin alpha-1,True,6upv,L,17.0,0.8947368421052632,391.8378,6.6935,23.0,14.0,0.8235294117647058
+Alpha-catenin-like protein hmp-1,6685_0,19,7uuw,G,Cofilin,True,38kn,a,9.0,0.47368421052631576,20.0615,10.5751,28.0,2.0,0.25
+Alpha-catenin-like protein hmp-1,6685_0,19,7uuw,G,Cofilin (UNC-60B),True,38jl,a,8.0,0.42105263157894735,20.0615,9.9081,28.0,2.0,0.2857142857142857
+Alpha-catenin-like protein hmp-1,6685_0,19,7uuw,G,Cofilin-1,True,9qfj,G,7.0,0.3684210526315789,15.3023,12.4354,28.0,0.0,0.0
+Alpha-catenin-like protein hmp-1,6685_0,19,7uuw,G,Cofilin-2,True,9y9p,a,7.0,0.3684210526315789,15.3023,12.288,25.0,0.0,0.0
+Alpha-catenin-like protein hmp-1,6685_0,19,7uuw,G,Gelsolin,True,12bw,I,5.0,0.2631578947368421,6.7528,3.6113,14.0,0.0,0.0
+Alpha-catenin-like protein hmp-1,6685_0,19,7uuw,G,Inverted formin-2,True,9az4,G,7.0,0.3684210526315789,17.9674,7.7272,10.0,0.0,0.0
+Alpha-catenin-like protein hmp-1,6685_141,33,7uuw,H,Catenin alpha-1,True,7utj,H,25.0,0.7575757575757576,382.4554,16.2059,29.0,16.0,0.64
+Alpha-catenin-like protein hmp-1,6685_141,33,7uuw,H,Spectrin beta chain,True,8iai,M,11.0,0.3333333333333333,14.8788,11.7349,41.0,1.0,0.1111111111111111
+Beta-adducin,6685_150,32,8iah,9,Adducin 1,True,8iai,9,26.0,0.8125,700.3342,2.6083,32.0,23.0,0.92
+Beta-adducin,6685_151,23,8iai,3,Adducin 1,True,8iah,1,20.0,0.8695652173913043,363.5187,7.9387,24.0,19.0,0.95
+Beta-adducin,6685_152,14,8iah,3,Adducin 1,True,8iai,1,10.0,0.7142857142857143,161.125,0.6827,20.0,10.0,1.0
+Catenin alpha-1,6685_0,23,6upv,L,Alpha-catenin-like protein hmp-1,True,7uuw,G,20.0,0.8695652173913043,485.7805,4.9966,19.0,14.0,0.7368421052631579
+Catenin alpha-1,6685_0,23,6upv,L,Cofilin,True,38kn,a,3.0,0.13043478260869565,14.1536,1.0492,28.0,1.0,0.3333333333333333
+Catenin alpha-1,6685_0,23,6upv,L,Cofilin (UNC-60B),True,38jl,a,3.0,0.13043478260869565,14.1536,1.0501,28.0,1.0,0.3333333333333333
+Catenin alpha-1,6685_0,23,6upv,L,Cofilin-1,True,9qfj,G,2.0,0.08695652173913043,14.1536,0.4984,28.0,0.0,0.0
+Catenin alpha-1,6685_0,23,6upv,L,Cofilin-2,True,9y9p,a,3.0,0.13043478260869565,14.1536,0.6563,25.0,1.0,0.3333333333333333
+Catenin alpha-1,6685_0,23,6upv,L,Gelsolin,True,12bw,I,9.0,0.391304347826087,20.1895,10.3852,14.0,2.0,0.2222222222222222
+Catenin alpha-1,6685_0,23,6upv,L,Inverted formin-2,True,9az4,G,6.0,0.2608695652173913,24.3073,5.3683,10.0,0.0,0.0
+Catenin alpha-1,6685_102,21,7utj,G,Gelsolin,True,12bz,J,3.0,0.14285714285714285,7.2348,1.1241,20.0,1.0,0.3333333333333333
+Catenin alpha-1,6685_102,21,7utj,G,Inositol-trisphosphate 3-kinase A,False,,,,,,,,,
+Catenin alpha-1,6685_102,21,7utj,G,Protein diaphanous homolog 1,True,9b3d,H,8.0,0.38095238095238093,24.0616,9.7328,16.0,1.0,0.125
+Catenin alpha-1,6685_141,29,7utj,H,Alpha-catenin-like protein hmp-1,True,7uuw,H,27.0,0.9310344827586207,412.7365,9.6411,33.0,20.0,0.7407407407407407
+Catenin alpha-1,6685_141,29,7utj,H,Spectrin beta chain,True,8iai,M,5.0,0.1724137931034483,13.5746,8.2617,41.0,2.0,0.4
+Catenin alpha-1,6685_16,30,6upv,L,Epididymis secretory protein Li 37,True,6vec,c,10.0,0.3333333333333333,10.9837,11.7232,30.0,2.0,0.2
+Catenin alpha-1,6685_16,30,6upv,L,Filamin-A,True,6d8c,A,10.0,0.3333333333333333,17.2574,11.6187,34.0,7.0,0.7
+Catenin alpha-1,6685_16,30,6upv,L,Utrophin,True,6m5g,F,7.0,0.23333333333333334,32.9511,6.5628,35.0,1.0,0.14285714285714285
+Cell invasion protein SipA,6685_154,9,8c4e,K,Adducin 1,True,8iah,2,2.0,0.2222222222222222,10.9837,0.3972,12.0,0.0,0.0
+Cofilin,6685_0,28,38kn,a,Alpha-catenin-like protein hmp-1,True,7uuw,G,5.0,0.17857142857142858,12.1536,2.235,19.0,0.0,0.0
+Cofilin,6685_0,28,38kn,a,Catenin alpha-1,True,6upv,L,16.0,0.5714285714285714,29.4708,11.7663,23.0,1.0,0.06666666666666667
+Cofilin,6685_0,28,38kn,a,Cofilin (UNC-60B),True,38jl,a,28.0,1.0,2419.2695,1.8143,28.0,28.0,1.0
+Cofilin,6685_0,28,38kn,a,Cofilin-1,True,9qfj,G,14.0,0.5,67.2358,10.6333,28.0,7.0,0.5384615384615384
+Cofilin,6685_0,28,38kn,a,Cofilin-2,True,9y9p,a,14.0,0.5,57.7261,10.3793,25.0,7.0,0.5
+Cofilin,6685_0,28,38kn,a,Gelsolin,True,12bw,I,18.0,0.6428571428571429,63.412,10.4749,14.0,5.0,0.2777777777777778
+Cofilin,6685_0,28,38kn,a,Inverted formin-2,True,9az4,H,6.0,0.21428571428571427,16.2185,8.8154,8.0,0.0,0.0
+Cofilin,6685_290,30,38kn,a,Cofilin (UNC-60B),True,38jl,a,30.0,1.0,2729.4812,5.1782,28.0,28.0,0.9333333333333333
+Cofilin (UNC-60B),6685_0,28,38jl,a,Alpha-catenin-like protein hmp-1,True,7uuw,G,16.0,0.5714285714285714,34.0047,13.0392,19.0,2.0,0.125
+Cofilin (UNC-60B),6685_0,28,38jl,a,Catenin alpha-1,True,6upv,L,10.0,0.35714285714285715,16.7445,11.3735,23.0,1.0,0.1
+Cofilin (UNC-60B),6685_0,28,38jl,a,Cofilin,True,38kn,a,28.0,1.0,2474.8721,4.9743,28.0,28.0,1.0
+Cofilin (UNC-60B),6685_0,28,38jl,a,Cofilin-1,True,9qfj,G,13.0,0.4642857142857143,77.3895,9.5851,28.0,7.0,0.5833333333333334
+Cofilin (UNC-60B),6685_0,28,38jl,a,Cofilin-2,True,9y9p,a,15.0,0.5357142857142857,67.8797,9.1353,25.0,8.0,0.5333333333333333
+Cofilin (UNC-60B),6685_0,28,38jl,a,Gelsolin,True,12bw,I,17.0,0.6071428571428571,37.7957,8.5344,14.0,4.0,0.23529411764705882
+Cofilin (UNC-60B),6685_0,28,38jl,a,Inverted formin-2,True,9az4,H,8.0,0.2857142857142857,17.4059,7.4246,8.0,0.0,0.0
+Cofilin (UNC-60B),6685_290,28,38jl,a,Cofilin,True,38kn,a,28.0,1.0,2417.3052,2.5759,30.0,28.0,1.0
+Cofilin-1,6685_0,28,9qfj,G,Alpha-catenin-like protein hmp-1,True,7uuw,G,3.0,0.10714285714285714,10.9837,4.3364,19.0,2.0,0.6666666666666666
+Cofilin-1,6685_0,28,9qfj,G,Catenin alpha-1,True,6upv,L,10.0,0.35714285714285715,17.1373,8.7987,23.0,1.0,0.1
+Cofilin-1,6685_0,28,9qfj,G,Cofilin,True,38kn,a,16.0,0.5714285714285714,69.6735,9.7622,28.0,6.0,0.4
+Cofilin-1,6685_0,28,9qfj,G,Cofilin (UNC-60B),True,38jl,a,18.0,0.6428571428571429,81.8271,11.0069,28.0,6.0,0.35294117647058826
+Cofilin-1,6685_0,28,9qfj,G,Cofilin-2,True,9y9p,a,27.0,0.9642857142857143,1379.1046,6.7478,25.0,21.0,0.7777777777777778
+Cofilin-1,6685_0,28,9qfj,G,Gelsolin,True,12bw,I,8.0,0.2857142857142857,12.5913,9.9321,14.0,2.0,0.25
+Cofilin-1,6685_0,28,9qfj,G,Inverted formin-2,True,9az4,G,10.0,0.35714285714285715,23.1373,12.1604,10.0,0.0,0.0
+Cofilin-1,6685_200,29,9qfd,J,Inverted formin-2,True,9azq,H,19.0,0.6551724137931034,16.1665,13.2971,31.0,9.0,0.47368421052631576
+Cofilin-1,6685_200,29,9qfd,J,Protein diaphanous homolog 1,True,9b27,G,20.0,0.6896551724137931,32.5175,10.414,31.0,1.0,0.05
+Cofilin-1,6685_21,20,9qfj,F,Cofilin-2,True,9y9p,a,20.0,1.0,999.2833,3.1655,18.0,17.0,0.85
+Cofilin-2,6685_0,25,9y9p,a,Alpha-catenin-like protein hmp-1,True,7uuw,G,15.0,0.6,27.2022,11.5655,19.0,1.0,0.06666666666666667
+Cofilin-2,6685_0,25,9y9p,a,Catenin alpha-1,True,6upv,L,9.0,0.36,14.1536,10.9964,23.0,0.0,0.0
+Cofilin-2,6685_0,25,9y9p,a,Cofilin,True,38kn,a,12.0,0.48,48.2393,9.57,28.0,6.0,0.5454545454545454
+Cofilin-2,6685_0,25,9y9p,a,Cofilin (UNC-60B),True,38jl,a,12.0,0.48,48.2393,9.7737,28.0,6.0,0.5454545454545454
+Cofilin-2,6685_0,25,9y9p,a,Cofilin-1,True,9qfj,G,23.0,0.92,1147.6552,6.3715,28.0,21.0,0.9130434782608695
+Cofilin-2,6685_0,25,9y9p,a,Gelsolin,True,12bw,I,7.0,0.28,10.1536,12.7045,14.0,1.0,0.14285714285714285
+Cofilin-2,6685_0,25,9y9p,a,Inverted formin-2,True,9az4,H,4.0,0.16,14.1536,8.7986,8.0,0.0,0.0
+Cofilin-2,6685_21,18,9y9p,a,Cofilin-1,True,9qfd,J,18.0,1.0,942.6064,7.2729,20.0,17.0,0.9444444444444444
+Dematin actin binding protein,6685_168,9,8ib2,5,Actin-related protein 2/3 complex subunit 2,False,,,,,,,,,
+Epididymis secretory protein Li 37,6685_15,12,6vec,e,Actin-related protein 2/3 complex subunit 1B,True,7tpt,C,3.0,0.25,10.9837,1.2267,7.0,0.0,0.0
+Epididymis secretory protein Li 37,6685_15,12,6vec,e,Filamin-A,True,6d8c,A,3.0,0.25,7.8138,2.557,13.0,2.0,0.6666666666666666
+Epididymis secretory protein Li 37,6685_15,12,6vec,e,Utrophin,True,6m5g,G,2.0,0.16666666666666666,10.1536,0.7871,15.0,0.0,0.0
+Epididymis secretory protein Li 37,6685_16,30,6vec,c,Catenin alpha-1,True,6upv,L,9.0,0.3,12.6926,13.0505,30.0,1.0,0.1111111111111111
+Epididymis secretory protein Li 37,6685_16,30,6vec,c,Filamin-A,True,6d8c,A,22.0,0.7333333333333333,93.8851,9.8425,34.0,11.0,0.5
+Epididymis secretory protein Li 37,6685_16,30,6vec,c,Utrophin,True,6m5g,G,23.0,0.7666666666666667,264.7419,11.0366,33.0,15.0,0.6521739130434783
+Epididymis secretory protein Li 37,6685_29,28,6vec,a,Plastin-3,True,7r94,F,26.0,0.9285714285714286,1522.7667,1.256,25.0,24.0,0.9230769230769231
+F-actin-capping protein subunit beta,6685_169,6,9yim,Z,Isoform 2 of F-actin-capping protein subunit beta,True,8p94,V,6.0,1.0,60.3234,0.4352,6.0,6.0,1.0
+Filamin-A,6685_15,13,6d8c,A,Actin-related protein 2/3 complex subunit 1B,True,7tpt,C,4.0,0.3076923076923077,14.1536,2.6295,7.0,0.0,0.0
+Filamin-A,6685_15,13,6d8c,A,Epididymis secretory protein Li 37,True,6vec,a,3.0,0.23076923076923078,20.3073,0.3329,12.0,3.0,1.0
+Filamin-A,6685_15,13,6d8c,A,Utrophin,True,6m5g,G,2.0,0.15384615384615385,6.7528,0.1029,15.0,0.0,0.0
+Filamin-A,6685_16,34,6d8c,A,Catenin alpha-1,True,6upv,L,20.0,0.5882352941176471,23.6941,15.0675,30.0,4.0,0.2
+Filamin-A,6685_16,34,6d8c,A,Epididymis secretory protein Li 37,True,6vec,c,27.0,0.7941176470588235,186.5793,14.5972,30.0,15.0,0.5555555555555556
+Filamin-A,6685_16,34,6d8c,A,Utrophin,True,6m5g,F,28.0,0.8235294117647058,449.771,11.224,35.0,17.0,0.6071428571428571
+Gelsolin,6685_0,14,12bw,I,Alpha-catenin-like protein hmp-1,True,7uuw,G,5.0,0.35714285714285715,7.5098,11.8727,19.0,0.0,0.0
+Gelsolin,6685_0,14,12bw,I,Catenin alpha-1,True,6upv,L,5.0,0.35714285714285715,6.5389,9.3593,23.0,1.0,0.2
+Gelsolin,6685_0,14,12bw,I,Cofilin,True,38kn,a,7.0,0.5,16.9624,7.5617,28.0,3.0,0.42857142857142855
+Gelsolin,6685_0,14,12bw,I,Cofilin (UNC-60B),True,38jl,a,7.0,0.5,16.9624,6.543,28.0,4.0,0.5714285714285714
+Gelsolin,6685_0,14,12bw,I,Cofilin-1,True,9qfj,G,2.0,0.14285714285714285,10.1536,1.0898,28.0,0.0,0.0
+Gelsolin,6685_0,14,12bw,I,Cofilin-2,True,9y9p,a,3.0,0.21428571428571427,6.9837,1.0758,25.0,0.0,0.0
+Gelsolin,6685_0,14,12bw,I,Inverted formin-2,True,9az4,H,7.0,0.5,36.4208,10.5416,8.0,0.0,0.0
+Gelsolin,6685_102,20,12bz,J,Catenin alpha-1,True,7utj,G,2.0,0.1,8.9837,0.2985,21.0,1.0,0.5
+Gelsolin,6685_102,20,12bz,J,Inositol-trisphosphate 3-kinase A,True,9hm9,F,2.0,0.1,3.7347,0.0252,14.0,1.0,0.5
+Gelsolin,6685_102,20,12bz,J,Protein diaphanous homolog 1,True,9b3d,H,12.0,0.6,30.7671,11.1969,16.0,1.0,0.08333333333333333
+Inositol-trisphosphate 3-kinase A,6685_102,14,9hm9,F,Catenin alpha-1,True,7utj,H,4.0,0.2857142857142857,8.1536,4.061,21.0,1.0,0.25
+Inositol-trisphosphate 3-kinase A,6685_102,14,9hm9,F,Gelsolin,True,12bz,J,3.0,0.21428571428571427,10.9837,3.4159,20.0,0.0,0.0
+Inositol-trisphosphate 3-kinase A,6685_102,14,9hm9,F,Protein diaphanous homolog 1,True,9b3d,H,6.0,0.42857142857142855,20.4369,8.6992,16.0,0.0,0.0
+Inositol-trisphosphate 3-kinase A,6685_121,13,9gob,F,Plastin-3,True,7r94,F,4.0,0.3076923076923077,8.1536,8.1487,11.0,0.0,0.0
+Inositol-trisphosphate 3-kinase A,6685_121,13,9gob,F,Spectrin beta chain,True,8iai,M,6.0,0.46153846153846156,19.325,6.1637,12.0,0.0,0.0
+Inositol-trisphosphate 3-kinase A,6685_121,13,9gob,F,Talin-1,True,9az6,H,6.0,0.46153846153846156,50.5326,4.6847,12.0,1.0,0.16666666666666666
+Inositol-trisphosphate 3-kinase A,6685_144,12,9qgk,A,Actin-related protein 2/3 complex subunit 1,True,8e9b,C,5.0,0.4166666666666667,40.6271,2.406,10.0,4.0,0.8
+Inositol-trisphosphate 3-kinase A,6685_144,12,9qgk,A,Actin-related protein 2/3 complex subunit 1B,True,8p94,C,4.0,0.3333333333333333,14.1536,6.6157,8.0,0.0,0.0
+Inverted formin-2,6685_0,10,9az4,G,Alpha-catenin-like protein hmp-1,True,7uuw,H,7.0,0.7,20.9818,6.9973,19.0,0.0,0.0
+Inverted formin-2,6685_0,10,9az4,G,Catenin alpha-1,True,6upv,L,8.0,0.8,20.9818,7.6412,23.0,0.0,0.0
+Inverted formin-2,6685_0,10,9az4,G,Cofilin,True,38kn,a,6.0,0.6,10.2011,4.8925,28.0,1.0,0.16666666666666666
+Inverted formin-2,6685_0,10,9az4,G,Cofilin (UNC-60B),True,38jl,a,6.0,0.6,10.2011,4.9748,28.0,1.0,0.16666666666666666
+Inverted formin-2,6685_0,10,9az4,G,Cofilin-1,True,9qfj,G,3.0,0.3,9.2601,3.7835,28.0,0.0,0.0
+Inverted formin-2,6685_0,10,9az4,G,Cofilin-2,True,9y9p,a,3.0,0.3,7.5098,0.9189,25.0,1.0,0.3333333333333333
+Inverted formin-2,6685_0,10,9az4,G,Gelsolin,True,12bw,I,3.0,0.3,2.9242,1.5536,14.0,0.0,0.0
+Inverted formin-2,6685_200,31,9az4,G,Cofilin-1,True,9qfd,J,12.0,0.3870967741935484,12.2625,11.817,29.0,2.0,0.16666666666666666
+Inverted formin-2,6685_200,31,9az4,G,Protein diaphanous homolog 1,True,9b27,G,15.0,0.4838709677419355,81.4583,10.8419,31.0,8.0,0.5333333333333333
+Inverted formin-2,6685_211,35,9az4,H,Protein diaphanous homolog 1,True,9b27,H,17.0,0.4857142857142857,66.1566,17.358,26.0,9.0,0.5625
+Isoform 2 of F-actin-capping protein subunit beta,6685_169,6,8p94,V,F-actin-capping protein subunit beta,True,9yim,Z,6.0,1.0,59.5982,0.4352,6.0,6.0,1.0
+"Isoform A2 of Troponin T, cardiac muscle",6685_136,11,9e2e,K,"Troponin T2, cardiac type",True,8dd0,K,11.0,1.0,259.7927,0.9213,11.0,11.0,1.0
+"Isoform A2 of Troponin T, cardiac muscle",6685_138,19,9e2e,K,"Troponin T2, cardiac type",True,8dd0,K,18.0,0.9473684210526315,426.0612,1.5913,18.0,18.0,1.0
+Leiomodin-2,6685_164,45,9zzj,L,Tropomodulin-1,True,8f8t,T,36.0,0.8,652.4732,11.0271,55.0,25.0,0.7352941176470589
+Leiomodin-2,6685_59,10,9zzj,L,Tropomodulin-1,True,8f8t,T,7.0,0.7,26.0033,4.4432,10.0,4.0,0.5714285714285714
+"Maltose/maltodextrin-binding periplasmic protein,Adenylate cyclase ExoY",6685_25,3,7p1g,O,Myosin-7,False,,,,,,,,,
+Myosin heavy chain 4,6685_193,8,8zbm,A,Actin-related protein 2/3 complex subunit 1,True,8uxw,C,2.0,0.25,7.8138,0.2099,4.0,0.0,0.0
+Myosin heavy chain 4,6685_193,8,8zbm,A,Myosin-6,True,8zbn,A,5.0,0.625,27.4453,0.2982,8.0,4.0,0.8
+Myosin heavy chain 4,6685_97,35,8zbm,A,Myosin-6,True,8zbn,A,30.0,0.8571428571428571,712.3421,9.5925,29.0,26.0,0.8666666666666667
+Myosin heavy chain 4,6685_97,35,8zbm,A,beta-cardiac myosin II,True,8efh,A,34.0,0.9714285714285714,1158.6674,8.775,31.0,29.0,0.8529411764705882
+"Myosin-14,Alpha-actinin A",6685_6,43,5jlh,F,Myosin-6,True,8zbn,L,27.0,0.627906976744186,249.1592,10.4805,30.0,14.0,0.5384615384615384
+"Myosin-14,Alpha-actinin A",6685_6,43,5jlh,F,Myosin-7,True,8zb7,H,30.0,0.6976744186046512,283.4346,10.256,37.0,16.0,0.5333333333333333
+"Myosin-14,Alpha-actinin A",6685_6,43,5jlh,F,Myosin-A,True,7aln,F,7.0,0.16279069767441862,35.817,11.5602,36.0,0.0,0.0
+"Myosin-14,Alpha-actinin A",6685_6,43,5jlh,F,Unconventional myosin-Ib,True,6c1d,P,22.0,0.5116279069767442,85.6598,14.5657,34.0,8.0,0.38095238095238093
+"Myosin-14,Alpha-actinin A",6685_6,43,5jlh,F,Vinculin,True,6upw,L,6.0,0.13953488372093023,14.1536,12.8459,23.0,0.0,0.0
+Myosin-6,6685_193,8,8zbn,A,Actin-related protein 2/3 complex subunit 1,False,,,,,,,,,
+Myosin-6,6685_193,8,8zbn,A,Myosin heavy chain 4,True,8zbm,A,7.0,0.875,41.924,7.4348,8.0,4.0,0.5714285714285714
+Myosin-6,6685_6,30,8zbn,L,"Myosin-14,Alpha-actinin A",True,5jlh,F,17.0,0.5666666666666667,143.1277,10.1464,43.0,13.0,0.8125
+Myosin-6,6685_6,30,8zbn,L,Myosin-7,True,8zb7,J,30.0,1.0,890.0576,2.6813,36.0,28.0,0.9333333333333333
+Myosin-6,6685_6,30,8zbn,L,Myosin-A,True,7aln,F,11.0,0.36666666666666664,19.5226,14.5468,36.0,0.0,0.0
+Myosin-6,6685_6,30,8zbn,L,Unconventional myosin-Ib,True,6c1d,P,11.0,0.36666666666666664,28.9511,16.6752,34.0,0.0,0.0
+Myosin-6,6685_6,30,8zbn,L,Vinculin,True,6upw,L,3.0,0.1,7.8138,2.2232,23.0,1.0,0.3333333333333333
+Myosin-6,6685_97,29,8zbn,A,Myosin heavy chain 4,True,8zbm,A,28.0,0.9655172413793104,608.4404,5.0265,35.0,26.0,0.9285714285714286
+Myosin-6,6685_97,29,8zbn,A,beta-cardiac myosin II,True,8efh,A,28.0,0.9655172413793104,685.664,1.9336,31.0,28.0,1.0
+Myosin-7,6685_25,8,8zb7,J,"Maltose/maltodextrin-binding periplasmic protein,Adenylate cyclase ExoY",True,7p1g,O,3.0,0.375,10.1536,0.2993,3.0,0.0,0.0
+Myosin-7,6685_6,37,8zb7,H,"Myosin-14,Alpha-actinin A",True,5jlh,F,26.0,0.7027027027027027,156.7717,16.9496,43.0,17.0,0.6538461538461539
+Myosin-7,6685_6,37,8zb7,H,Myosin-6,True,8zbn,L,33.0,0.8918918918918919,1018.7439,8.8109,30.0,27.0,0.8181818181818182
+Myosin-7,6685_6,37,8zb7,H,Myosin-A,True,7aln,F,19.0,0.5135135135135135,30.121,16.4522,36.0,2.0,0.10526315789473684
+Myosin-7,6685_6,37,8zb7,H,Unconventional myosin-Ib,True,6c1d,P,19.0,0.5135135135135135,43.0518,18.3419,34.0,0.0,0.0
+Myosin-7,6685_6,37,8zb7,H,Vinculin,True,6upw,L,16.0,0.43243243243243246,16.7975,19.3086,23.0,3.0,0.1875
+Myosin-A,6685_6,36,7aln,F,"Myosin-14,Alpha-actinin A",True,5jlh,F,24.0,0.6666666666666666,28.7449,16.9431,43.0,1.0,0.041666666666666664
+Myosin-A,6685_6,36,7aln,F,Myosin-6,True,8zbn,L,16.0,0.4444444444444444,21.6634,10.4619,30.0,0.0,0.0
+Myosin-A,6685_6,36,7aln,F,Myosin-7,True,8zb7,J,22.0,0.6111111111111112,25.7723,15.6871,36.0,0.0,0.0
+Myosin-A,6685_6,36,7aln,F,Unconventional myosin-Ib,True,6c1d,P,10.0,0.2777777777777778,26.3073,13.8501,34.0,1.0,0.1
+Myosin-A,6685_6,36,7aln,F,Vinculin,True,6upw,L,9.0,0.25,28.121,12.6337,23.0,0.0,0.0
+Plastin-3,6685_121,11,7r94,F,Inositol-trisphosphate 3-kinase A,False,,,,,,,,,
+Plastin-3,6685_121,11,7r94,F,Spectrin beta chain,True,8iai,M,5.0,0.45454545454545453,9.1067,4.6468,12.0,0.0,0.0
+Plastin-3,6685_121,11,7r94,F,Talin-1,True,9az6,H,5.0,0.45454545454545453,7.2562,4.0354,12.0,0.0,0.0
+Plastin-3,6685_29,25,7r94,F,Epididymis secretory protein Li 37,True,6vec,e,24.0,0.96,1522.5182,0.5093,28.0,24.0,1.0
+Protein diaphanous homolog 1,6685_102,16,9b3d,H,Catenin alpha-1,True,7utj,G,10.0,0.625,12.1536,10.972,21.0,5.0,0.5
+Protein diaphanous homolog 1,6685_102,16,9b3d,H,Gelsolin,True,12bz,J,5.0,0.3125,21.1373,9.3643,20.0,0.0,0.0
+Protein diaphanous homolog 1,6685_102,16,9b3d,H,Inositol-trisphosphate 3-kinase A,False,,,,,,,,,
+Protein diaphanous homolog 1,6685_200,31,9b27,G,Cofilin-1,True,9qfd,J,8.0,0.25806451612903225,14.1536,11.8189,29.0,4.0,0.5
+Protein diaphanous homolog 1,6685_200,31,9b27,G,Inverted formin-2,True,9azq,H,19.0,0.6129032258064516,86.2961,17.0413,31.0,11.0,0.6111111111111112
+Protein diaphanous homolog 1,6685_211,26,9b27,H,Inverted formin-2,True,9azp,H,13.0,0.5,71.6607,7.9882,40.0,7.0,0.5384615384615384
+Spectrin beta chain,6685_121,12,8iai,M,Inositol-trisphosphate 3-kinase A,False,,,,,,,,,
+Spectrin beta chain,6685_121,12,8iai,M,Plastin-3,True,7r94,F,4.0,0.3333333333333333,17.8114,0.543,11.0,3.0,0.75
+Spectrin beta chain,6685_121,12,8iai,M,Talin-1,True,9az6,H,2.0,0.16666666666666666,5.2348,0.1006,12.0,2.0,1.0
+Spectrin beta chain,6685_141,41,8iai,M,Alpha-catenin-like protein hmp-1,True,7uuw,H,21.0,0.5121951219512195,41.4386,17.6755,33.0,4.0,0.19047619047619047
+Spectrin beta chain,6685_141,41,8iai,M,Catenin alpha-1,True,7utj,H,13.0,0.3170731707317073,22.7574,11.4896,29.0,1.0,0.07692307692307693
+Talin-1,6685_121,12,9az6,H,Inositol-trisphosphate 3-kinase A,True,9gob,F,2.0,0.16666666666666666,7.7901,0.0674,13.0,0.0,0.0
+Talin-1,6685_121,12,9az6,H,Plastin-3,True,7r94,F,5.0,0.4166666666666667,15.9674,6.8673,11.0,0.0,0.0
+Talin-1,6685_121,12,9az6,H,Spectrin beta chain,True,8iai,M,9.0,0.75,29.633,10.4999,12.0,0.0,0.0
+Tropomodulin-1,6685_164,55,8f8t,T,Leiomodin-2,True,9zzj,L,34.0,0.6181818181818182,679.0443,19.9063,45.0,19.0,0.5588235294117647
+Tropomodulin-1,6685_59,10,8f8t,T,Leiomodin-2,True,9zzm,M,4.0,0.4,37.4748,2.9502,10.0,4.0,1.0
+"Troponin T2, cardiac type",6685_136,11,8dd0,K,"Isoform A2 of Troponin T, cardiac muscle",True,9e2e,K,11.0,1.0,266.505,0.9213,11.0,11.0,1.0
+"Troponin T2, cardiac type",6685_138,18,8dd0,K,"Isoform A2 of Troponin T, cardiac muscle",True,9e2e,K,18.0,1.0,429.7343,1.4359,19.0,18.0,1.0
+Unconventional myosin-Ib,6685_6,34,6c1d,P,"Myosin-14,Alpha-actinin A",True,5jlh,F,13.0,0.38235294117647056,34.121,14.2269,43.0,0.0,0.0
+Unconventional myosin-Ib,6685_6,34,6c1d,P,Myosin-6,True,8zbn,L,11.0,0.3235294117647059,35.291,13.7532,30.0,4.0,0.36363636363636365
+Unconventional myosin-Ib,6685_6,34,6c1d,P,Myosin-7,True,8zb7,H,12.0,0.35294117647058826,19.9674,15.8712,37.0,0.0,0.0
+Unconventional myosin-Ib,6685_6,34,6c1d,P,Myosin-A,True,7aln,F,7.0,0.20588235294117646,24.3073,11.4618,36.0,0.0,0.0
+Unconventional myosin-Ib,6685_6,34,6c1d,P,Vinculin,True,6upw,L,8.0,0.23529411764705882,25.1373,9.8223,23.0,1.0,0.125
+Utrophin,6685_15,12,6m5g,F,Actin-related protein 2/3 complex subunit 1B,True,7tpt,C,2.0,0.16666666666666666,8.9837,0.1527,7.0,1.0,0.5
+Utrophin,6685_15,12,6m5g,F,Epididymis secretory protein Li 37,True,6vec,c,3.0,0.25,14.3527,0.1936,12.0,0.0,0.0
+Utrophin,6685_15,12,6m5g,F,Filamin-A,True,6d8c,A,7.0,0.5833333333333334,31.5449,6.7153,13.0,2.0,0.2857142857142857
+Utrophin,6685_16,33,6m5g,G,Catenin alpha-1,True,6upv,L,13.0,0.3939393939393939,14.1536,11.2592,30.0,0.0,0.0
+Utrophin,6685_16,33,6m5g,G,Epididymis secretory protein Li 37,True,6vec,c,27.0,0.8181818181818182,271.345,12.4371,30.0,14.0,0.56
+Utrophin,6685_16,33,6m5g,G,Filamin-A,True,6d8c,A,26.0,0.7878787878787878,287.5477,12.2626,34.0,15.0,0.6
+Vibrio VopV,6685_257,26,9p3d,c,VopV,True,9p1i,c,26.0,1.0,433.8854,1.4662,28.0,26.0,1.0
+Vibrio VopV,6685_258,15,9p3d,c,VopV,True,9p1i,f,15.0,1.0,344.9873,1.7325,17.0,15.0,1.0
+Vibrio VopV,6685_259,20,9p3d,d,VopV,True,9p1i,c,20.0,1.0,452.1065,3.4758,18.0,18.0,0.9
+Vinculin,6685_6,23,6upw,L,"Myosin-14,Alpha-actinin A",True,5jlh,F,7.0,0.30434782608695654,28.3073,7.1416,43.0,0.0,0.0
+Vinculin,6685_6,23,6upw,L,Myosin-6,True,8zbn,L,11.0,0.4782608695652174,40.4609,12.5804,30.0,0.0,0.0
+Vinculin,6685_6,23,6upw,L,Myosin-7,True,8zb7,H,15.0,0.6521739130434783,51.2584,13.4966,37.0,0.0,0.0
+Vinculin,6685_6,23,6upw,L,Myosin-A,True,7aln,F,11.0,0.4782608695652174,21.1373,9.2018,36.0,0.0,0.0
+Vinculin,6685_6,23,6upw,L,Unconventional myosin-Ib,True,6c1d,P,9.0,0.391304347826087,33.6308,7.4958,34.0,0.0,0.0
+VopV,6685_257,28,9p1i,c,Vibrio VopV,True,9p3d,d,28.0,1.0,544.186,1.2525,26.0,26.0,0.9285714285714286
+VopV,6685_258,17,9p1i,f,Vibrio VopV,True,9p3d,d,17.0,1.0,401.7374,0.9745,17.0,16.0,0.9411764705882353
+VopV,6685_259,18,9p1i,g,Vibrio VopV,True,9p3d,d,18.0,1.0,259.3158,4.847,20.0,18.0,1.0
+"WD repeat-containing protein 1,Methylated-DNA--protein-cysteine methyltransferase",6685_266,24,9qfq,P,Actin-interacting protein 1,True,38kl,Y,19.0,0.7916666666666666,340.8566,8.0763,24.0,13.0,0.6842105263157895
+"WD repeat-containing protein 1,Methylated-DNA--protein-cysteine methyltransferase",6685_267,37,9qfq,P,Actin-interacting protein 1,True,38kl,Y,18.0,0.4864864864864865,87.3794,15.3971,35.0,10.0,0.5555555555555556
+beta-cardiac myosin II,6685_97,31,8efh,A,Myosin heavy chain 4,True,8zbm,A,30.0,0.967741935483871,1124.4436,0.9555,35.0,29.0,0.9666666666666667
+beta-cardiac myosin II,6685_97,31,8efh,A,Myosin-6,True,8zbn,A,30.0,0.967741935483871,720.5159,5.129,29.0,28.0,0.9333333333333333

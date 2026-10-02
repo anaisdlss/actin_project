@@ -136,3 +136,5 @@ def render_footprint_comparison():
         st.dataframe(matrix,width='stretch')
         st.download_button('Download complete Jaccard matrix (CSV)',matrix.to_csv().encode(),
                            file_name='abp_jaccard_matrix.csv',mime='text/csv',key='fp_matrix_download')
+    from steric_screen import render_steric_screen
+    render_steric_screen()

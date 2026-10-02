@@ -21,10 +21,14 @@ Sortie :
 """
 import re
 import subprocess
+import sys
 from pathlib import Path
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0,str(ROOT/'script'))
+from folddisco_jobs import chain_pdb_text
+from folddisco_audit import residue_token, read_chain_ca, validate_motif
 OUT = ROOT / "data/exports/abp_site_domain"
 CHAINS = OUT / "abp_chains"
 INDEX = OUT / "folddisco_index" / "idx"
@@ -56,19 +60,25 @@ def main():
         pdb_chain = f"{r.pdb}_{r.abp_chain}"
         sub = res[(res.interaction_id == int(r.interaction_id))
                   & (res.chain == pdb_chain)]
-        contacts = sorted(pd.to_numeric(
-            sub.residue_number_structure, errors="coerce").dropna().astype(int))
-        if len(contacts) < 3:
-            continue
-        query = ",".join(f"{r.abp_chain}{c}" for c in contacts)
         qpdb = CHAINS / f"{r.stem}.pdb"
         if not qpdb.exists():
             continue
+        contacts = [residue_token(value) for value in sub.residue_number_structure]
+        checked = validate_motif(','.join(p if p is not None else '?' for p in contacts),
+                                 read_chain_ca(qpdb,str(r.abp_chain)).position,str(r.abp_chain))
+        if not checked['query']:
+            print(f"Skipped unsupported motif {r.abp_title}: {checked['errors']}")
+            continue
+        contacts = checked['positions']; query = checked['query']
+        query_dir=OUT/'folddisco_queries';query_dir.mkdir(exist_ok=True)
+        prepared=query_dir/f'{r.stem}.pdb'
+        prepared.write_text(chain_pdb_text(qpdb,str(r.abp_chain)))
         print(f"[2/3] query {r.abp_title} ({len(contacts)} résidus)…")
         out = subprocess.run(
-            ["folddisco", "query", "-p", str(qpdb), "-q", query,
-             "-i", str(INDEX), "-t", "4"],
-            capture_output=True, text=True)
+            ["folddisco", "query", "-p", str(prepared), "-q", query,
+             "-i", str(INDEX), "-t", "4", "--header", "--per-match",
+             "--format-output", "tid,node_count,idf,rmsd"],
+            capture_output=True, text=True, check=True)
         for line in out.stdout.splitlines():
             parts = line.split("\t")
             if len(parts) < 4:

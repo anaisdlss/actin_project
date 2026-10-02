@@ -283,6 +283,8 @@ def _render_local_query(catalog,abp,cluster):
     text=st.text_area('ABP query positions to prepare (comma-separated PDB residue identifiers)',
                       value=row['contact_positions'],key=f'fd_query_positions_{abp}_{row["query_cluster"]}',height=90)
     checked=validate_motif(text,coords.position,row['source_chain'])
+    if checked['submitted_chain'] != row['source_chain']:
+        st.caption(f"For FoldDisco export only, source chain {row['source_chain']} is named {checked['submitted_chain']}. Coordinates and residue numbers are unchanged. Download the matching prepared PDB with the motif.")
     for error in checked['errors']:st.warning(error)
     if checked['duplicate_tokens_removed']:st.caption('Repeated position tokens are counted once.')
     picked=coords[coords.position.isin(checked['positions'])]
@@ -322,12 +324,14 @@ def _render_local_query(catalog,abp,cluster):
             st.download_button('Download prepared residue coordinates (CSV)',picked.to_csv(index=False).encode(),
                                file_name='folddisco_prepared_coordinates.csv',mime='text/csv',key=f'fd_query_csv_{abp}_{cluster}')
             if checked['text_export_supported']:
+                from folddisco_jobs import chain_pdb_text
                 st.code(checked['query'])
+                st.download_button('Download matching prepared chain (PDB)',chain_pdb_text(path,row['source_chain']),
+                                   file_name='folddisco_query.pdb',key=f'fd_query_pdb_{abp}_{cluster}')
                 st.download_button('Download FoldDisco motif text',checked['query'],file_name='folddisco_motif.txt',
                                    mime='text/plain',key=f'fd_query_text_{abp}_{cluster}')
             else:
-                st.info('Insertion codes or multi-character chain identifiers are preserved in JSON. '
-                        'The existing pipeline does not support their unambiguous FoldDisco text serialization.')
+                st.info('Insertion codes and negative residue numbers are preserved in JSON, but are not supported by the FoldDisco query parser.')
 
     if not checked['errors'] and checked['query']:
         _render_query_jobs(row, checked, path)
@@ -390,6 +394,93 @@ def _render_query_jobs(row, checked, path):
                            file_name='folddisco_search.json', key='fd_fresh_manifest')
 
 
+def _render_saved_searches(records, abp, site):
+    """Results remain accessible even when the prepared motif is edited."""
+    import json
+    from folddisco_jobs import result_table
+    from folddisco_status import search_label
+    matching = [(p, r) for p, r in records if r.get('source', {}).get('query_abp') == abp
+                and site in r.get('source', {}).get('query_cluster', '').split('+')]
+    if not matching:
+        return False
+    # Prefer a usable result, retaining every old query for audit.
+    matching.sort(key=lambda item: item[1].get('state') != 'complete')
+    options = list(range(len(matching)))
+    index = st.selectbox('Saved search', options, key=f'fd_saved_{abp}_{site}',
+        format_func=lambda i: f"{matching[i][1].get('source',{}).get('query_cluster')} · {search_label(matching[i][1])} · {matching[i][1].get('updated_utc','')[:10]}") if len(options)>1 else 0
+    folder, record = matching[index]
+    st.markdown(f"**{search_label(record)}**")
+    source = record.get('source', {})
+    st.caption(f"Submitted source: {source.get('source_pdb','').upper()} / chain {source.get('source_chain')} · {len(record.get('positions',[]))} residues. Editing the preparation below does not change these saved results.")
+    if record.get('state') == 'complete':
+        try:
+            frame = result_table(folder)
+        except (OSError, ValueError, KeyError) as exc:
+            st.error(f'Saved result cannot be read: {exc}'); return True
+        if frame.empty:
+            st.info('Search completed with no returned alignments. This does not prove the motif or an actin-binding protein is absent from nature.')
+        else:
+            if 'idfscore' in frame:
+                frame=frame.sort_values('idfscore',ascending=False)
+            from folddisco_annotations import annotate_hits
+            frame=annotate_hits(frame)
+            visible = [c for c in ['database','target_id','Record','nodecount','coverage','idfscore','rmsd','targetresidues',
+                                   'go_molecular_function','go_biological_process','go_cellular_component','go_annotation_status'] if c in frame]
+            st.dataframe(frame[visible],hide_index=True,width='stretch',height=400,
+                         column_config={'Record':st.column_config.LinkColumn('Structure record',display_text='Open')})
+            st.download_button('Download saved search results (CSV)',frame.to_csv(index=False).encode(),
+                file_name='folddisco_saved_results.csv',key=f'fd_saved_csv_{abp}_{site}')
+            st.caption('Coverage = matched residues / submitted motif size. RMSD is in Å. Hits are structural candidates; the service may cap the returned list.')
+            st.caption('GO annotations use the existing partial UniProt cache by exact accession. Missing annotations are shown explicitly; names and PDB-to-UniProt mappings are not guessed.')
+    else:
+        st.info(record.get('message',search_label(record)))
+    st.download_button('Download saved search provenance (JSON)',json.dumps(record,indent=2),
+                       file_name='folddisco_saved_search.json',key=f'fd_saved_manifest_{abp}_{site}')
+    return True
+
+
+@st.cache_data(show_spinner=False)
+def _local_control_tables(stamp):
+    root=Path('data/exports/folddisco_controls')
+    return tuple(pd.read_csv(root/name) for name in ['queries.csv','hits.csv','shared_site_controls.csv'])
+
+
+def _render_local_controls(abp, site):
+    root=Path('data/exports/folddisco_controls')
+    paths=[root/n for n in ['queries.csv','hits.csv','shared_site_controls.csv']]
+    if not all(p.exists() for p in paths):return
+    queries,hits,controls=_local_control_tables(tuple((p.stat().st_mtime_ns,p.stat().st_size) for p in paths))
+    selected=queries[queries.query_abp.eq(abp)&queries.query_cluster.eq(site)]
+    if selected.empty:return
+    with st.expander('Local validation: known ABPs and observed actin contacts'):
+        st.info('This separate local search tests the motif against representative ABP chains already in this dataset. It also accepts motifs longer than 32 residues. It does not search the full PDB or AlphaFold databases.')
+        st.caption('A structural match is compared with the target chain’s recorded actin-contact residues. The same-site comparison tests contacts with the selected actin site; the any-site comparison includes all recorded actin contacts of that target chain. These are observed contact sets, not curated boundaries of every actin-binding domain.')
+        st.dataframe(selected,hide_index=True,width='stretch')
+        if selected.iloc[0]['state']!='complete':return
+        self_cov=float(selected.iloc[0]['self_coverage'])
+        if self_cov<.999:
+            st.warning(f'The highest-scoring self-match covers only {self_cov:.0%} of this query. Interpret partial matches cautiously; this control does not establish sensitivity or specificity.')
+        comparison=controls[controls.query_abp.eq(abp)&controls.query_cluster.eq(site)]
+        if not comparison.empty:
+            st.markdown('**Known partners sharing this actin site**')
+            st.dataframe(comparison.drop(columns=['query_abp','query_cluster']),hide_index=True,width='stretch')
+        else:
+            st.caption('No other ABP in the local representative panel is recorded at this same actin site.')
+        sub=hits[hits.query_abp.eq(abp)&hits.query_cluster.eq(site)].sort_values('idfscore',ascending=False)
+        columns=[c for c in ['target_abp','target_pdb','target_chain','matched_residues','coverage','rmsd_A',
+                            'matched_contact_count_same_site','fraction_matched_on_observed_contacts',
+                            'matched_contact_count_any_site','fraction_matched_on_any_observed_contact'] if c in sub]
+        st.markdown('**Best saved match per target chain**')
+        st.dataframe(sub[columns],hide_index=True,width='stretch',height=350)
+        st.caption('Default FoldDisco parameters; highest IDF match per target chain. A hit outside the recorded contacts does not validate a shared actin-binding motif. No negative-control specificity estimate or evolutionary-homology claim is made.')
+        st.download_button('Download local matches and contact checks',sub.to_csv(index=False).encode(),
+                           file_name=f'folddisco_local_{site}.csv',key=f'fd_local_csv_{abp}_{site}')
+        st.download_button('Download all known-partner controls',controls.to_csv(index=False).encode(),
+                           file_name='folddisco_shared_site_controls.csv',key=f'fd_controls_csv_{abp}_{site}')
+        st.download_button('Download local-search methods and provenance',(root/'manifest.json').read_bytes(),
+                           file_name='folddisco_local_manifest.json',key=f'fd_local_manifest_{abp}_{site}')
+
+
 def render_discovery(sel_abp):
     """Per-ABP view, broken down by cluster: one motif per site, 2 dbs (PDB/AFDB)."""
     st.markdown("#### Discovery — interface motif per cluster (FoldDisco)")
@@ -418,13 +509,26 @@ def render_discovery(sel_abp):
     stamp=tuple((str(p),p.stat().st_mtime_ns,p.stat().st_size) for p in sources if p.exists())
     catalog=_load_motif_catalog(stamp)
     discovery=df if df is not None else pd.DataFrame()
+    from folddisco_jobs import JOBS
+    from folddisco_status import saved_searches, status_inventory
+    records=saved_searches(JOBS)
+    inventory=status_inventory(catalog,discovery,records)
+    local_queries=Path('data/exports/folddisco_controls/queries.csv')
+    if local_queries.exists():
+        local_status=pd.read_csv(local_queries)[['query_abp','query_cluster','state']].rename(
+            columns={'query_abp':'ABP','query_cluster':'Site','state':'Local known-ABP control'})
+        inventory=inventory.merge(local_status,on=['ABP','Site'],how='left',validate='one_to_one')
+    with st.expander('Search status for every ABP and site'):
+        st.dataframe(inventory,hide_index=True,width='stretch')
+        st.caption('Historical rows have incomplete query provenance. Tracked searches retain the exact motif and coordinates. Invalid old queries are excluded from negative-search counts.')
+        st.download_button('Download all search statuses',inventory.to_csv(index=False).encode(),
+                           file_name='folddisco_search_status.csv',key='fd_all_status')
     local=_load_folddisco(os.path.getmtime(_FD_CSV) if os.path.exists(_FD_CSV) else 0)
     with st.expander('Dataset coverage: ABPs, local motifs and saved results'):
         from folddisco_jobs import JOBS
-        import json
         ledger = []
-        for file in JOBS.glob('*/job.json'):
-            item = json.loads(file.read_text()); source = item.get('source', {})
+        for _, item in records:
+            source = item.get('source', {})
             ledger.append({'ABP': source.get('query_abp'), 'Sites': source.get('query_cluster'),
                            'State': item.get('state'), 'Returned alignments': item.get('hit_rows'),
                            'Updated': item.get('updated_utc')})
@@ -453,16 +557,21 @@ def render_discovery(sel_abp):
     cl = st.selectbox(
         f"Actin site of {sel_abp} ({len(clusters)} cluster(s) → as many motifs)",
         clusters, key=f"disco_cl_{sel_abp}")
-    _render_local_query(catalog,sel_abp,cl)
-    if abp.empty or not abp.query_cluster.eq(cl).any():
-        st.caption('No historical result rows for this ABP/site. Any tracked search is shown above.');return
-    st.subheader("Historical results for the original single-site search")
-    filt = _interp_filter_ui(f"disco_filt_{sel_abp}_{cl}")
-    sub = abp[(abp["query_cluster"] == cl) & (~abp["is_source"])]
-    tabs = st.tabs([lbl for _, lbl in _DB_TABS])
-    for tab, (db, _) in zip(tabs, _DB_TABS):
-        with tab:
-            _render_db_table(sub[sub["db"] == db], db, filt)
+    st.subheader('Saved results')
+    tracked=_render_saved_searches(records,sel_abp,cl)
+    if not abp.empty and abp.query_cluster.eq(cl).any():
+        with st.expander('Historical results for the original single-site search',expanded=not tracked):
+            filt = _interp_filter_ui(f"disco_filt_{sel_abp}_{cl}")
+            sub = abp[(abp["query_cluster"] == cl) & (~abp["is_source"])]
+            tabs = st.tabs([lbl for _, lbl in _DB_TABS])
+            for tab, (db, _) in zip(tabs, _DB_TABS):
+                with tab:
+                    _render_db_table(sub[sub["db"] == db], db, filt)
+    elif not tracked:
+        st.info('No saved search for this ABP/site yet. Prepare and submit a motif below; an empty inventory is not a failed search.')
+    _render_local_controls(sel_abp,cl)
+    with st.expander('Prepare or edit a new motif',expanded=False):
+        _render_local_query(catalog,sel_abp,cl)
 
 
 def render_discovery_cluster(cluster_id):
@@ -512,7 +621,7 @@ def render_discovery_cluster(cluster_id):
                 out.drop(columns=['db','target_id','target_chain']), hide_index=True, use_container_width=True, height=400,
                 column_config={
                     "Protein": st.column_config.TextColumn(width="large"),
-                    "Link": st.column_config.LinkColumn("Fiche",
-                                                        display_text="ouvrir")})
+                    "Link": st.column_config.LinkColumn("Record",
+                                                        display_text="open")})
             st.download_button('Download pooled hits with score and annotation provenance',out.to_csv(index=False).encode(),
                                file_name=f'folddisco_{cluster_id}_{db}.csv',mime='text/csv',key=f'fd_cluster_csv_{cluster_id}_{db}')

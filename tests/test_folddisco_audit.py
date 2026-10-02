@@ -72,11 +72,37 @@ class FoldDiscoAuditTests(unittest.TestCase):
         self.assertFalse(accepted['text_export_supported'])
         self.assertIsNone(accepted['query'])
         plain=validate_motif('-1, 2, 3',['-1','2','3'],'a')
-        self.assertEqual(plain['query'],'a-1,a2,a3')
+        self.assertIsNone(plain['query'])
         invalid=validate_motif('1,2,99,2.5',['1','2','3'],'A')
         self.assertEqual(len(invalid['errors']),2)
         self.assertIsNone(invalid['query'])
         self.assertIsNone(residue_token('nan'))
+
+    def test_numeric_chain_export_is_unambiguous_and_retains_coordinates(self):
+        from folddisco_jobs import prepare
+        from folddisco_status import query_problem, saved_searches, status_inventory
+        with tempfile.TemporaryDirectory() as directory:
+            path=Path(directory)/'source.pdb'
+            records=[]
+            for serial,(chain,position) in enumerate([('A',99),('9',33),('9',34),('9',37)],1):
+                records.append(f'ATOM  {serial:5d}  CA  ALA {chain}{position:4d}    {float(serial):8.3f}{0.:8.3f}{0.:8.3f}  1.00 20.00           C  \n')
+            path.write_text(''.join(records)+'END\n')
+            row=dict(source_chain='9',source_pdb='1abc',query_abp='Adducin',query_cluster='s1')
+            folder,record=prepare(row,'33,34,37',path,root=Path(directory)/'jobs')
+            self.assertEqual(record['motif'],'A33,A34,A37')
+            self.assertEqual(record['submitted_chain'],'A')
+            self.assertEqual(record['source']['source_chain'],'9')
+            coords=read_chain_ca(folder/'query.pdb','A')
+            self.assertEqual(coords.position.tolist(),['33','34','37'])
+            self.assertEqual(coords.x.tolist(),[2.,3.,4.])
+            self.assertIsNone(query_problem(record))
+            legacy={**record,'state':'complete','hit_rows':0};legacy.pop('submitted_chain')
+            self.assertIn('not a negative search',query_problem(legacy))
+            (folder/'job.json').write_text(json.dumps(legacy))
+            loaded=saved_searches(Path(directory)/'jobs')
+            inventory=status_inventory(pd.DataFrame([dict(query_abp='Adducin',query_cluster='s1')]),pd.DataFrame(),loaded)
+            self.assertEqual(inventory.iloc[0]['Invalid old queries'],1)
+            self.assertTrue(pd.isna(inventory.iloc[0]['Tracked alignments']))
 
     def test_structure_reading_and_export_do_not_lose_chain_case_or_insertion_code(self):
         with tempfile.TemporaryDirectory() as directory:

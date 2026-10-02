@@ -1,0 +1,207 @@
+query_abp,query_cluster,query_size,source_pdb,source_chain,state,target_chains_returned,self_coverage
+Actin-interacting protein 1,6685_266,16,38jl,X,complete,110,1.0
+Actin-interacting protein 1,6685_267,35,38kl,Y,complete,119,1.0
+Actin-interacting protein 1,6685_291,16,38jl,X,complete,77,1.0
+Actin-interacting protein 1,6685_292,17,38jl,X,complete,124,1.0
+Actin-interacting protein 1,6685_295,30,38kq,Y,complete,126,1.0
+Actin-related protein 2,6685_109,20,8uxw,B,complete,98,1.0
+Actin-related protein 2,6685_3,35,8uxw,B,complete,126,1.0
+Actin-related protein 2/3 complex subunit 1,6685_144,10,8uxw,C,complete,122,1.0
+Actin-related protein 2/3 complex subunit 1,6685_145,5,8e9b,C,complete,78,1.0
+Actin-related protein 2/3 complex subunit 1,6685_193,4,8uxw,C,complete,31,1.0
+Actin-related protein 2/3 complex subunit 1B,6685_144,8,8p94,C,complete,128,1.0
+Actin-related protein 2/3 complex subunit 1B,6685_145,3,8p94,C,complete,69,1.0
+Actin-related protein 2/3 complex subunit 1B,6685_15,7,7tpt,C,complete,114,1.0
+Actin-related protein 2/3 complex subunit 2,6685_110,3,7tpt,D,complete,4,1.0
+Actin-related protein 2/3 complex subunit 2,6685_111,11,8uxw,D,complete,108,1.0
+Actin-related protein 2/3 complex subunit 2,6685_112,26,8uxw,D,complete,126,1.0
+Actin-related protein 2/3 complex subunit 2,6685_146,10,8uxw,D,complete,80,0.9
+Actin-related protein 2/3 complex subunit 2,6685_147,9,8e9b,D,complete,109,0.8888888888888888
+Actin-related protein 2/3 complex subunit 2,6685_168,19,8p94,D,complete,119,1.0
+Actin-related protein 2/3 complex subunit 2,6685_183,13,8p94,D,complete,101,0.9230769230769231
+Actin-related protein 2/3 complex subunit 2,6685_184,10,8p94,D,complete,104,1.0
+Actin-related protein 2/3 complex subunit 2,6685_195,9,8uxx,D,complete,69,0.8888888888888888
+Actin-related protein 2/3 complex subunit 3,6685_113,5,8uxw,E,complete,103,1.0
+Actin-related protein 2/3 complex subunit 3,6685_185,5,8p94,E,complete,20,1.0
+Actin-related protein 2/3 complex subunit 3,6685_194,4,8uxw,E,complete,2,0.75
+Actin-related protein 2/3 complex subunit 4,6685_114,23,8uxw,F,complete,131,1.0
+Actin-related protein 2/3 complex subunit 5-like protein,6685_186,4,8p94,G,complete,36,1.0
+Actin-related protein 3,6685_106,26,8p94,A,complete,131,1.0
+Actin-related protein 3,6685_107,7,8uxw,A,complete,69,1.0
+Actin-related protein 3,6685_108,10,7tpt,A,complete,103,1.0
+Actin-related protein 3,6685_142,19,8uxw,A,complete,117,1.0
+Actin-related protein 3,6685_143,5,8e9b,A,complete,32,1.0
+Actin-related protein 3,6685_182,8,8p94,A,complete,64,1.0
+Actin-related protein 3,6685_3,51,8uxw,A,complete,134,1.0
+Adducin 1,6685_150,32,8iai,9,complete,134,1.0
+Adducin 1,6685_151,27,8iai,1,complete,132,1.0
+Adducin 1,6685_152,20,8iai,1,complete,129,0.75
+Adducin 1,6685_153,4,8iah,1,complete,33,1.0
+Adducin 1,6685_154,12,8iah,2,complete,111,1.0
+Adenylyl cyclase-associated protein 1,6685_208,6,9y9j,X,complete,37,1.0
+Adenylyl cyclase-associated protein 1,6685_276,7,9xye,X,complete,91,1.0
+Adenylyl cyclase-associated protein 1,6685_65,35,9q7o,W,complete,131,1.0
+Afadin,6685_234,7,9dva,G,complete,93,1.0
+Alpha-catenin-like protein hmp-1,6685_0,19,7uuw,G,complete,127,1.0
+Alpha-catenin-like protein hmp-1,6685_141,33,7uuw,H,complete,132,1.0
+Beta-adducin,6685_150,32,8iah,9,complete,134,1.0
+Beta-adducin,6685_151,23,8iai,3,complete,133,1.0
+Beta-adducin,6685_152,14,8iah,3,complete,118,1.0
+Beta-adducin,6685_155,44,8iah,3,complete,132,1.0
+Beta-adducin,6685_156,25,8iah,3,complete,116,0.64
+Beta-adducin,6685_157,28,8iah,4,complete,129,1.0
+Beta-adducin,6685_166,11,8iai,3,complete,105,1.0
+Catenin alpha-1,6685_0,23,6upv,L,complete,128,1.0
+Catenin alpha-1,6685_102,21,7utj,G,complete,128,1.0
+Catenin alpha-1,6685_141,29,7utj,H,complete,133,1.0
+Catenin alpha-1,6685_16,30,6upv,L,complete,132,1.0
+Cell invasion protein SipA,6685_154,9,8c4e,K,complete,105,1.0
+Cell invasion protein SipA,6685_178,25,8c4e,N,complete,130,1.0
+Cell invasion protein SipA,6685_179,25,8uee,A,complete,127,1.0
+Cell invasion protein SipA,6685_180,31,8c4e,M,complete,135,1.0
+Cell invasion protein SipA,6685_181,6,8uee,C,complete,72,1.0
+Cell invasion protein SipA,6685_189,21,8c4c,M,complete,134,1.0
+Cell invasion protein SipA,6685_190,15,8c4c,N,complete,100,1.0
+Cell invasion protein SipA,6685_191,26,8c4e,M,complete,125,1.0
+Cell invasion protein SipA,6685_192,5,8c4e,M,complete,26,1.0
+Cell invasion protein SipA,6685_235,18,8vfm,A,complete,112,1.0
+Cell invasion protein SipA,6685_236,8,8vfm,A,complete,64,1.0
+Cofilin,6685_0,28,38kn,a,complete,134,1.0
+Cofilin,6685_290,30,38kn,a,complete,130,1.0
+Cofilin (UNC-60B),6685_0,28,38jl,a,complete,130,1.0
+Cofilin (UNC-60B),6685_290,28,38jl,a,complete,132,1.0
+Cofilin-1,6685_0,28,9qfj,G,complete,134,1.0
+Cofilin-1,6685_200,29,9qfd,J,complete,135,1.0
+Cofilin-1,6685_21,20,9qfj,F,complete,121,1.0
+Cofilin-2,6685_0,25,9y9p,a,complete,132,1.0
+Cofilin-2,6685_21,18,9y9p,a,complete,119,1.0
+"Coronin-1B,Methylated-DNA--protein-cysteine methyltransferase",6685_260,25,9qey,H,complete,123,1.0
+"Coronin-1B,Methylated-DNA--protein-cysteine methyltransferase",6685_261,27,9qf2,F,complete,127,1.0
+"Coronin-1B,Methylated-DNA--protein-cysteine methyltransferase",6685_262,7,9qf2,G,complete,60,1.0
+"Coronin-1B,Methylated-DNA--protein-cysteine methyltransferase",6685_263,19,9qf2,I,complete,119,1.0
+"Coronin-1B,Methylated-DNA--protein-cysteine methyltransferase",6685_264,14,9qf2,F,complete,113,1.0
+"Coronin-1B,Methylated-DNA--protein-cysteine methyltransferase",6685_265,5,9qfg,L,complete,51,1.0
+"Coronin-1B,Methylated-DNA--protein-cysteine methyltransferase",6685_44,19,9qey,H,complete,114,1.0
+Dematin actin binding protein,6685_158,31,8iai,5,complete,129,1.0
+Dematin actin binding protein,6685_159,30,8iai,5,complete,132,0.7333333333333333
+Dematin actin binding protein,6685_160,11,8iai,5,complete,93,1.0
+Dematin actin binding protein,6685_167,4,8ib2,5,complete,51,1.0
+Dematin actin binding protein,6685_168,9,8ib2,5,complete,68,1.0
+Epididymis secretory protein Li 37,6685_15,12,6vec,e,complete,124,1.0
+Epididymis secretory protein Li 37,6685_16,30,6vec,c,complete,130,1.0
+Epididymis secretory protein Li 37,6685_29,28,6vec,a,complete,130,1.0
+F-actin-capping protein subunit alpha-1,6685_14,21,8p94,U,complete,127,1.0
+F-actin-capping protein subunit alpha-1,6685_278,10,9y9l,Y,complete,98,1.0
+F-actin-capping protein subunit alpha-1,6685_68,16,9yim,Y,complete,102,0.5625
+F-actin-capping protein subunit alpha-1,6685_91,13,8p94,U,complete,98,0.6153846153846154
+F-actin-capping protein subunit alpha-1,6685_92,20,9yim,Y,complete,127,1.0
+F-actin-capping protein subunit beta,6685_169,6,9yim,Z,complete,95,1.0
+F-actin-capping protein subunit beta,6685_170,26,9yim,Z,complete,134,0.7307692307692307
+F-actin-capping protein subunit beta,6685_279,4,9y9m,Z,complete,17,0.5
+Filamin-A,6685_15,13,6d8c,A,complete,124,1.0
+Filamin-A,6685_16,34,6d8c,A,complete,130,1.0
+Gelsolin,6685_0,14,12bw,I,complete,128,1.0
+Gelsolin,6685_102,20,12bz,J,complete,135,1.0
+Gelsolin,6685_231,31,8viz,G,complete,135,1.0
+Gelsolin,6685_232,41,8viz,G,complete,133,1.0
+Gelsolin,6685_233,73,8viz,G,complete,135,1.0
+Gelsolin,6685_286,19,12bw,I,complete,126,1.0
+Gelsolin,6685_287,41,12by,I,complete,131,1.0
+Inositol-trisphosphate 3-kinase A,6685_102,14,9hm9,F,complete,135,1.0
+Inositol-trisphosphate 3-kinase A,6685_121,13,9gob,F,complete,128,1.0
+Inositol-trisphosphate 3-kinase A,6685_144,12,9qgk,A,complete,134,1.0
+Inositol-trisphosphate 3-kinase A,6685_241,8,9qgk,A,complete,113,1.0
+Inverted formin-2,6685_0,10,9az4,G,complete,129,1.0
+Inverted formin-2,6685_200,31,9az4,G,complete,128,1.0
+Inverted formin-2,6685_202,9,9az4,G,complete,84,1.0
+Inverted formin-2,6685_209,9,9az4,G,complete,117,0.5555555555555556
+Inverted formin-2,6685_210,7,9az4,H,complete,107,0.5714285714285714
+Inverted formin-2,6685_211,35,9az4,H,complete,131,0.8857142857142857
+Inverted formin-2,6685_212,7,9azp,G,complete,125,1.0
+Inverted formin-2,6685_213,15,9azp,G,complete,122,1.0
+Inverted formin-2,6685_214,7,9azp,H,complete,125,1.0
+Inverted formin-2,6685_215,21,9azp,G,complete,123,0.42857142857142855
+Inverted formin-2,6685_217,4,9azq,H,complete,7,1.0
+Inverted formin-2,6685_218,8,9b03,H,complete,125,1.0
+Inverted formin-2,6685_219,4,9b03,G,complete,52,1.0
+Inverted formin-2,6685_220,12,9b03,H,complete,128,1.0
+Inverted formin-2,6685_221,9,9b03,G,complete,88,1.0
+Inverted formin-2,6685_222,21,9b03,H,complete,127,0.7142857142857143
+Inverted formin-2,6685_223,15,9b03,G,complete,129,0.8666666666666667
+Inverted formin-2,6685_26,4,9azp,H,complete,6,1.0
+Isoform 2 of F-actin-capping protein subunit beta,6685_169,6,8p94,V,complete,91,1.0
+Isoform 2 of F-actin-capping protein subunit beta,6685_89,25,8p94,V,complete,130,0.68
+Isoform 2 of F-actin-capping protein subunit beta,6685_90,6,7pdz,E,complete,93,1.0
+"Isoform A2 of Troponin T, cardiac muscle",6685_136,11,9e2e,K,complete,100,1.0
+"Isoform A2 of Troponin T, cardiac muscle",6685_138,19,9e2e,K,complete,129,1.0
+Leiomodin-2,6685_164,45,9zzj,L,complete,128,1.0
+Leiomodin-2,6685_282,12,9zzj,L,complete,107,1.0
+Leiomodin-2,6685_285,11,9zzm,M,complete,96,1.0
+Leiomodin-2,6685_59,10,9zzj,L,complete,119,1.0
+Leiomodin-2,6685_84,40,9zzm,L,complete,130,1.0
+"Maltose/maltodextrin-binding periplasmic protein,Adenylate cyclase ExoY",6685_25,3,7p1g,O,complete,14,1.0
+"Maltose/maltodextrin-binding periplasmic protein,Adenylate cyclase ExoY",6685_95,46,7p1g,K,complete,132,1.0
+"Maltose/maltodextrin-binding periplasmic protein,TccC3",6685_119,15,7z7h,F,complete,110,1.0
+"Maltose/maltodextrin-binding periplasmic protein,TccC3",6685_120,26,7z7h,F,complete,124,1.0
+Myosin heavy chain 4,6685_193,8,8zbm,A,complete,89,1.0
+Myosin heavy chain 4,6685_97,35,8zbm,A,complete,130,1.0
+"Myosin-14,Alpha-actinin A",6685_6,43,5jlh,F,complete,129,1.0
+"Myosin-14,Alpha-actinin A",6685_80,11,5jlh,F,complete,116,1.0
+Myosin-6,6685_193,8,8zbn,A,complete,86,0.875
+Myosin-6,6685_248,9,8zbn,C,complete,110,0.8888888888888888
+Myosin-6,6685_6,30,8zbn,L,complete,129,1.0
+Myosin-6,6685_97,29,8zbn,A,complete,126,1.0
+Myosin-7,6685_18,33,7jh7,F,complete,124,1.0
+Myosin-7,6685_25,8,8zb7,J,complete,98,1.0
+Myosin-7,6685_6,37,8zb7,H,complete,130,1.0
+Myosin-A,6685_6,36,7aln,F,complete,129,1.0
+Myosin-A,6685_69,17,7aln,F,complete,126,1.0
+Plastin-3,6685_121,11,7r94,F,complete,120,1.0
+Plastin-3,6685_29,25,7r94,F,complete,133,1.0
+Profilin-1,6685_5,27,9azp,J,complete,131,1.0
+Protein diaphanous homolog 1,6685_102,16,9b3d,H,complete,126,1.0
+Protein diaphanous homolog 1,6685_200,31,9b27,G,complete,131,1.0
+Protein diaphanous homolog 1,6685_201,7,9b27,G,complete,51,1.0
+Protein diaphanous homolog 1,6685_211,26,9b27,H,complete,131,0.9230769230769231
+Protein diaphanous homolog 1,6685_224,21,9b3d,G,complete,123,0.9523809523809523
+Protein diaphanous homolog 1,6685_225,7,9b3d,H,complete,82,0.7142857142857143
+Spectrin beta chain,6685_121,12,8iai,M,complete,117,1.0
+Spectrin beta chain,6685_141,41,8iai,M,complete,131,1.0
+Src substrate cortactin,6685_187,9,8p94,I,complete,102,1.0
+Src substrate cortactin,6685_188,41,8p94,I,complete,135,1.0
+Talin-1,6685_121,12,9az6,H,complete,125,1.0
+Talin-1,6685_249,5,9az6,I,complete,110,1.0
+Talin-1,6685_250,42,9az6,F,complete,131,1.0
+Tropomodulin-1,6685_162,48,8f8t,T,complete,132,0.7291666666666666
+Tropomodulin-1,6685_164,55,8f8t,T,complete,135,1.0
+Tropomodulin-1,6685_59,10,8f8t,T,complete,117,1.0
+Tropomyosin alpha-1 chain,6685_128,11,8zbn,T,complete,125,1.0
+Tropomyosin alpha-1 chain,6685_129,9,8zbn,S,complete,128,1.0
+Tropomyosin alpha-1 chain,6685_130,7,8zb7,P,complete,118,1.0
+Tropomyosin alpha-1 chain,6685_135,8,8dd0,I,complete,120,1.0
+Tropomyosin alpha-1 chain,6685_137,9,8dd0,G,complete,98,1.0
+Tropomyosin alpha-1 chain,6685_139,10,8dd0,G,complete,123,1.0
+Tropomyosin alpha-1 chain,6685_245,9,8zb7,L,complete,128,1.0
+Tropomyosin alpha-1 chain,6685_251,6,9e2e,G,complete,105,1.0
+Tropomyosin alpha-1 chain,6685_252,7,9e2e,J,complete,118,1.0
+Tropomyosin beta chain,6685_246,6,8zbm,B,complete,114,1.0
+Tropomyosin beta chain,6685_247,6,8zbm,G,complete,115,1.0
+Tropomyosin-1.9,6685_161,9,8iai,U,complete,120,1.0
+"Troponin T2, cardiac type",6685_136,11,8dd0,K,complete,104,1.0
+"Troponin T2, cardiac type",6685_138,18,8dd0,K,complete,126,1.0
+Unconventional myosin-Ib,6685_33,14,6c1d,P,complete,117,1.0
+Unconventional myosin-Ib,6685_6,34,6c1d,P,complete,132,1.0
+Utrophin,6685_15,12,6m5g,F,complete,123,1.0
+Utrophin,6685_16,33,6m5g,G,complete,130,1.0
+Vibrio VopV,6685_257,26,9p3d,c,complete,121,1.0
+Vibrio VopV,6685_258,15,9p3d,c,complete,96,1.0
+Vibrio VopV,6685_259,20,9p3d,d,complete,122,1.0
+Vinculin,6685_51,32,6upw,L,complete,134,1.0
+Vinculin,6685_6,23,6upw,L,complete,129,1.0
+VopV,6685_257,28,9p1i,c,complete,123,1.0
+VopV,6685_258,17,9p1i,f,complete,102,1.0
+VopV,6685_259,18,9p1i,g,complete,119,1.0
+"WD repeat-containing protein 1,Methylated-DNA--protein-cysteine methyltransferase",6685_266,24,9qfq,P,complete,107,1.0
+"WD repeat-containing protein 1,Methylated-DNA--protein-cysteine methyltransferase",6685_267,37,9qfq,P,complete,113,1.0
+beta-cardiac myosin II,6685_140,6,8efh,A,complete,74,1.0
+beta-cardiac myosin II,6685_97,31,8efh,A,complete,130,1.0

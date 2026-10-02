@@ -88,4 +88,19 @@ class FollowupTests(unittest.TestCase):
             record=refresh(folder,session)
             self.assertEqual(record['state'],'pending');self.assertEqual(record['ticket'],'keep')
 
+    def test_saved_hits_link_to_exact_database_ids_without_inventing_chain_numbers(self):
+        with tempfile.TemporaryDirectory() as d:
+            folder=Path(d)
+            (folder/'job.json').write_text(json.dumps({'positions':['1','2','3','4']}))
+            (folder/'results.json').write_text(json.dumps({'results':[
+                {'db':'pdb_folddisco','alignments':[{'target':'/db/pdb100/8iai.ent','nodecount':3,'targetresidues':'1484,1485,_'}]},
+                {'db':'afdb-proteome_folddisco','alignments':[{'target':'AF-P75829-F1-model_v4.pdb','nodecount':2}]},
+                {'db':'pdb_folddisco','alignments':[{'target':'unknown-format','nodecount':1}]}]}))
+            frame=result_table(folder)
+            self.assertEqual(frame.iloc[0]['Record'],'https://www.rcsb.org/structure/8IAI')
+            self.assertEqual(frame.iloc[0].targetresidues,'1484,1485,_')
+            self.assertEqual(frame.iloc[0].coverage,.75)
+            self.assertEqual(frame.iloc[1]['Record'],'https://alphafold.ebi.ac.uk/entry/P75829')
+            self.assertIsNone(frame.iloc[2]['Record'])
+
 if __name__=='__main__':unittest.main()
