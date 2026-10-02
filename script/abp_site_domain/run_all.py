@@ -9,6 +9,7 @@ TM-align interface, familles, empreinte actine, structure secondaire, chimie.
 Lancer :  pixi run python -m script.abp_site_domain.run_all
 Sorties : data/exports/abp_site_domain/*.csv/tsv (+ figures)
 """
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -50,6 +51,9 @@ def _sh(cmd, desc):
 
 
 def main():
+    OUT.mkdir(parents=True, exist_ok=True)
+    marker = OUT / "pipeline_incomplete.json"
+    marker.write_text(json.dumps({"state": "running"}))
     print("== Étape 10 : analyses structurales ABP ==")
     _py("01_build_table.py")
     _py("02_extract_chains.py")
@@ -89,16 +93,15 @@ def main():
         subprocess.run(["rm", "-rf", str(d)], check=False)
 
     if _failed:
-        print(f"== Sous-étapes en échec (non bloquant) : {', '.join(_failed)} ==",
-              flush=True)
-    # Complétude jugée sur la sortie clé. Si elle manque, on sort en erreur pour
-    # que Run/update re-tente l'étape au prochain lancement (les sous-scripts
-    # réseau sont cachés/reprenables → ils repartiront d'où ils se sont arrêtés).
+        marker.write_text(json.dumps({"state": "failed", "steps": _failed}, indent=2))
+        print(f"Structural analysis incomplete: {', '.join(_failed)}. Previous files do not establish success.", flush=True)
+        sys.exit(1)
     familles = OUT / "familles.csv"
     if not familles.exists():
         print("== Étape 10 INCOMPLÈTE : familles.csv (sortie clé) absent — "
               "relance Run/update pour re-tenter. ==", flush=True)
         sys.exit(1)
+    marker.unlink(missing_ok=True)
     print("== Étape 10 terminée ==")
 
 

@@ -32,7 +32,8 @@ def scores_cached(stamp):return load_actin_scores()
 
 
 def current_scores():
-    return scores_cached(signatures(list(Path('data/proteocast/actin').glob('*'))+[Path('data/P60709_ref.fasta'),Path('data/proteocast/conservation_vs_asa_per_position.csv')]))
+    from rsa_source import source_files
+    return scores_cached(signatures(source_files()+list(Path('data/proteocast/actin').glob('*'))+[Path('data/P60709_ref.fasta')]))
 
 
 def current_footprints():
@@ -47,6 +48,8 @@ def render_conservation():
     if not Path('data/proteocast/actin/4.query_ProteoCast.csv').exists():
         st.info('Import the actin ProteoCast source results to enable the complete profile.');return
     raw,scores=current_scores()
+    if scores.rsa_status.iloc[0] != "current":
+        st.warning(scores.rsa_status.iloc[0] + " Open Documentation → Data management.")
     from residue_passport import build_passport, pp_mtimes
     from residue_explorer import render_residue_conservation
     passport = build_passport(pp_mtimes())
@@ -59,7 +62,7 @@ def render_conservation():
     cutoff=st.slider('Buried ASA threshold for sensitivity footprints (%)',0.0,100.0,0.0,step=1.0,key='cons_asa')
     table,cor,clusters=conservation_summary(scores,current_footprints(),cutoff)
     fig=make_subplots(rows=4,cols=1,shared_xaxes=True,vertical_spacing=.06,
-                      subplot_titles=('Mutational sensitivity','RSA in existing structural source','Distinct ABP source names','Observed actin–actin contacts'))
+                      subplot_titles=('Mutational sensitivity','RSA · isolated 7PDZ chain I','Distinct ABP source names','Observed actin–actin contacts'))
     for row,(col,label,color) in enumerate([('sensitivity','Mutational sensitivity','#0072B2'),('rsa','RSA','#777777'),('n_abp_names','Distinct ABP source names','#E69F00'),('homo_contact','Actin–actin contact (0/1)','#884EA0')],1):
         fig.add_trace(go.Scatter(x=table.position,y=table[col],mode='lines',name=label,line=dict(color=color),customdata=table.aa,
                                  hovertemplate='%{customdata}%{x} · %{fullData.name}: %{y:.3~g}<extra></extra>'),row=row,col=1)
@@ -75,8 +78,8 @@ def render_conservation():
     st.markdown('**Exploratory correlations and footprint summaries**')
     st.caption('One observation per P60709 position; pairwise missing values are excluded. Spearman correlations '
                'and BH corrections cover the four displayed tests. Residues are structurally dependent: '
-               'p-values are exploratory. RSA comes from the existing structural table; its filament/monomer '
-               'provenance has not been established. No observed contact does not mean no possible interaction.')
+               'p-values are exploratory. RSA is calculated locally on isolated 7PDZ chain I in its experimental '
+               'filament conformation. It is not an average across structures. No observed contact does not mean no possible interaction.')
     st.dataframe(cor,hide_index=True,width='stretch')
     fig=go.Figure()
     for cat,color in zip(['No observed contact','Actin only','ABP only','Both'],['#999999','#0072B2','#E69F00','#884EA0']):

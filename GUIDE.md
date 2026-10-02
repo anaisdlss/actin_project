@@ -20,8 +20,16 @@ group together, where partner footprints overlap, which partners occur in the sa
 
 ## 2. Where the data comes from (pipeline)
 
-The full dataset is regenerated locally by a **9-step pipeline** (button
-*Run / update*). Summary of the sources:
+The local project separates two operations under **Documentation → Data management**:
+
+- **Rebuild local scientific results** computes documented RSA, the ABP motif catalogue, variant/sensitivity/interface summaries, interface geometry, filament proximity, S1 figures and local FoldDisco controls from the installed sources. The procedure checks file contents, code and software versions, skips unchanged results, records each successful calculation and resumes after failure. It does not submit external jobs.
+- **Run / update** refreshes PPI3D through the existing nine-stage acquisition pipeline, then runs the local scientific rebuild. If the remote service cannot be checked, the update stops with an error and retains installed data. A network failure is not reported as a successful refresh.
+
+**Data origins and calculation receipts** lists every CSV, its checksum and the provenance that could actually be established. A recovered producer script is distinct from a verified historical run. Imported variant snapshots have an identified import source but unknown original release dates. ProteoCast scores and database assertions remain external inputs. Undocumented historical files are listed explicitly; they are not certified by their presence.
+
+Current residue RSA is recomputed from experimental **7PDZ chain I**, with three explicit contexts: isolated chain in the same conformation, six-actin fragment, and fragment plus capping proteins. It is **not a mean over all actins or all PDBs**. The isolated-chain context defines the RSA ≥ 0.2 baseline in mutational-sensitivity comparisons. Missing/modified/incomplete residues retain missing RSA. The old `conservation_vs_asa_per_position.csv` is retained for historical comparison, but current readers and the migrated analysis scripts no longer use it as a measurement source.
+
+Source summary:
 
 1. **PPI3D** — all 3D interactions involving actin (summary + structures +
    inter-residue contacts). We keep only assemblies with **≥ 5 connected actin

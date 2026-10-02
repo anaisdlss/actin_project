@@ -113,15 +113,15 @@ def render_residue_conservation(pp):
                                errors="coerce").iloc[0]
         c1, c2, c3 = st.columns(3)
         _rsa_value = pd.to_numeric(pd.Series([row.get("rsa")]), errors="coerce").iloc[0]
-        c3.metric("RSA in source table (%)", _fmt(_rsa_value * 100, 1),
-                  help="Solvent accessibility from the legacy RSA source table. This is distinct from interface buried ASA; the structure and method must be checked before treating it as filament accessibility.")
+        c3.metric("RSA · 7PDZ I, isolated (%)", _fmt(_rsa_value * 100, 1),
+                  help="Locally computed on experimental 7PDZ chain I, extracted in the same conformation. SASA / Tien maximum; not an average of the dataset.")
         c1.metric(
             "Mutational sensitivity", _fmt(this_c),
             delta=(f"{float(this_c) - avg_surf:+.2f} vs mean surface"
                    if pd.notna(this_c) and pd.notna(avg_surf) else None))
         c2.metric("Mean sensitivity, RSA ≥ 0.2", _fmt(avg_surf))
 
-    st.caption("ProteoCast class and sensitivity describe the supplied model scores. The surface mean uses the legacy RSA source, whose structural context remains to be established.")
+    st.caption("ProteoCast class and sensitivity describe the supplied model scores. The surface mean uses the locally computed isolated 7PDZ chain I (RSA ≥ 0.2), in its experimental filament conformation.")
 
 
 def render_residue_fiche(pp, canon):
@@ -131,9 +131,17 @@ def render_residue_fiche(pp, canon):
     st.markdown(f"### Residue **{aa}{numbering.label(canon)}**  (UniProt P60709 numbering)")
 
     if row is not None:
-        rsa = pd.to_numeric(pd.Series([row.get("rsa")]), errors="coerce").iloc[0]
-        st.metric("RSA in source table (%)", _fmt(rsa * 100, 1),
-                  help="Legacy structural source; monomer/filament provenance is unresolved. See Actin mutational sensitivity → Solvent accessibility for a separately documented calculation.")
+        from rsa_source import CONTEXTS
+        for column, (context, label) in zip(st.columns(3), CONTEXTS.items()):
+            rsa = pd.to_numeric(pd.Series([row.get('rsa_' + context)]), errors='coerce').iloc[0]
+            column.metric(f"RSA · {label} (%)", _fmt(rsa * 100, 1))
+        st.caption("Calculated locally from experimental 7PDZ chain I, with identical coordinates in three contexts. "
+                   "P60709 supplies the residue numbering; these values are not a mean across the dataset. "
+                   "Isolated means the same chain without its neighbours, not a relaxed G-actin model. "
+                   "Missing or incomplete residues have no RSA value.")
+        state = row.get('rsa_status', 'RSA needs a local rebuild.')
+        if state != 'current':
+            st.warning(str(state) + ' Open Documentation → Data management.')
     from app_navigation import request_page
     st.button("Mutational sensitivity of this residue", key=f"residue_conservation_{canon}",
               on_click=request_page, args=("actin-conservation", "Overview"),
@@ -594,7 +602,6 @@ def _render_pair_3d(pp, inter, only1, only2, a1, a2, colors):
 # ── Vue séquence query (#1) ──────────────────────────────────────────────────
 
 _ACTIN_REF_FASTA = "data/P60709_ref.fasta"
-_CONS_CSV = "data/proteocast/conservation_vs_asa_per_position.csv"
 
 
 @st.cache_data(show_spinner="Fetching the UniProt sequence…")
@@ -646,13 +653,11 @@ def _actin_bfactor_pdb(pp, col):
 @st.cache_data(show_spinner=False)
 def _canonical_actin():
     """Séquence de référence P60709 (ACTB humaine) + mapping position P60709 -> canon."""
-    if not (os.path.exists(_ACTIN_REF_FASTA) and os.path.exists(_CONS_CSV)):
+    if not os.path.exists(_ACTIN_REF_FASTA):
         return None
     seq = "".join(l.strip() for l in open(_ACTIN_REF_FASTA)
                   if not l.startswith(">"))
-    cons = pd.read_csv(_CONS_CSV)
-    res2canon = {int(r): int(c) for r, c in
-                 zip(cons["Residue"], cons["canon"]) if pd.notna(r) and pd.notna(c)}
+    res2canon = {r: numbering.to_canon(r) for r in range(1, len(seq) + 1)}
     return seq, res2canon
 
 

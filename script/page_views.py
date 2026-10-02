@@ -103,6 +103,8 @@ _GRAPH_COMPONENT = st.components.v1.declare_component("actin_graph", path=str(_P
 
 
 def render_data_tools():
+    from local_rebuild_ui import render as render_local_rebuild
+    render_local_rebuild()
     pipeline_ui.render()
     if not DEPLOY_MODE:
         st.divider()

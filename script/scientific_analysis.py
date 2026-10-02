@@ -97,15 +97,17 @@ def load_actin_scores(root=Path('.')):
     scores=raw.groupby('position').Variant_score.mean().reindex(range(1,376)).to_frame('mean_variant_score')
     scores['sensitivity']=-scores.mean_variant_score
     scores['aa']=list(ref);scores.index.name='position'
-    old=root/'data/proteocast/conservation_vs_asa_per_position.csv'
-    scores['rsa']=np.nan
-    if old.exists():
-        rs=pd.read_csv(old)
-        rs['position']=numbering.uniprot_series(rs.canon)
-        # RSA uses structural MAFFT mapping, not the ProteoCast sequence index.
-        rs=rs.dropna(subset=['position']).set_index('position')
-        scores['rsa']=pd.to_numeric(rs.rsa,errors='coerce').reindex(scores.index)
-        scores.loc[~scores.rsa.between(0,1),'rsa']=np.nan
+    from rsa_source import load_rsa, LABEL
+    profile, state = load_rsa(root)
+    scores['rsa_source'] = LABEL
+    scores['rsa_status'] = state
+    for context in ('isolated', 'actin_fragment', 'with_abp'):
+        column = 'rsa_' + context
+        scores[column] = (profile.set_index('position')[column].reindex(scores.index)
+                          if not profile.empty else np.nan)
+    # The surface baseline is the explicit isolated-chain context, not an
+    # undocumented average over species or structures. Other contexts stay visible.
+    scores['rsa'] = scores.rsa_isolated
     return raw,scores.reset_index()
 
 
@@ -182,7 +184,7 @@ def disease_associations(variants,records,gene,disease):
 
 
 def canonical_conservation(root=Path('.')):
-    """Refresh score coordinates while preserving structural RSA in its own mapping."""
+    """Recompute P60709 scores, observed contact means and documented reference RSA."""
     raw,scores=load_actin_scores(root)
     out=scores.rename(columns={'position':'Residue','sensitivity':'conservation','mean_variant_score':'mean_vs'}).copy()
     out['canon']=out.Residue.map(numbering.to_canon)
@@ -196,6 +198,14 @@ def canonical_conservation(root=Path('.')):
         out['at_homo']=out.Residue.isin(records.loc[records.kind.eq('homo'),'position'])
         out['at_hetero']=out.Residue.isin(records.loc[records.kind.eq('abp'),'position'])
         out['at_interface']=out.at_homo | out.at_hetero
+        # Mean over observed positive interface residues: one maximum per
+        # interaction/chain, then equal observation weights. Absent contact is
+        # not a measured zero-accessibility value.
+        observations = records.groupby(['kind','position','interaction_id','chain']).asa.max().reset_index()
+        for kind, column in [('homo', 'homo_asa'), ('abp', 'hetero_asa')]:
+            values = observations[observations.kind.eq(kind)].groupby('position').asa.mean()
+            out[column] = out.Residue.map(values)
+        out['combined_asa'] = out.Residue.map(observations.groupby('position').asa.mean())
     else:
         for col in ['at_homo','at_hetero','at_interface']:out[col]=pd.NA
     return out

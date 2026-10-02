@@ -1,6 +1,21 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+# Load the installed package before the sibling streamlit.py can shadow it.
+import sys as _sys
+if not __package__:
+    _script_directory = _sys.path.pop(0)
+    try:
+        import streamlit
+    finally:
+        _sys.path.insert(0, _script_directory)
+
+from functools import lru_cache
+from scientific_analysis import canonical_conservation
+_cached_actin_profile = lru_cache(maxsize=1)(canonical_conservation)
+def _current_actin_profile(root):
+    return _cached_actin_profile(root).copy()
+
 import os as _os
 _os.chdir(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))  # cwd = racine projet (robuste, peu importe d'où on lance)
 
@@ -315,7 +330,7 @@ for sd in range(30):
 labels=best[1]
 
 # --- taille = conservation moyenne de l'interface actine (ponderee par enfouissement) ---
-_cdf=pd.read_csv(_R/'data/proteocast/conservation_vs_asa_per_position.csv')
+_cdf=_current_actin_profile(_R)
 _cmap=dict(zip(_cdf['canon'].astype(int), _cdf['conservation']))
 _cvec=np.array([_cmap.get(int(c),np.nan) for c in pivot.columns]); _msk=~np.isnan(_cvec)
 _W=pivot.values.astype(float)
@@ -402,7 +417,7 @@ _im=_het.set_index('interaction_id'); _s1=_im['chain_A_id']; _ab=_im['abp']; _st
 _dd=_df3[_df3.interaction_id.isin(set(_het.interaction_id))].copy()
 _dd['_c']=_dd.interaction_id.map(_s1); _dd=_dd[_dd.chain==_dd._c].copy()   # cote actine
 _dd['abp']=_dd.interaction_id.map(_ab); _dd['site']=_dd.interaction_id.map(_st); _dd['canon']=_dd.canon.astype(int)
-_cdf=pd.read_csv(_R/'data/proteocast/conservation_vs_asa_per_position.csv'); _cons=dict(zip(_cdf['canon'].astype(int),_cdf['conservation']))
+_cdf=_current_actin_profile(_R); _cons=dict(zip(_cdf['canon'].astype(int),_cdf['conservation']))
 _KD={'A':1.8,'R':-4.5,'N':-3.5,'D':-3.5,'C':2.5,'Q':-3.5,'E':-3.5,'G':-0.4,'H':-3.2,'I':4.5,'L':3.8,'K':-3.9,'M':1.9,'F':2.8,'P':-1.6,'S':-0.8,'T':-0.7,'W':-0.9,'Y':-1.3,'V':4.2}
 def _mode(s): m=s.mode(); return m.iloc[0] if len(m) else None
 # --- etage 1 : par (abp, site, canon) -> enfouissement moyen de la position dans le site ---
@@ -576,7 +591,7 @@ P=_d.groupby('canon').agg(
 P['hydrophobicite']=P['res'].map(lambda r:_KD.get(str(r),np.nan))   # Kyte-Doolittle
 
 # --- descripteurs Proteocast / exposition par position ---
-_cdf=pd.read_csv(_R/'data/proteocast/conservation_vs_asa_per_position.csv').set_index('canon')
+_cdf=_current_actin_profile(_R).set_index('canon')
 P=P.join(_cdf[['conservation','rsa','residue_class','homo_asa','hetero_asa','combined_asa']])
 #   conservation = sensibilite Proteocast ; rsa = exposition ; homo/hetero/combined_asa = surface enfouie filament / ABP / totale
 
@@ -883,7 +898,7 @@ _imap=_m.set_index('interaction_id'); _chA=_imap['chain_A_id']; _clu=_imap['clus
 _d=_df3[_df3.interaction_id.isin(set(_m.interaction_id))].copy()
 _d['_a']=_d.interaction_id.map(_chA); _d=_d[_d.chain==_d._a].copy()   # cote actine = chaine A (subunit_1)
 _d['clu']=_d.interaction_id.map(_clu); _d['canon']=_d.canon.astype(int)
-_cdf=pd.read_csv(_R/'data/proteocast/conservation_vs_asa_per_position.csv'); _cons=dict(zip(_cdf['canon'].astype(int),_cdf['conservation']))
+_cdf=_current_actin_profile(_R); _cons=dict(zip(_cdf['canon'].astype(int),_cdf['conservation']))
 _KD={'A':1.8,'R':-4.5,'N':-3.5,'D':-3.5,'C':2.5,'Q':-3.5,'E':-3.5,'G':-0.4,'H':-3.2,'I':4.5,'L':3.8,'K':-3.9,'M':1.9,'F':2.8,'P':-1.6,'S':-0.8,'T':-0.7,'W':-0.9,'Y':-1.3,'V':4.2}
 def _md(s): mm=s.mode(); return mm.iloc[0] if len(mm) else None
 _po=_d.groupby(['clu','canon']).agg(w=('pct','mean'),res=('residue_name',_md)).reset_index()
@@ -1053,7 +1068,7 @@ plt.tight_layout(); plt.show()
 
 # === Conservation des positions actine selon le role d'interface ===
 from scipy.stats import kruskal, mannwhitneyu
-_cv=pd.read_csv(_R/'data/proteocast/conservation_vs_asa_per_position.csv')
+_cv=_current_actin_profile(_R)
 for _c in ['at_homo','at_hetero','at_interface']: _cv[_c]=_cv[_c].astype(bool)
 def _grp(r):
     if not r['at_interface']: return 'non-interface'
@@ -1093,7 +1108,7 @@ plt.tight_layout(); plt.show()
 # touche aussi le filament). Les groupes se CHEVAUCHENT -> on teste par paires
 # (Mann-Whitney), pas en Kruskal-Wallis (qui suppose des groupes independants).
 from scipy.stats import mannwhitneyu
-_cv=pd.read_csv(_R/'data/proteocast/conservation_vs_asa_per_position.csv')
+_cv=_current_actin_profile(_R)
 for _c in ['at_homo','at_hetero','at_interface']: _cv[_c]=_cv[_c].astype(bool)
 
 _groups={
@@ -1143,7 +1158,7 @@ _d3['is_homo']=_d3.interaction_id.isin(_homoids)
 _hm=_d3[_d3.is_homo].groupby('canon')['pct'].max()      # ASA max cote filament
 _hh=_d3[~_d3.is_homo].groupby('canon')['pct'].max()     # ASA max cote ABP
 
-_cvc=pd.read_csv(_R/'data/proteocast/conservation_vs_asa_per_position.csv').set_index('canon')
+_cvc=_current_actin_profile(_R).set_index('canon')
 _fcore=(_hm.reindex(_cvc.index)>25).fillna(False)   # coeur filament : max ASA homo > 25%
 _acore=(_hh.reindex(_cvc.index)>25).fillna(False)   # coeur ABP      : max ASA hetero > 25%
 
@@ -1547,7 +1562,7 @@ _c['aromatique_A']=_a.isin(_ARO).astype(int); _c['aromatique_B']=_b.isin(_ARO).a
 _c['charge_A']=_qA.values; _c['charge_B']=_qB.values             # charges nettes separees
 # conservation cote actine
 _pp=pd.read_csv(_R/'data/filtered/proteins_per_pdb.csv'); _ac=set(_pp[_pp.is_actin]['chain'])
-_cdf=pd.read_csv(_R/'data/proteocast/conservation_vs_asa_per_position.csv'); _cons=dict(zip(_cdf['canon'].astype(int),_cdf['conservation']))
+_cdf=_current_actin_profile(_R); _cons=dict(zip(_cdf['canon'].astype(int),_cdf['conservation']))
 _cnA=pd.to_numeric(_c['residue_A_canon_mafft'],errors='coerce'); _cnB=pd.to_numeric(_c['residue_B_canon_mafft'],errors='coerce')
 _isA=_c['chain_A_id'].isin(_ac).values; _isB=_c['chain_B_id'].isin(_ac).values
 _c['iface']=np.where(_isA&_isB,'actine-actine',np.where(_isA^_isB,'actine-ABP','autre'))  # type de contact homo/hetero

@@ -10,6 +10,8 @@ Sorties :
   data/exports/abp_site_domain/actin_residue_determinants.csv
   data/exports/abp_site_domain/figure_site_determinants.png
 """
+import sys
+import streamlit
 from pathlib import Path
 from collections import defaultdict
 import pandas as pd
@@ -27,7 +29,9 @@ res = pd.read_csv(ROOT / "data/filtered/details/3.interface_residues.csv")
 res["canon"] = pd.to_numeric(res["residue_number_canon_mafft"], errors="coerce")
 fam = pd.read_csv(OUT / "familles.csv")
 fam_of = {a.strip(): r.famille for _, r in fam.iterrows() for a in str(r.membres).split(" · ")}
-cons = pd.read_csv(ROOT / "data/proteocast/conservation_vs_asa_per_position.csv")
+sys.path.insert(0, str(ROOT / "script"))
+from scientific_analysis import canonical_conservation
+cons = canonical_conservation(ROOT)
 
 m = df.merge(di, left_on=["subunit_1", "subunit_2"],
              right_on=["chain_A_id", "chain_B_id"], how="left")

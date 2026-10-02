@@ -10,6 +10,7 @@ from footprint_comparison import footprint_records,FILES
 from interface_properties import chemistry_records,chemistry_summary,SOURCES as CHEMISTRY_SOURCES
 out=ROOT/'reports/scientific_audit';out.mkdir(parents=True,exist_ok=True)
 v,m=load_variants(ROOT);raw,scores=load_actin_scores(ROOT)
+if not scores.rsa_status.eq('current').all():raise ValueError(scores.rsa_status.iloc[0])
 records=footprint_records(*(pd.read_csv(p,low_memory=False) for p in FILES))
 profiles,cor,summary=conservation_summary(scores,records)
 a,c,o,ctx=interface_evidence(pd.read_csv(FILES[0],low_memory=False))
@@ -22,7 +23,7 @@ for name,frame in [('cross_gene_observations',cross),('cross_gene_pair_counts',c
                    ('cross_gene_abp_summaries',cross_abp),('cross_gene_abp_details',cross_detail),
                    ('partner_chemistry_positions',chem_profile),('partner_chemistry_per_abp',chem_abp)]:
  frame.to_csv(out/f'{name}.csv',index=False)
-paths=[ROOT/'data/human_variants/clinvar_identity.json']+list(FILES)+list(CHEMISTRY_SOURCES)+list((ROOT/'data/human_variants').rglob('*.csv'))+list((ROOT/'data/human_variants').rglob('*.fasta'))+list((ROOT/'data/proteocast/actin').glob('*'))+[ROOT/'data/proteocast/conservation_vs_asa_per_position.csv']
+paths=[ROOT/'data/human_variants/clinvar_identity.json']+list(FILES)+list(CHEMISTRY_SOURCES)+list((ROOT/'data/human_variants').rglob('*.csv'))+list((ROOT/'data/human_variants').rglob('*.fasta'))+list((ROOT/'data/proteocast/actin').glob('*'))+[ROOT/'reports/scientific_audit/filament_accessibility_7pdz_I.csv',ROOT/'reports/scientific_audit/filament_accessibility_manifest.json']
 manifest={'generated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'variant_records':len(v),'mapped_variant_records':int(v.mapping_valid.sum()),'analysis_eligible_records':int(v.analysis_eligible.sum()),'positions':len(scores),'ASA_threshold':0,'numbering':'P60709',
  'scientific_status':'Exploratory; structure-state labels and clinical effects are not validated by these statistics.',
  'source_sha256':{str(p.relative_to(ROOT) if p.is_absolute() else p):hashlib.sha256(p.read_bytes()).hexdigest() for p in paths},

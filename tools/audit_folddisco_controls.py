@@ -45,7 +45,8 @@ def main():
         except (ValueError,OSError) as exc:missing.append(dict(pdb=pdb,chain=chain,error=str(exc)))
     wanted={Path(t['file']).name for t in targets}
     stale=[p.name for p in target_dir.glob('*.pdb') if p.name not in wanted]
-    if stale:raise ValueError(f'Stale index sources present: {stale}. Use a fresh output directory.')
+    # Only generated representative-chain files in this tool-owned directory.
+    for name in stale:(target_dir/name).unlink()
     index=OUT/'index';cmd=[str(binary),'index','-p',str(target_dir),'-i',str(index),'-t','4']
     subprocess.run(cmd,check=True,capture_output=True,text=True)
     target_map={t['key']:t for t in targets}

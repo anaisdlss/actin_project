@@ -12,6 +12,7 @@ from pathlib import Path
 import sys
 import time
 
+import streamlit  # import package before script/ shadows its name
 import Bio
 from Bio import SeqIO
 from Bio.PDB import PDBParser
@@ -118,7 +119,7 @@ def main(argv=None):
                         "Isolated chain is extracted from the filament in the same conformation, not relaxed or separately measured G-actin.",
                         "Missing atoms and excluded ligands can affect accessibility of neighboring residues; coordinates are not completed.",
                         "Discretization convergence is numerical sensitivity, not biological uncertainty.",
-                        "This audit does not replace the existing RSA data whose provenance remains unknown, and does not validate biological major/minor interface classifications."],
+                        "Current app RSA uses these explicit contexts; the legacy table remains archived and is not used. This calculation does not validate biological major/minor interface classifications."],
         "primary_method_sources": ["https://biopython.org/docs/latest/api/Bio.PDB.SASA.html", "https://doi.org/10.1016/0022-2836(73)90011-9", "https://doi.org/10.1371/journal.pone.0080635"],
         "code_sha256": {name: digest(ROOT / name) for name in ("script/filament_accessibility.py", "tools/calculate_filament_accessibility.py")},
         "outputs_sha256": {str(p.relative_to(root)): digest(p) for p in paths},

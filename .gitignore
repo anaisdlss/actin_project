@@ -61,3 +61,6 @@ deploy/
 
 # Local safety copies of regenerated figures
 reports/figure_backups/
+
+# Runtime lock for the local scientific rebuild
+reports/local_rebuild/*.lock

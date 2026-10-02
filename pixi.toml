@@ -10,6 +10,9 @@ platforms = [
 version = "0.1.0"
 
 [tasks]
+rebuild = "python tools/rebuild_local.py"
+data-status = "python tools/rebuild_local.py --status"
+data-inventory = "python tools/rebuild_local.py --inventory"
 
 [dependencies]
 python = "3.12.*"

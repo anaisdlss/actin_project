@@ -1,0 +1,22 @@
+{
+  "started_utc": "2026-10-02T14:55:46.592714+00:00",
+  "state": "complete",
+  "requested": [
+    "abp_catalog",
+    "figures",
+    "filament_proximity",
+    "folddisco_controls",
+    "interface_geometry",
+    "rsa",
+    "scientific_tables"
+  ],
+  "completed": [
+    "rsa",
+    "abp_catalog",
+    "scientific_tables",
+    "interface_geometry",
+    "filament_proximity",
+    "figures",
+    "folddisco_controls"
+  ]
+}

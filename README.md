@@ -1,5 +1,14 @@
 # Actin–ABP interaction analysis
 
+## Reproducible local calculations
+
+In the full research project, open **Documentation → Data management → Rebuild local scientific results**, or run `pixi run rebuild`. This offline workflow rebuilds seven registered scientific calculations and verifies source/code/output checksums before reusing a result. `pixi run data-status` checks freshness; `pixi run data-inventory` inventories CSV provenance. The public app displays saved results and does not launch these local tools.
+
+Successful calculation receipts, logs and the CSV inventory are saved in `reports/local_rebuild/`. An interrupted or failed step is never accepted merely because an old output exists. Remote PPI3D updates remain a separate action; imported ProteoCast and variant source snapshots are not represented as locally generated measurements. Historical source gaps remain visible in the inventory.
+
+The RSA displayed by the app now comes from the reproducible 7PDZ chain I calculation, with explicit isolated/fragment/capped-fragment contexts. It does not average unrelated structures or silently reuse the legacy CSV.
+
+
 Structural analysis of actin and its actin-binding proteins (ABPs), built from
 every 3D co-structure in [PPI3D](https://bioinformatics.lt/ppi3d) (actin,
 UniProt **P60709**). The pipeline keeps assemblies with ≥ 5 connected actin

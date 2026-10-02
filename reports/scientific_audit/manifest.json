@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-10-01T14:06:04.239802+00:00",
+  "generated_utc": "2026-10-02T14:53:54.278265+00:00",
   "variant_records": 3039,
   "mapped_variant_records": 3022,
   "analysis_eligible_records": 2864,
@@ -35,14 +35,15 @@
     "data/proteocast/actin/1.query.fasta": "350341f0efa6d0b5736714a0a5ec50721be5211481c8cfb8b4f44dd4267f311c",
     "data/proteocast/actin/2.aliAF-P60709-F1-msa_v6.fasta": "e8bbcc7c1a7ea66d1fbe5272509c2496d591cbd573d6361c62781c9a14f9f7da",
     "data/proteocast/actin/4.query_ProteoCast.csv": "909024144ba3aa29fe879bbdb4c2c661a74ee30d90d4b993406500e6d81cd4e4",
-    "data/proteocast/conservation_vs_asa_per_position.csv": "9e74b08cd8973d457cdd3cf1bf59c72332c02f3557f52b993f1b54e88780074e"
+    "reports/scientific_audit/filament_accessibility_7pdz_I.csv": "6b1ce398fe1b997f2708df607c929494cd4f848c3798b9ad2c30e7544e8b73c2",
+    "reports/scientific_audit/filament_accessibility_manifest.json": "8e3dccd15818f80da545aa9c118f20f7dbe6a063f0cd3afe610397fbe8e3629f"
   },
   "chemistry_weight": "Positive uncensored pair contact area; fractions per interface and position, equal interface means within PDB/ABP, equal PDB then ABP means",
   "code_sha256": {
-    "script/scientific_analysis.py": "0f195f81d2ee48dac2e797349fe5777499d5da224b4229655c9a7a8ada7df3a9",
-    "script/footprint_comparison.py": "c426849ca45674b4419db8b08e3bdeaee8eb099fde73d288836462b2cc5d364d",
-    "script/interface_properties.py": "cdfc66c914761fbb320572b60635b4a5f519abdfdfdc814f8fb4c8f64d3adef6",
+    "script/scientific_analysis.py": "3ab9cb503eade2d6a11d72340c5503a52bc1af923eb95075255b24e8232d0495",
+    "script/footprint_comparison.py": "4c79c743966c68045621da8c8a2ef35227260100c06d053107fd6523b83083b2",
+    "script/interface_properties.py": "fa4824a77364067c56b0de88ea526666143eeb47b02cf80b0acadf2caee1a4da",
     "script/residue_contacts.py": "9b4369da1b7982f794f1f777bc8795304c256b7f24f759154c2c096ba0333b28",
-    "tools/export_scientific_audit.py": "1b2a7d239beef4bca5abf8d9c14da24bff197e54769ba3c1e4181f37d13a9f20"
+    "tools/export_scientific_audit.py": "ef217f4206c6df289c6dd754aafea8bfd72b73c27bc770da3845a47f52e4922e"
   }
 }

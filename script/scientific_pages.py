@@ -26,6 +26,8 @@ def render(section):
                 st.rerun()
             if views.DEPLOY_MODE:
                 st.info("This public app uses a prepared dataset. Data updates and calculations are managed in the full project.")
+                from local_rebuild_ui import render as render_local_rebuild
+                render_local_rebuild()
             else:
                 views.render_data_tools()
         guide = Path("GUIDE.md")

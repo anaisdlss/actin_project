@@ -1,5 +1,14 @@
 # Vérifier l’application Actin–ABP
 
+## Latest local provenance checks — 2 October 2026
+
+- **115 unit tests pass in each repository.** New cases cover content changes with unchanged modification times, modified/missing outputs, last-good output recovery after failure, concurrent-build exclusion, unknown CSV provenance, removal of legacy RSA fallback, failed network substeps with an existing family table, and changed alignment coordinates.
+- All seven registered calculations were executed separately on each dataset. A second complete run verified their fingerprints and skipped all seven unchanged calculations. Source integrity checks have no blocking failures; four catalogue PDBs remain outside the retained interaction scope and are reported as a warning.
+- AppTest traversed all eleven pages and representative controls successfully in both repositories. This checks Streamlit execution and figure data; it is not a new browser/WebGL visual inspection.
+- Current RSA is explicitly calculated from 7PDZ chain I, using the same coordinates in three contexts. The historical RSA CSV is preserved but no longer used by current readers. Numerical freshness and biological validation remain separate.
+- Calculation receipts and the per-file inventory are under `reports/local_rebuild/`. External snapshot release dates and some historical origins remain unresolved; the inventory states these limitations instead of certifying them.
+
+
 ## Contrôle final du 2 octobre 2026
 
 Ce statut prime sur les nombres et constats historiques ci-dessous.

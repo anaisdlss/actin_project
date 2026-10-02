@@ -1,0 +1,34 @@
+{
+  "finished_utc": "2026-10-02T14:53:50.705264+00:00",
+  "fingerprint": {
+    "inputs": {
+      "data/P60709_ref.fasta": "50469aa3087cbb3679ce4167ab78ce1352cc07bd7fa6533e77ed9601dedcaa08",
+      "data/filtered/details/structures_files/assembly/7pdz.pdb": "961bc2f531bd1b2fd694227dd4c4a9a47a62229144005baef9e835059719226f",
+      "data/filtered/proteins_per_pdb.csv": "be97933d256e64017cba6e06cc93965866b167143727c1841b175f0edb57912f"
+    },
+    "code": {
+      "script/display_helpers.py": "cfff8b5096f06a125dc7da681c36a9c804e68f8b3eacde79cad00eb8e232d2fb",
+      "script/filament_accessibility.py": "40b3fb1b797012fe418af5e5a9bc32dacf866ef70e52119fe1302588d33f8237",
+      "script/local_rebuild.py": "9128d0b366bf79bcf52ca91bb8c9e8d8d74d0164c580306c0f1d1d7ef61641fb",
+      "script/numbering.py": "740de6699bf30037e4db8905cf6701cdc1b978ea3bf5a6bfb5f8476c42a18ede",
+      "script/residue_contacts.py": "9b4369da1b7982f794f1f777bc8795304c256b7f24f759154c2c096ba0333b28",
+      "tools/calculate_filament_accessibility.py": "020a308050396dd03be609ba8789fe86fa09c22aeb65f963679c8cd0a45f3464"
+    },
+    "runtime": {
+      "python": "3.12.13",
+      "numpy": "2.5.0",
+      "pandas": "2.3.3",
+      "biopython": "1.87",
+      "scipy": "1.18.0"
+    },
+    "command": [
+      "-u",
+      "tools/calculate_filament_accessibility.py"
+    ]
+  },
+  "outputs": {
+    "reports/scientific_audit/filament_accessibility_7pdz_I.csv": "6b1ce398fe1b997f2708df607c929494cd4f848c3798b9ad2c30e7544e8b73c2",
+    "reports/scientific_audit/filament_accessibility_convergence.csv": "d8effa2179c82567cd5b20c86c8375a373c4e703c50d7b511b6f4817d31eccbc",
+    "reports/scientific_audit/filament_accessibility_manifest.json": "8e3dccd15818f80da545aa9c118f20f7dbe6a063f0cd3afe610397fbe8e3629f"
+  }
+}

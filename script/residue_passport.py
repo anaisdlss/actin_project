@@ -24,6 +24,7 @@ import numpy as np
 import streamlit as st
 import numbering
 from residue_metrics import complete_actin_positions
+from rsa_source import source_files, load_rsa
 
 _REF_FASTA = "data/P60709_ref.fasta"
 
@@ -32,14 +33,14 @@ _PP_FILES = [
     "data/filtered/details/3.interface_residues.csv",
     "data/filtered/details/4.inter-residue_contacts.csv",
     "data/filtered/filtered_all_data.csv",
-    "data/proteocast/conservation_vs_asa_per_position.csv",
+    "reports/scientific_audit/filament_accessibility_7pdz_I.csv",
 ]
 
 
 def pp_mtimes():
     """Empreinte temporelle des fichiers sources (clé de cache)."""
     return tuple(os.path.getmtime(f) if os.path.exists(f) else 0.0
-                 for f in [*_PP_FILES, _REF_FASTA, "data/proteocast/actin/4.query_ProteoCast.csv", "data/proteocast/actin/1.query.fasta"])
+                 for f in [*_PP_FILES, *map(str, source_files()), _REF_FASTA, "data/proteocast/actin/4.query_ProteoCast.csv", "data/proteocast/actin/1.query.fasta"])
 
 
 def _clean_abp_name(s: pd.Series) -> pd.Series:
@@ -156,12 +157,9 @@ def build_passport(mtimes):
             "asa_pct", "area", "contact_type", "c70", "s1_site", "interaction_id"]]
 
     # ── pos : conservation par position + agrégats ABP ─────────────────────────
-    if os.path.exists(f_cons):
-        if os.path.exists("data/proteocast/actin/4.query_ProteoCast.csv"):
-            from scientific_analysis import canonical_conservation
-            pos = canonical_conservation()
-        else:
-            pos = pd.read_csv(f_cons)
+    if os.path.exists("data/proteocast/actin/4.query_ProteoCast.csv"):
+        from scientific_analysis import canonical_conservation
+        pos = canonical_conservation()
     else:
         pos = pd.DataFrame({"canon": sorted(res_abp["canon"].unique())})
     pos["canon"] = pd.to_numeric(pos["canon"], errors="coerce")
@@ -169,7 +167,15 @@ def build_passport(mtimes):
     pos["canon"] = pos["canon"].astype(int)
 
     pos = complete_actin_positions(pos)
-    for col in ("rsa", "conservation", "residue_class"):
+    if 'rsa_status' not in pos:
+        profile, state = load_rsa()
+        pos['rsa_status'] = state
+        for context in ('isolated', 'actin_fragment', 'with_abp'):
+            col = 'rsa_' + context
+            pos[col] = (pos.canon.map(numbering.to_uniprot).map(profile.set_index('position')[col])
+                        if not profile.empty else np.nan)
+        pos['rsa'] = pos.rsa_isolated
+    for col in ("rsa", "rsa_isolated", "rsa_actin_fragment", "rsa_with_abp", "conservation", "residue_class"):
         if col not in pos:
             pos[col] = np.nan
 

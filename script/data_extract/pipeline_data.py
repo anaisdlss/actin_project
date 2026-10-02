@@ -197,15 +197,6 @@ def main():
         _downstream_fresh = is_up_to_date(
             _last_output, DETAILS / "1.interactions.csv",
             FILTERED / "filtered_all_data.csv")
-        if (_prev_update and _prev_update not in ("unknown", None)
-                and _prev_update == _now_update and _last_output.exists()
-                and _data_coherent and _details_ok and _downstream_fresh):
-            print(f"  PPI3D inchangé (dernière mise à jour : {_now_update}), "
-                  "jeu de données cohérent, détails complets et analyses à jour.")
-            print("Aucune nouvelle donnée — rien à refaire.")
-            refresh_structure_annotations()
-            print("\nPipeline terminé avec succès.")
-            return
         if not _details_ok:
             print("  Détails d'interface INCOMPLETS (download précédent interrompu ?) "
                   "→ le pipeline va les compléter.")
@@ -298,6 +289,9 @@ def main():
                       _exec([py, str(RG / "regenerate_s1_global_heatmap.py")])), None),
         ])
 
+        # Documented RSA must exist before legacy figure consumers are run.
+        _exec([py, "tools/rebuild_local.py", "--only", "rsa"])
+
         # ══ 8/9 — Analyse ABP (compétition + interfaces) [notebook] ══════════
         _flag = VISUALISATIONS / "abp_analysis_done.flag"
         _flag.parent.mkdir(parents=True, exist_ok=True)
@@ -320,6 +314,7 @@ def main():
         # ══ 9/9 — Analyses structurales ABP (Foldseek / InterPro / TM / …) ════
         run_group("9/9 — Analyses structurales ABP (convergence)", [
             ("Foldseek + InterPro + TM + empreinte + SS + chimie",
+             not (PROJECT_ROOT / "data/exports/abp_site_domain/pipeline_incomplete.json").exists() and
              is_up_to_date(PROJECT_ROOT / "data/exports/abp_site_domain/familles.csv",
                            FILTERED / "filtered_all_data.csv", DETAILS / "3.interface_residues.csv",
                            DETAILS / "1.interactions.csv"),
@@ -327,6 +322,7 @@ def main():
         ])
 
         refresh_structure_annotations()
+        _exec([py, "tools/rebuild_local.py"])
         print("\nPipeline terminé avec succès.")
 
     except subprocess.CalledProcessError as e:

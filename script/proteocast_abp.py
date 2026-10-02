@@ -340,11 +340,10 @@ def _render_abp_proteocast(sel_abp, abp_subunits):
 
 @st.cache_data(show_spinner=False)
 def _load_actin_conservation(mtimes):
-    p = _Path("data/proteocast/conservation_vs_asa_per_position.csv")
-    if p.exists() and _Path("data/proteocast/actin/4.query_ProteoCast.csv").exists():
+    if _Path("data/proteocast/actin/4.query_ProteoCast.csv").exists():
         from scientific_analysis import canonical_conservation
         return canonical_conservation()
-    return pd.read_csv(p) if p.exists() else None
+    return None
 
 
 @st.cache_data(show_spinner=False)
@@ -369,11 +368,11 @@ def _abp_actin_footprint(sel_abp, mtime):
 
 def _render_abp_actin_conservation(sel_abp):
     """Côté actin : la conservation (ProteoCast actin) des résidus que cet ABP touche."""
-    _sources = [_Path("data/proteocast/conservation_vs_asa_per_position.csv"),
-                _Path("data/proteocast/actin/4.query_ProteoCast.csv"),
+    _sources = [_Path("data/proteocast/actin/4.query_ProteoCast.csv"),
                 _Path("data/proteocast/actin/1.query.fasta"), _Path("data/P60709_ref.fasta")]
     from footprint_comparison import FILES as _footprint_files
-    _sources += _footprint_files
+    from rsa_source import source_files
+    _sources += _footprint_files + source_files()
     cons = _load_actin_conservation(tuple(p.stat().st_mtime_ns if p.exists() else 0 for p in _sources))
     if cons is None:
         st.info(

@@ -137,7 +137,11 @@ def render_filament_accessibility(root=".", key_prefix="filament_rsa"):
     if not table.exists():
         st.info("The reference accessibility calculation is not installed.")
         return
-    frame = pd.read_csv(table)
+    from rsa_source import load_rsa
+    frame, status = load_rsa(Path(root))
+    if status != 'current':
+        st.warning(status + ' Open Documentation → Data management.')
+        return
     with st.expander("Methods and reference structure"):
         st.caption("7PDZ chain I, same experimental coordinates in all three calculations. Isolated means this chain "
                    "removed from its neighbors, not a separately determined or relaxed G-actin. The finite fragment contains "
@@ -147,7 +151,7 @@ def render_filament_accessibility(root=".", key_prefix="filament_rsa"):
                    "RSA = SASA / Tien et al. theoretical maximum for the residue (Biopython Wilke scale), without clipping. "
                    "Missing coordinates, incomplete standard residues and modified residues have no RSA. "
                    "H73 is modified (HIC): its atoms contribute to occlusion and its raw SASA is retained. "
-                   "Nucleotides, ions, waters and phalloidin are excluded. This separate audit does not replace the old RSA table.")
+                   "Nucleotides, ions, waters and phalloidin are excluded. These documented contexts supply the current app RSA. The old table is retained only as an archive.")
     fig = go.Figure()
     for col, label, color in [("rsa_isolated", "Isolated chain, same conformation", "#777777"),
                               ("rsa_actin_fragment", "Six-actin fragment only", "#E69F00"),

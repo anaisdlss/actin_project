@@ -1,5 +1,5 @@
 {
-  "created_utc": "2026-10-02T13:31:30.846417+00:00",
+  "created_utc": "2026-10-02T14:51:12.983167+00:00",
   "tool_version": "2.9375a2d",
   "query_count": 206,
   "target_chain_count": 135,
@@ -8,7 +8,7 @@
     "data/filtered/details/3.interface_residues.csv": "e403fcda60c6df08b5a6298809c20f9c241991b32674fe2c1efc849531f69581"
   },
   "missing_structures": [],
-  "script_sha256": "d65b5f6af2216a46689d53da03d43f14e1c7f7f00253a1ed55fef9dafb191ec9",
+  "script_sha256": "dda01c636023780f3bdabc21c56546fa6ec994ca6f9487512c36b6f4b332660d",
   "method": "Default FoldDisco local query; highest IDF hit per target chain. Same-site controls use the highest IDF among representative target chains observed contacting this site. Fractions compare exact PDB residue identifiers to observed contacts in the source dataset. No homology or biological negative classification.",
   "scope": "Current best-resolution site motifs against the finite panel of observed representative ABP chains. Not PDB/AlphaFold discovery; not independent of the source dataset. No curated UniProt ABD boundaries or negative-control specificity estimate."
 }

@@ -1,5 +1,16 @@
 # Analyses demandées par Rémi — état au 2 octobre 2026
 
+## Mise à jour : provenance et reconstruction locale
+
+La RSA historique de `conservation_vs_asa_per_position.csv` ne dispose toujours pas d'une recette d'origine retrouvée. La même valeur réapparaît dans d'anciens exports de déterminants ; cela ne prouve pas son origine. Ce fichier est conservé, mais retiré des lecteurs actuels et des scripts d'analyse migrés.
+
+L'application utilise désormais le calcul local documenté de **7PDZ, chaîne I** : mêmes coordonnées, trois contextes (chaîne extraite, fragment de six actines, fragment avec deux protéines de coiffe), méthode Shrake–Rupley, sonde 1,4 Å, 960 points et contrôle à 480, normalisation Tien/Wilke. A29 vaut environ **2,05 %** dans les trois contextes, contre **1,8 %** dans le fichier historique. Ce changement de référence est explicite ; aucune moyenne sur toutes les actines n'est supposée. Les comparaisons de sensibilité utilisent la surface de la chaîne extraite dans sa conformation expérimentale (RSA ≥ 0,2).
+
+Une commande et un bouton reconstruisent les sept groupes de calculs locaux, avec contrôles des empreintes des sources, du code, des versions et des sorties. Les résultats de variants, sensibilités, interfaces, figures et contrôles FoldDisco gardent les limites méthodologiques déjà indiquées ci-dessous. Les traitements réseau restent distincts. Un échec de mise à jour ou d'une sous-étape structurale n'est plus masqué par un ancien fichier `familles.csv`.
+
+**Limite de provenance conservée :** automatiser un traitement ne restitue pas la date de publication d'un ancien export ni des paramètres historiques perdus. L'inventaire distingue les calculs effectivement reconstruits, les recettes retrouvées sans preuve d'exécution historique, les résultats externes et les origines non résolues. Les anciens instantanés ClinVar/gnomAD et les scores ProteoCast ne sont pas des mesures inventées par l'application, mais leurs métadonnées d'origine ne sont pas toutes récupérables. Une reconstruction locale ne prétend pas renouveler ces bases.
+
+
 ## État à transmettre à Rémi — 2 octobre 2026, contrôle final
 
 Ce bilan remplace les statuts antérieurs ci-dessous lorsqu'ils divergent. Le code et les analyses consultables ont été complétés ; les résultats exploratoires ne constituent pas une validation biologique définitive.
