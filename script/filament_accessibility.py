@@ -1,3 +1,4 @@
+from display_helpers import plotly_chart
 """Separate, reproducible accessibility audit; never replaces legacy RSA data."""
 from pathlib import Path
 
@@ -131,11 +132,13 @@ def render_filament_accessibility(root=".", key_prefix="filament_rsa"):
 
     base = Path(root) / "reports/scientific_audit"
     table = base / "filament_accessibility_7pdz_I.csv"
-    with st.expander("Reference accessibility: isolated actin, actin fragment and capping proteins"):
-        if not table.exists():
-            st.info("The reference accessibility calculation is not installed.")
-            return
-        frame = pd.read_csv(table)
+    st.info("How much of each actin residue remains exposed to solvent? This comparison measures the masking caused by neighbouring actins, then by capping proteins, while keeping the same actin conformation. It does not measure mutational sensitivity.")
+    st.subheader("Reference accessibility: isolated actin, actin fragment and capping proteins")
+    if not table.exists():
+        st.info("The reference accessibility calculation is not installed.")
+        return
+    frame = pd.read_csv(table)
+    with st.expander("Methods and reference structure"):
         st.caption("7PDZ chain I, same experimental coordinates in all three calculations. Isolated means this chain "
                    "removed from its neighbors, not a separately determined or relaxed G-actin. The finite fragment contains "
                    "six actins; the additional ABP context includes the two capping-protein chains. This capped-end "
@@ -145,28 +148,28 @@ def render_filament_accessibility(root=".", key_prefix="filament_rsa"):
                    "Missing coordinates, incomplete standard residues and modified residues have no RSA. "
                    "H73 is modified (HIC): its atoms contribute to occlusion and its raw SASA is retained. "
                    "Nucleotides, ions, waters and phalloidin are excluded. This separate audit does not replace the old RSA table.")
-        fig = go.Figure()
-        for col, label, color in [("rsa_isolated", "Isolated chain, same conformation", "#777777"),
-                                  ("rsa_actin_fragment", "Six-actin fragment only", "#E69F00"),
-                                  ("rsa_with_abp", "Fragment + capping proteins", "#0072B2")]:
-            fig.add_trace(go.Scatter(x=frame.position, y=frame[col], mode="lines", name=label,
-                                    line=dict(color=color), connectgaps=False, customdata=frame.aa,
-                                    hovertemplate="%{customdata}%{x}: %{y:.3f}<extra>%{fullData.name}</extra>"))
-        fig.update_layout(xaxis_title="P60709 position", yaxis_title="Relative solvent accessibility", height=400)
-        st.plotly_chart(position_hover(fig), use_container_width=True, key=f"{key_prefix}_profile")
-        cutoff = st.slider("Surface RSA threshold for this reference comparison", 0.0, 1.0, .2, .01, key=f"{key_prefix}_cutoff")
-        valid = frame[frame.rsa_eligible]
-        st.dataframe(pd.DataFrame([
-            {"Context": label, "Residues with RSA": int(valid[col].notna().sum()), "Residues at or above threshold": int(valid[col].ge(cutoff).sum())}
-            for col, label in [("rsa_isolated", "Isolated"), ("rsa_actin_fragment", "Actin fragment"), ("rsa_with_abp", "Fragment + capping proteins")]
-        ]), hide_index=True, width="stretch")
-        st.dataframe(frame, hide_index=True, width="stretch")
-        st.download_button("Download separate reference SASA/RSA calculation", table.read_bytes(), file_name=table.name, mime="text/csv", key=f"{key_prefix}_csv")
-        for name, label in [("filament_accessibility_manifest.json", "Download accessibility methods and provenance"),
-                            ("filament_accessibility_convergence.csv", "Download numerical convergence check")]:
-            path = base / name
-            if path.exists():
-                st.download_button(label, path.read_bytes(), file_name=name, key=f"{key_prefix}_{name}")
+    fig = go.Figure()
+    for col, label, color in [("rsa_isolated", "Isolated chain, same conformation", "#777777"),
+                              ("rsa_actin_fragment", "Six-actin fragment only", "#E69F00"),
+                              ("rsa_with_abp", "Fragment + capping proteins", "#0072B2")]:
+        fig.add_trace(go.Scatter(x=frame.position, y=frame[col], mode="lines", name=label,
+                                line=dict(color=color), connectgaps=False, customdata=frame.aa,
+                                hovertemplate="%{customdata}%{x}: %{y:.3f}<extra>%{fullData.name}</extra>"))
+    fig.update_layout(xaxis_title="P60709 position", yaxis_title="Relative solvent accessibility", height=400)
+    plotly_chart(position_hover(fig), use_container_width=True, key=f"{key_prefix}_profile")
+    cutoff = st.slider("Surface RSA threshold for this reference comparison", 0.0, 1.0, .2, .01, key=f"{key_prefix}_cutoff")
+    valid = frame[frame.rsa_eligible]
+    st.dataframe(pd.DataFrame([
+        {"Context": label, "Residues with RSA": int(valid[col].notna().sum()), "Residues at or above threshold": int(valid[col].ge(cutoff).sum())}
+        for col, label in [("rsa_isolated", "Isolated"), ("rsa_actin_fragment", "Actin fragment"), ("rsa_with_abp", "Fragment + capping proteins")]
+    ]), hide_index=True, width="stretch")
+    st.dataframe(frame, hide_index=True, width="stretch")
+    st.download_button("Download separate reference SASA/RSA calculation", table.read_bytes(), file_name=table.name, mime="text/csv", key=f"{key_prefix}_csv")
+    for name, label in [("filament_accessibility_manifest.json", "Download accessibility methods and provenance"),
+                        ("filament_accessibility_convergence.csv", "Download numerical convergence check")]:
+        path = base / name
+        if path.exists():
+            st.download_button(label, path.read_bytes(), file_name=name, key=f"{key_prefix}_{name}")
 
 
 def render_representative_geometry(root=".", key_prefix="geometry_audit"):

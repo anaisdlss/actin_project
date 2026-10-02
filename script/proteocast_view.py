@@ -436,41 +436,62 @@ def _bfactor_range(pdb_text):
     return (min(vals), max(vals)) if vals else (0.0, 1.0)
 
 
-@st.cache_data(show_spinner=False)
+def score_structure(af, csv):
+    """Map only complete score profiles with exact positional sequence agreement."""
+    from abp_profile import load_abp_scores
+    from Bio.SeqUtils import seq1
+    _, profile = load_abp_scores(csv)
+    refs = profile.set_index("position").reference_aa.to_dict()
+    observed = {}
+    for line in af.splitlines():
+        if line.startswith("ATOM") and line[12:16].strip() == "CA":
+            position = int(line[22:26])
+            aa = seq1(line[17:20])
+            if line[26:27].strip() or position not in refs or refs[position] != aa:
+                raise ValueError("Structure and score-query numbering do not agree; sensitivity was not projected.")
+            observed[position] = aa
+    if not observed or not profile.complete_score_grid.all():
+        raise ValueError("A complete score grid and matching structure are required for this 3D sensitivity map.")
+    values = profile.set_index("position").mutational_sensitivity.to_dict()
+    return _set_bfactor(af, values), min(values.values()), max(values.values())
+
+
 def structure_for(slug, uniprot, _mtime):
-    """Structure 3D de l'ABP + b-factor à colorer.
-    Priorité : PDB du dossier ProteoCast (sensibilité) > AlphaFold + mapping du
-    Variant_score si CSV présent > AlphaFold seul (pLDDT). Renvoie dict ou None."""
-    # 1) PDB fourni par ProteoCast (b-factor déjà = métrique)
-    d = _result_dir_or_csv(slug)
-    if d:
-        pdbs = [f for f in os.listdir(d) if f.lower().endswith(".pdb")]
-        pref = ([f for f in pdbs if "sensitiv" in f.lower()]
-                or [f for f in pdbs if "resclass" in f.lower()] or pdbs)
-        if pref:
-            txt = open(os.path.join(d, pref[0])).read()
-            vmin, vmax = _bfactor_range(txt)
-            return {"pdb": txt, "by": "ProteoCast sensitivity (b-factor of the result)",
-                    "vmin": vmin, "vmax": vmax, "metric": True}
-    # 2) AlphaFold + mapping du Variant_score si CSV présent
-    if not uniprot:
-        return None
-    af = _fetch_af_pdb(uniprot)
+    from pathlib import Path
+    folder = Path(_ABP_DIR) / slug
+    files = list(folder.glob("*.pdb")) + list(folder.glob("*.csv")) + list(folder.glob("*.fasta"))
+    flat = Path(_ABP_DIR) / (slug + ".csv")
+    if flat.exists():
+        files.append(flat)
+    signature = tuple(sorted((str(p), p.stat().st_mtime_ns, p.stat().st_size) for p in files))
+    return _structure_for(slug, uniprot, signature)
+
+
+@st.cache_data(show_spinner=False)
+def _structure_for(slug, uniprot, source_signature):
+    """Never interpret an arbitrary structure's B-factor as a ProteoCast score."""
+    from pathlib import Path
+    folder = _result_dir_or_csv(slug)
+    # Original downloaded AlphaFold files contain confidence, not sensitivity.
+    af_files = sorted(p for p in Path(folder).glob("*.pdb")
+                      if re.fullmatch(r"(?:\d+\.)?AF-[A-Za-z0-9]+-F\d+-model_v\d+\.pdb", p.name)) if folder else []
+    af = af_files[0].read_text() if af_files else None
+    if af is None and uniprot and not pd.isna(uniprot):
+        af = _fetch_af_pdb(str(uniprot))
     if af is None:
         return None
+    note = ""
     csv = _proteocast_csv(slug)
     if csv:
-        df = pd.read_csv(csv)
-        if {"Residue", "Variant_score"} <= set(df.columns):
-            # sensibilité par position = -moyenne (positif, plus haut = plus sensible)
-            g = df.groupby("Residue")["Variant_score"].mean()
-            resmap = {int(k): -float(v) for k, v in g.items()}
-            txt = _set_bfactor(af, resmap)
-            vmin, vmax = _bfactor_range(txt)
-            return {"pdb": txt, "by": "ProteoCast mutational sensitivity "
-                    "(redder = more sensitive)", "vmin": vmin, "vmax": vmax,
-                    "metric": True}
-    # 3) AlphaFold seul (pLDDT) — utile en attendant ProteoCast
-    vmin, vmax = _bfactor_range(af)
-    return {"pdb": af, "by": "AlphaFold pLDDT confidence (ProteoCast not provided yet)",
-            "vmin": vmin, "vmax": vmax, "metric": False}
+        try:
+            text, low, high = score_structure(af, csv)
+            return {"pdb": text, "by": "Mutational sensitivity (−mean of 20 ProteoCast scores)",
+                    "vmin": low, "vmax": high, "metric": True}
+        except (ValueError, KeyError, TypeError) as exc:
+            note = str(exc)
+    return {"pdb": af, "by": "AlphaFold confidence (pLDDT)",
+            "vmin": 0.0, "vmax": 100.0, "metric": False,
+            "note": note or "No usable ProteoCast scores are available; this view shows model confidence."}
+
+
+structure_for.clear = _structure_for.clear

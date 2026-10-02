@@ -9,6 +9,7 @@ st.markdown(
     "[data-testid='stSidebarNavLink']{height:auto;min-height:2rem;}"
     "[data-testid='stSidebarNavLink'] span,[data-testid='stSidebarNavLink'] p"
     "{white-space:normal;overflow:visible;text-overflow:clip;}"
+    ".hoverlayer path.legend3dandfriends[style*=url]{opacity:0;}"
     "</style>", unsafe_allow_html=True,
 )
 run_navigation()

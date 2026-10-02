@@ -1,3 +1,4 @@
+from display_helpers import plotly_chart
 """Extracted from streamlit.py — proteocast_abp view/build helpers (keeps streamlit.py light)."""
 import os
 import csv
@@ -169,7 +170,7 @@ def _render_proteocast_mutland(csv_path, iface_asa=None, title="", domains=None,
         fig.update_xaxes(range=[focus[0] - 0.5, focus[1] + 0.5])
     # Domain spans only carry endpoints; preserve the cell/domain hover there.
     position_hover(fig, unified=not bool(_ndom))
-    st.plotly_chart(fig, use_container_width=True)
+    plotly_chart(fig, use_container_width=True)
 
     st.markdown("**ABP mutational sensitivity along the sequence**")
     st.caption("Sensitivity is minus the mean of all 20 supplied ProteoCast scores at a "
@@ -189,7 +190,7 @@ def _render_proteocast_mutland(csv_path, iface_asa=None, title="", domains=None,
     if not _dom:
         st.caption("No domain annotation is available for this protein.")
     _profile_fig = profile_figure(_annotated, domains=_dom, title=title, focus=focus)
-    st.plotly_chart(_profile_fig, use_container_width=True)
+    plotly_chart(_profile_fig, use_container_width=True)
     st.download_button("Download ABP sensitivity and contact profile (CSV)",
                        _annotated.to_csv(index=False).encode(),
                        file_name=f"{_query_path.parent.name}_sensitivity_profile.csv",
@@ -212,10 +213,25 @@ def _abp_actin_focus(sel_abp, slug):
     qlen = len(_qs) if _qs else max(iface)
     lo, hi = min(iface), max(iface)
     span = hi - lo + 1
-    if qlen and span < 0.6 * qlen and (qlen - span) > 50:
-        mar = max(10, int(0.05 * span))
-        return (max(1, lo - mar), min(qlen, hi + mar), qlen)
-    return None
+    mar = max(10, int(0.05 * span))
+    return (max(1, lo - mar), min(qlen, hi + mar), qlen)
+
+
+def contact_region_zoom(abp, slug, key):
+    """Keep the control visible; only mapped observed contacts can define a region."""
+    bounds = _abp_actin_focus(abp, slug)
+    label = "Zoom on the observed actin-contact region"
+    if bounds:
+        lo, hi, length = bounds
+        label += f" ({lo}–{hi} of {length} aa)"
+    zoom = st.toggle(label, value=False, key=key, disabled=bounds is None,
+                     help="Bounds span the observed contact residues, with a margin. They are not a predicted binding domain.")
+    if bounds is None:
+        st.caption("Region zoom unavailable: contact positions could not be mapped to this protein sequence. Mouse zoom remains available.")
+    elif bounds[:2] == (1, bounds[2]):
+        st.caption("Observed contacts span most of this protein; the contact region covers the full sequence.")
+    return bounds[:2] if zoom and bounds else None
+
 
 
 def _crop_pdb_residues(pdb_text, lo, hi):
@@ -258,19 +274,7 @@ def _render_abp_proteocast(sel_abp, abp_subunits):
         # Gros ABP multi-domaines : seule une région contacte l'actin. On zoome
         # dessus par défaut (contacts ± marge) plutôt que d'afficher 2500 résidus
         # hors-sujet (ex. Filamin-A : interface ~30–146 sur 2647 aa).
-        _focus = None
-        _fz = _abp_actin_focus(sel_abp, slug)
-        if _fz:
-            _flo, _fhi, _qlen = _fz
-            _zoom = st.toggle(
-                f"Zoom on the actin-binding region (~{_flo}–{_fhi}) — "
-                f"otherwise the whole protein ({_qlen} aa)",
-                value=False, key=f"pc_whole_{slug}",
-                help="This ABP is multi-domain but only one region contacts "
-                     "actin. The whole protein is shown by default; enable to "
-                     "zoom on the actin-binding region.")
-            if _zoom:
-                _focus = (_flo, _fhi)
+        _focus = contact_region_zoom(sel_abp, slug, f"pc_whole_{slug}")
         _surface = st.toggle(
             "Exposed surface only (RSA ≥ 0.2) — recompute the gradient on these positions",
             value=False, key=f"pc_surface_{slug}",
@@ -373,7 +377,7 @@ def _render_abp_actin_conservation(sel_abp):
     cons = _load_actin_conservation(tuple(p.stat().st_mtime_ns if p.exists() else 0 for p in _sources))
     if cons is None:
         st.info(
-            "Actin conservation unavailable (data/proteocast/conservation_vs_asa_per_position.csv).")
+            "Actin mutational sensitivity is unavailable.")
         return
     _cp = _Path("data/filtered/details/3.interface_residues.csv")
     fp = _abp_actin_footprint(
@@ -398,14 +402,14 @@ def _render_abp_actin_conservation(sel_abp):
     # Footprint : on n'affiche plus le chiffre brut, mais s'il est plus/moins
     # conservé que le reste de la surface.
     c2.metric("Footprint vs rest of surface", _fp_cmp,
-              help="Is the ABP footprint on actin more or less conserved than "
+              help="Is the ABP footprint on actin more or less mutation-sensitive than "
                    "the rest of the exposed actin surface?")
-    c3.metric("Mean conservation (rest of surface)", f"{other.mean():.2f}")
+    c3.metric("Mean sensitivity (rest of surface)", f"{other.mean():.2f}")
     try:
         from scipy.stats import mannwhitneyu
         _p = mannwhitneyu(fpv, other, alternative="two-sided").pvalue
-        verdict = ("more conserved" if fpv.mean() >
-                   other.mean() else "less conserved")
+        verdict = ("more mutation-sensitive" if fpv.mean() >
+                   other.mean() else "less mutation-sensitive")
     except Exception:
         pass
 
@@ -413,24 +417,24 @@ def _render_abp_actin_conservation(sel_abp):
     from plotly.subplots import make_subplots
     _figc = make_subplots(
         rows=1, cols=2, column_widths=[0.75, 0.25], horizontal_spacing=0.09,
-        subplot_titles=(f"Actin conservation — residues contacted by {sel_abp}",
+        subplot_titles=(f"Actin mutational sensitivity — residues contacted by {sel_abp}",
                         "Footprint vs surface"))
     _cs = cons.sort_values("Residue")
     # Ligne grise = toutes les positions (hover : position + conservation)
     _figc.add_trace(go.Scatter(
         x=_cs["Residue"], y=_cs["conservation"], mode="lines",
         line=dict(color="lightgrey", width=1), name="all positions",
-        hovertemplate="actin residue %{x}<br>conservation %{y:.2f}<extra></extra>",
+        hovertemplate="actin residue %{x}<br>Mutational sensitivity %{y:.2f}<extra></extra>",
         showlegend=False), row=1, col=1)
     # Points rouges = empreinte de cet ABP (hover : position + conservation)
     _fpd = cons[cons.is_fp]
     _figc.add_trace(go.Scatter(
         x=_fpd["Residue"], y=_fpd["conservation"], mode="markers",
         marker=dict(color="#D55E00", size=8), name="footprint of this ABP",
-        hovertemplate="actin residue %{x}<br>conservation %{y:.2f}"
+        hovertemplate="actin residue %{x}<br>Mutational sensitivity %{y:.2f}"
                       "<extra>footprint</extra>"), row=1, col=1)
     _figc.update_xaxes(title_text="Actin residue (UniProt P60709)", row=1, col=1)
-    _figc.update_yaxes(title_text="conservation", row=1, col=1)
+    _figc.update_yaxes(title_text="Mutational sensitivity", row=1, col=1)
     # Boxplots : reste de la surface vs empreinte
     _figc.add_trace(go.Box(y=other.dropna(), name="rest (surface)",
                            marker_color="#56B4E9", showlegend=False),
@@ -438,10 +442,10 @@ def _render_abp_actin_conservation(sel_abp):
     _figc.add_trace(go.Box(y=fpv.dropna(), name="footprint",
                            marker_color="#D55E00", showlegend=False),
                     row=1, col=2)
-    _figc.update_yaxes(title_text="conservation", row=1, col=2)
+    _figc.update_yaxes(title_text="Mutational sensitivity", row=1, col=2)
     _figc.update_layout(
         height=380, margin=dict(l=10, r=10, t=40, b=10),
         legend=dict(orientation="h", yanchor="bottom", y=1.04,
                     xanchor="right", x=1))
     position_hover(_figc, axes=["x"], unified=False)
-    st.plotly_chart(_figc, use_container_width=True)
+    plotly_chart(_figc, use_container_width=True)

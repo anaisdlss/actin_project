@@ -1,3 +1,5 @@
+from display_helpers import viewer_html
+from display_helpers import plotly_chart
 """Observed partner chemistry, with explicit weighting and structural sampling."""
 from pathlib import Path
 import numpy as np
@@ -126,6 +128,7 @@ def render_surface_chemistry(profile):
                   and (int(line[22:26]), line[26:27]) in residue_keys]
     pdb_text = '\n'.join(atom_lines)
     dominant = profile.set_index('P60709 position')['Dominant partner class'].to_dict()
+    st.info("Both shapes below are actin. Left: the chemical class of each actin residue. Right: the most frequent class among ABP residues observed contacting that position. The right-hand shape is a projection of partner chemistry onto actin, not an ABP structure.")
     st.caption('Projection onto experimental 7PDZ chain I, aligned to P60709. Only matching reference '
                'residues are coloured. Grey = no usable contact, tie or unmapped position; it is not an accessibility measurement. '
                'The partner view pools observed ABP contacts; it is not a predicted binding surface.')
@@ -149,7 +152,7 @@ def render_surface_chemistry(profile):
             for color, atoms in serials.items():
                 view.addSurface(py3Dmol.SES, {'opacity':1.0,'color':color}, {'serial':atoms}, {})
             view.setBackgroundColor('white'); view.zoomTo()
-            st.components.v1.html(view._make_html(),height=365)
+            st.components.v1.html(viewer_html(view),height=365)
 
 
 def render_interface_properties():
@@ -190,7 +193,7 @@ def render_interface_properties():
         customdata=[letters]*len(CLASSES),colorbar=dict(title='Fraction',len=.72,y=.38),hoverongaps=False,
         hovertemplate='%{y}<br>%{customdata}%{x}: %{z:.3f}<extra></extra>'),row=2,col=1)
     fig.update_layout(height=410,xaxis2_title='P60709 position')
-    st.plotly_chart(position_hover(fig),width='stretch',key='surface_chem_profile')
+    plotly_chart(position_hover(fig),width='stretch',key='surface_chem_profile')
     st.caption('Class colours in 3D: '+ ' · '.join(f'{name}: {color}' for name,color in COLORS.items()))
     with st.expander('View actin and partner chemistry in 3D'):
         if st.checkbox('Load chemistry surfaces',key='surface_chem_3d'):
@@ -225,5 +228,5 @@ def render_interface_properties():
         if not comp.empty:
             fig=go.Figure(go.Heatmap(x=list(CLASSES),y=comp.Partner,z=comp[list(CLASSES)].values,zmin=0,zmax=1,colorscale='Blues',colorbar=dict(title='Fraction')))
             fig.update_layout(height=max(280,28*len(comp)+130))
-            st.plotly_chart(fig,width='stretch',key='surface_chem_families')
+            plotly_chart(fig,width='stretch',key='surface_chem_families')
         st.download_button('Download binding-site chemistry comparison',comp.to_csv(index=False),file_name=f'{site}_partner_chemistry.csv',key='surface_chem_family_csv')

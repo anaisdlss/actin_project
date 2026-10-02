@@ -24,7 +24,7 @@ class VariantHeatmapTests(unittest.TestCase):
         pd.testing.assert_frame_equal(variants,original)
         figure=presence_figure(matrix,'ACTA1','pathogenic')
         self.assertFalse(figure.data[0].showscale)
-        self.assertEqual([trace.name for trace in figure.data[1:]],['Not recorded (0)','Recorded (1)'])
+        self.assertEqual([trace.name for trace in figure.data[1:]],['Not recorded in this category','Recorded in this category'])
         self.assertTrue(all(trace.showlegend for trace in figure.data[1:]))
 
     def test_count_gradient_keeps_absolute_integer_counts(self):

@@ -1,3 +1,4 @@
+from display_helpers import plotly_chart
 """Exploratory overlap of observed footprints; no steric or functional verdict."""
 from pathlib import Path
 import json
@@ -101,13 +102,15 @@ def render_footprint_comparison():
     selected_abps=st.multiselect('ABP footprints aligned with actin–actin sites',names,key='fp_aligned_abps')
     displayed={**groups, **{f'ABP: {name}':abps[name] for name in selected_abps}}
     matrix=[[int(p in siteset) for p in range(1,376)] for siteset in displayed.values()]
-    fig=go.Figure(go.Heatmap(z=matrix,x=list(range(1,376)),y=list(groups),
-                             colorscale=[[0,'#f2f2f2'],[1,'#0072B2']],zmin=0,zmax=1,showscale=False,
-                             hovertemplate='%{y}<br>P60709 position %{x}<br>Observed: %{z}<extra></extra>'))
-    fig.data[0].y=list(displayed)
+    fig=go.Figure(go.Heatmap(z=matrix,x=list(range(1,376)),y=list(displayed),
+                             colorscale=[[0,'#f2f2f2'],[.4999,'#f2f2f2'],[.5,'#0072B2'],[1,'#0072B2']],zmin=0,zmax=1,showscale=False,
+                             customdata=[['Contact observed' if value else 'No contact above threshold' for value in row] for row in matrix],
+                             hovertemplate='%{y}<br>P60709 position %{x}<br>%{customdata}<extra></extra>'))
     fig.update_layout(height=max(230,32*len(displayed)+100),xaxis_title=numbering.AXIS_TITLE,margin=dict(l=5,r=5,t=10,b=40))
     position_hover(fig)
-    st.plotly_chart(fig,use_container_width=True,key='homo_footprint_comparison')
+    plotly_chart(fig,use_container_width=True,key='homo_footprint_comparison')
+    from display_helpers import color_legend
+    color_legend([('Contact observed', '#0072B2'), ('No contact above threshold', '#f2f2f2')])
     with st.expander('Compare positive contacts with the selected ASA threshold'):
         counts=[]
         for label,kind,selected in [('Reference actin sites','homo',a),('Comparison actin sites','homo',b)]+[(f'ABP: {n}','abp',[n]) for n in selected_abps]:

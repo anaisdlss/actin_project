@@ -94,9 +94,9 @@ same browser session. Reloading the browser starts a new Streamlit session.
 | **Actin-actin interfaces** | **Binding sites**, **Compare footprints**, **Structural evidence**. Mixed sites are also included. |
 | **ABP-actin interfaces** | **By protein** (clusters and structures), **Overview and heatmap**, **Binding sites**. |
 | **Comparative analyses of binding sites** | **Binding-site clusters**, **Interaction clusters**, **ABP networks**, **ABP pairs and sequences**. |
-| **Actin binding sites conservation** | **Overview**, **By ABP footprint**, **Solvent accessibility**. |
+| **Actin mutational sensitivity** | **Overview**, **By ABP footprint**, **Solvent accessibility**. |
 | **Human actin variants** | Gene/category selection, substitution maps, footprint summaries and exploratory associations. |
-| **ABP conservation** | **Profiles**, **3D structure**, **Sequence alignments**. Missing results are identified explicitly. |
+| **ABP mutational sensitivity** | **Profiles**, **3D structure**, **Sequence alignments**. Missing results are identified explicitly. |
 | **Physico-chemical properties of the interface** | **Actin surface chemistry**, **By binding site** (contact chemistry, alignments and structural comparisons). |
 | **Homolog search** | Historical results and tracked searches for single or combined ABP motifs; motif coordinates and provenance are retained. New submissions run in the full project. |
 
@@ -153,8 +153,8 @@ Because the interface is kept clean, the meaning of every element is listed here
   canonical position, %ASA and interaction count.
 - **Interface sequences coloured by %ASA** — the linear version of the same
   information: each interface residue is shaded by how buried it is.
-- **Conservation profiles** — model-derived sensitivity along actin, with the selected ABP footprint and structural accessibility shown separately. Comparisons and p-values are exploratory; residues are not independent observations.
-- **Residue sensitivity vs surface mean** — located in **Actin binding sites conservation**. The selected residue is retained when opening **Conservation of this residue** from the contact explorer. The legacy surface mean uses RSA ≥ 0.2; that source's monomer/filament provenance remains unresolved.
+- **Mutational sensitivity profiles** — model-derived sensitivity along actin, with the selected ABP footprint and structural accessibility shown separately. Comparisons and p-values are exploratory; residues are not independent observations.
+- **Residue sensitivity vs surface mean** — located in **Actin mutational sensitivity**. The selected residue is retained when opening **Mutational sensitivity of this residue** from the contact explorer. The legacy surface mean uses RSA ≥ 0.2; that source's monomer/filament provenance remains unresolved.
 - **Interaction-type surface** — orange: positive buried-ASA observations with actin only; blue: ABPs only; purple: both; gray: no observed positive contact or unmapped atoms. Both sides of actin–actin interactions are included. Black sticks locate the selected residue. Absence of an observed contact does not establish absence of binding.
 - **ABP landscape** — scores cover the whole supplied query, with observed contacts and annotated domains on aligned tracks. Missing scores remain missing.
 - **Competition / Cooperation networks** — observed footprint overlap / co-presence, respectively. Neither establishes a functional mechanism by itself.
@@ -174,3 +174,16 @@ Because the interface is kept clean, the meaning of every element is listed here
   describe the interfaces that have actually been solved, not every possible
   interaction.
 - PDB **4b1z** is deliberately excluded from all analyses.
+
+
+### Display and interpretation update — 2 October 2026
+
+- Interaction IDs in source tables sort numerically. Data identifiers and joins remain unchanged.
+- ProteoCast residue summaries are labelled **mutational sensitivity**, defined as minus the mean of the 20 supplied substitution scores. They are neither sequence-identity percentages nor clinical severity grades. Original source filenames are retained for compatibility.
+- Heatmap tooltips include the hovered cell colour. Binary maps show recorded/not-recorded states; quantitative ASA maps retain numerical percentages. Plot zoom controls stay visible.
+- Three-dimensional panels fit their container when resized. Binding-site views can reconstruct observed actin–ABP pairs from the local assemblies and contact tables, even without pre-generated cluster PDBs. Partner superpositions require at least 100 matching actin Cα pairs, 80% matching resolved residues and RMSD ≤ 5 Å; they do not demonstrate co-binding.
+- ABP 3D sensitivity requires complete ProteoCast score grids and exact agreement between query and structure numbering/identity. Otherwise the original AlphaFold model is explicitly labelled **pLDDT confidence**. Arbitrary PDB B-factors are never assumed to be sensitivity.
+- Contact-region zoom stays visible, disabled with an explanation when contacts cannot be mapped. Its bounds are observed contact positions with a margin, not a predicted domain boundary.
+- FoldDisco query positions refer to the selected ABP's PDB chain. The resolved sequence and 3D motif identify the selected residues. Distant sequence positions may be neighbours in 3D. The public server limit remains 32 residues; the app never truncates motifs automatically.
+
+These display changes do not resolve the remaining scientific validations: biological interpretation of major/minor interfaces, provenance of the legacy RSA reference, unavailable ProteoCast results, and positive/negative control validation of FoldDisco candidates. Sequence conservation, model sensitivity, structural similarity and clinical annotation remain distinct concepts.

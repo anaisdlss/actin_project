@@ -1,3 +1,4 @@
+from display_helpers import viewer_html
 import streamlit as st
 import pandas as pd
 import numbering
@@ -9,7 +10,7 @@ from collections import defaultdict
 
 # ── Bipartite network helpers ─────────────────────────────────────────────────
 # Incrémenter pour invalider le cache en mémoire après un correctif logique
-_BIP_CACHE_VERSION = 5
+_BIP_CACHE_VERSION = 6
 
 _ACTIN_COLOR_NET = "#5B9BD5"
 _ABP_PALETTE_NET = [
@@ -1184,7 +1185,7 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, version, *mtimes
             f'<div style="display:flex;justify-content:space-between;font-size:8px;color:#999;'
             f'margin-bottom:6px"><span>0</span><span>max ({s2_ca_max:.1f} %)</span></div>'
             + f'<div style="font-weight:700;color:#555;margin-bottom:3px;font-size:{_fs_h}">'
-            'Partenaires</div>'
+            'Partners</div>'
             + "".join(
                 f'<div style="margin:2px 0;font-size:{_fs_b};color:#444">• {p[:30]}</div>'
                 for p in s2_partner_names
@@ -1198,7 +1199,7 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, version, *mtimes
     _leg += (
         f'<div style="border-top:1px solid #eee;margin:5px 0 4px"></div>'
         f'<div style="font-weight:700;color:#555;margin-bottom:3px;font-size:{_fs_h}">'
-        'Combinaisons S1×S2</div>'
+        'S1×S2 combinations</div>'
         + "".join(
             f'<div style="margin:1px 0;font-size:{_fs_b};color:#444">'
             f'{c} <span style="color:#999">({n})</span></div>'
@@ -1377,12 +1378,8 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, version, *mtimes
                 _pdb_lines.append(_line)
             _pdb_mod = "".join(_pdb_lines)
 
-            # Normalisation locale : max observé dans ce PDB (relatif à la structure)
-            _s1_bfac_max = max(max(_s1_bfac.values())
-                               if _s1_bfac else 0.0, 1.0)
-            _s2_bfac_max = max(max(_s2_bfac.values())
-                               if _s2_bfac else 0.0, 1.0)
-
+            # Absolute ASA percentage for both chains; comparable between pairs.
+            _s1_bfac_max = _s2_bfac_max = 100.0
             _ylord = ["#FFFFCC", "#FFF0A9", "#FEE186", "#FECA65", "#FDAA48",
                       "#FC8C3B", "#FC5A2D", "#EC2D21", "#D30F20", "#AF0026", "#800026"]
             _s1_sch = {"prop": "b", "gradient": "linear",
@@ -1390,11 +1387,11 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, version, *mtimes
             _s2_cols = (["#FFF0F5", "#FFD6E0", "#FFB6C1", "#FF85A1",
                          "#FF69B4", "#FF1493", "#C71585"]
                         if _is_homo3d else
-                        ["#9CE699", "#41AB5D", "#238443", "#006837"])
+                        ["#F7FBFF", "#6BAED6", "#2171B5", "#08306B"])
             _s2_sch = {"prop": "b", "gradient": "linear",
                        "colors": _s2_cols, "min": 0, "max": _s2_bfac_max}
 
-            _v3 = py3Dmol.view(width=700, height=430)
+            _v3 = py3Dmol.view(width="100%", height=430)
             _v3.addModel(_pdb_mod, "pdb")
             _v3.setStyle({}, {})
             _v3.addSurface(py3Dmol.SES,
@@ -1405,7 +1402,9 @@ def _build_bipartite_c70_html(patch_c70, bipartite, color_mode, version, *mtimes
                            {"chain": _chain_s2_3d})
             _v3.setBackgroundColor("white")
             _v3.zoomTo()
-            _html_3d = _v3._make_html()
+            _html_3d = viewer_html(_v3)
+            if _seq_asa is not None:
+                _seq_asa["partner_is_actin"] = _is_homo3d
     except Exception:
         _html_3d = None
 
@@ -1446,7 +1445,7 @@ def _build_s1_3d_html(patch_s1, version, *mtimes):
         _s1_sch = {"prop": "b", "gradient": "linear",
                    "colors": _ylord, "min": 0, "max": 100}
 
-        _v3 = py3Dmol.view(width=500, height=450)
+        _v3 = py3Dmol.view(width="100%", height=450)
         _v3.addModel(pdb_content, "pdb")
         _v3.setStyle({}, {})
         _v3.addSurface(py3Dmol.SES,
@@ -1456,7 +1455,7 @@ def _build_s1_3d_html(patch_s1, version, *mtimes):
         _v3.zoomTo({"chain": chain_id})
         _v3.zoom(0.7)
         import re as _re_fog
-        _html3d = _v3._make_html()
+        _html3d = viewer_html(_v3)
         # disable fog — inject before first render() call
         _html3d_nofog = _re_fog.sub(
             r'(viewer_\w+)\.render\(\)',

@@ -1,3 +1,4 @@
+from display_helpers import plotly_chart
 """Scientific navigation and descriptions, shared by local and public builds.
 
 The same scientific sections are used by both native page navigations.
@@ -15,9 +16,9 @@ SECTIONS = (
     ("actin-actin-interfaces", "Actin-actin interfaces", "Binding sites involved in actin–actin contacts, including mixed sites."),
     ("abp-actin-interfaces", "ABP-actin interfaces", "ABP footprints, interface clusters and structures."),
     ("comparative-binding-sites", "Comparative analyses of binding sites", "Compare binding sites, interaction networks and pairs of ABPs."),
-    ("actin-conservation", "Actin binding sites conservation", "Conservation of actin residues contacted by a selected ABP."),
+    ("actin-conservation", "Actin mutational sensitivity", "ProteoCast sensitivity of actin residues contacted by a selected ABP."),
     ("human-actin-variants", "Human actin variants", ""),
-    ("abp-conservation", "ABP conservation", "ABP ProteoCast results and sequence alignments."),
+    ("abp-conservation", "ABP mutational sensitivity", "ABP ProteoCast results and sequence alignments."),
     ("interface-properties", "Physico-chemical properties of the interface", "Contact chemistry and structural comparisons for a selected binding site."),
     ("homolog-search", "Homolog search", "Explore existing FoldDisco results for a selected ABP."),
 )
@@ -99,7 +100,7 @@ def render_cluster_table(kind, show_selector=True):
                               hovertemplate="Site %{x}<br>%{y} PDBs with homo contacts<extra></extra>"))
         fig.update_layout(xaxis=dict(title="Binding-site cluster", categoryorder="array", categoryarray=counts.index.tolist()),
                           yaxis_title="PDBs with homo contacts", margin=dict(t=12, b=70), height=360)
-        st.plotly_chart(fig, key="homo_pdb_counts", use_container_width=True)
+        plotly_chart(fig, key="homo_pdb_counts", use_container_width=True)
         st.caption("PDB counts measure representation in this dataset, not physiological prevalence. "
                    "Major/minor interface labels have not been assigned. "
                    "Select a binding site below to inspect its contacts, heatmap and 3D structure.")

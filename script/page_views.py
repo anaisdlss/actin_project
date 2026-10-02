@@ -1,3 +1,5 @@
+from display_helpers import viewer_html
+from display_helpers import plotly_chart
 """Independent renderers for the scientific pages; only the chosen view runs."""
 from abp_3d import (
     _s1_abp_3d_options, _build_abp_actin_3d, _build_all_abp_pdb, _build_all_abp_3d, _ABP_MULTI_COLORS)
@@ -329,7 +331,8 @@ def render_source_tables():
         selected = st.selectbox("Choose a table",
                                 sorted(available_tables, key=str.casefold),
                                 format_func=table_label, key="source_table")
-        df = read_csv(available_tables[selected])
+        from display_helpers import ordered_interactions
+        df = ordered_interactions(read_csv(available_tables[selected]))
         describe_table(selected, df.columns)
         hide_constant = st.checkbox(
             "Hide columns without variation", value=False, key="hide_constant_columns")
@@ -664,7 +667,7 @@ def render_structures():
                                   _PDB_ACTIN_COLOR, _PDB_ABP_COLOR)
                     if st.session_state.get("viewer_key") != viewer_key:
                         import py3Dmol
-                        view = py3Dmol.view(width=580, height=450)
+                        view = py3Dmol.view(width="100%", height=450)
                         view.addModel(pdb_data, fmt)
                         view.setStyle({}, {})
                         # Tout est affiché en SURFACE. Le SES (lisse) de tout un gros
@@ -703,7 +706,7 @@ def render_structures():
                             view.zoomTo({"chain": list(_surf_chains)})
                         else:
                             view.zoomTo()
-                        st.session_state["viewer_html"] = view._make_html()
+                        st.session_state["viewer_html"] = viewer_html(view)
                         st.session_state["viewer_key"] = viewer_key
 
                     st.components.v1.html(
@@ -1040,7 +1043,7 @@ def _load_abp_context(stamp):
                     **{"Binding site S1": ("_s1_bs", _fmt_ids)},
                     **{"Cluster C70": ("cluster_data_70", _fmt_ids)},
                     **{"Position": ("_actin_key", _fmt_fil_summary)},
-                    **{"Localisation filament": ("_actin_key", _fmt_fil_labels)},
+                    **{"Filament position": ("_actin_key", _fmt_fil_labels)},
                 )
                 .reset_index()
                 .rename(columns={"protein": "Protein", "Nb_noeuds": "# nodes"})
@@ -1084,7 +1087,7 @@ def render_abp_overview():
         "PDB": st.column_config.TextColumn(width="large"),
         "Binding site S1": st.column_config.TextColumn(width="medium"),
         "Cluster C70": st.column_config.TextColumn(width="medium"),
-        "Localisation filament": st.column_config.TextColumn(width="medium"),
+        "Filament position": st.column_config.TextColumn(width="medium"),
     })
     st.subheader("Heatmap — actin residues contacted by ABPs")
 
@@ -1150,7 +1153,7 @@ def render_abp_overview():
                 colorscale="YlOrRd", zmin=0, zmax=100,
                 colorbar=dict(title="% ASA moy", thickness=12, len=0.86, y=0.57),
                 hovertemplate=("ABP : %{y}<br>Position : %{x}"
-                               "<br>%ASA moy : %{z:.2f}<extra></extra>"),
+                               "<br>Mean buried ASA (%): %{z:.2f}<extra></extra>"),
                 hoverongaps=False,
             ), row=1, col=1)
             _fig_hm.add_trace(go.Bar(
@@ -1175,7 +1178,7 @@ def render_abp_overview():
                                  title_text=numbering.AXIS_TITLE,
                                  title_font=dict(size=11))
             position_hover(_fig_hm)
-            st.plotly_chart(_fig_hm, use_container_width=True)
+            plotly_chart(_fig_hm, use_container_width=True)
 
 
 def render_abp_networks():
@@ -1487,7 +1490,7 @@ def render_abp_networks():
             _pct_max = max(_pct_raw.values()) if _pct_raw else 1.0
 
             def _pct_color(n_comp: int, n_total: int) -> str:
-                """Jaune → rouge selon % de C70 en compétition (normalisé min/max réel)."""
+                """Yellow → red: percentage of C70 clusters sharing residues (scaled to the observed range)."""
                 if n_total == 0:
                     return "#cccccc"
                 pct = n_comp / n_total
@@ -1590,7 +1593,7 @@ def render_abp_networks():
                            f"Famille : {_fam_nc}\n"
                            f"Position filament : {_pos_str}\n"
                            f"{_c70_line}\n"
-                           f"Partenaires ABP uniques en concurrence : {_n_comp_nc}"),
+                           f"Distinct ABP partners sharing residues: {_n_comp_nc}"),
                     size=_sz,
                     color={"background": _col, "border": _border_col},
                     borderWidth=1,
@@ -1927,7 +1930,7 @@ def render_abp_details():
                             with _cols3d[_ci3d]:
                                 st.markdown(f"**{_c70_3d}**")
                                 st.components.v1.html(
-                                    _v3d._make_html(), height=390, scrolling=False)
+                                    viewer_html(_v3d), height=390, scrolling=False)
 
             st.divider()
 
@@ -1995,7 +1998,7 @@ def render_s1_heatmap():
             "`script/interface_analysis_s1.py`).")
     else:
         heatmap_mode = st.selectbox(
-            "Normalisation",
+            "Normalization",
             ["Relative (max cluster = 1)",
              "Absolute (max = 100 %)"],
             index=1,   # défaut : valeurs absolues (% ASA)
@@ -2097,6 +2100,7 @@ def render_s1_cluster(kind="all"):
         sel_s1 = st.selectbox("Binding site to explore", all_s1, key="sel_s1",
                               format_func=lambda p: f"{p} — {int(df_s1[df_s1['patch'].astype(str) == p]['n_interactions'].values[0])} interactions")
 
+        st.caption("Binding-site clusters group similar sets of contacted residues on aligned actin. Similar footprints do not guarantee identical partner orientation or biological function.")
         row_s1 = df_s1[df_s1["patch"].astype(str) == sel_s1].iloc[0]
 
         # ── Réseau bipartite interactif + Surface 3D ─────────────────
@@ -2122,9 +2126,9 @@ def render_s1_cluster(kind="all"):
             st.markdown("**Interface 3D — actin ↔ ABP**")
             _abp3d = _s1_abp_3d_options(
                 sel_s1, os.path.getmtime("data/filtered/filtered_all_data.csv"))
-            _opts = [{"label": "cluster on actin", "mode": "none"}]
+            _opts = [{"label": "Footprint on actin", "mode": "none"}]
             if _abp3d:
-                _opts.append({"label": "— All together —", "mode": "all"})
+                _opts.append({"label": "All available partners, aligned on actin", "mode": "all"})
                 _opts += [dict(o, mode="one") for o in _abp3d]
             _sel3d = st.selectbox("Display", _opts,
                                   format_func=lambda o: o["label"], key=f"abp3d_v2_{sel_s1}")
@@ -2145,6 +2149,7 @@ def render_s1_cluster(kind="all"):
                     _h3d, _bm = _build_all_abp_3d(_pdb_c, _ac, _cmap)
                     st.components.v1.html(
                         _h3d, height=490, scrolling=False)
+                    st.caption(f"{len(_cmap)} of {len(_abp3d)} available pairs aligned on matching actin residues (at least 100 Cα pairs; RMSD ≤ 5 Å). Gray = reference actin; partner colours identify separate observations. This overlay does not imply simultaneous binding.")
                     _leg = " · ".join(
                         f"<span style='color:{_ABP_MULTI_COLORS[i % len(_ABP_MULTI_COLORS)]};"
                         f"font-size:16px'>■</span> {l}"
@@ -2155,12 +2160,19 @@ def render_s1_cluster(kind="all"):
             else:
                 _r3d = _build_abp_actin_3d(_sel3d["pdb"])
                 if _r3d:
+                    st.caption(f"Observed pair: interaction {_sel3d['interaction_id']}. Colours show this pair's buried ASA; the other cluster observations are not painted onto it.")
                     _h3d, _amax, _bmax = _r3d
                     st.components.v1.html(
                         _h3d, height=490, scrolling=False)
                 else:
                     st.info("3D structure unreadable for this ABP.")
 
+            if _mode3d == "one" and _r3d:
+                from display_helpers import gradient_legend
+                gradient_legend("Actin · buried ASA (%)", ["#FFFFCC", "#FDAA48", "#D30F20", "#800026"], 0, 100,
+                                "Pale yellow to dark red = increasing buried ASA on actin.")
+                gradient_legend("ABP · buried ASA (%)", ["#F7FBFF", "#9ECAE1", "#2171B5", "#08306B"], 0, 100,
+                                "Pale blue to dark blue = increasing buried ASA on the partner. Zero indicates no positive ASA recorded for this pair.")
             # Téléchargement du script PyMOL — placé sous la représentation 3D
             _pml_path = os.path.join(
                 "data/filtered/details/structures_files/bfactor_c70_interface/by_s1_gradient",
@@ -2263,6 +2275,13 @@ def render_c70_cluster():
                         st.components.v1.html(
                             _html_3d_c70, height=_net_height - 40,
                             scrolling=False)
+                        from display_helpers import gradient_legend
+                        gradient_legend("Actin · buried ASA (%)", ["#FFFFCC", "#FDAA48", "#D30F20", "#800026"], 0, 100,
+                                        "Darker red = more surface buried at this observed interface.")
+                        _homo_partner = bool(_cmat_c70 and _cmat_c70.get("partner_is_actin"))
+                        gradient_legend("Partner · buried ASA (%)",
+                                        ["#FFF0F5", "#FF69B4", "#C71585"] if _homo_partner else ["#F7FBFF", "#6BAED6", "#2171B5", "#08306B"], 0, 100,
+                                        "Pink = second actin; darker pink = more buried surface." if _homo_partner else "Blue = ABP; darker blue = more buried surface.")
                 else:
                     st.components.v1.html(
                         _html_c70, height=_net_height, scrolling=False)
@@ -2363,7 +2382,7 @@ def render_abp_proteocast(view="Profiles"):
     st.markdown("#### ABP ProteoCast — mutational landscape + 3D structure")
     if _pc_status is not None:
         st.caption(f"Scores available for {int(_pc_status['fait'].sum())} / {len(_pc_status)} ABPs in this dataset. Missing results remain unavailable; updates are managed in Documentation.")
-    _pc_selected = st.selectbox("ABP for conservation", sorted(abp_global["Protein"].tolist(), key=str.casefold), key="conservation_abp")
+    _pc_selected = st.selectbox("ABP for mutational sensitivity", sorted(abp_global["Protein"].tolist(), key=str.casefold), key="conservation_abp")
     _pc_chains = set(merged[merged["protein"] == _pc_selected]["_abp_chain"])
     if _pc_selected:
         _pc_row = None
@@ -2395,17 +2414,8 @@ def render_abp_proteocast(view="Profiles"):
             _pc_style = st.radio("Display", ["Surface", "Cartoon"],
                                  horizontal=True, key=f"pc_view_{_pc_slug}")
             # gros ABP : restreindre la 3D à la zone qui touche l'actin (ABD)
-            _pc_focus = None
-            _pc_fz = _abp_actin_focus(_pc_selected, _pc_slug)
-            if _pc_fz:
-                _pflo, _pfhi, _pql = _pc_fz
-                if st.toggle(
-                        f"Zoom on the actin-binding region (~{_pflo}–{_pfhi}) — "
-                        f"otherwise the whole protein ({_pql} aa)",
-                        value=False, key=f"pc3d_whole_{_pc_slug}",
-                        help="Zoom on the domain that contacts actin; "
-                             "off = whole protein."):
-                    _pc_focus = (_pflo, _pfhi)
+            from proteocast_abp import contact_region_zoom
+            _pc_focus = contact_region_zoom(_pc_selected, _pc_slug, f"pc3d_whole_{_pc_slug}")
             _pc_struct = proteocast_view.structure_for(
                 _pc_slug, _pc_uni, _pc_mt)
             if _pc_struct is None:
@@ -2430,7 +2440,14 @@ def render_abp_proteocast(view="Profiles"):
                 _v.zoomTo()
                 _v.setBackgroundColor("white")
                 st.components.v1.html(
-                    _v._make_html(), height=510, scrolling=False)
+                    viewer_html(_v), height=510, scrolling=False)
+                from display_helpers import gradient_legend
+                gradient_legend(_pc_struct["by"], _grad, _pc_struct["vmin"], _pc_struct["vmax"],
+                    "Blue = lower sensitivity; red = higher sensitivity. This is a model-derived score, not clinical pathogenicity."
+                    if _pc_struct["metric"] else "Orange = lower confidence; blue = higher confidence. pLDDT measures AlphaFold model confidence, not mutational sensitivity.")
+                if _pc_struct.get("note"):
+                    st.caption(_pc_struct["note"])
+
 
 
 def render_actin_abp_conservation():

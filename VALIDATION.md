@@ -202,3 +202,30 @@ vides, et deux entrées du manifeste complet n'ont pas d'accession. La validatio
 biologique des interfaces et des candidats ABD reste du ressort des auteurs ;
 les mesures et leurs limites sont disponibles pour cette revue. Aucun
 redéploiement de l'application Cloud n'est réalisé par ce lot.
+
+
+## Display, terminology and 3D provenance — 2 October 2026
+
+- 102 unit tests pass in each repository, including numeric interaction order,
+  per-cell hover colours without changing measurements, real py3Dmol element
+  resizing, complete-score/sequence requirements and cache refresh after import.
+- `tools/check_app.py` passes across the 11 pages and their representative views
+  in both datasets. `tools/check_followup.py` passes for saved FoldDisco results,
+  coherent combined motifs, server-size limits and residue navigation.
+- `tools/check_display.py` passes in both datasets: numeric source table, individual
+  Myosin-6 pair in 6685_6, aligned partners, explicit 3D metric legend, visible zoom
+  controls and cell-colour tooltip payloads. Dataset-specific ABP availability is
+  preserved; the public test does not assume Actin-interacting protein 1 is present.
+- The complete dataset supplies seven observed partner pairs for 6685_6. Their
+  superposition uses sequence-matched actin Cα atoms; colours in a single-pair view
+  use that pair's ASA measurements, rather than pooled cluster measurements.
+- The existing Actin-interacting protein 1 PDB is an original AlphaFold file. Its
+  B-factors are now labelled pLDDT confidence, rather than ProteoCast sensitivity.
+- `git diff --check` passes. No clinical classifications or source contact tables
+  were changed by this display update.
+
+Visual browser inspection was blocked because the browser tool could not verify
+its required security policy. No alternate browser path was used. AppTest validates
+page execution and generated controls, but does not certify the rendered WebGL
+framing or tooltip appearance on the user's screen. These visual changes therefore
+still need a browser check once that tool access is available.

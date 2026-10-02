@@ -1,3 +1,4 @@
+from display_helpers import plotly_chart
 """Comparison of ABP interface motifs with FoldDisco.
 
 Provides saved pairwise scores, auditable discovery coverage, and local query
@@ -191,7 +192,7 @@ def _hbar(names, scores, colors=None):
         margin=dict(l=6, r=6, t=6, b=6),
         xaxis_title="Score ratio (source-labelled or best-hit denominator)",
         yaxis=dict(autorange="reversed"))
-    st.plotly_chart(fig, use_container_width=True)
+    plotly_chart(fig, use_container_width=True)
 
 
 def _render_db_table(sub, db, filt):
@@ -285,6 +286,23 @@ def _render_local_query(catalog,abp,cluster):
     for error in checked['errors']:st.warning(error)
     if checked['duplicate_tokens_removed']:st.caption('Repeated position tokens are counted once.')
     picked=coords[coords.position.isin(checked['positions'])]
+    st.caption(f"Prepared motif: {len(checked['positions'])} residues; public server limit: 32. "
+               "The initial selection uses ABP residues observed in contact with actin. Residues far apart in the sequence can lie next to one another in 3D.")
+    from Bio.SeqUtils import seq1
+    from html import escape
+    selected_positions = set(checked['positions'])
+    cells = []
+    for residue in coords.itertuples():
+        chosen = residue.position in selected_positions
+        colour = '#E69F00' if chosen else '#F2F3F5'
+        letter = seq1(residue.residue, custom_map={'HIC': 'H'})
+        cells.append(f'<span title="{escape(str(residue.residue))} {escape(str(residue.position))}" '
+                     f'style="display:inline-block;padding:3px;margin:1px;background:{colour};color:#222">'
+                     f'{letter}<small style="display:block;font-size:9px">{escape(str(residue.position))}</small></span>')
+    with st.expander('Resolved ABP sequence and selected motif'):
+        st.caption('Orange residues form the prepared motif. Labels use PDB numbering; unresolved residues are omitted. Edit the position field above to change the selection.')
+        st.markdown('<div style="font-family:monospace;line-height:1.2">'+''.join(cells)+'</div>', unsafe_allow_html=True)
+
     fig=go.Figure()
     fig.add_trace(go.Scatter3d(x=coords.x,y=coords.y,z=coords.z,mode='markers',name='Resolved C-alpha atoms',
                              marker=dict(color='#BBBBBB',size=3,opacity=.45),customdata=coords[['residue','position']],
@@ -294,7 +312,7 @@ def _render_local_query(catalog,abp,cluster):
                              hovertemplate='%{customdata[0]} %{customdata[1]}<extra></extra>'))
     fig.update_layout(height=460,scene=dict(aspectmode='data',xaxis_visible=False,yaxis_visible=False,zaxis_visible=False),
                       margin=dict(l=0,r=0,t=0,b=0),legend=dict(orientation='h'))
-    st.plotly_chart(fig,use_container_width=True,key=f'fd_query_3d_{abp}_{cluster}')
+    plotly_chart(fig,use_container_width=True,key=f'fd_query_3d_{abp}_{cluster}')
     st.caption('Local C-alpha representation: gray = resolved chain residues; orange = prepared motif. '
                'Editing this selection does not recalculate or change the saved discovery results below.')
     if not checked['errors']:
@@ -375,6 +393,7 @@ def _render_query_jobs(row, checked, path):
 def render_discovery(sel_abp):
     """Per-ABP view, broken down by cluster: one motif per site, 2 dbs (PDB/AFDB)."""
     st.markdown("#### Discovery — interface motif per cluster (FoldDisco)")
+    st.info("FoldDisco searches for similar arrangements of amino acids in 3D. Here the query is an observed ABP contact motif. A match is a structural candidate, not evidence that the hit binds actin or has the same function.")
     with st.expander("How FoldDisco scores are interpreted"):
         st.markdown("Coverage is the fraction of stored query residues matched. For each ABP/site/database, "
                     "the score is divided by the highest positive source-labelled hit, or by the best available "

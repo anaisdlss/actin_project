@@ -1,3 +1,5 @@
+from display_helpers import viewer_html
+from display_helpers import plotly_chart
 """Explorateur interactif actin : résidu / cluster / ABP / paire d'ABP / séquence.
 
 Cinq vues sur la même table « passeport résidu » (residue_passport.build_passport) :
@@ -89,7 +91,7 @@ def render_residue_conservation(pp):
         return
     if st.session_state.get("actin_ov_selbox") not in positions:
         st.session_state["actin_ov_selbox"] = positions[0]
-    canon = st.selectbox("Residue for conservation", positions, key="actin_ov_selbox",
+    canon = st.selectbox("Residue for mutational sensitivity", positions, key="actin_ov_selbox",
                          format_func=lambda c: f"{_pos_row(pp, c)['actin_aa']}{numbering.label(c)}")
     row = _pos_row(pp, canon)
     if row is not None:
@@ -112,7 +114,7 @@ def render_residue_conservation(pp):
         c1, c2, c3 = st.columns(3)
         _rsa_value = pd.to_numeric(pd.Series([row.get("rsa")]), errors="coerce").iloc[0]
         c3.metric("RSA in source table (%)", _fmt(_rsa_value * 100, 1),
-                  help="Solvent accessibility from the conservation source table. This is distinct from interface buried ASA; the structure and method must be checked before treating it as filament accessibility.")
+                  help="Solvent accessibility from the legacy RSA source table. This is distinct from interface buried ASA; the structure and method must be checked before treating it as filament accessibility.")
         c1.metric(
             "Mutational sensitivity", _fmt(this_c),
             delta=(f"{float(this_c) - avg_surf:+.2f} vs mean surface"
@@ -131,9 +133,9 @@ def render_residue_fiche(pp, canon):
     if row is not None:
         rsa = pd.to_numeric(pd.Series([row.get("rsa")]), errors="coerce").iloc[0]
         st.metric("RSA in source table (%)", _fmt(rsa * 100, 1),
-                  help="Legacy structural source; monomer/filament provenance is unresolved. See Conservation → Solvent accessibility for a separately documented calculation.")
+                  help="Legacy structural source; monomer/filament provenance is unresolved. See Actin mutational sensitivity → Solvent accessibility for a separately documented calculation.")
     from app_navigation import request_page
-    st.button("Conservation of this residue", key=f"residue_conservation_{canon}",
+    st.button("Mutational sensitivity of this residue", key=f"residue_conservation_{canon}",
               on_click=request_page, args=("actin-conservation", "Overview"),
               kwargs={"actin_ov_selbox": canon})
 
@@ -246,7 +248,7 @@ def render_residue_tab(pp):
     )
 
     position_hover(fig)
-    st.plotly_chart(fig, use_container_width=True, key="explo_hm",
+    plotly_chart(fig, use_container_width=True, key="explo_hm",
                     on_select=partial(_select_residue_from_chart, "explo_hm",
                                       "explo_res_selbox", label2canon),
                     selection_mode="points")
@@ -312,7 +314,7 @@ def _render_actin_3d(pp, canon):
                    {"sphere": {"color": "magenta", "opacity": 0.6}})
         v.zoomTo({"resi": resnum})
         v.setBackgroundColor("white")
-        st.components.v1.html(v._make_html(), height=430, scrolling=False)
+        st.components.v1.html(viewer_html(v), height=430, scrolling=False)
 
 
 # ── Vue cluster (#2) ────────────────────────────────────────────────────────
@@ -339,10 +341,10 @@ def _residues_summary(pp, df_long, title_extra=""):
         agg.rename(columns={
             "residu": "Residue", "asa_max": "% ASA max",
             "n_abp": "# ABPs", "abps": "Other ABPs on this residue",
-            "conservation": "Conservation", "mean_vs": "Mut. sens.",
+            "conservation": "Mutational sensitivity", "mean_vs": "Mean ProteoCast variant score",
             "frac_impactful": "Frac. impact.", "rsa": "RSA",
             "residue_class": "Class",
-        })[["Residue", "% ASA max", "Conservation", "Mut. sens.",
+        })[["Residue", "% ASA max", "Mutational sensitivity", "Mean ProteoCast variant score",
             "Frac. impact.", "RSA", "Class", "# ABPs",
             "Other ABPs on this residue"]],
         hide_index=True, use_container_width=True,
@@ -426,10 +428,10 @@ def _residues_summary_with_others(pp, df_long, others_map):
     st.dataframe(
         agg.rename(columns={
             "residu": "Residue", "asa_max": "% ASA max",
-            "conservation": "Conservation", "mean_vs": "Mut. sens.",
+            "conservation": "Mutational sensitivity", "mean_vs": "Mean ProteoCast variant score",
             "frac_impactful": "Frac. impact.", "rsa": "RSA",
             "residue_class": "Class", "autres": "Other ABPs sharing",
-        })[["Residue", "% ASA max", "Conservation", "Mut. sens.",
+        })[["Residue", "% ASA max", "Mutational sensitivity", "Mean ProteoCast variant score",
             "Frac. impact.", "RSA", "Class", "Other ABPs sharing"]],
         hide_index=True, use_container_width=True,
     )
@@ -538,7 +540,7 @@ def render_pair_tab(pp):
         xaxis=dict(title=numbering.AXIS_TITLE, dtick=25),
         yaxis=dict(autorange="reversed"), showlegend=False)
     position_hover(fig, unified=False)
-    st.plotly_chart(fig, use_container_width=True)
+    plotly_chart(fig, use_container_width=True)
 
     # ── Actin 3D : lieux de contact, mêmes couleurs (partagé / A / B) ──────
     _render_pair_3d(pp, inter, only1, only2, lab1, lab2, colors)
@@ -581,7 +583,7 @@ def _render_pair_3d(pp, inter, only1, only2, a1, a2, colors):
                          {"resi": rl})
     v.zoomTo()
     v.setBackgroundColor("white")
-    st.components.v1.html(v._make_html(), height=470, scrolling=False)
+    st.components.v1.html(viewer_html(v), height=470, scrolling=False)
     st.markdown(
         f"<span style='color:{colors['shared']};font-size:18px'>■</span> shared "
         f"&nbsp; <span style='color:{colors[a1]};font-size:18px'>■</span> {a1} only "
@@ -770,8 +772,8 @@ def render_sequence_tab(pp):
         rows.append({
             "Variation (P60709)": f"{wt}{rpos}{mut}",
             "canon": canon,
-            "Conservation": None if pr is None else pr.get("conservation"),
-            "Mut. sens.": None if pr is None else pr.get("mean_vs"),
+            "Mutational sensitivity": None if pr is None else pr.get("conservation"),
+            "Mean ProteoCast variant score": None if pr is None else pr.get("mean_vs"),
             "at interface": ("unknown" if pr is None or pd.isna(pr.get("at_interface")) else "yes" if bool(pr.get("at_interface")) else "no"),
             "# ABPs": len(sub),
             "ABPs involved": abps,
@@ -792,7 +794,7 @@ def render_sequence_tab(pp):
         marker=dict(size=6, color="#e2e2e2", symbol="square"),
         hoverinfo="skip"))
     if not _dd.empty:
-        _cons = pd.to_numeric(_dd["Conservation"], errors="coerce")
+        _cons = pd.to_numeric(_dd["Mutational sensitivity"], errors="coerce")
         figt.add_trace(go.Scatter(
             x=_dd["canon"].map(numbering.to_uniprot), y=[0] * len(_dd), mode="markers+text",
             marker=dict(size=15, color=_cons, colorscale="Blues",
@@ -810,7 +812,7 @@ def render_sequence_tab(pp):
                         "colour = mutational sensitivity, dark = more sensitive)",
                    font=dict(size=11)))
     position_hover(figt, unified=False)
-    st.plotly_chart(figt, use_container_width=True)
+    plotly_chart(figt, use_container_width=True)
 
     # actin 3D : PAS de gradient — actin neutre, seules les positions
     # substituées sont mises en avant (grosses sphères vertes bien visibles).
@@ -829,7 +831,7 @@ def render_sequence_tab(pp):
                              {"resi": _rp})
             v.zoomTo()
             v.setBackgroundColor("white")
-            st.components.v1.html(v._make_html(), height=510, scrolling=False)
+            st.components.v1.html(viewer_html(v), height=510, scrolling=False)
         except ImportError:
             pass
 
@@ -910,7 +912,7 @@ def _render_actin_overview_3d(pp, sel, mode="Interaction type"):
     v.zoomTo()       # vue d'ensemble stable — on ne re-zoome pas sur le résidu
     v.zoom(0.82)     # léger dézoom pour que TOUTE l'actine tienne dans le cadre
     v.setBackgroundColor("white")
-    st.components.v1.html(v._make_html(), height=470, scrolling=False)
+    st.components.v1.html(viewer_html(v), height=470, scrolling=False)
     _aa = row["actin_aa"] if row is not None and pd.notna(row.get("actin_aa")) else ""
 
 
@@ -953,7 +955,7 @@ def render_actin_overview(pp):
             yaxis=dict(title="number of ABPs in contact"))
         position_hover(fig)
         fig.add_vline(x=numbering.to_uniprot(sel), line_color="#444444", line_width=1)
-        st.plotly_chart(fig, use_container_width=True, key="actin_ov",
+        plotly_chart(fig, use_container_width=True, key="actin_ov",
                         on_select=partial(_select_residue_from_chart, "actin_ov",
                                           "actin_ov_selbox", dict(zip(xu, x))),
                         selection_mode="points")

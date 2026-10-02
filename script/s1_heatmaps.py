@@ -1,3 +1,4 @@
+from display_helpers import plotly_chart
 """Extracted from streamlit.py — s1_heatmaps view/build helpers (keeps streamlit.py light)."""
 import os
 import numpy as np
@@ -229,7 +230,7 @@ def _render_s1_global_plotly(data, relative, valid_clusters=None):
     fig.add_trace(go.Bar(
         x=full, y=cnt, marker=dict(
             color=cnt, colorscale="Blues", showscale=False),
-        hovertemplate="Position : %{x}<br>clusters touchant : %{y}<extra></extra>"),
+        hovertemplate="Position : %{x}<br>Clusters contacting this position: %{y}<extra></extra>"),
         row=3, col=1)
 
     fig.update_layout(
@@ -255,7 +256,7 @@ def _render_s1_global_plotly(data, relative, valid_clusters=None):
     _labels = set(homo) | set(hetero)
     if valid_clusters is not None:
         _labels &= set(valid_clusters)
-    st.plotly_chart(fig, use_container_width=True, key="s1g_hm",
+    plotly_chart(fig, use_container_width=True, key="s1g_hm",
                     on_select=lambda: _on_s1_global_selection(_labels),
                     selection_mode="points")
 
@@ -370,7 +371,7 @@ def _render_s1_patch_plotly(detail, patch):
                       title_font=dict(size=10))
     # Clic sur une position → met à jour le sélecteur « Position canonical » ci-dessus.
     position_hover(fig1)
-    st.plotly_chart(fig1, use_container_width=True, key=f"s1prof_{patch}",
+    plotly_chart(fig1, use_container_width=True, key=f"s1prof_{patch}",
                     on_select=lambda: _on_s1_patch_selection(str(patch)),
                     selection_mode="points")
 
@@ -389,7 +390,7 @@ def _render_s1_patch_plotly(detail, patch):
     fig2.update_xaxes(dtick=25, title_text=numbering.AXIS_TITLE,
                       title_font=dict(size=10))
     position_hover(fig2)
-    st.plotly_chart(fig2, use_container_width=True)
+    plotly_chart(fig2, use_container_width=True)
 
 
 _S1_TAXID_NAMES = {

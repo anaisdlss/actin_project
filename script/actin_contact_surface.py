@@ -1,3 +1,4 @@
+from display_helpers import viewer_html
 """Observed residue interaction types on a sequence-mapped actin reference."""
 from io import StringIO
 from pathlib import Path
@@ -81,7 +82,7 @@ def render_contact_surface(text, selected):
     if selected in mapped:
         viewer.addStyle({'serial': mapped[selected]}, {'stick': {'color': '#111111', 'radius': .3}})
     viewer.zoomTo(); viewer.zoom(.82); viewer.setBackgroundColor('white')
-    st.components.v1.html(viewer._make_html(), height=470, scrolling=False)
+    st.components.v1.html(viewer_html(viewer), height=470, scrolling=False)
     st.markdown(' &nbsp; '.join(f'<span style="color:{color}">■</span> {label}' for label, color in CATEGORIES.items()), unsafe_allow_html=True)
     st.caption(f"Selected position: {selected} · {categories.get(selected, 'unmapped')}. Black sticks mark the selected residue. "
                'Categories combine observed positive buried-ASA contacts across the dataset; gray does not mean that binding is impossible. Unmapped atoms are also gray.')

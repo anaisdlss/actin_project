@@ -25,6 +25,6 @@ app.switch_page('views/residue-level.py').run()
 app.selectbox(key='actin_ov_selbox').set_value(51).run()
 app.button(key='residue_conservation_51').click().run()
 assert not app.exception,[e.message for e in app.exception]
-assert app.header[0].value=='Actin binding sites conservation'
+assert app.header[0].value=='Actin mutational sensitivity'
 assert app.selectbox(key='actin_ov_selbox').value==51
 print('PASS selected residue opens its conservation detail',flush=True)

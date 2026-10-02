@@ -1,3 +1,4 @@
+from display_helpers import plotly_chart
 """Views for the mentor's variant, conservation and interface questions."""
 from pathlib import Path
 import json
@@ -55,7 +56,7 @@ def render_conservation():
     st.caption('Sensitivity = minus the mean of the 20 supplied ProteoCast scores at a position (including the unchanged amino acid). This is a model-derived '
                'mutational sensitivity proxy, not a clinical classification or a direct sequence-identity percentage. '
                'The query sequence and all mutation reference letters are checked against P60709.')
-    cutoff=st.slider('Buried ASA threshold for conservation footprints (%)',0.0,100.0,0.0,step=1.0,key='cons_asa')
+    cutoff=st.slider('Buried ASA threshold for sensitivity footprints (%)',0.0,100.0,0.0,step=1.0,key='cons_asa')
     table,cor,clusters=conservation_summary(scores,current_footprints(),cutoff)
     fig=make_subplots(rows=4,cols=1,shared_xaxes=True,vertical_spacing=.06,
                       subplot_titles=('Mutational sensitivity','RSA in existing structural source','Distinct ABP source names','Observed actin–actin contacts'))
@@ -64,10 +65,10 @@ def render_conservation():
                                  hovertemplate='%{customdata}%{x} · %{fullData.name}: %{y:.3~g}<extra></extra>'),row=row,col=1)
     fig.update_layout(height=700,showlegend=False);fig.update_xaxes(title_text='P60709 position',row=4,col=1)
     position_hover(fig)
-    st.plotly_chart(fig,use_container_width=True,key='cons_tracks')
+    plotly_chart(fig,use_container_width=True,key='cons_tracks')
     with st.expander('Actin ProteoCast landscape and sequence alignment'):
         pivot=raw.pivot(index='alternate',columns='position',values='Variant_score').reindex(columns=range(1,376))
-        st.plotly_chart(position_hover(go.Figure(go.Heatmap(z=pivot.values,x=pivot.columns,y=pivot.index,colorscale='Blues',colorbar=dict(title='Variant score')))),use_container_width=True,key='cons_landscape')
+        plotly_chart(position_hover(go.Figure(go.Heatmap(z=pivot.values,x=pivot.columns,y=pivot.index,colorscale='Blues',colorbar=dict(title='Variant score')))),use_container_width=True,key='cons_landscape')
         msa=Path('data/proteocast/actin/2.aliAF-P60709-F1-msa_v6.fasta')
         if msa.exists():st.download_button('Download actin ProteoCast alignment',msa.read_bytes(),file_name=msa.name,key='cons_msa')
         download(raw,'Download actin variant scores','actin_proteocast_scores.csv','cons_raw')
@@ -82,9 +83,9 @@ def render_conservation():
         sub=table[table.category.eq(cat)]
         fig.add_trace(go.Box(y=sub.sensitivity,name=f'{cat} (n={sub.sensitivity.notna().sum()})',marker_color=color))
     fig.update_layout(yaxis_title='ProteoCast sensitivity',height=330)
-    st.plotly_chart(fig,use_container_width=True,key='cons_categories')
+    plotly_chart(fig,use_container_width=True,key='cons_categories')
     st.dataframe(clusters,hide_index=True,width='stretch')
-    with st.expander('Conservation footprints: positive contacts versus selected ASA threshold'):
+    with st.expander('Sensitivity footprints: positive contacts versus selected ASA threshold'):
         _,_,baseline=conservation_summary(scores,current_footprints(),0.0)
         st.caption('The first table uses all positive buried-ASA observations. The second uses the selected '
                    'strict threshold. Both retain the same source sequences and ProteoCast scores.')
@@ -92,26 +93,26 @@ def render_conservation():
         st.dataframe(baseline,hide_index=True,width='stretch')
         st.markdown(f'**ASA strictly above {cutoff:g}%**')
         st.dataframe(clusters,hide_index=True,width='stretch')
-        download(baseline,'Download conservation without an additional ASA threshold','footprint_conservation_asa0.csv','cons_baseline_csv')
-    with st.expander('Conservation within a selected ABP binding-site cluster'):
+        download(baseline,'Download sensitivity without an additional ASA threshold','footprint_conservation_asa0.csv','cons_baseline_csv')
+    with st.expander('Sensitivity within a selected ABP binding-site cluster'):
         records=current_footprints()
         names=sorted(records.loc[records.kind.eq('abp'),'group'].unique())
-        name=st.selectbox('ABP for cluster conservation',names,key='cons_cluster_abp')
+        name=st.selectbox('ABP for cluster sensitivity',names,key='cons_cluster_abp')
         sites=sorted(records.loc[records.kind.eq('abp')&records.group.eq(name),'site'].dropna().unique())
         if sites:
-            site=st.selectbox('Binding site for conservation',sites,key='cons_cluster_site')
+            site=st.selectbox('Binding site for sensitivity',sites,key='cons_cluster_site')
             selected=records[records.kind.eq('abp')&records.group.eq(name)&records.site.eq(site)&records.asa.gt(cutoff)]
             positions=set(selected.position.astype(int));profile=table[table.position.isin(positions)]
             fig=go.Figure(go.Scatter(x=table.position,y=table.sensitivity,mode='lines',name='All positions',line=dict(color='#BBBBBB')))
             fig.add_trace(go.Scatter(x=profile.position,y=profile.sensitivity,mode='markers',name=site,marker_color='#0072B2',customdata=profile.aa,hovertemplate='%{customdata}%{x}: %{y}<extra></extra>'))
             fig.update_layout(xaxis_title='P60709 position',yaxis_title='ProteoCast sensitivity',height=320)
             position_hover(fig, unified=False)
-            st.plotly_chart(fig,use_container_width=True,key='cons_cluster_profile')
-            download(profile,'Download selected cluster conservation','cluster_conservation.csv','cons_cluster_csv')
-    with st.expander('Download conservation tables'):
+            plotly_chart(fig,use_container_width=True,key='cons_cluster_profile')
+            download(profile,'Download selected cluster sensitivity','cluster_conservation.csv','cons_cluster_csv')
+    with st.expander('Download sensitivity tables'):
         download(table,'Download aligned residue profiles','actin_conservation_profiles.csv','cons_profiles_csv')
         download(cor,'Download correlations','actin_conservation_correlations.csv','cons_cor_csv')
-        download(clusters,'Download footprint conservation summaries','footprint_conservation.csv','cons_clusters_csv')
+        download(clusters,'Download footprint sensitivity summaries','footprint_conservation.csv','cons_clusters_csv')
 
 
 def render_variants():
@@ -132,6 +133,7 @@ def render_variants():
     c1.metric('Source records',len(variants));c2.metric('Records eligible for analysis',len(valid));c3.metric('Excluded records',len(variants)-len(valid))
     gene=st.selectbox('Human actin gene',sorted(GENES),key='hv_gene')
     categories=sorted(valid.classif_cat.dropna().unique())
+    st.info("ClinVar categories describe evidence about disease association: benign, likely benign, uncertain significance, likely pathogenic and pathogenic. They are not degrees of disease severity. Conflicting annotations and population observations are shown separately; gnomAD presence does not mean benign.")
     category=st.selectbox('Variant annotation to display',categories,index=categories.index('pathogenic'),key='hv_category')
     selected=valid[valid.classif_cat.eq(category)].drop_duplicates(['gene','position','aa_ref','aa_alt'])
     st.caption('For one gene, each alternate-amino-acid/position cell is binary: blue = a recorded substitution; '
@@ -141,7 +143,7 @@ def render_variants():
     matrix=presence_matrix(per)
     fig=presence_figure(matrix,gene,category)
     position_hover(fig,unified=False)
-    st.plotly_chart(fig,use_container_width=True,key='hv_gene_heatmap')
+    plotly_chart(fig,use_container_width=True,key='hv_gene_heatmap')
     counts=selected.groupby(['gene','position']).size().unstack(fill_value=0).reindex(index=sorted(GENES),columns=range(1,376),fill_value=0).fillna(0)
     combined=counts.sum(axis=0).to_frame().T;combined.index=['All genes (sum)']
     counts=pd.concat([counts,combined])
@@ -159,7 +161,7 @@ def render_variants():
                       legend=dict(orientation='h',x=0,y=-.16,xanchor='left',yanchor='top'))
     fig.update_xaxes(title_text='P60709 position',row=3,col=1)
     position_hover(fig)
-    st.plotly_chart(fig,use_container_width=True,key='hv_combined')
+    plotly_chart(fig,use_container_width=True,key='hv_combined')
     detail=valid[valid.gene.eq(gene)].copy()
     detail['P60709_reference']=detail.position.map(scores.set_index('position').aa)
     detail=detail.merge(raw[['position','alternate','Variant_score']],left_on=['position','aa_alt'],right_on=['position','alternate'],how='left')
@@ -199,7 +201,7 @@ def render_variants():
         fig.add_trace(go.Scatter(x=track.index,y=track.sensitivity,mode='lines',name='ProteoCast sensitivity',
                                 line=dict(color='#884EA0')),row=4,col=1)
         fig.update_layout(height=730,showlegend=False);fig.update_xaxes(title_text='P60709 position',row=4,col=1)
-        st.plotly_chart(position_hover(fig),use_container_width=True,key='hv_conflicts_heatmap')
+        plotly_chart(position_hover(fig),use_container_width=True,key='hv_conflicts_heatmap')
         st.caption('Tracks share aligned P60709 positions. Conflicting means the source annotation; VUS are unchanged. '
                    'The footprint aggregates structural observations across the retained dataset, not structures '
                    'of the selected human gene. A gray footprint cell means no positive ASA observation; it does '
@@ -282,7 +284,7 @@ def render_interface_evidence():
                'Co-occurrence does not establish direct contact or a distorted filament conformation.')
     fig=go.Figure(go.Bar(x=sites.site,y=sites.PDB_count,marker_color='#0072B2'))
     fig.update_layout(xaxis_title='Binding-site cluster',yaxis_title='Distinct PDB structures',height=330)
-    st.plotly_chart(fig,use_container_width=True,key='interface_evidence_counts')
+    plotly_chart(fig,use_container_width=True,key='interface_evidence_counts')
     st.dataframe(sites,hide_index=True,width='stretch')
     st.markdown('**Interface clusters (C70)**')
     st.dataframe(c70,hide_index=True,width='stretch')

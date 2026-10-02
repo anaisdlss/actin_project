@@ -22,7 +22,7 @@ def presence_figure(matrix,gene,category):
         colorscale=[[0,ABSENT_COLOR],[.4999,ABSENT_COLOR],[.5,PRESENT_COLOR],[1,PRESENT_COLOR]],
         showscale=False,customdata=states,
         hovertemplate='P60709 %{x} → %{y}<br>%{customdata}<extra></extra>'))
-    for label,color in [('Not recorded (0)',ABSENT_COLOR),('Recorded (1)',PRESENT_COLOR)]:
+    for label,color in [('Not recorded in this category',ABSENT_COLOR),('Recorded in this category',PRESENT_COLOR)]:
         figure.add_trace(go.Scatter(x=[None],y=[None],mode='markers',name=label,
             marker=dict(symbol='square',size=12,color=color,line=dict(color='#7A7A7A',width=1)),
             hoverinfo='skip',showlegend=True))
