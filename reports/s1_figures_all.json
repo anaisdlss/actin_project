@@ -1,10 +1,10 @@
 {
-  "generated_utc": "20261003T083949067609Z",
+  "generated_utc": "20261003T094954129381Z",
   "scope": "all",
   "reference": "P60709 1\u2013375",
   "S1_scope": "subunit_1 only, as in the app; both-side union is a separate footprint analysis",
   "aggregation": "Within C70: sum of per-interaction residue max ASA / total interactions; then equal-weight mean across C70. Absent interface residues contribute zero, not measured solvent accessibility.",
-  "backup": "reports/figure_backups/20261003T083949067609Z.zip",
+  "backup": "reports/figure_backups/20261003T094954129381Z.zip",
   "sources": {
     "data/filtered/filtered_all_data.csv": "2cc698166ffe50f9e0793289e6fbef470aaffbe52bbd44a9814789effa497574",
     "data/filtered/details/1.interactions.csv": "ea101480359ff3a436093ebf9593004f7af4d8ae242e738fb01f29ee6238a893",

@@ -1,0 +1,18 @@
+{
+  "retrieved_utc": "2026-10-03T09:42:43.659964+00:00",
+  "pdb_id": "8DNH",
+  "entity_id": "1",
+  "organism": "Homo sapiens",
+  "uniprot": "P60709",
+  "files": {
+    "8dnh.cif": {
+      "url": "https://files.rcsb.org/download/8DNH.cif",
+      "sha256": "1f073cf8a2cabf61a07490246c43e22d281bc690c6e6d435aadd88ca26751d9b"
+    },
+    "8dnh_entity.json": {
+      "url": "https://data.rcsb.org/rest/v1/core/polymer_entity/8DNH/1",
+      "sha256": "f3a5ee23ee8be7dd8a8d16e35defebb01147226ba55a629189e1ed8b63a8f6b2"
+    }
+  },
+  "reproduce": "python tools/fetch_rsa_reference.py"
+}

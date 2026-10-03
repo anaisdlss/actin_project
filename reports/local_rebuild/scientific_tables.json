@@ -1,5 +1,5 @@
 {
-  "finished_utc": "2026-10-03T08:38:38.365869+00:00",
+  "finished_utc": "2026-10-03T09:54:21.772061+00:00",
   "fingerprint": {
     "inputs": {
       "data/P60709_ref.fasta": "50469aa3087cbb3679ce4167ab78ce1352cc07bd7fa6533e77ed9601dedcaa08",
@@ -31,19 +31,19 @@
       "data/proteocast/actin/1.query.fasta": "350341f0efa6d0b5736714a0a5ec50721be5211481c8cfb8b4f44dd4267f311c",
       "data/proteocast/actin/2.aliAF-P60709-F1-msa_v6.fasta": "e8bbcc7c1a7ea66d1fbe5272509c2496d591cbd573d6361c62781c9a14f9f7da",
       "data/proteocast/actin/4.query_ProteoCast.csv": "909024144ba3aa29fe879bbdb4c2c661a74ee30d90d4b993406500e6d81cd4e4",
-      "reports/scientific_audit/filament_accessibility_7pdz_I.csv": "6b1ce398fe1b997f2708df607c929494cd4f848c3798b9ad2c30e7544e8b73c2",
-      "reports/scientific_audit/filament_accessibility_manifest.json": "1fc40586ff4681dafd02867e1d2bf7cbb98b8e12c5b2cf27b00eca372810f28e"
+      "reports/scientific_audit/filament_accessibility_8dnh_B.csv": "2ab2c2152841b107cec647505f3de5080b145cb2cdd0511b5644b973cbe03adb",
+      "reports/scientific_audit/filament_accessibility_manifest.json": "92e4e2ba40906d5cd63b8765a28603ea376335f71d180cbf065e65830a8c8eee"
     },
     "code": {
       "script/display_helpers.py": "cfff8b5096f06a125dc7da681c36a9c804e68f8b3eacde79cad00eb8e232d2fb",
       "script/footprint_comparison.py": "4c79c743966c68045621da8c8a2ef35227260100c06d053107fd6523b83083b2",
       "script/interface_properties.py": "fa4824a77364067c56b0de88ea526666143eeb47b02cf80b0acadf2caee1a4da",
-      "script/local_rebuild.py": "262758a659fe34f01ea71a593ae655299853f1a469cb2d61057213a0b4d848dd",
+      "script/local_rebuild.py": "f4ff5ae9ea53091088dc03bac90cf99f0c4bd27430f3fd376d442eac432916ca",
       "script/numbering.py": "740de6699bf30037e4db8905cf6701cdc1b978ea3bf5a6bfb5f8476c42a18ede",
       "script/residue_contacts.py": "9b4369da1b7982f794f1f777bc8795304c256b7f24f759154c2c096ba0333b28",
-      "script/rsa_source.py": "0fa8e5e85f1b678f5f361bfedf7a12b57e78fe092dfc6748cb70ef546c1b68ed",
-      "script/scientific_analysis.py": "3ab9cb503eade2d6a11d72340c5503a52bc1af923eb95075255b24e8232d0495",
-      "tools/export_scientific_audit.py": "ef217f4206c6df289c6dd754aafea8bfd72b73c27bc770da3845a47f52e4922e"
+      "script/rsa_source.py": "1433de5f8f6f9ccc76ab7fbff79f552adee862af07835dfdf2590678fdcb28fe",
+      "script/scientific_analysis.py": "20495939ba1446297eed9fff4d5c62dae448fa8c11763c2907ed9537872547d2",
+      "tools/export_scientific_audit.py": "2ffcc9d65834b150e81c640451d48c6a0972dbca4f1094ee512cb4cd97a128db"
     },
     "runtime": {
       "python": "3.12.13",
@@ -59,9 +59,9 @@
     ]
   },
   "outputs": {
-    "reports/scientific_audit/conservation_correlations.csv": "04860fa01d4b0fa433c42fdf925c2c11ad36a0ecfcebe51f33ee5b735b9856ce",
+    "reports/scientific_audit/conservation_correlations.csv": "bd8c9413b4c0fd9fb225d79bb6bfec6fd8da462d4c878b3df63c68486e815cd5",
     "reports/scientific_audit/conservation_footprints.csv": "0a94202d0f4f2b88c1747c968da1d3d61add8c607cf2cf8b3c96978560c57c1d",
-    "reports/scientific_audit/conservation_profiles.csv": "d1b1aed4aaa684428230dbe7f21eadb4786bf95d0b565fe8b52bc05bde10499d",
+    "reports/scientific_audit/conservation_profiles.csv": "c1717fc9e3154505eb4b308cd834ced3e8ce62c0fa88027e4c92a254cc4f68bb",
     "reports/scientific_audit/cross_gene_abp_details.csv": "993547143abadd67d55d3f9185d71908e23bd3c91984a2e3c607b299c0a9ee94",
     "reports/scientific_audit/cross_gene_abp_summaries.csv": "dc6a381b7be26a3b58f32cfcc69581b8ead96551a31a6815cd66cfef79df1686",
     "reports/scientific_audit/cross_gene_observations.csv": "8b22e2c455505b1732b46e78796c603a3f61b9adfee2942657cd5a42bc5a74a7",
@@ -70,7 +70,7 @@
     "reports/scientific_audit/interface_context.csv": "155547ed23d3b8c0f9bfba5080f1f96a9fdd6f9f0b263ad44d66b5aee932d2df",
     "reports/scientific_audit/interface_occurrences.csv": "9bc236015d6d724d5950a4b76759d4179a9511bdd7662826d123d809018aee6b",
     "reports/scientific_audit/interface_sites.csv": "d9d99c929251a7aec593ad0572669b60889f3997a4f5aa08798ac64fe1a56a1e",
-    "reports/scientific_audit/manifest.json": "9ccac6a8cdca380f44f8b7f5afe04d27977a579faeb8560e86b33aef81f74e59",
+    "reports/scientific_audit/manifest.json": "ff31784e1b6485e2c8bc85753cafd0a432fbf4d3c6fb583186a7ccc46afaa0de",
     "reports/scientific_audit/partner_chemistry_per_abp.csv": "b6538e5d1c6fc71ec8f5b233f99231fa4cfb06a4eb52bd3c3116f6e9abbe7d14",
     "reports/scientific_audit/partner_chemistry_positions.csv": "e0073127fe5b7db5711337710759dd700273116ddb7ab03c937ee00c15e13623",
     "reports/scientific_audit/variant_exclusions.csv": "767946ad5d8e4f4a4a2f807774c4684f84f9037d98a10e903d574f57994b7060",

@@ -104,7 +104,7 @@ def load_actin_scores(root=Path('.')):
     for context in ('isolated', 'actin_fragment', 'with_abp'):
         column = 'rsa_' + context
         scores[column] = (profile.set_index('position')[column].reindex(scores.index)
-                          if not profile.empty else np.nan)
+                          if not profile.empty and column in profile else np.nan)
     # The surface baseline is the explicit isolated-chain context, not an
     # undocumented average over species or structures. Other contexts stay visible.
     scores['rsa'] = scores.rsa_isolated

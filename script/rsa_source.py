@@ -4,11 +4,10 @@ import hashlib
 import json
 import pandas as pd
 
-TABLE = 'reports/scientific_audit/filament_accessibility_7pdz_I.csv'
+TABLE = 'reports/scientific_audit/filament_accessibility_8dnh_B.csv'
 MANIFEST = 'reports/scientific_audit/filament_accessibility_manifest.json'
-CONTEXTS = {'isolated': 'Isolated chain', 'actin_fragment': 'Six-actin fragment',
-            'with_abp': 'Fragment + capping proteins'}
-LABEL = '7PDZ chain I, isolated in the same conformation'
+CONTEXTS = {'actin_fragment': 'In the actin fragment', 'isolated': 'Chain alone'}
+LABEL = 'Human beta-actin, 8DNH chain B, isolated in the same conformation'
 
 
 def sha256(path):
@@ -21,8 +20,8 @@ def sha256(path):
 
 def source_files(root=Path('.')):
     names = [TABLE, MANIFEST, 'reports/scientific_audit/filament_accessibility_convergence.csv', 'data/P60709_ref.fasta',
-             'data/filtered/details/structures_files/assembly/7pdz.pdb',
-             'data/filtered/proteins_per_pdb.csv', 'script/filament_accessibility.py',
+             'data/reference_structures/8dnh.cif', 'data/reference_structures/8dnh_entity.json',
+             'data/reference_structures/8dnh_source.json', 'tools/fetch_rsa_reference.py', 'script/filament_accessibility.py',
              'tools/calculate_filament_accessibility.py', 'script/rsa_source.py']
     return [root / name for name in names]
 
@@ -32,11 +31,13 @@ def load_rsa(root=Path('.')):
     root = Path(root)
     try:
         manifest = json.loads((root / MANIFEST).read_text())
-        if (manifest['pdb_id'], manifest['target_author_chain']) != ('7PDZ', 'I'):
+        if (manifest['pdb_id'], manifest['target_author_chain']) != ('8DNH', 'B'):
             raise ValueError('unexpected reference structure')
+        if manifest['taxonomy_id'] != 9606 or manifest['uniprot'] != 'P60709':
+            raise ValueError('expected human ACTB reference')
         checks = dict(manifest['code_sha256'])
         checks.update(manifest['outputs_sha256'])
-        for key in ('reference', 'structure', 'chain_classification_source'):
+        for key in ('reference', 'structure', 'entity_metadata', 'download_receipt'):
             item = manifest[key]
             checks[item['file']] = item['sha256']
         for name, expected in checks.items():

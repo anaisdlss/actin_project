@@ -1,5 +1,5 @@
 {
-  "finished_utc": "2026-10-03T08:39:48.195998+00:00",
+  "finished_utc": "2026-10-03T09:49:53.077165+00:00",
   "fingerprint": {
     "inputs": {
       "data/P60709_ref.fasta": "50469aa3087cbb3679ce4167ab78ce1352cc07bd7fa6533e77ed9601dedcaa08",
@@ -171,10 +171,10 @@
     "code": {
       "script/display_helpers.py": "cfff8b5096f06a125dc7da681c36a9c804e68f8b3eacde79cad00eb8e232d2fb",
       "script/folddisco_audit.py": "b412be7a4f9a34e06ce62227354b3e2a05836081203093a90d32cb1436eb5edc",
-      "script/local_rebuild.py": "262758a659fe34f01ea71a593ae655299853f1a469cb2d61057213a0b4d848dd",
+      "script/local_rebuild.py": "f4ff5ae9ea53091088dc03bac90cf99f0c4bd27430f3fd376d442eac432916ca",
       "script/numbering.py": "740de6699bf30037e4db8905cf6701cdc1b978ea3bf5a6bfb5f8476c42a18ede",
       "script/residue_contacts.py": "9b4369da1b7982f794f1f777bc8795304c256b7f24f759154c2c096ba0333b28",
-      "script/scientific_analysis.py": "3ab9cb503eade2d6a11d72340c5503a52bc1af923eb95075255b24e8232d0495",
+      "script/scientific_analysis.py": "20495939ba1446297eed9fff4d5c62dae448fa8c11763c2907ed9537872547d2",
       "script/steric_screen.py": "134f79bf6ee7b58beb7e9032f80ba8141a76f9c19466a333fd21a00c4a769a25",
       "tools/audit_steric_proximity.py": "ad13db6eca981bfb908302def90374f632665971f5536e24255001cd73acf570"
     },
@@ -193,6 +193,6 @@
   },
   "outputs": {
     "reports/scientific_audit/rigid_filament_proximity.csv": "bb95de5fae6b1072aa0ebda21bc4e0635c71644322be56428be15def723845db",
-    "reports/scientific_audit/rigid_filament_proximity_manifest.json": "ed69300e9a1931702eaaac1d3d0f4bac214a1300f419b9d3d7f90a1827d41bf0"
+    "reports/scientific_audit/rigid_filament_proximity_manifest.json": "8ba461843457495265dd3c464c4c014a7a1cf7fe009e2e11f77a84e8d319ae9e"
   }
 }

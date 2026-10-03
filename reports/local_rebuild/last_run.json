@@ -1,38 +1,20 @@
 {
-  "started_utc": "2026-10-03T08:43:48.948241+00:00",
+  "started_utc": "2026-10-03T09:54:16.505485+00:00",
   "state": "complete",
   "requested": [
     "abp_catalog",
-    "abp_chemistry",
     "abp_cross_tables",
     "abp_determinants",
     "abp_families",
-    "abp_footprints",
-    "figures",
-    "filament_proximity",
-    "folddisco_controls",
-    "interface_geometry",
-    "proteocast_availability",
-    "representative_geometry",
     "rsa",
-    "scientific_tables",
-    "structure_annotations"
+    "scientific_tables"
   ],
   "completed": [
     "rsa",
     "abp_catalog",
-    "structure_annotations",
-    "proteocast_availability",
     "abp_cross_tables",
     "abp_families",
-    "abp_footprints",
-    "abp_chemistry",
     "abp_determinants",
-    "representative_geometry",
-    "scientific_tables",
-    "interface_geometry",
-    "filament_proximity",
-    "figures",
-    "folddisco_controls"
+    "scientific_tables"
   ]
 }

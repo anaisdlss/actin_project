@@ -113,15 +113,15 @@ def render_residue_conservation(pp):
                                errors="coerce").iloc[0]
         c1, c2, c3 = st.columns(3)
         _rsa_value = pd.to_numeric(pd.Series([row.get("rsa")]), errors="coerce").iloc[0]
-        c3.metric("RSA · 7PDZ I, isolated (%)", _fmt(_rsa_value * 100, 1),
-                  help="Locally computed on experimental 7PDZ chain I, extracted in the same conformation. SASA / Tien maximum; not an average of the dataset.")
+        c3.metric("RSA · human actin alone (%)", _fmt(_rsa_value * 100, 1),
+                  help="Solvent exposure calculated on human beta-actin, 8DNH chain B, alone in its experimental shape. Not a dataset average.")
         c1.metric(
             "Mutational sensitivity", _fmt(this_c),
             delta=(f"{float(this_c) - avg_surf:+.2f} vs mean surface"
                    if pd.notna(this_c) and pd.notna(avg_surf) else None))
         c2.metric("Mean sensitivity, RSA ≥ 0.2", _fmt(avg_surf))
 
-    st.caption("ProteoCast class and sensitivity describe the supplied model scores. The surface mean uses the locally computed isolated 7PDZ chain I (RSA ≥ 0.2), in its experimental filament conformation.")
+    st.caption("ProteoCast class and sensitivity describe the supplied model scores. The surface mean uses the locally computed isolated human 8DNH chain B (RSA ≥ 0.2), in its experimental filament conformation.")
 
 
 def render_residue_fiche(pp, canon):
@@ -132,13 +132,12 @@ def render_residue_fiche(pp, canon):
 
     if row is not None:
         from rsa_source import CONTEXTS
-        for column, (context, label) in zip(st.columns(3), CONTEXTS.items()):
+        for column, (context, label) in zip(st.columns(len(CONTEXTS)), CONTEXTS.items()):
             rsa = pd.to_numeric(pd.Series([row.get('rsa_' + context)]), errors='coerce').iloc[0]
             column.metric(f"RSA · {label} (%)", _fmt(rsa * 100, 1))
-        st.caption("Calculated locally from experimental 7PDZ chain I, with identical coordinates in three contexts. "
-                   "P60709 supplies the residue numbering; these values are not a mean across the dataset. "
-                   "Isolated means the same chain without its neighbours, not a relaxed G-actin model. "
-                   "Missing or incomplete residues have no RSA value.")
+        st.caption("Human beta-actin · 8DNH chain B. RSA measures solvent exposure: higher means more exposed. "
+                   "The two values use the same chain, with or without its neighbours in a four-actin fragment. "
+                   "They are not an average of all actins. Missing or modified residues have no value.")
         state = row.get('rsa_status', 'RSA needs a local rebuild.')
         if state != 'current':
             st.warning(str(state) + ' Open Documentation → Data management.')

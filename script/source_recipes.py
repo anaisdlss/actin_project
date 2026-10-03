@@ -40,6 +40,9 @@ RECIPES = {
 
 
 def recovered_origin(root, relative):
+    if Path(relative).name.startswith('filament_accessibility_7pdz_I'):
+        return ('archived previous reference', 'tools/calculate_filament_accessibility.py (Git history)',
+                'Bovine 7PDZ replaced by human 8DNH. Original method receipt retained; excluded from current RSA.')
     if relative in RECIPES:
         recipe = RECIPES[relative]
         if all((Path(root)/name).exists() for name in recipe.split('; ')):
@@ -50,7 +53,7 @@ def recovered_origin(root, relative):
                 'Imported/downloaded ProteoCast mutation scores. These are not locally recomputed; query sequence validation remains required.')
     if relative.startswith('data/proteocast/abp/') and relative.endswith('/rsa_values.csv'):
         return ('external bundle; RSA recipe unresolved', 'ProteoCast bundle',
-                'RSA distributed with the model result. Its calculation must not be confused with the locally documented 7PDZ RSA.')
+                'RSA distributed with the model result. Its calculation must not be confused with the locally documented human 8DNH RSA.')
     if relative.startswith('data/proteocast/abp/') and Path(relative).name in {
             '8.query_Segmentation.csv', '14.query_GEMME_pLDDT.csv', 'mapping_fasta_pdb.csv'}:
         return ('external bundle; original execution unverified', 'ProteoCast supplementary output',

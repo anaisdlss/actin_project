@@ -58,7 +58,7 @@ print(f"n_familles vs conservation : rho={rho_cons:.2f} (p={p_cons:.1e})")
 # figure
 fig, (a1, a2) = plt.subplots(1, 2, figsize=(13, 5))
 a1.scatter(sub.rsa, sub.n_familles, s=14, alpha=0.5, color="#E69F00")
-a1.set_xlabel("RSA of isolated 7PDZ chain I")
+a1.set_xlabel("RSA of human actin alone (8DNH chain B)")
 a1.set_ylabel("Observed contacting ABP families")
 a1.set_title(f"RSA association   (ρ={rho_rsa:.2f})")
 a2.scatter(sub.conservation, sub.n_familles, s=14, alpha=0.5, color="#0072B2")

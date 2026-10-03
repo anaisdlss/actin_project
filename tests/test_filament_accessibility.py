@@ -60,6 +60,32 @@ class FilamentAccessibilityTests(unittest.TestCase):
         self.assertTrue(frame.loc[[0, 2, 3], "rsa_isolated"].isna().all())
         self.assertEqual(frame.loc[2, "sasa_isolated_A2"], 10.0)
 
+    def test_acetyl_cap_occludes_solvent_without_getting_a_residue_rsa(self):
+        model = Model(0)
+        chain = Chain('B')
+        model.add(chain)
+        cap = residue('ACE', 0, [('CH3', 'C', (3, 0, 0))])
+        gly = residue('GLY', 1, [('CA', 'C', (0, 0, 0))])
+        chain.add(cap)
+        chain.add(gly)
+        without = protein_heavy_model(model, ['B'])
+        capped = protein_heavy_model(model, ['B'], include_acetyl_caps=True)
+        self.assertEqual(len(without['B']), 1)
+        self.assertEqual(len(capped['B']), 2)
+        sr = ShrakeRupley(n_points=100)
+        sr.compute(without, level='R')
+        sr.compute(capped, level='R')
+        self.assertLess(capped['B'][1].sasa, without['B'][1].sasa)
+
+    def test_separately_modelled_modification_excludes_standard_normalization(self):
+        gly = residue('GLY', 1, [(name, element, (i, 0, 0)) for i, (name, element) in enumerate(
+            [('N', 'N'), ('CA', 'C'), ('C', 'C'), ('O', 'O')])])
+        frame = residue_profile('MG', [gly], {0: 2}, {'isolated': {gly.id: 52.0}},
+                                'TEST', 'B', modified_positions={2})
+        self.assertEqual(frame.loc[1, 'coordinate_status'], 'modified_residue')
+        self.assertTrue(np.isnan(frame.loc[1, 'rsa_isolated']))
+        self.assertEqual(frame.loc[1, 'sasa_isolated_A2'], 52.0)
+
 
 if __name__ == "__main__":
     unittest.main()

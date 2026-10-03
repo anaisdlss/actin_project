@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-10-03T08:38:38.198788+00:00",
+  "generated_utc": "2026-10-03T09:54:21.654322+00:00",
   "variant_records": 3039,
   "mapped_variant_records": 3022,
   "analysis_eligible_records": 2864,
@@ -35,15 +35,24 @@
     "data/proteocast/actin/1.query.fasta": "350341f0efa6d0b5736714a0a5ec50721be5211481c8cfb8b4f44dd4267f311c",
     "data/proteocast/actin/2.aliAF-P60709-F1-msa_v6.fasta": "e8bbcc7c1a7ea66d1fbe5272509c2496d591cbd573d6361c62781c9a14f9f7da",
     "data/proteocast/actin/4.query_ProteoCast.csv": "909024144ba3aa29fe879bbdb4c2c661a74ee30d90d4b993406500e6d81cd4e4",
-    "reports/scientific_audit/filament_accessibility_7pdz_I.csv": "6b1ce398fe1b997f2708df607c929494cd4f848c3798b9ad2c30e7544e8b73c2",
-    "reports/scientific_audit/filament_accessibility_manifest.json": "1fc40586ff4681dafd02867e1d2bf7cbb98b8e12c5b2cf27b00eca372810f28e"
+    "reports/scientific_audit/filament_accessibility_8dnh_B.csv": "2ab2c2152841b107cec647505f3de5080b145cb2cdd0511b5644b973cbe03adb",
+    "reports/scientific_audit/filament_accessibility_manifest.json": "92e4e2ba40906d5cd63b8765a28603ea376335f71d180cbf065e65830a8c8eee",
+    "reports/scientific_audit/filament_accessibility_convergence.csv": "ba4ca7c6236573c62f30400753dfc7ef27aff9363e41dfe9ec8d33634e1a3780",
+    "data/P60709_ref.fasta": "50469aa3087cbb3679ce4167ab78ce1352cc07bd7fa6533e77ed9601dedcaa08",
+    "data/reference_structures/8dnh.cif": "1f073cf8a2cabf61a07490246c43e22d281bc690c6e6d435aadd88ca26751d9b",
+    "data/reference_structures/8dnh_entity.json": "f3a5ee23ee8be7dd8a8d16e35defebb01147226ba55a629189e1ed8b63a8f6b2",
+    "data/reference_structures/8dnh_source.json": "fd2c95d5fc1da2ee607a0770b3ae58875799b63f761b11d35968b926dc288be3",
+    "tools/fetch_rsa_reference.py": "36e5b3b38a24de59c0d466457644930d5ec3dfd0c953e198ee21917d796a7e09",
+    "script/filament_accessibility.py": "2efbe23c958b5d8b19daa4f7137f37aa56df8d8216025a3dba0d12396568bf51",
+    "tools/calculate_filament_accessibility.py": "7143ed3d575b085bcc3514e54994b43bddc1a6122a00d1735b8da2896aa0a0a0",
+    "script/rsa_source.py": "1433de5f8f6f9ccc76ab7fbff79f552adee862af07835dfdf2590678fdcb28fe"
   },
   "chemistry_weight": "Positive uncensored pair contact area; fractions per interface and position, equal interface means within PDB/ABP, equal PDB then ABP means",
   "code_sha256": {
-    "script/scientific_analysis.py": "3ab9cb503eade2d6a11d72340c5503a52bc1af923eb95075255b24e8232d0495",
+    "script/scientific_analysis.py": "20495939ba1446297eed9fff4d5c62dae448fa8c11763c2907ed9537872547d2",
     "script/footprint_comparison.py": "4c79c743966c68045621da8c8a2ef35227260100c06d053107fd6523b83083b2",
     "script/interface_properties.py": "fa4824a77364067c56b0de88ea526666143eeb47b02cf80b0acadf2caee1a4da",
     "script/residue_contacts.py": "9b4369da1b7982f794f1f777bc8795304c256b7f24f759154c2c096ba0333b28",
-    "tools/export_scientific_audit.py": "ef217f4206c6df289c6dd754aafea8bfd72b73c27bc770da3845a47f52e4922e"
+    "tools/export_scientific_audit.py": "2ffcc9d65834b150e81c640451d48c6a0972dbca4f1094ee512cb4cd97a128db"
   }
 }

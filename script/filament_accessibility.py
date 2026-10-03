@@ -1,5 +1,5 @@
+"""Reproducible accessibility from the explicitly selected human actin reference."""
 from display_helpers import plotly_chart
-"""Separate, reproducible accessibility audit; never replaces legacy RSA data."""
 from pathlib import Path
 
 import numpy as np
@@ -56,7 +56,7 @@ def exact_reference_map(observed, reference):
     return maps[0]
 
 
-def protein_heavy_model(source_model, chain_ids):
+def protein_heavy_model(source_model, chain_ids, include_acetyl_caps=False):
     """Heavy atoms of amino-acid residues, including modified parent residues.
 
     Selected alternate locations are those chosen by Bio.PDB (highest occupancy).
@@ -70,7 +70,8 @@ def protein_heavy_model(source_model, chain_ids):
         chain = Chain(chain_id)
         model.add(chain)
         for residue in source_model[chain_id]:
-            if residue.resname not in protein_letters_3to1_extended or "CA" not in residue:
+            acetyl = include_acetyl_caps and residue.resname == "ACE"
+            if not acetyl and (residue.resname not in protein_letters_3to1_extended or "CA" not in residue):
                 continue
             clean = Residue(residue.id, residue.resname, residue.segid)
             # Attach the hierarchy before adding atoms: ShrakeRupley uses the
@@ -94,7 +95,7 @@ def complete_standard_residue(residue):
     return expected is not None and set(expected.split()).issubset(set(residue.child_dict))
 
 
-def residue_profile(reference, residues, mapping, areas, pdb_id, chain_id):
+def residue_profile(reference, residues, mapping, areas, pdb_id, chain_id, modified_positions=()):
     """One row per reference position, NaN for missing/modified/incomplete RSA."""
     rows = [{"position": p, "aa": aa, "pdb_id": pdb_id, "chain": chain_id,
              "pdb_residue_number": None, "pdb_insertion_code": "", "pdb_residue_name": "",
@@ -104,8 +105,8 @@ def residue_profile(reference, residues, mapping, areas, pdb_id, chain_id):
     for i, residue in enumerate(residues):
         position = mapping[i]
         row = rows[position - 1]
-        standard = residue.resname in protein_letters_3to1
-        eligible = complete_standard_residue(residue)
+        standard = residue.resname in protein_letters_3to1 and position not in modified_positions
+        eligible = standard and complete_standard_residue(residue)
         row.update(pdb_residue_number=residue.id[1], pdb_insertion_code=residue.id[2].strip(),
                    pdb_residue_name=residue.resname, rsa_eligible=eligible,
                    coordinate_status="complete_standard_residue" if eligible else "incomplete_atoms" if standard else "modified_residue")
@@ -130,45 +131,44 @@ def render_filament_accessibility(root=".", key_prefix="filament_rsa"):
     import plotly.graph_objects as go
     from plot_interaction import position_hover
 
+    from rsa_source import load_rsa, TABLE, CONTEXTS
     base = Path(root) / "reports/scientific_audit"
-    table = base / "filament_accessibility_7pdz_I.csv"
-    st.info("How much of each actin residue remains exposed to solvent? This comparison measures the masking caused by neighbouring actins, then by capping proteins, while keeping the same actin conformation. It does not measure mutational sensitivity.")
-    st.subheader("Reference accessibility: isolated actin, actin fragment and capping proteins")
-    if not table.exists():
-        st.info("The reference accessibility calculation is not installed.")
-        return
-    from rsa_source import load_rsa
+    table = Path(root) / TABLE
+    st.subheader("Solvent accessibility of human beta-actin")
+    st.info("RSA describes how exposed a residue is to solvent. Higher values mean more exposure. "
+            "Compare the chain alone with the same chain surrounded by the other deposited actins.")
     frame, status = load_rsa(Path(root))
     if status != 'current':
         st.warning(status + ' Open Documentation → Data management.')
         return
-    with st.expander("Methods and reference structure"):
-        st.caption("7PDZ chain I, same experimental coordinates in all three calculations. Isolated means this chain "
-                   "removed from its neighbors, not a separately determined or relaxed G-actin. The finite fragment contains "
-                   "six actins; the additional ABP context includes the two capping-protein chains. This capped-end "
-                   "reference does not represent every position in an infinite filament.")
-        st.caption("Shrake–Rupley, 1.4 Å probe, 960 sphere points per atom; heavy protein atoms only. "
-                   "RSA = SASA / Tien et al. theoretical maximum for the residue (Biopython Wilke scale), without clipping. "
-                   "Missing coordinates, incomplete standard residues and modified residues have no RSA. "
-                   "H73 is modified (HIC): its atoms contribute to occlusion and its raw SASA is retained. "
-                   "Nucleotides, ions, waters and phalloidin are excluded. These documented contexts supply the current app RSA. The old table is retained only as an archive.")
+    st.caption("Human ACTB · PDB 8DNH, chain B · four-actin fragment without ABPs. "
+               "This is one structural reference, not an average across the dataset.")
+    with st.expander("Calculation details and limits"):
+        st.caption("The chain keeps its experimental filament shape in both calculations. The four-subunit "
+                   "fragment is finite; neither context represents every actin state or a separately measured G-actin. "
+                   "The human protein was expressed in yeast. The deposited mutation flag refers to N-terminal "
+                   "acetylation; the observed parent sequence matches human P60709.")
+        st.caption("Shrake–Rupley, 1.4 Å probe, 960 sphere points per atom (480-point numerical check). "
+                   "RSA = SASA / Tien theoretical maximum (Wilke scale); values are not clipped. "
+                   "Heavy protein atoms and the attached acetyl cap are kept; nucleotides, ions and waters are excluded. "
+                   "Position 1 is absent; acetylated Asp2 and methylated His73 have no standard-residue RSA. "
+                   "Other incomplete or modified residues also remain missing. The previous bovine 7PDZ reference is archived.")
     fig = go.Figure()
-    for col, label, color in [("rsa_isolated", "Isolated chain, same conformation", "#777777"),
-                              ("rsa_actin_fragment", "Six-actin fragment only", "#E69F00"),
-                              ("rsa_with_abp", "Fragment + capping proteins", "#0072B2")]:
-        fig.add_trace(go.Scatter(x=frame.position, y=frame[col], mode="lines", name=label,
+    for col, label, color in [("rsa_actin_fragment", "In the four-actin fragment", "#E69F00"),
+                              ("rsa_isolated", "Chain alone, same shape", "#777777")]:
+        fig.add_trace(go.Scatter(x=frame.position, y=frame[col] * 100, mode="lines", name=label,
                                 line=dict(color=color), connectgaps=False, customdata=frame.aa,
-                                hovertemplate="%{customdata}%{x}: %{y:.3f}<extra>%{fullData.name}</extra>"))
-    fig.update_layout(xaxis_title="P60709 position", yaxis_title="Relative solvent accessibility", height=400)
+                                hovertemplate="%{customdata}%{x}: %{y:.1f}%<extra>%{fullData.name}</extra>"))
+    fig.update_layout(xaxis_title="P60709 position", yaxis_title="Solvent accessibility (RSA %)", height=400)
     plotly_chart(position_hover(fig), use_container_width=True, key=f"{key_prefix}_profile")
     cutoff = st.slider("Surface RSA threshold for this reference comparison", 0.0, 1.0, .2, .01, key=f"{key_prefix}_cutoff")
     valid = frame[frame.rsa_eligible]
     st.dataframe(pd.DataFrame([
         {"Context": label, "Residues with RSA": int(valid[col].notna().sum()), "Residues at or above threshold": int(valid[col].ge(cutoff).sum())}
-        for col, label in [("rsa_isolated", "Isolated"), ("rsa_actin_fragment", "Actin fragment"), ("rsa_with_abp", "Fragment + capping proteins")]
+        for col, label in [("rsa_" + key, label) for key, label in CONTEXTS.items()]
     ]), hide_index=True, width="stretch")
     st.dataframe(frame, hide_index=True, width="stretch")
-    st.download_button("Download separate reference SASA/RSA calculation", table.read_bytes(), file_name=table.name, mime="text/csv", key=f"{key_prefix}_csv")
+    st.download_button("Download human actin SASA/RSA calculation", table.read_bytes(), file_name=table.name, mime="text/csv", key=f"{key_prefix}_csv")
     for name, label in [("filament_accessibility_manifest.json", "Download accessibility methods and provenance"),
                         ("filament_accessibility_convergence.csv", "Download numerical convergence check")]:
         path = base / name

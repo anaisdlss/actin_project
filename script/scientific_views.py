@@ -62,7 +62,7 @@ def render_conservation():
     cutoff=st.slider('Buried ASA threshold for sensitivity footprints (%)',0.0,100.0,0.0,step=1.0,key='cons_asa')
     table,cor,clusters=conservation_summary(scores,current_footprints(),cutoff)
     fig=make_subplots(rows=4,cols=1,shared_xaxes=True,vertical_spacing=.06,
-                      subplot_titles=('Mutational sensitivity','RSA · isolated 7PDZ chain I','Distinct ABP source names','Observed actin–actin contacts'))
+                      subplot_titles=('Mutational sensitivity','RSA · isolated human 8DNH chain B','Distinct ABP source names','Observed actin–actin contacts'))
     for row,(col,label,color) in enumerate([('sensitivity','Mutational sensitivity','#0072B2'),('rsa','RSA','#777777'),('n_abp_names','Distinct ABP source names','#E69F00'),('homo_contact','Actin–actin contact (0/1)','#884EA0')],1):
         fig.add_trace(go.Scatter(x=table.position,y=table[col],mode='lines',name=label,line=dict(color=color),customdata=table.aa,
                                  hovertemplate='%{customdata}%{x} · %{fullData.name}: %{y:.3~g}<extra></extra>'),row=row,col=1)
@@ -78,7 +78,7 @@ def render_conservation():
     st.markdown('**Exploratory correlations and footprint summaries**')
     st.caption('One observation per P60709 position; pairwise missing values are excluded. Spearman correlations '
                'and BH corrections cover the four displayed tests. Residues are structurally dependent: '
-               'p-values are exploratory. RSA is calculated locally on isolated 7PDZ chain I in its experimental '
+               'p-values are exploratory. RSA is calculated locally on isolated human 8DNH chain B in its experimental '
                'filament conformation. It is not an average across structures. No observed contact does not mean no possible interaction.')
     st.dataframe(cor,hide_index=True,width='stretch')
     fig=go.Figure()

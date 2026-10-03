@@ -33,7 +33,7 @@ _PP_FILES = [
     "data/filtered/details/3.interface_residues.csv",
     "data/filtered/details/4.inter-residue_contacts.csv",
     "data/filtered/filtered_all_data.csv",
-    "reports/scientific_audit/filament_accessibility_7pdz_I.csv",
+    "reports/scientific_audit/filament_accessibility_8dnh_B.csv",
 ]
 
 
@@ -173,7 +173,7 @@ def build_passport(mtimes):
         for context in ('isolated', 'actin_fragment', 'with_abp'):
             col = 'rsa_' + context
             pos[col] = (pos.canon.map(numbering.to_uniprot).map(profile.set_index('position')[col])
-                        if not profile.empty else np.nan)
+                        if not profile.empty and col in profile else np.nan)
         pos['rsa'] = pos.rsa_isolated
     for col in ("rsa", "rsa_isolated", "rsa_actin_fragment", "rsa_with_abp", "conservation", "residue_class"):
         if col not in pos:

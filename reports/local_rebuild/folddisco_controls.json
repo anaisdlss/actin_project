@@ -1,5 +1,5 @@
 {
-  "finished_utc": "2026-10-03T08:41:07.224637+00:00",
+  "finished_utc": "2026-10-03T09:50:58.770432+00:00",
   "fingerprint": {
     "inputs": {
       "data/exports/abp_site_domain/abp_site_table.csv": "35ca2deff6b2c8085baab47cc93ded3caf94f31003e3a3e2c857cad8a2179068",
@@ -168,7 +168,7 @@
       "script/display_helpers.py": "cfff8b5096f06a125dc7da681c36a9c804e68f8b3eacde79cad00eb8e232d2fb",
       "script/folddisco_audit.py": "b412be7a4f9a34e06ce62227354b3e2a05836081203093a90d32cb1436eb5edc",
       "script/folddisco_jobs.py": "df39c5d90f541ddd04d9a35f9f105d3ead538ee4b54feda264ae46a7ab5db2f8",
-      "script/local_rebuild.py": "262758a659fe34f01ea71a593ae655299853f1a469cb2d61057213a0b4d848dd",
+      "script/local_rebuild.py": "f4ff5ae9ea53091088dc03bac90cf99f0c4bd27430f3fd376d442eac432916ca",
       "script/numbering.py": "740de6699bf30037e4db8905cf6701cdc1b978ea3bf5a6bfb5f8476c42a18ede",
       "script/residue_contacts.py": "9b4369da1b7982f794f1f777bc8795304c256b7f24f759154c2c096ba0333b28",
       "tools/audit_folddisco_controls.py": "dda01c636023780f3bdabc21c56546fa6ec994ca6f9487512c36b6f4b332660d"
@@ -189,10 +189,10 @@
   },
   "outputs": {
     "data/exports/folddisco_controls/hits.csv": "c3094bcd274a8add7e135152c8b4a111a83e4094c721e6a15070b5753d2e990e",
-    "data/exports/folddisco_controls/manifest.json": "8bc862aa39a2cbcba6163a32f724c723c4669027a264cbfacc5871c420501ea3",
+    "data/exports/folddisco_controls/manifest.json": "4b6e7549ca863525c73f96cc53e311296ba6fba34fd67a2642c6b93227c98dc0",
     "data/exports/folddisco_controls/queries.csv": "7a98a8ec243a87a56ec12b5e06fdf53d0def3df3aa5e7ac4c848d5d841c094c2",
     "data/exports/folddisco_controls/shared_site_controls.csv": "4e4b542ac07e6de66ad3dd679c7f877eb0f858bbccec9f11671ac2ca516e7bf6",
-    "reports/scientific_audit/folddisco_controls_manifest.json": "3be7aa7a7712fa65ead385abeb2c7d710a9c2c575d0377e7a296eadaf093850c",
+    "reports/scientific_audit/folddisco_controls_manifest.json": "73710735d6ba750302344006dec856bd97c5ea62fa43ef1566ab68a86126a4eb",
     "reports/scientific_audit/folddisco_local_queries.csv": "7a98a8ec243a87a56ec12b5e06fdf53d0def3df3aa5e7ac4c848d5d841c094c2",
     "reports/scientific_audit/folddisco_shared_site_controls.csv": "4e4b542ac07e6de66ad3dd679c7f877eb0f858bbccec9f11671ac2ca516e7bf6"
   }

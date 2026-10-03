@@ -279,3 +279,12 @@ still need a browser check once that tool access is available.
 
 GitHub publication and online runtime verification are different checks. Browser
 access remains blocked; no fresh live Cloud/WebGL inspection is claimed.
+
+
+## Référence RSA humaine et compte rendu court — 3 octobre 2026
+
+- Référence 8DNH/B : entité RCSB humaine ACTB/P60709 contrôlée, séquence observée alignée exactement, sources et téléchargement archivés. 372 positions avec RSA ; M1, D2 acétylé et H73 méthylé restent sans valeur standard. A29 : 4,366 % (4,4 % à l’affichage).
+- Les 15 groupes de calculs ont été reconstruits puis vérifiés ; les résultats de sensibilité et la figure des déterminants utilisent la référence humaine. La version 7PDZ bovine reste archivée.
+- 127 tests réussis dans le projet complet (Python 3.12) et la copie publique (Python 3.13). Les 11 pages et la vue RSA humaine s’exécutent avec Streamlit AppTest dans la copie publique. Import neuf de `_BIP_REQUIRED_FILES` vérifié.
+- Le compte rendu destiné au suivi tient sur deux pages, rendues puis relues visuellement.
+- Le fonctionnement réel du serveur Streamlit Cloud reste non vérifié ; les anciens logs d’import après mise à jour nécessitent un redémarrage du processus via Manage app si l’erreur persiste. Les tests locaux ne constituent pas une validation biologique.

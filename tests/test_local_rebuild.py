@@ -85,6 +85,9 @@ class RsaSourceTests(unittest.TestCase):
             self.skipTest('local research sources absent')
         frame, state = load_rsa(root)
         self.assertEqual(state, 'current')
+        self.assertEqual(set(frame.pdb_id), {'8DNH'})
+        self.assertEqual(set(frame.chain), {'B'})
+        self.assertTrue(frame.set_index('position').loc[[1, 2, 73], 'rsa_isolated'].isna().all())
         _, scores = load_actin_scores(root)
         self.assertTrue(scores.rsa.equals(scores.rsa_isolated))
         a29 = scores.set_index('position').loc[29]

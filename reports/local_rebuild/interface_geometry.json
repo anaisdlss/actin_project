@@ -1,5 +1,5 @@
 {
-  "finished_utc": "2026-10-03T08:39:21.306864+00:00",
+  "finished_utc": "2026-10-03T09:49:29.483683+00:00",
   "fingerprint": {
     "inputs": {
       "data/P60709_ref.fasta": "50469aa3087cbb3679ce4167ab78ce1352cc07bd7fa6533e77ed9601dedcaa08",
@@ -168,10 +168,10 @@
     "code": {
       "script/display_helpers.py": "cfff8b5096f06a125dc7da681c36a9c804e68f8b3eacde79cad00eb8e232d2fb",
       "script/interface_geometry.py": "e8e1867492d535ad0ed4d4d8cdfa94bc7c7d5e214e9264b9e15c8cee8220038d",
-      "script/local_rebuild.py": "262758a659fe34f01ea71a593ae655299853f1a469cb2d61057213a0b4d848dd",
+      "script/local_rebuild.py": "f4ff5ae9ea53091088dc03bac90cf99f0c4bd27430f3fd376d442eac432916ca",
       "script/numbering.py": "740de6699bf30037e4db8905cf6701cdc1b978ea3bf5a6bfb5f8476c42a18ede",
       "script/residue_contacts.py": "9b4369da1b7982f794f1f777bc8795304c256b7f24f759154c2c096ba0333b28",
-      "script/scientific_analysis.py": "3ab9cb503eade2d6a11d72340c5503a52bc1af923eb95075255b24e8232d0495",
+      "script/scientific_analysis.py": "20495939ba1446297eed9fff4d5c62dae448fa8c11763c2907ed9537872547d2",
       "tools/audit_all_interface_geometry.py": "4139632d9bf7c47babf5f3329d315138a23cd782b40f8a15c26b3c6e4579bc3c"
     },
     "runtime": {
@@ -190,7 +190,7 @@
   "outputs": {
     "reports/scientific_audit/all_interface_geometry.csv": "80b8f7409fc76cc0381f4bfaa8964fc1ba1c016350697983c2a361c37f56f75e",
     "reports/scientific_audit/all_interface_geometry_coverage.csv": "e8c27e1844965b948a2b4912e4eda6944df59475afb63c890040f28732ccec7f",
-    "reports/scientific_audit/all_interface_geometry_manifest.json": "ebb999e5e1467a296413aba13f21095e38011bd8f9f16912f0a6936cd5682e8b",
+    "reports/scientific_audit/all_interface_geometry_manifest.json": "75615fdaece1c88ae4948e8a53f0f42f3c4f94425ad55747080da855141a95ef",
     "reports/scientific_audit/all_interface_geometry_summary.csv": "fc452ecc2fdf75d10e42b0e9bf4cfd39b9bcfc7bc86e048de67e5411442cce78"
   }
 }

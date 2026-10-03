@@ -1,0 +1,211 @@
+{
+  "generated_utc": "2026-10-03T08:38:20.469311+00:00",
+  "biopython_version": "1.87",
+  "pdb_id": "7PDZ",
+  "model_index": 0,
+  "target_author_chain": "I",
+  "reference": {
+    "id": "UniProt P60709",
+    "file": "data/P60709_ref.fasta",
+    "sha256": "50469aa3087cbb3679ce4167ab78ce1352cc07bd7fa6533e77ed9601dedcaa08"
+  },
+  "structure": {
+    "file": "data/filtered/details/structures_files/assembly/7pdz.pdb",
+    "sha256": "961bc2f531bd1b2fd694227dd4c4a9a47a62229144005baef9e835059719226f",
+    "url": "https://www.rcsb.org/structure/7PDZ"
+  },
+  "chain_classification_source": {
+    "file": "data/filtered/proteins_per_pdb.csv",
+    "sha256": "be97933d256e64017cba6e06cc93965866b167143727c1841b175f0edb57912f",
+    "proteins": [
+      {
+        "chain": "7pdz_E",
+        "protein": "Isoform 2 of F-actin-capping protein subunit beta",
+        "is_actin": false
+      },
+      {
+        "chain": "7pdz_F",
+        "protein": "F-actin-capping protein subunit alpha-1",
+        "is_actin": false
+      },
+      {
+        "chain": "7pdz_I",
+        "protein": "Actin, cytoplasmic 1",
+        "is_actin": true
+      },
+      {
+        "chain": "7pdz_J",
+        "protein": "Actin, cytoplasmic 1",
+        "is_actin": true
+      },
+      {
+        "chain": "7pdz_K",
+        "protein": "Actin, cytoplasmic 1",
+        "is_actin": true
+      },
+      {
+        "chain": "7pdz_L",
+        "protein": "Actin, cytoplasmic 1",
+        "is_actin": true
+      },
+      {
+        "chain": "7pdz_N",
+        "protein": "Actin, cytoplasmic 1",
+        "is_actin": true
+      },
+      {
+        "chain": "7pdz_O",
+        "protein": "Actin, cytoplasmic 1",
+        "is_actin": true
+      }
+    ]
+  },
+  "method": "Bio.PDB.SASA.ShrakeRupley; same coordinates in all contexts; no structural relaxation, no added atoms",
+  "probe_radius_A": 1.4,
+  "sphere_points_per_atom": 960,
+  "convergence_check_points": 480,
+  "atomic_radii_A": {
+    "C": 1.7,
+    "N": 1.55,
+    "O": 1.52,
+    "S": 1.8
+  },
+  "rsa_normalization": "SASA / Tien et al. (2013) theoretical maximum; Bio.Data.PDBData.residue_sasa_scales['Wilke']; not clipped to [0,1]",
+  "maximum_ASA_A2": {
+    "ALA": 129.0,
+    "ARG": 274.0,
+    "ASN": 195.0,
+    "ASP": 193.0,
+    "CYS": 167.0,
+    "GLN": 225.0,
+    "GLU": 223.0,
+    "GLY": 104.0,
+    "HIS": 224.0,
+    "ILE": 197.0,
+    "LEU": 201.0,
+    "LYS": 236.0,
+    "MET": 224.0,
+    "PHE": 240.0,
+    "PRO": 159.0,
+    "SER": 155.0,
+    "THR": 172.0,
+    "TRP": 285.0,
+    "TYR": 263.0,
+    "VAL": 174.0
+  },
+  "mapping": "Global BLOSUM62, gap open -10, extend -0.5; every observed parent amino acid must match P60709 exactly and map identically across all optimal alignments. Author numbers are retained separately.",
+  "observed_parent_residues": 371,
+  "rsa_eligible_residues": 370,
+  "missing_coordinate_positions": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "modified_residues_without_RSA": [
+    {
+      "position": 73,
+      "aa": "H",
+      "pdb_residue_name": "HIC"
+    }
+  ],
+  "atom_policy": "Selected highest-occupancy alternate location from Bio.PDB; exclude occupancy=0, H and D. Keep amino-acid heavy atoms, including modified-parent residues, only in selected chains. Exclude waters, ions, nucleotides, non-protein ligands and phalloidin chains. RSA absent for modified or incomplete standard residues; raw observed-atom SASA retained.",
+  "contexts_960": {
+    "isolated": {
+      "chain_ids": [
+        "I"
+      ],
+      "atom_count": 2894,
+      "elapsed_seconds": 1.7945161249954253
+    },
+    "actin_fragment": {
+      "chain_ids": [
+        "I",
+        "J",
+        "K",
+        "L",
+        "N",
+        "O"
+      ],
+      "atom_count": 17364,
+      "elapsed_seconds": 10.762022832990624
+    },
+    "with_abp": {
+      "chain_ids": [
+        "E",
+        "F",
+        "I",
+        "J",
+        "K",
+        "L",
+        "N",
+        "O"
+      ],
+      "atom_count": 21722,
+      "elapsed_seconds": 13.62351458298508
+    }
+  },
+  "contexts_480": {
+    "isolated": {
+      "chain_ids": [
+        "I"
+      ],
+      "atom_count": 2894,
+      "elapsed_seconds": 0.8577620830037631
+    },
+    "actin_fragment": {
+      "chain_ids": [
+        "I",
+        "J",
+        "K",
+        "L",
+        "N",
+        "O"
+      ],
+      "atom_count": 17364,
+      "elapsed_seconds": 5.408623041992541
+    },
+    "with_abp": {
+      "chain_ids": [
+        "E",
+        "F",
+        "I",
+        "J",
+        "K",
+        "L",
+        "N",
+        "O"
+      ],
+      "atom_count": 21722,
+      "elapsed_seconds": 6.762329082994256
+    }
+  },
+  "excluded_chain_ids": [
+    "P",
+    "Q",
+    "R",
+    "S",
+    "T"
+  ],
+  "limitations": [
+    "7PDZ is a finite capped-end experimental fragment, not a universal infinite-filament/interior reference.",
+    "Isolated chain is extracted from the filament in the same conformation, not relaxed or separately measured G-actin.",
+    "Missing atoms and excluded ligands can affect accessibility of neighboring residues; coordinates are not completed.",
+    "Discretization convergence is numerical sensitivity, not biological uncertainty.",
+    "Current app RSA uses these explicit contexts; the legacy table remains archived and is not used. This calculation does not validate biological major/minor interface classifications."
+  ],
+  "primary_method_sources": [
+    "https://biopython.org/docs/latest/api/Bio.PDB.SASA.html",
+    "https://doi.org/10.1016/0022-2836(73)90011-9",
+    "https://doi.org/10.1371/journal.pone.0080635"
+  ],
+  "code_sha256": {
+    "script/filament_accessibility.py": "40b3fb1b797012fe418af5e5a9bc32dacf866ef70e52119fe1302588d33f8237",
+    "tools/calculate_filament_accessibility.py": "020a308050396dd03be609ba8789fe86fa09c22aeb65f963679c8cd0a45f3464"
+  },
+  "outputs_sha256": {
+    "reports/scientific_audit/filament_accessibility_7pdz_I.csv": "6b1ce398fe1b997f2708df607c929494cd4f848c3798b9ad2c30e7544e8b73c2",
+    "reports/scientific_audit/filament_accessibility_convergence.csv": "d8effa2179c82567cd5b20c86c8375a373c4e703c50d7b511b6f4817d31eccbc"
+  },
+  "reproduce": "python tools/calculate_filament_accessibility.py"
+}
