@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-10-02T14:53:54.278265+00:00",
+  "generated_utc": "2026-10-03T08:38:38.198788+00:00",
   "variant_records": 3039,
   "mapped_variant_records": 3022,
   "analysis_eligible_records": 2864,
@@ -36,7 +36,7 @@
     "data/proteocast/actin/2.aliAF-P60709-F1-msa_v6.fasta": "e8bbcc7c1a7ea66d1fbe5272509c2496d591cbd573d6361c62781c9a14f9f7da",
     "data/proteocast/actin/4.query_ProteoCast.csv": "909024144ba3aa29fe879bbdb4c2c661a74ee30d90d4b993406500e6d81cd4e4",
     "reports/scientific_audit/filament_accessibility_7pdz_I.csv": "6b1ce398fe1b997f2708df607c929494cd4f848c3798b9ad2c30e7544e8b73c2",
-    "reports/scientific_audit/filament_accessibility_manifest.json": "8e3dccd15818f80da545aa9c118f20f7dbe6a063f0cd3afe610397fbe8e3629f"
+    "reports/scientific_audit/filament_accessibility_manifest.json": "1fc40586ff4681dafd02867e1d2bf7cbb98b8e12c5b2cf27b00eca372810f28e"
   },
   "chemistry_weight": "Positive uncensored pair contact area; fractions per interface and position, equal interface means within PDB/ABP, equal PDB then ABP means",
   "code_sha256": {

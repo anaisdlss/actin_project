@@ -14,6 +14,8 @@ Sorties :
   data/exports/abp_site_domain/figure_footprint_overlap.png
 """
 from pathlib import Path
+import sys
+import streamlit
 from itertools import combinations
 import numpy as np
 import pandas as pd
@@ -31,7 +33,9 @@ EXCLUDE_FUSION = {
 df = pd.read_csv(ROOT / "data/filtered/filtered_all_data.csv", low_memory=False)
 di = pd.read_csv(ROOT / "data/filtered/details/1.interactions.csv")[["interaction_id", "chain_A_id", "chain_B_id", "resolution"]].rename(columns={"resolution": "res"})
 resdf = pd.read_csv(ROOT / "data/filtered/details/3.interface_residues.csv")
-resdf["canon"] = pd.to_numeric(resdf["residue_number_canon_mafft"], errors="coerce")
+sys.path.insert(0, str(ROOT / "script"))
+import numbering
+resdf["canon"] = numbering.uniprot_series(resdf["residue_number_canon_mafft"])
 fams = pd.read_csv(OUT / "familles.csv")
 
 fam_of = {}
@@ -40,8 +44,9 @@ for _, r in fams.iterrows():
         fam_of[a.strip()] = r.famille
 
 m = df.merge(di, left_on=["subunit_1", "subunit_2"], right_on=["chain_A_id", "chain_B_id"], how="left")
-m = m[(m.s1_actine) & (~m.s2_actine)].copy()          # actine = s1, ABP = s2
-m["abp_title"] = m.subunit_2_title
+m = m[m.s1_actine.ne(m.s2_actine)].copy()
+m["abp_title"] = np.where(m.s1_actine, m.subunit_2_title, m.subunit_1_title)
+m["actin_chain"] = np.where(m.s1_actine, m.subunit_1, m.subunit_2)
 m["res"] = pd.to_numeric(m.res, errors="coerce")
 
 # empreinte actine = résidus canoniques contactés côté chaîne actine (subunit_1)
@@ -50,14 +55,15 @@ def footprint(iid, actin_chain):
     return set(s.canon.dropna().astype(int))
 
 # 1 interaction représentante par (site, ABP) : meilleure résolution
-m["site"] = m.s1_binding_site_cluster_data_70
-sites_abp = (m.dropna(subset=["site"]).sort_values("res")
-             .groupby(["site", "abp_title"], as_index=False).first())
+m["site"] = np.where(m.s1_actine, m.s1_binding_site_cluster_data_70, m.s2_binding_site_cluster_data_70)
+sites_abp = (m.dropna(subset=["site", "interaction_id"])
+             .sort_values(["res", "interaction_id", "actin_chain"], kind="stable")
+             .drop_duplicates(["site", "abp_title"]))
 
 # pré-calcul empreintes
 fp = {}
 for _, r in sites_abp.iterrows():
-    fp[(r.site, r.abp_title)] = footprint(int(r.interaction_id), r.subunit_1)
+    fp[(r.site, r.abp_title)] = footprint(int(r.interaction_id), r.actin_chain)
 
 rows = []
 for site, g in sites_abp.groupby("site"):
@@ -79,7 +85,7 @@ for site, g in sites_abp.groupby("site"):
 
 ov = pd.DataFrame(rows)
 # dédoublonner les couples de familles différentes (1 paire représentante = jaccard max)
-ov["fam_couple"] = ov.apply(lambda r: frozenset((r.fam_a, r.fam_b)), axis=1)
+ov["fam_couple"] = ov.apply(lambda r: tuple(sorted((r.fam_a, r.fam_b))), axis=1)
 diff = ov[~ov.same_fam].sort_values("jaccard", ascending=False).groupby(["site", "fam_couple"], as_index=False).first()
 same = ov[ov.same_fam]
 ov.to_csv(OUT / "actin_footprint_overlap.csv", index=False)
@@ -96,19 +102,20 @@ print(show[["site", "fA", "fB", "partages", "n_a", "n_b", "jaccard", "recouvreme
 
 # figure
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13, 5.5))
-ax1.boxplot([same.jaccard.dropna(), diff.jaccard.dropna()], tick_labels=["même\nfamille", "familles\ndifférentes"],
-            patch_artist=True, boxprops=dict(facecolor="#cfe8e0"), medianprops=dict(color="black"))
-ax1.scatter(np.random.normal(1, 0.05, len(same)), same.jaccard, color="#2a9d8f", alpha=0.5, s=18)
-ax1.scatter(np.random.normal(2, 0.05, len(diff)), diff.jaccard, color="#e76f51", alpha=0.6, s=22)
-ax1.set_ylabel("Jaccard des résidus d'actine contactés")
-ax1.set_title("Recouvrement d'empreinte sur l'actine")
+ax1.boxplot([same.jaccard.dropna(), diff.jaccard.dropna()], tick_labels=["Same\nfamily", "Different\nfamilies"],
+            patch_artist=True, boxprops=dict(facecolor="#d9eaf5"), medianprops=dict(color="black"))
+rng = np.random.default_rng(0)  # Reproducible display jitter; it never changes the measurements.
+ax1.scatter(rng.normal(1, 0.05, len(same)), same.jaccard, color="#0072B2", alpha=0.5, s=18)
+ax1.scatter(rng.normal(2, 0.05, len(diff)), diff.jaccard, color="#E69F00", alpha=0.6, s=22)
+ax1.set_ylabel("Jaccard of contacted actin residues")
+ax1.set_title("Observed actin footprint overlap")
 
-ax2.hist(diff.recouvrement_min.dropna(), bins=np.arange(0, 1.01, 0.1), color="#e76f51", edgecolor="white")
+ax2.hist(diff.recouvrement_min.dropna(), bins=np.arange(0, 1.01, 0.1), color="#E69F00", edgecolor="white")
 ax2.axvline(0.5, ls="--", color="grey")
-ax2.set_xlabel("Fraction de résidus communs (sur la + petite empreinte)")
-ax2.set_ylabel("Nb couples de familles différentes")
-ax2.set_title("Familles différentes : partagent-elles les mêmes résidus ?")
-fig.suptitle("Empreinte sur l'ACTINE : 'même site' = mêmes résidus contactés ?", fontsize=13, fontweight="bold", y=1.02)
+ax2.set_xlabel("Shared residues / smaller footprint")
+ax2.set_ylabel("Number of pairs of different families")
+ax2.set_title("Overlap between families sharing an actin site")
+fig.suptitle("Actin footprints of representative interactions (P60709 positions)", fontsize=13, fontweight="bold", y=1.02)
 fig.tight_layout()
 fig.savefig(OUT / "figure_footprint_overlap.png", dpi=150, bbox_inches="tight")
 print(f"\nfigure : {OUT/'figure_footprint_overlap.png'}")

@@ -1,0 +1,36 @@
+{
+  "finished_utc": "2026-10-03T08:43:53.605739+00:00",
+  "fingerprint": {
+    "inputs": {
+      "data/P60709_ref.fasta": "50469aa3087cbb3679ce4167ab78ce1352cc07bd7fa6533e77ed9601dedcaa08",
+      "data/alignments/cluster_6685.aln": "da616f5bde17be50876a03004e48bd4edf41b0822becf7de1ef08ba815f9adbc",
+      "data/exports/abp_site_domain/familles.csv": "327b8421de2b7c2be100d9e7f44df5cce3c6af07bc7552a449871689f85daf5a",
+      "data/filtered/details/1.interactions.csv": "ea101480359ff3a436093ebf9593004f7af4d8ae242e738fb01f29ee6238a893",
+      "data/filtered/details/3.interface_residues.csv": "e403fcda60c6df08b5a6298809c20f9c241991b32674fe2c1efc849531f69581",
+      "data/filtered/filtered_all_data.csv": "2cc698166ffe50f9e0793289e6fbef470aaffbe52bbd44a9814789effa497574"
+    },
+    "code": {
+      "script/abp_site_domain/13_actin_footprint_overlap.py": "09f8b8f7b9c4a5cff213b1711d69acc62c00fbfccca2ee8f1a7a5982ca3e788f",
+      "script/display_helpers.py": "cfff8b5096f06a125dc7da681c36a9c804e68f8b3eacde79cad00eb8e232d2fb",
+      "script/local_rebuild.py": "262758a659fe34f01ea71a593ae655299853f1a469cb2d61057213a0b4d848dd",
+      "script/numbering.py": "740de6699bf30037e4db8905cf6701cdc1b978ea3bf5a6bfb5f8476c42a18ede",
+      "script/residue_contacts.py": "9b4369da1b7982f794f1f777bc8795304c256b7f24f759154c2c096ba0333b28"
+    },
+    "runtime": {
+      "python": "3.12.13",
+      "numpy": "2.5.0",
+      "pandas": "2.3.3",
+      "biopython": "1.87",
+      "scipy": "1.18.0",
+      "matplotlib": "3.10.9"
+    },
+    "command": [
+      "-u",
+      "script/abp_site_domain/13_actin_footprint_overlap.py"
+    ]
+  },
+  "outputs": {
+    "data/exports/abp_site_domain/actin_footprint_overlap.csv": "7d91c05e98c683b0bc75a00188d1cb1baf0b39c40e0ce902e315ef46da8dffb6",
+    "data/exports/abp_site_domain/figure_footprint_overlap.png": "20214ef5736cf9dde9975f2968023e55dd2901a24b876f81d2021c132a7214cf"
+  }
+}

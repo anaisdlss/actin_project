@@ -2,7 +2,7 @@
 
 ## Reproducible local calculations
 
-In the full research project, open **Documentation → Data management → Rebuild local scientific results**, or run `pixi run rebuild`. This offline workflow rebuilds seven registered scientific calculations and verifies source/code/output checksums before reusing a result. `pixi run data-status` checks freshness; `pixi run data-inventory` inventories CSV provenance. The public app displays saved results and does not launch these local tools.
+In the full research project, open **Documentation → Data management → Rebuild local scientific results**, or run `pixi run rebuild`. This offline workflow rebuilds fifteen registered scientific calculations and verifies source/code/output checksums before reusing a result. `pixi run data-status` checks freshness; `pixi run data-inventory` inventories CSV provenance. The public app displays saved results and does not launch these local tools.
 
 Successful calculation receipts, logs and the CSV inventory are saved in `reports/local_rebuild/`. An interrupted or failed step is never accepted merely because an old output exists. Remote PPI3D updates remain a separate action; imported ProteoCast and variant source snapshots are not represented as locally generated measurements. Historical source gaps remain visible in the inventory.
 
@@ -83,3 +83,22 @@ self-contained `deploy/` folder to push to a separate repo.
 See [diagnostic and roadmap](SCIENTIFIC_APP_ROADMAP.md) for the September 2026 reorganization, scientific checks still required and the local/public synchronization strategy.
 
 Regression checks (in an environment with the app dependencies installed): `python -m unittest discover -s tests -v`.
+
+## Updating the public dataset
+
+From the full local environment, rebuild first, then preview a checked sync:
+
+```sh
+python tools/rebuild_local.py
+python tools/sync_cloud_dataset.py --source /path/to/actin_project --destination /path/to/actin-abp-app
+```
+
+Add `--apply` to copy the verified snapshot. This preserves public-only imported
+results, omits local calculation work files and keeps original local data intact.
+Run `python tools/check_dataset.py` and `python tools/check_app.py` in the public
+checkout before publication. Use this checked synchronization for updates rather
+than the historical `script/make_slim_deploy.py` export.
+
+The public `master` branch is the publication branch. The local research project
+continues on `codex/scientific-app-foundations`. A successful push alone does not
+prove that the remote Streamlit runtime has rebuilt successfully.

@@ -254,3 +254,28 @@ its required security policy. No alternate browser path was used. AppTest valida
 page execution and generated controls, but does not certify the rendered WebGL
 framing or tooltip appearance on the user's screen. These visual changes therefore
 still need a browser check once that tool access is available.
+
+
+## Source reconstruction and Cloud preparation - 3 October 2026
+
+- 125 unit tests pass in each checkout, including source reconstruction, complete
+  ProteoCast grids, correct interaction-chain selection, and safe Cloud cleanup.
+- All 11 pages and representative controls pass `tools/check_app.py` in the full
+  project and the refreshed public dataset. These checks do not submit remote jobs.
+- All 15 registered local calculation groups completed. Their input, code and
+  output checksums are current. Four ABP summary figures were also regenerated.
+- `tools/sync_cloud_dataset.py` checks the full source dataset and calculation
+  receipts before copying it to the public checkout. It keeps displayed results,
+  assemblies, existing alignments and public-only historical imports. It removes
+  only tracked working indexes/comparison files and byte-identical duplicate
+  copies. Untracked conflicting user files stop synchronization.
+- The refreshed public core contains 2,325 retained interaction records and 159
+  PDBs, matching the local dataset (the previous public snapshot had 2,152 / 151).
+  It includes 49 complete ProteoCast profiles among 57 source ABP entries and
+  the 206 local FoldDisco motif control results. Missing external profiles stay
+  explicitly unavailable. No synthetic results are substituted.
+- The Cloud snapshot carries `reports/cloud_snapshot.json`; local source receipts
+  do not certify extra historical files retained only in the public build.
+
+GitHub publication and online runtime verification are different checks. Browser
+access remains blocked; no fresh live Cloud/WebGL inspection is claimed.

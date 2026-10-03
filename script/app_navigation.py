@@ -1,5 +1,6 @@
 """Native page navigation and persistent scientific choices."""
 from pathlib import Path
+import json
 import streamlit as st
 from app_sections import SECTIONS
 
@@ -34,6 +35,13 @@ def run_navigation():
     with st.sidebar:
         st.caption("Actin–ABP · PPI3D")
         st.caption("Public dataset" if Path("data/.slim_deploy").exists() else "Local research project")
+        snapshot = Path('reports/cloud_snapshot.json')
+        if Path('data/.slim_deploy').exists() and snapshot.exists():
+            try:
+                date = json.loads(snapshot.read_text())['created_utc'][:10]
+                st.caption(f'Data snapshot: {date}')
+            except (ValueError, KeyError):
+                pass
     requested = st.session_state.pop("_requested_page", None)
     if requested:
         st.switch_page(f"views/{requested}.py")

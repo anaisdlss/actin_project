@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-10-02T14:53:50.553771+00:00",
+  "generated_utc": "2026-10-03T08:38:20.469311+00:00",
   "biopython_version": "1.87",
   "pdb_id": "7PDZ",
   "model_index": 0,
@@ -116,7 +116,7 @@
         "I"
       ],
       "atom_count": 2894,
-      "elapsed_seconds": 1.9076528750010766
+      "elapsed_seconds": 1.7945161249954253
     },
     "actin_fragment": {
       "chain_ids": [
@@ -128,7 +128,7 @@
         "O"
       ],
       "atom_count": 17364,
-      "elapsed_seconds": 12.534369417000562
+      "elapsed_seconds": 10.762022832990624
     },
     "with_abp": {
       "chain_ids": [
@@ -142,7 +142,7 @@
         "O"
       ],
       "atom_count": 21722,
-      "elapsed_seconds": 15.95904495799914
+      "elapsed_seconds": 13.62351458298508
     }
   },
   "contexts_480": {
@@ -151,7 +151,7 @@
         "I"
       ],
       "atom_count": 2894,
-      "elapsed_seconds": 1.0696124589885585
+      "elapsed_seconds": 0.8577620830037631
     },
     "actin_fragment": {
       "chain_ids": [
@@ -163,7 +163,7 @@
         "O"
       ],
       "atom_count": 17364,
-      "elapsed_seconds": 6.463920000009239
+      "elapsed_seconds": 5.408623041992541
     },
     "with_abp": {
       "chain_ids": [
@@ -177,7 +177,7 @@
         "O"
       ],
       "atom_count": 21722,
-      "elapsed_seconds": 8.665407457971014
+      "elapsed_seconds": 6.762329082994256
     }
   },
   "excluded_chain_ids": [

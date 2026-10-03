@@ -1,5 +1,5 @@
 {
-  "finished_utc": "2026-10-02T14:49:35.000208+00:00",
+  "finished_utc": "2026-10-03T08:39:21.306864+00:00",
   "fingerprint": {
     "inputs": {
       "data/P60709_ref.fasta": "50469aa3087cbb3679ce4167ab78ce1352cc07bd7fa6533e77ed9601dedcaa08",
@@ -168,7 +168,7 @@
     "code": {
       "script/display_helpers.py": "cfff8b5096f06a125dc7da681c36a9c804e68f8b3eacde79cad00eb8e232d2fb",
       "script/interface_geometry.py": "e8e1867492d535ad0ed4d4d8cdfa94bc7c7d5e214e9264b9e15c8cee8220038d",
-      "script/local_rebuild.py": "9128d0b366bf79bcf52ca91bb8c9e8d8d74d0164c580306c0f1d1d7ef61641fb",
+      "script/local_rebuild.py": "262758a659fe34f01ea71a593ae655299853f1a469cb2d61057213a0b4d848dd",
       "script/numbering.py": "740de6699bf30037e4db8905cf6701cdc1b978ea3bf5a6bfb5f8476c42a18ede",
       "script/residue_contacts.py": "9b4369da1b7982f794f1f777bc8795304c256b7f24f759154c2c096ba0333b28",
       "script/scientific_analysis.py": "3ab9cb503eade2d6a11d72340c5503a52bc1af923eb95075255b24e8232d0495",
@@ -179,7 +179,8 @@
       "numpy": "2.5.0",
       "pandas": "2.3.3",
       "biopython": "1.87",
-      "scipy": "1.18.0"
+      "scipy": "1.18.0",
+      "matplotlib": "3.10.9"
     },
     "command": [
       "-u",
@@ -189,7 +190,7 @@
   "outputs": {
     "reports/scientific_audit/all_interface_geometry.csv": "80b8f7409fc76cc0381f4bfaa8964fc1ba1c016350697983c2a361c37f56f75e",
     "reports/scientific_audit/all_interface_geometry_coverage.csv": "e8c27e1844965b948a2b4912e4eda6944df59475afb63c890040f28732ccec7f",
-    "reports/scientific_audit/all_interface_geometry_manifest.json": "0f9a7cabd748bc47667e1ebd567a709a5336fb3e4b60ea133db00221a6bc7224",
+    "reports/scientific_audit/all_interface_geometry_manifest.json": "ebb999e5e1467a296413aba13f21095e38011bd8f9f16912f0a6936cd5682e8b",
     "reports/scientific_audit/all_interface_geometry_summary.csv": "fc452ecc2fdf75d10e42b0e9bf4cfd39b9bcfc7bc86e048de67e5411442cce78"
   }
 }

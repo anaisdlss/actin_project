@@ -61,10 +61,14 @@ def main(argv=None):
     args = parser.parse_args(argv)
     if args.offline and args.refresh:
         parser.error("--offline and --refresh cannot be combined")
+    if args.offline and args.reuse_cache:
+        parser.error("Import a cache separately before rebuilding offline")
     root = args.root.resolve()
     base = root / "data/annotations"
     base.mkdir(parents=True, exist_ok=True)
     cache_path = base / "rcsb_structure_metadata.json"
+    if args.offline and not cache_path.exists():
+        raise FileNotFoundError("No RCSB source cache is installed; offline reconstruction is unavailable")
     cache = json.loads(cache_path.read_text()) if cache_path.exists() else {"records": {}}
     if args.reuse_cache:
         for key, value in json.loads(args.reuse_cache.read_text()).get("records", {}).items():
@@ -92,7 +96,8 @@ def main(argv=None):
                 failed.extend(batch)
                 print(f"Metadata request failed; previous records preserved: {exc}", file=sys.stderr, flush=True)
             time.sleep(.15)
-    save_json(cache_path, cache)
+    if not args.offline:
+        save_json(cache_path, cache)
     structures, entities = build_annotations(root, cache)
     structures.to_csv(base / "structure_annotations.csv", index=False)
     entities.to_csv(base / "entity_annotations.csv", index=False)

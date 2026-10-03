@@ -1,12 +1,14 @@
 {
-  "finished_utc": "2026-10-03T08:38:21.266921+00:00",
+  "finished_utc": "2026-10-03T08:38:29.739140+00:00",
   "fingerprint": {
     "inputs": {
+      "data/exports/abp_site_domain/abp_representatives.csv": "c19c5fc3837f033858e66072c4bc652e0fa664afbe2864581a4a06594d99ce32",
       "data/filtered/details/1.interactions.csv": "ea101480359ff3a436093ebf9593004f7af4d8ae242e738fb01f29ee6238a893",
+      "data/filtered/details/3.interface_residues.csv": "e403fcda60c6df08b5a6298809c20f9c241991b32674fe2c1efc849531f69581",
       "data/filtered/filtered_all_data.csv": "2cc698166ffe50f9e0793289e6fbef470aaffbe52bbd44a9814789effa497574"
     },
     "code": {
-      "script/abp_site_domain/01_build_table.py": "048cc275ec643e1e67df42a8cf41975eb795649add9b7f59f64a32055fda2f9d",
+      "script/abp_site_domain/16_interface_chemistry.py": "8de569dba79380c11de512fc579b649f9937932a61478fbad5afe2228e7becc6",
       "script/display_helpers.py": "cfff8b5096f06a125dc7da681c36a9c804e68f8b3eacde79cad00eb8e232d2fb",
       "script/local_rebuild.py": "262758a659fe34f01ea71a593ae655299853f1a469cb2d61057213a0b4d848dd",
       "script/numbering.py": "740de6699bf30037e4db8905cf6701cdc1b978ea3bf5a6bfb5f8476c42a18ede",
@@ -22,11 +24,10 @@
     },
     "command": [
       "-u",
-      "script/abp_site_domain/01_build_table.py"
+      "script/abp_site_domain/16_interface_chemistry.py"
     ]
   },
   "outputs": {
-    "data/exports/abp_site_domain/abp_representatives.csv": "c19c5fc3837f033858e66072c4bc652e0fa664afbe2864581a4a06594d99ce32",
-    "data/exports/abp_site_domain/abp_site_table.csv": "35ca2deff6b2c8085baab47cc93ded3caf94f31003e3a3e2c857cad8a2179068"
+    "data/exports/abp_site_domain/interface_chemistry.csv": "8f557b4f18eb2763391abdcd70f2ec918fd38bcc0c86d1c43d500bf6a6a31f99"
   }
 }

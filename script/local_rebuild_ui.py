@@ -13,7 +13,8 @@ def render():
     report = root/'reports/local_rebuild'
     st.subheader('Rebuild scientific results from local sources')
     st.caption('Recalculate RSA, source-checked scientific tables, interface geometry, filament proximity, '
-               'S1 figures and local FoldDisco controls. No remote job is submitted. '
+               'S1 figures, ABP summary tables, cached structure annotations, ProteoCast availability '
+               'and local FoldDisco controls. No remote job is submitted. '
                'Unchanged calculations are skipped after checking their inputs, code and outputs.')
     if (report/'last_run.json').exists():
         last = json.loads((report/'last_run.json').read_text())
@@ -48,10 +49,17 @@ def render():
         path = report/'csv_inventory.csv'
         if path.exists():
             st.caption('Inventory from the last local rebuild; run it again to check newly modified files.')
+            if (root/'data/.slim_deploy').exists():
+                st.caption('This inventory covers the full local calculation snapshot. Additional historical '
+                           'files retained in the public build are not certified by these calculation receipts.')
             data = pd.read_csv(path)
             unresolved = data.status.eq('unresolved historical provenance')
-            st.write(f'{len(data)} CSV files inventoried; {int(unresolved.sum())} still need their historical provenance resolved.')
-            st.dataframe(data[['file','status','producer','note']], hide_index=True, width='stretch')
+            st.write(f'{len(data)} CSV files inventoried; {int(unresolved.sum())} have no recovered source recipe.')
+            st.caption('A recovered recipe is not proof of the original execution. External model results '
+                       'and database snapshots remain distinct from locally rebuilt measurements. '
+                       'Files that cannot be reconstructed reliably are kept as documented inputs or archives.')
+            columns = [c for c in ['file','status','producer','automatic_action','note'] if c in data]
+            st.dataframe(data[columns], hide_index=True, width='stretch')
             st.download_button('Download complete provenance inventory', path.read_bytes(),
                                file_name=path.name, mime='text/csv', key='provenance_inventory')
         else:

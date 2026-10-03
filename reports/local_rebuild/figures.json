@@ -1,5 +1,5 @@
 {
-  "finished_utc": "2026-10-02T14:50:25.160236+00:00",
+  "finished_utc": "2026-10-03T08:40:13.767339+00:00",
   "fingerprint": {
     "inputs": {
       "data/P60709_ref.fasta": "50469aa3087cbb3679ce4167ab78ce1352cc07bd7fa6533e77ed9601dedcaa08",
@@ -10,7 +10,7 @@
     },
     "code": {
       "script/display_helpers.py": "cfff8b5096f06a125dc7da681c36a9c804e68f8b3eacde79cad00eb8e232d2fb",
-      "script/local_rebuild.py": "9128d0b366bf79bcf52ca91bb8c9e8d8d74d0164c580306c0f1d1d7ef61641fb",
+      "script/local_rebuild.py": "262758a659fe34f01ea71a593ae655299853f1a469cb2d61057213a0b4d848dd",
       "script/numbering.py": "740de6699bf30037e4db8905cf6701cdc1b978ea3bf5a6bfb5f8476c42a18ede",
       "script/plot_interaction.py": "4199fa8723b5ac75707f0aa4f932fbb0023844b128e9f0d9f1322c0186138642",
       "script/residue_contacts.py": "9b4369da1b7982f794f1f777bc8795304c256b7f24f759154c2c096ba0333b28",
@@ -22,7 +22,8 @@
       "numpy": "2.5.0",
       "pandas": "2.3.3",
       "biopython": "1.87",
-      "scipy": "1.18.0"
+      "scipy": "1.18.0",
+      "matplotlib": "3.10.9"
     },
     "command": [
       "-u",
@@ -362,6 +363,6 @@
     "data/visualisations/actin_s1_homo_top4_mean_heatmap.png": "e12e72d12715a9950efb93f4ac3f334973f02225b0655190df0f56a4c5fac920",
     "data/visualisations/actin_s1_homo_used_heatmap.png": "2a0aaec2830cb55169ba871117f27969fb317bce893613aef33b0ec5bcd612d5",
     "data/visualisations/actin_s1_top4homo_used_heatmap.png": "99f9c3002a69215f9191b99ea3376edad378abe6c4901e87e7a688df39cb0fe1",
-    "reports/s1_figures_all.json": "05d2598c82937862f4b1c02c533a581e0342f6b7a816b51265a879c9895ee644"
+    "reports/s1_figures_all.json": "dafa00f639eaf83c9e862df50507ea5e2de7a05ab7faa7590c229297ba2c1e02"
   }
 }

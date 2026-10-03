@@ -1,0 +1,44 @@
+{
+  "finished_utc": "2026-10-03T08:43:55.755765+00:00",
+  "fingerprint": {
+    "inputs": {
+      "data/P60709_ref.fasta": "50469aa3087cbb3679ce4167ab78ce1352cc07bd7fa6533e77ed9601dedcaa08",
+      "data/alignments/cluster_6685.aln": "da616f5bde17be50876a03004e48bd4edf41b0822becf7de1ef08ba815f9adbc",
+      "data/exports/abp_site_domain/familles.csv": "327b8421de2b7c2be100d9e7f44df5cce3c6af07bc7552a449871689f85daf5a",
+      "data/filtered/details/1.interactions.csv": "ea101480359ff3a436093ebf9593004f7af4d8ae242e738fb01f29ee6238a893",
+      "data/filtered/details/3.interface_residues.csv": "e403fcda60c6df08b5a6298809c20f9c241991b32674fe2c1efc849531f69581",
+      "data/filtered/filtered_all_data.csv": "2cc698166ffe50f9e0793289e6fbef470aaffbe52bbd44a9814789effa497574",
+      "data/proteocast/actin/1.query.fasta": "350341f0efa6d0b5736714a0a5ec50721be5211481c8cfb8b4f44dd4267f311c",
+      "data/proteocast/actin/2.aliAF-P60709-F1-msa_v6.fasta": "e8bbcc7c1a7ea66d1fbe5272509c2496d591cbd573d6361c62781c9a14f9f7da",
+      "data/proteocast/actin/4.query_ProteoCast.csv": "909024144ba3aa29fe879bbdb4c2c661a74ee30d90d4b993406500e6d81cd4e4",
+      "reports/scientific_audit/filament_accessibility_7pdz_I.csv": "6b1ce398fe1b997f2708df607c929494cd4f848c3798b9ad2c30e7544e8b73c2",
+      "reports/scientific_audit/filament_accessibility_manifest.json": "1fc40586ff4681dafd02867e1d2bf7cbb98b8e12c5b2cf27b00eca372810f28e"
+    },
+    "code": {
+      "script/abp_site_domain/18_site_determinants.py": "233a7af1a3a7a4683032ea54672773d9f52537f27168feee34b1b5e0fc8b7bb3",
+      "script/display_helpers.py": "cfff8b5096f06a125dc7da681c36a9c804e68f8b3eacde79cad00eb8e232d2fb",
+      "script/footprint_comparison.py": "4c79c743966c68045621da8c8a2ef35227260100c06d053107fd6523b83083b2",
+      "script/local_rebuild.py": "262758a659fe34f01ea71a593ae655299853f1a469cb2d61057213a0b4d848dd",
+      "script/numbering.py": "740de6699bf30037e4db8905cf6701cdc1b978ea3bf5a6bfb5f8476c42a18ede",
+      "script/residue_contacts.py": "9b4369da1b7982f794f1f777bc8795304c256b7f24f759154c2c096ba0333b28",
+      "script/rsa_source.py": "0fa8e5e85f1b678f5f361bfedf7a12b57e78fe092dfc6748cb70ef546c1b68ed",
+      "script/scientific_analysis.py": "3ab9cb503eade2d6a11d72340c5503a52bc1af923eb95075255b24e8232d0495"
+    },
+    "runtime": {
+      "python": "3.12.13",
+      "numpy": "2.5.0",
+      "pandas": "2.3.3",
+      "biopython": "1.87",
+      "scipy": "1.18.0",
+      "matplotlib": "3.10.9"
+    },
+    "command": [
+      "-u",
+      "script/abp_site_domain/18_site_determinants.py"
+    ]
+  },
+  "outputs": {
+    "data/exports/abp_site_domain/actin_residue_determinants.csv": "8271c445af80089d85ed4bd64c1310e687863d2b7623565ea633ff606f51de51",
+    "data/exports/abp_site_domain/figure_site_determinants.png": "cde81919c040cfc956b63c7c823d97954b24907e68d8fd4fa76d1b5f5765dd9a"
+  }
+}

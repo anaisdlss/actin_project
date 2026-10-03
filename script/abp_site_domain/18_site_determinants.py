@@ -31,20 +31,17 @@ fam = pd.read_csv(OUT / "familles.csv")
 fam_of = {a.strip(): r.famille for _, r in fam.iterrows() for a in str(r.membres).split(" · ")}
 sys.path.insert(0, str(ROOT / "script"))
 from scientific_analysis import canonical_conservation
+from footprint_comparison import footprint_records
+import numbering
 cons = canonical_conservation(ROOT)
 
-m = df.merge(di, left_on=["subunit_1", "subunit_2"],
-             right_on=["chain_A_id", "chain_B_id"], how="left")
-m = m[(m.s1_actine) & (~m.s2_actine)]
-
 fam_by_canon = defaultdict(set)
-for _, r in m.iterrows():
-    fa = fam_of.get(r.subunit_2_title)
+records = footprint_records(df, di, res)
+for r in records[records.kind.eq('abp') & records.asa.gt(0)].itertuples():
+    fa = fam_of.get(r.group)
     if not fa:
         continue
-    rr = res[(res.interaction_id == r.interaction_id) & (res.chain == r.subunit_1)]
-    for c in rr.canon.dropna().astype(int):
-        fam_by_canon[c].add(fa)
+    fam_by_canon[numbering.to_canon(int(r.position))].add(fa)
 
 nfam = pd.Series({c: len(s) for c, s in fam_by_canon.items()}, name="n_familles")
 t = cons.set_index("canon").join(nfam).copy()
@@ -60,15 +57,15 @@ print(f"n_familles vs conservation : rho={rho_cons:.2f} (p={p_cons:.1e})")
 
 # figure
 fig, (a1, a2) = plt.subplots(1, 2, figsize=(13, 5))
-a1.scatter(sub.rsa, sub.n_familles, s=14, alpha=0.5, color="#e76f51")
-a1.set_xlabel("Exposition au solvant du résidu d'actine (RSA)")
-a1.set_ylabel("Nb de familles d'ABP qui le touchent")
-a1.set_title(f"Exposition → convergence   (ρ={rho_rsa:.2f})")
-a2.scatter(sub.conservation, sub.n_familles, s=14, alpha=0.5, color="#2a9d8f")
-a2.set_xlabel("Conservation du résidu d'actine (ProteoCast)")
-a2.set_ylabel("Nb de familles d'ABP qui le touchent")
-a2.set_title(f"Conservation → peu prédictif   (ρ={rho_cons:.2f})")
-fig.suptitle("Pourquoi ces résidus d'actine ? — c'est l'EXPOSITION qui attire les ABP",
+a1.scatter(sub.rsa, sub.n_familles, s=14, alpha=0.5, color="#E69F00")
+a1.set_xlabel("RSA of isolated 7PDZ chain I")
+a1.set_ylabel("Observed contacting ABP families")
+a1.set_title(f"RSA association   (ρ={rho_rsa:.2f})")
+a2.scatter(sub.conservation, sub.n_familles, s=14, alpha=0.5, color="#0072B2")
+a2.set_xlabel("Mutational sensitivity (ProteoCast)")
+a2.set_ylabel("Observed contacting ABP families")
+a2.set_title(f"Sensitivity association   (ρ={rho_cons:.2f})")
+fig.suptitle("Observed family contacts, reference RSA and mutational sensitivity",
              fontsize=13, fontweight="bold", y=1.02)
 fig.tight_layout()
 fig.savefig(OUT / "figure_site_determinants.png", dpi=150, bbox_inches="tight")

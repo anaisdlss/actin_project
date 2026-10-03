@@ -44,7 +44,7 @@ class Task:
     outputs: list
     code: list
     dependencies: list = field(default_factory=list)
-    packages: tuple = ('numpy', 'pandas', 'biopython', 'scipy')
+    packages: tuple = ('numpy', 'pandas', 'biopython', 'scipy', 'matplotlib')
 
 
 def registry():
@@ -54,6 +54,7 @@ def registry():
     reference = ['data/P60709_ref.fasta', 'data/alignments/cluster_6685.aln']
     structures = [details+'structures_files/assembly/*.pdb', details+'structures_files/assembly/*.cif']
     report = 'reports/scientific_audit/'
+    abp = 'data/exports/abp_site_domain/'
     profiles = ['variant_mapping', 'variant_exclusions', 'conservation_profiles',
                 'conservation_correlations', 'conservation_footprints', 'interface_sites',
                 'interface_c70', 'interface_occurrences', 'interface_context',
@@ -73,6 +74,37 @@ def registry():
               report+'filament_accessibility_manifest.json'], ['script/filament_accessibility.py']),
         task('abp_catalog', 'script/abp_site_domain/01_build_table.py', tables[:2],
              ['data/exports/abp_site_domain/abp_site_table.csv', 'data/exports/abp_site_domain/abp_representatives.csv'], []),
+        task('structure_annotations', 'tools/update_structure_annotations.py',
+             [tables[0], 'data/filtered/proteins_per_pdb.csv', 'data/annotations/rcsb_structure_metadata.json'],
+             ['data/annotations/structure_annotations.csv', 'data/annotations/entity_annotations.csv',
+              'data/annotations/manifest.json'], ['script/structure_annotations.py'], args=['--offline']),
+        task('proteocast_availability', 'tools/audit_proteocast_availability.py',
+             ['data/proteocast/abp_inputs/manifest.csv', 'data/proteocast/abp/*.csv',
+              'data/proteocast/abp/*/*', 'data/proteocast/abp/.job_status/*.json'],
+             [report+'proteocast_availability.csv'], ['script/abp_profile.py', 'script/proteocast_results.py']),
+        task('abp_cross_tables', 'script/abp_site_domain/04_crosstab.py',
+             [abp+n for n in ('abp_site_table.csv', 'abp_representatives.csv', 'abp_interpro.csv', 'fold_cluster_cluster.tsv')],
+             [abp+n for n in ('abp_master.csv', 'site_cluster_summary.csv', 'figure_site_vs_domaine.png')],
+             [], ['abp_catalog']),
+        task('abp_families', 'script/abp_site_domain/11_family_regroup.py',
+             [abp+n for n in ('abp_interpro.csv', 'abp_master.csv', 'abp_site_table.csv', 'whole_pairs_all.tsv')],
+             [abp+n for n in ('familles.csv', 'convergences_inter_familles.csv', 'figure_convergence_familles.png')],
+             [], ['abp_cross_tables']),
+        task('abp_footprints', 'script/abp_site_domain/13_actin_footprint_overlap.py',
+             [*tables, *reference, abp+'familles.csv'],
+             [abp+'actin_footprint_overlap.csv', abp+'figure_footprint_overlap.png'], [], ['abp_families']),
+        task('abp_chemistry', 'script/abp_site_domain/16_interface_chemistry.py',
+             [*tables, abp+'abp_representatives.csv'], [abp+'interface_chemistry.csv'], [], ['abp_catalog']),
+        task('abp_determinants', 'script/abp_site_domain/18_site_determinants.py',
+             [*tables, *reference, abp+'familles.csv', 'data/proteocast/actin/*',
+              report+'filament_accessibility_7pdz_I.csv', report+'filament_accessibility_manifest.json'],
+             [abp+'actin_residue_determinants.csv', abp+'figure_site_determinants.png'],
+             ['script/scientific_analysis.py', 'script/footprint_comparison.py', 'script/rsa_source.py'],
+             ['rsa', 'abp_families']),
+        task('representative_geometry', 'tools/check_interface_geometry.py',
+             [tables[0], 'data/P60709_ref.fasta', *[details+'structures_files/assembly/'+p+'.pdb' for p in ('3j8a','5yu8','6vao')]],
+             [report+'representative_geometry'+s for s in ('.csv','_summary.csv','_manifest.json')],
+             ['script/scientific_analysis.py']),
         task('scientific_tables', 'tools/export_scientific_audit.py',
              [*tables, *reference, details+'4.inter-residue_contacts.csv', 'data/filtered/proteins_per_pdb.csv',
               'data/human_variants/sources/*.csv', 'data/human_variants/ref/*.fasta',
@@ -236,11 +268,26 @@ def inventory(root, tasks):
                 recovered = recovered_origin(root, rel)
                 if recovered:
                     state, producer, note = recovered
-            rows.append(dict(file=rel, status=state, producer=producer, sha256=checksum, note=note))
+            if rel in produced:
+                action = 'Rebuilt automatically when its sources or code change'
+            elif rel == 'data/proteocast/conservation_vs_asa_per_position.csv':
+                action = 'Archived, excluded from current RSA; replaced by documented local calculation'
+            elif rel.endswith('/rsa_values.csv') and '/proteocast/abp/' in rel:
+                action = 'Supplementary imported archive; not read by the current application; no replacement invented'
+            elif rel == 'data/proteocast/abp_inputs/manifest.csv':
+                action = 'Keep reviewed accession choices; do not regenerate ambiguous identities from a protein name'
+            elif state.startswith('producer recipe found'):
+                action = 'Existing source pipeline; outside the offline result rebuild (historical execution not certified)'
+            elif state.startswith(('external', 'imported')):
+                action = 'Preserve external snapshot; local summaries use these identified inputs without recreating the model/database'
+            else:
+                action = 'Not automatically regenerated: insufficient provenance'
+            rows.append(dict(file=rel, status=state, producer=producer, sha256=checksum, note=note,
+                             automatic_action=action))
     out = root / REPORT / 'csv_inventory.csv'
     out.parent.mkdir(parents=True, exist_ok=True)
     with out.open('w') as stream:
-        writer = csv.DictWriter(stream, fieldnames=['file','status','producer','sha256','note'])
+        writer = csv.DictWriter(stream, fieldnames=['file','status','producer','sha256','note','automatic_action'], lineterminator='\n')
         writer.writeheader(); writer.writerows(rows)
     return rows
 

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_utc": "2026-10-01T13:48:34.791484+00:00",
+  "generated_utc": "2026-10-03T08:38:21.967469+00:00",
   "retained_pdb_count": 159,
   "metadata_available": 159,
   "metadata_missing": [],
@@ -22,7 +22,7 @@
   },
   "code_sha256": {
     "script/structure_annotations.py": "b68fab334d2c32623f25a174b26d79243b5a4519d21b97e71020fab0b1fde9f8",
-    "tools/update_structure_annotations.py": "10deda8ff069d798a7bd48892a620216db7386ed864be5caf8ed3f61576e938c"
+    "tools/update_structure_annotations.py": "6a50f9f9de2cb1e47c269103ef13cc580e417fec15eb512ec77f428df4c05360"
   },
   "outputs": {
     "structure_annotations.csv": "5bb852a059f8ec77a53de4a8b9bf06aa5fa37ca515268d061422671bb86fd126",

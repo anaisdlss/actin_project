@@ -1,0 +1,36 @@
+{
+  "finished_utc": "2026-10-03T08:38:22.010267+00:00",
+  "fingerprint": {
+    "inputs": {
+      "data/annotations/rcsb_structure_metadata.json": "c84108cb4a83be280852cb5b951e5aace03701a1a19633b6ccf965d1f9a1b704",
+      "data/filtered/filtered_all_data.csv": "2cc698166ffe50f9e0793289e6fbef470aaffbe52bbd44a9814789effa497574",
+      "data/filtered/proteins_per_pdb.csv": "be97933d256e64017cba6e06cc93965866b167143727c1841b175f0edb57912f"
+    },
+    "code": {
+      "script/display_helpers.py": "cfff8b5096f06a125dc7da681c36a9c804e68f8b3eacde79cad00eb8e232d2fb",
+      "script/local_rebuild.py": "262758a659fe34f01ea71a593ae655299853f1a469cb2d61057213a0b4d848dd",
+      "script/numbering.py": "740de6699bf30037e4db8905cf6701cdc1b978ea3bf5a6bfb5f8476c42a18ede",
+      "script/residue_contacts.py": "9b4369da1b7982f794f1f777bc8795304c256b7f24f759154c2c096ba0333b28",
+      "script/structure_annotations.py": "b68fab334d2c32623f25a174b26d79243b5a4519d21b97e71020fab0b1fde9f8",
+      "tools/update_structure_annotations.py": "6a50f9f9de2cb1e47c269103ef13cc580e417fec15eb512ec77f428df4c05360"
+    },
+    "runtime": {
+      "python": "3.12.13",
+      "numpy": "2.5.0",
+      "pandas": "2.3.3",
+      "biopython": "1.87",
+      "scipy": "1.18.0",
+      "matplotlib": "3.10.9"
+    },
+    "command": [
+      "-u",
+      "tools/update_structure_annotations.py",
+      "--offline"
+    ]
+  },
+  "outputs": {
+    "data/annotations/entity_annotations.csv": "05584af0590e90675af6e3a15cabf906e28206fc33da1458548af0ea0a536966",
+    "data/annotations/manifest.json": "186f4552dbac33e5980e29b5272d95bc5e4381c8b5b50282c982047648fa519d",
+    "data/annotations/structure_annotations.csv": "5bb852a059f8ec77a53de4a8b9bf06aa5fa37ca515268d061422671bb86fd126"
+  }
+}

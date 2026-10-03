@@ -1,5 +1,5 @@
 {
-  "finished_utc": "2026-10-02T14:50:00.712226+00:00",
+  "finished_utc": "2026-10-03T08:39:48.195998+00:00",
   "fingerprint": {
     "inputs": {
       "data/P60709_ref.fasta": "50469aa3087cbb3679ce4167ab78ce1352cc07bd7fa6533e77ed9601dedcaa08",
@@ -171,7 +171,7 @@
     "code": {
       "script/display_helpers.py": "cfff8b5096f06a125dc7da681c36a9c804e68f8b3eacde79cad00eb8e232d2fb",
       "script/folddisco_audit.py": "b412be7a4f9a34e06ce62227354b3e2a05836081203093a90d32cb1436eb5edc",
-      "script/local_rebuild.py": "9128d0b366bf79bcf52ca91bb8c9e8d8d74d0164c580306c0f1d1d7ef61641fb",
+      "script/local_rebuild.py": "262758a659fe34f01ea71a593ae655299853f1a469cb2d61057213a0b4d848dd",
       "script/numbering.py": "740de6699bf30037e4db8905cf6701cdc1b978ea3bf5a6bfb5f8476c42a18ede",
       "script/residue_contacts.py": "9b4369da1b7982f794f1f777bc8795304c256b7f24f759154c2c096ba0333b28",
       "script/scientific_analysis.py": "3ab9cb503eade2d6a11d72340c5503a52bc1af923eb95075255b24e8232d0495",
@@ -183,7 +183,8 @@
       "numpy": "2.5.0",
       "pandas": "2.3.3",
       "biopython": "1.87",
-      "scipy": "1.18.0"
+      "scipy": "1.18.0",
+      "matplotlib": "3.10.9"
     },
     "command": [
       "-u",
@@ -192,6 +193,6 @@
   },
   "outputs": {
     "reports/scientific_audit/rigid_filament_proximity.csv": "bb95de5fae6b1072aa0ebda21bc4e0635c71644322be56428be15def723845db",
-    "reports/scientific_audit/rigid_filament_proximity_manifest.json": "daca4904ed5c48cbb15d065abd028875e147d77de75fad22de1e13379794cf12"
+    "reports/scientific_audit/rigid_filament_proximity_manifest.json": "ed69300e9a1931702eaaac1d3d0f4bac214a1300f419b9d3d7f90a1827d41bf0"
   }
 }

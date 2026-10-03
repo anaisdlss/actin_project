@@ -6,7 +6,7 @@ Regroupement des ABP en FAMILLES, puis test des convergences INTER-FAMILLES.
    partagent ≥1 domaine Pfam (hors tags de fusion) OU le même accession UniProt.
 2. Pour chaque cluster de site : familles distinctes présentes.
    Cluster "multi-familles" = ≥2 familles → vraie convergence.
-3. Pour chaque PAIRE de familles différentes d'un même site, meilleur TM-score
+3. Pour chaque PAIRE de familles from different families d'un même site, meilleur TM-score
    entre leurs membres (protéine entière) + %id.
 
 Sorties :
@@ -105,7 +105,7 @@ for site, g in pt.groupby("actin_site_cluster"):
     if len(fams) < 2:
         continue
     multi_fam_clusters += 1
-    # pour chaque paire de familles, meilleure paire d'ABP (TM max)
+    # pour chaque paire de families, meilleure paire d'ABP (TM max)
     by_fam = {}
     for a in members:
         by_fam.setdefault(fam_of[a], []).append(a)
@@ -120,10 +120,10 @@ for site, g in pt.groupby("actin_site_cluster"):
             tm, fid, a, b = best
             conv.append(dict(site=site, familleA=fa, familleB=fb, TM=round(tm, 2),
                              pid=round(100*fid), repA=a, repB=b,
-                             convergence="repliement proche" if tm >= 0.5 else "structures différentes"))
+                             convergence="similar fold" if tm >= 0.5 else "different structures"))
         else:
             conv.append(dict(site=site, familleA=fa, familleB=fb, TM=np.nan, pid=np.nan,
-                             repA=by_fam[fa][0], repB=by_fam[fb][0], convergence="non alignable"))
+                             repA=by_fam[fa][0], repB=by_fam[fb][0], convergence="alignment unavailable"))
 
 cv = pd.DataFrame(conv)
 cv.to_csv(OUT / "convergences_inter_familles.csv", index=False)
@@ -133,30 +133,30 @@ n_ge = (cv.TM >= 0.5).sum()
 n_lt = ((cv.TM < 0.5)).sum()
 n_na = cv.TM.isna().sum()
 print(f"\nClusters multi-familles : {multi_fam_clusters}")
-print(f"Paires de familles différentes au même site : {n_pairs}")
-print(f"  TM ≥ 0.50 (repliement proche)   : {n_ge}  ({100*n_ge/n_pairs:.0f}%)")
-print(f"  TM < 0.50 (structures différentes): {n_lt}  ({100*n_lt/n_pairs:.0f}%)")
-print(f"  non alignable                    : {n_na}")
+print(f"Paires de familles from different families au même site : {n_pairs}")
+print(f"  TM ≥ 0.50 (similar fold)   : {n_ge}  ({100*n_ge/n_pairs:.0f}%)")
+print(f"  TM < 0.50 (different structures): {n_lt}  ({100*n_lt/n_pairs:.0f}%)")
+print(f"  alignment unavailable                    : {n_na}")
 print(f"TM médian inter-familles : {cv.TM.median():.2f}")
 
 # --- figure ---
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5.5), gridspec_kw={"width_ratios": [1, 1.3]})
 vals = cv.TM.dropna()
-ax1.hist(vals, bins=np.arange(0, 1.01, 0.1), color="#e76f51", edgecolor="white")
+ax1.hist(vals, bins=np.arange(0, 1.01, 0.1), color="#E69F00", edgecolor="white")
 ax1.axvline(0.5, ls="--", color="grey")
-ax1.text(0.51, ax1.get_ylim()[1]*0.9, "seuil 0.5", color="grey")
-ax1.set_xlabel("TM-score (meilleure paire entre 2 familles d'un même site)")
-ax1.set_ylabel("Nb de paires de familles")
-ax1.set_title(f"Convergences inter-familles (n={n_pairs} paires)")
+ax1.text(0.51, ax1.get_ylim()[1]*0.9, "threshold 0.5", color="grey")
+ax1.set_xlabel("TM-score (best pair between two families at one site)")
+ax1.set_ylabel("Number of family pairs")
+ax1.set_title(f"Structural comparisons between families (n={n_pairs} pairs)")
 
-cats = ["structures\ndifférentes\n(TM<0.5)", "repliement\nproche\n(TM≥0.5)", "non\nalignable"]
-ax2.bar(cats, [n_lt, n_ge, n_na], color=["#e76f51", "#8ab17d", "#bbbbbb"], edgecolor="black")
+cats = ["Different\nstructures\n(TM<0.5)", "Similar\nfold\n(TM≥0.5)", "Alignment\nunavailable"]
+ax2.bar(cats, [n_lt, n_ge, n_na], color=["#E69F00", "#0072B2", "#bbbbbb"], edgecolor="black")
 for i, vv in enumerate([n_lt, n_ge, n_na]):
     ax2.text(i, vv + 0.3, str(vv), ha="center", fontweight="bold")
-ax2.set_ylabel("Nb de paires de familles différentes")
-ax2.set_title("Quand 2 familles partagent un site, se ressemblent-elles ?")
-fig.suptitle(f"Après regroupement en familles : {len(fam)} familles, "
-             f"{multi_fam_clusters} sites multi-familles", fontsize=13, fontweight="bold", y=1.02)
+ax2.set_ylabel("Number of family pairs from different families")
+ax2.set_title("Structural similarity of families sharing an actin site")
+fig.suptitle(f"Annotation-based grouping: {len(fam)} families, "
+             f"{multi_fam_clusters} sites with multiple families", fontsize=13, fontweight="bold", y=1.02)
 fig.tight_layout()
 fig.savefig(OUT / "figure_convergence_familles.png", dpi=150, bbox_inches="tight")
 print(f"\nfigures + csv écrits dans {OUT}")

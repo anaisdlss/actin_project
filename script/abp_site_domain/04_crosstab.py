@@ -35,7 +35,7 @@ rep["fold_cluster"] = rep.stem.map(stem2fold)
 # table maitresse par ABP
 master = rep[["abp_title", "pdb", "abp_chain", "fold_cluster"]].merge(
     ip[["abp_title", "uniprot", "pfam_domains", "interpro_domains"]], on="abp_title", how="left")
-master["pfam_domains"] = master["pfam_domains"].fillna("(non annote)")
+master["pfam_domains"] = master["pfam_domains"].fillna("(not annotated)")
 master.to_csv(OUT / "abp_master.csv", index=False)
 
 # (site cluster, abp) uniques
@@ -46,11 +46,15 @@ rows = []
 for site, g in pairs.groupby("actin_site_cluster"):
     abps = sorted(g.abp_title.unique())
     folds = set(g.fold_cluster.dropna())
-    doms = set(g.pfam_domains)
+    doms = set(g.pfam_domains) - {'(not annotated)'}
+    fold_complete = bool(g.fold_cluster.notna().all())
+    domain_complete = bool(g.pfam_domains.ne('(not annotated)').all())
     rows.append(dict(
         site_cluster=site, n_abp=len(abps),
         n_folds=len(folds), n_domaines=len(doms),
-        mono_fold=(len(folds) == 1), mono_domaine=(len(doms) == 1),
+        mono_fold=(fold_complete and len(folds) == 1),
+        mono_domaine=(domain_complete and len(doms) == 1),
+        fold_annotation_complete=fold_complete, domain_annotation_complete=domain_complete,
         abps=" / ".join(a[:25] for a in abps),
     ))
 summ = pd.DataFrame(rows).sort_values(["n_abp", "site_cluster"], ascending=[False, True])
@@ -67,31 +71,35 @@ print(f"\nDetail des clusters multi-ABP :")
 print(multi[["site_cluster", "n_abp", "n_folds", "mono_fold", "abps"]].to_string(index=False))
 
 # ---------- FIGURE ----------
-fig, axes = plt.subplots(1, 2, figsize=(15, 6))
+fig, axes = plt.subplots(1, 2, figsize=(17, max(6, len(multi) * 0.36)))
 
 # Panel A : mono vs mixte (fold et domaine)
 ax = axes[0]
-cats = ["Même fold\n(Foldseek)", "Même domaine\n(Pfam)"]
+cats = ["Same fold\n(Foldseek)", "Same domain\n(Pfam)"]
 mono = [multi.mono_fold.sum(), multi.mono_domaine.sum()]
-mixte = [(~multi.mono_fold).sum(), (~multi.mono_domaine).sum()]
+mixte = [(multi.fold_annotation_complete & ~multi.mono_fold).sum(),
+         (multi.domain_annotation_complete & ~multi.mono_domaine).sum()]
+unknown = [(~multi.fold_annotation_complete).sum(), (~multi.domain_annotation_complete).sum()]
 x = np.arange(len(cats))
-ax.bar(x, mono, 0.55, label="1 seul (convergence d'une famille)", color="#2a9d8f")
-ax.bar(x, mixte, 0.55, bottom=mono, label="plusieurs (familles différentes)", color="#e76f51")
+ax.bar(x, mono, 0.55, label="One observed group", color="#0072B2")
+ax.bar(x, mixte, 0.55, bottom=mono, label="Several observed groups", color="#E69F00")
+ax.bar(x, unknown, 0.55, bottom=np.array(mono) + mixte,
+       label="Incomplete annotation", color="#bbbbbb")
 for i, (m, mx) in enumerate(zip(mono, mixte)):
     ax.text(i, m / 2, str(m), ha="center", va="center", color="white", fontweight="bold")
     if mx:
         ax.text(i, m + mx / 2, str(mx), ha="center", va="center", color="white", fontweight="bold")
 ax.set_xticks(x); ax.set_xticklabels(cats)
-ax.set_ylabel("Nb de clusters de site multi-ABP")
-ax.set_title(f"Clusters de site touchés par ≥2 ABP (n={len(multi)})")
+ax.set_ylabel("Number of sites with multiple ABPs")
+ax.set_title(f"Sites contacted by at least two ABPs (n={len(multi)})")
 ax.legend(fontsize=9)
 
 # Panel B : detail par cluster, ABP colorés par fold
 ax = axes[1]
 mdet = multi.sort_values("n_abp")
 folds_all = sorted(pairs.fold_cluster.dropna().unique())
-cmap = plt.get_cmap("tab20")
-fold_color = {f: cmap(i % 20) for i, f in enumerate(folds_all)}
+cmap = plt.get_cmap("cividis")
+fold_color = {f: cmap(i / max(len(folds_all) - 1, 1)) for i, f in enumerate(folds_all)}
 for yi, (_, r) in enumerate(mdet.iterrows()):
     g = pairs[pairs.actin_site_cluster == r.site_cluster].drop_duplicates("abp_title")
     for xi, (_, a) in enumerate(g.iterrows()):
@@ -99,12 +107,12 @@ for yi, (_, r) in enumerate(mdet.iterrows()):
                    edgecolor="black", linewidth=0.5)
         ax.text(xi, yi, a.abp_title[:14], ha="center", va="center", fontsize=6)
 ax.set_yticks(range(len(mdet)))
-ax.set_yticklabels([f"{r.site_cluster} ({'mono' if r.mono_fold else 'MIXTE'})"
+ax.set_yticklabels([f"{r.site_cluster} ({'UNKNOWN' if not r.fold_annotation_complete else 'ONE' if r.mono_fold else 'MIXED'})"
                     for _, r in mdet.iterrows()], fontsize=8)
-ax.set_xlabel("ABPs du cluster (couleur = fold Foldseek)")
-ax.set_title("Composition de chaque cluster multi-ABP")
+ax.set_xlabel("ABPs in site cluster (colour = Foldseek group)")
+ax.set_title("Composition of sites with multiple ABPs")
 ax.set_xlim(-0.6, mdet.n_abp.max() - 0.4)
-fig.suptitle("Les ABPs d'un même site de l'actine partagent-ils le même domaine ?",
+fig.suptitle("Domain and fold annotations of ABPs sharing an actin site",
              fontsize=14, y=1.02)
 fig.tight_layout()
 fig.savefig(OUT / "figure_site_vs_domaine.png", dpi=150, bbox_inches="tight")

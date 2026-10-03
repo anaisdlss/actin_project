@@ -1,0 +1,37 @@
+{
+  "finished_utc": "2026-10-03T08:38:34.970211+00:00",
+  "fingerprint": {
+    "inputs": {
+      "data/P60709_ref.fasta": "50469aa3087cbb3679ce4167ab78ce1352cc07bd7fa6533e77ed9601dedcaa08",
+      "data/filtered/details/structures_files/assembly/3j8a.pdb": "8884d0f3eb1868383022c3aa8fba41c936437b6efa838d6af274e3c4a03cde54",
+      "data/filtered/details/structures_files/assembly/5yu8.pdb": "4d8b22c6bb9b1a0bbabbc8448a79c5a6b61d7a09deedd345fdc5b841c58b0725",
+      "data/filtered/details/structures_files/assembly/6vao.pdb": "5448ab89a3511edb16ca2713bbda9c963667d85803988a9c9bd558002ba836cd",
+      "data/filtered/filtered_all_data.csv": "2cc698166ffe50f9e0793289e6fbef470aaffbe52bbd44a9814789effa497574"
+    },
+    "code": {
+      "script/display_helpers.py": "cfff8b5096f06a125dc7da681c36a9c804e68f8b3eacde79cad00eb8e232d2fb",
+      "script/local_rebuild.py": "262758a659fe34f01ea71a593ae655299853f1a469cb2d61057213a0b4d848dd",
+      "script/numbering.py": "740de6699bf30037e4db8905cf6701cdc1b978ea3bf5a6bfb5f8476c42a18ede",
+      "script/residue_contacts.py": "9b4369da1b7982f794f1f777bc8795304c256b7f24f759154c2c096ba0333b28",
+      "script/scientific_analysis.py": "3ab9cb503eade2d6a11d72340c5503a52bc1af923eb95075255b24e8232d0495",
+      "tools/check_interface_geometry.py": "b1b1168307082068dd2fd3dc85d202a069eb891e9dcff4f29c6d5817880301d7"
+    },
+    "runtime": {
+      "python": "3.12.13",
+      "numpy": "2.5.0",
+      "pandas": "2.3.3",
+      "biopython": "1.87",
+      "scipy": "1.18.0",
+      "matplotlib": "3.10.9"
+    },
+    "command": [
+      "-u",
+      "tools/check_interface_geometry.py"
+    ]
+  },
+  "outputs": {
+    "reports/scientific_audit/representative_geometry.csv": "97f77f142f0c9cb2ecfa95adea3740d1c5d0a052f6b99338e8e1893b03e2fa38",
+    "reports/scientific_audit/representative_geometry_manifest.json": "b0414e893380307f3e5d918280736776cf664e135a82cdc9826e812e8b719425",
+    "reports/scientific_audit/representative_geometry_summary.csv": "df2c74604cac0313fb5e0903909d0548fb4fac422f013f8a83a2e8711f5a8c01"
+  }
+}

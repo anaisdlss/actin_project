@@ -1,0 +1,35 @@
+{
+  "finished_utc": "2026-10-03T08:43:51.853195+00:00",
+  "fingerprint": {
+    "inputs": {
+      "data/exports/abp_site_domain/abp_interpro.csv": "6e440a61624a4a7b9da072f55cc45861d4669d5977197f05792f738967ea749f",
+      "data/exports/abp_site_domain/abp_master.csv": "d34dc0c08af1cfecdb864fadca6126b3417c32b3bbf56bb3cc9596851a20d760",
+      "data/exports/abp_site_domain/abp_site_table.csv": "35ca2deff6b2c8085baab47cc93ded3caf94f31003e3a3e2c857cad8a2179068",
+      "data/exports/abp_site_domain/whole_pairs_all.tsv": "c909f28a8399227b214e287c7b8101aa1b62635ec894cf84292a4d433ddbaf4e"
+    },
+    "code": {
+      "script/abp_site_domain/11_family_regroup.py": "78babcd4a1102f32ec9437e325200cc5755490cf023fecc67feed11b3b614f3c",
+      "script/display_helpers.py": "cfff8b5096f06a125dc7da681c36a9c804e68f8b3eacde79cad00eb8e232d2fb",
+      "script/local_rebuild.py": "262758a659fe34f01ea71a593ae655299853f1a469cb2d61057213a0b4d848dd",
+      "script/numbering.py": "740de6699bf30037e4db8905cf6701cdc1b978ea3bf5a6bfb5f8476c42a18ede",
+      "script/residue_contacts.py": "9b4369da1b7982f794f1f777bc8795304c256b7f24f759154c2c096ba0333b28"
+    },
+    "runtime": {
+      "python": "3.12.13",
+      "numpy": "2.5.0",
+      "pandas": "2.3.3",
+      "biopython": "1.87",
+      "scipy": "1.18.0",
+      "matplotlib": "3.10.9"
+    },
+    "command": [
+      "-u",
+      "script/abp_site_domain/11_family_regroup.py"
+    ]
+  },
+  "outputs": {
+    "data/exports/abp_site_domain/convergences_inter_familles.csv": "310a03a1d1fd1656741e0cba51e39e7604da6ecd6625c289521da3ebce7c243c",
+    "data/exports/abp_site_domain/familles.csv": "327b8421de2b7c2be100d9e7f44df5cce3c6af07bc7552a449871689f85daf5a",
+    "data/exports/abp_site_domain/figure_convergence_familles.png": "50c33c5ce5b9923feb93804fe6da9de7b52e3f49e2c6e9c7d44d695824fbb9a5"
+  }
+}

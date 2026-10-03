@@ -57,11 +57,15 @@ def one(nm):
 # stats de contact par interaction
 di_idx = di.set_index("interaction_id")[["interface_area", "num_contacts", "num_hbonds", "num_salt_bridges"]]
 
-# actine = subunit_1 par interaction (pour le patch actine)
-df_actin = df[(df.s1_actine) & (~df.s2_actine)][["subunit_1", "subunit_2"]]
+# The actin partner belongs to the selected interaction, not the first
+# interaction involving this ABP chain. Both subunit orientations are valid.
+df_actin = df[df.s1_actine.ne(df.s2_actine)]
 abp_to_actinchain = {}
 for _, r in df_actin.iterrows():
-    abp_to_actinchain.setdefault(r.subunit_2, r.subunit_1)
+    actin, abp = (r.subunit_1, r.subunit_2) if r.s1_actine else (r.subunit_2, r.subunit_1)
+    matching = di[((di.chain_A_id == r.subunit_1) & (di.chain_B_id == r.subunit_2))]
+    for iid in matching.interaction_id:
+        abp_to_actinchain[(int(iid), abp)] = actin
 
 rows = []
 for _, r in rep.iterrows():
@@ -74,7 +78,7 @@ for _, r in rep.iterrows():
     if chem is None:
         continue
     # côté actine (patch)
-    actin_chain = abp_to_actinchain.get(r.abp_subunit, None)
+    actin_chain = abp_to_actinchain.get((iid, r.abp_subunit), None)
     actin_charge = None
     if actin_chain is not None:
         sact = res[(res.interaction_id == iid) & (res.chain == actin_chain)]
