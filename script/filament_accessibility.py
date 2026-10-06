@@ -185,7 +185,7 @@ def render_representative_geometry(root=".", key_prefix="geometry_audit"):
         st.caption("Illustrative comparison of 3J8A, 5YU8 and 6VAO. One actin is fitted by its mapped Cα atoms; "
                    "the neighbor is measured under the SAME transformation, without a second fit. At least 300 Cα "
                    "per subunit are required. Both reference-chain assignments are tried and the smaller neighbor RMSD is retained. "
-                   "RMSD is in Å. These examples do not assign biological major/minor labels, test steric clashes, "
+                   "RMSD is in Å. These examples do not test steric clashes, "
                    "or validate every cluster. 3J8A also contains tropomyosin.")
         if not summary.exists():
             st.info("The representative geometry audit is not installed.")

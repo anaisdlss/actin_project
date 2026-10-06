@@ -209,7 +209,7 @@ Because the interface is kept clean, the meaning of every element is listed here
 - Contact-region zoom stays visible, disabled with an explanation when contacts cannot be mapped. Its bounds are observed contact positions with a margin, not a predicted domain boundary.
 - FoldDisco query positions refer to the selected ABP's PDB chain. The resolved sequence and 3D motif identify the selected residues. Distant sequence positions may be neighbours in 3D. The public server limit remains 32 residues; the app never truncates motifs automatically.
 
-These display changes do not resolve the remaining scientific validations: biological interpretation of major/minor interfaces, provenance of the legacy RSA reference, unavailable ProteoCast results, and positive/negative control validation of FoldDisco candidates. Sequence conservation, model sensitivity, structural similarity and clinical annotation remain distinct concepts.
+These display changes do not resolve the remaining scientific validations: provenance of the legacy RSA reference, unavailable ProteoCast results, and positive/negative control validation of FoldDisco candidates. Sequence conservation, model sensitivity, structural similarity and clinical annotation remain distinct concepts.
 
 
 ## Accessing FoldDisco results

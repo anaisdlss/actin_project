@@ -102,7 +102,6 @@ def render_cluster_table(kind, show_selector=True):
                           yaxis_title="PDBs with homo contacts", margin=dict(t=12, b=70), height=360)
         plotly_chart(fig, key="homo_pdb_counts", use_container_width=True)
         st.caption("PDB counts measure representation in this dataset, not physiological prevalence. "
-                   "Major/minor interface labels have not been assigned. "
                    "Select a binding site below to inspect its contacts, heatmap and 3D structure.")
 
 

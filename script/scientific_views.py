@@ -293,8 +293,7 @@ def render_interface_evidence():
     st.dataframe(c70,hide_index=True,width='stretch')
     st.caption('Fisher tests compare occurrence within the context cohort versus other retained PDBs; '
                'BH correction is separate for sites and C70 clusters. PDB entries need not be independent '
-               'experiments. Statistical association supports prioritization, not a validated major/minor '
-               'biological label. The proposed 6685_1–4 reference group must also be checked structurally.')
+               'experiments. Statistical association supports prioritization; it does not establish a biological mechanism.')
     with st.expander('Cohort definitions and evidence downloads'):
         st.markdown('**Source names defining the context cohort**')
         st.dataframe(matches,hide_index=True,width='stretch')
@@ -316,7 +315,7 @@ def render_interface_evidence():
                    'The nearest pair geometry is retained separately for 3J8A (with tropomyosin) and 5YU8 (with cofilin). '
                    'Summaries use one median per PDB, so repeated chains do not increase a PDB weight.')
         st.dataframe(pd.read_csv(global_summary), hide_index=True, width='stretch')
-        st.caption('Smaller RMSD indicates closer pair geometry. These descriptive measurements do not automatically assign major/minor labels, validate every assembly, or test steric compatibility with an ABP.')
+        st.caption('Smaller RMSD indicates closer pair geometry. These descriptive measurements do not validate every assembly or test steric compatibility with an ABP.')
         with st.expander('Geometry measurements, coverage and methods'):
             for name, label in [('all_interface_geometry.csv', 'All pair measurements'),
                                 ('all_interface_geometry_coverage.csv', 'Measured and unavailable pairs'),

@@ -42,7 +42,7 @@ L’ancienne table RSA sans méthode retrouvée reste archivée et exclue des va
 ### Ce qui reste réellement ouvert
 
 1. ProteoCast fournit 49 résultats utilisables sur 57 ABP du complet et 54 du public. Les essais récents des entrées manquantes n'ont pas donné de grille de scores ; l'interface conserve ces échecs comme tels. Pour Cofilin/UNC-60B, RCSB donne une construction de 152 aa, tandis que l'entrée UniProt candidate actuelle Q07750 en contient 165 et diffère : aucune accession ni grille n'est substituée sans correspondance isoforme/construction vérifiée (`cofilin_accession_review.json`).
-2. Rémi doit confirmer la qualification biologique des interfaces majoritaires/minoritaires, le choix des références et l'interprétation des proximités/contacts. Les comptages, comparaisons d'empreintes et ajustements structuraux sont disponibles ; fréquence de dépôt PDB et fréquence physiologique restent distinctes.
+2. Le choix des références et l'interprétation des proximités/contacts restent à examiner selon la question biologique. Les comptages, comparaisons d'empreintes et ajustements structuraux sont disponibles ; fréquence de dépôt PDB et fréquence physiologique restent distinctes.
 3. Pour un article : retrouver la provenance de l'ancienne RSA et les dates originales de téléchargement des variants ; compléter les GO, les limites d'ABD annotés, les témoins négatifs et le protocole de validation. Le calcul RSA humain sur 8DNH est traçable ; le changement de référence est explicite et l'ancienne table reste archivée. Les figures S1 régénérées et les figures dynamiques de l'app sont distinctes des exports historiques archivés.
 4. Les textes finaux de Documentation restent ceux que Rémi souhaite réécrire. Coévolution, chimères et deep learning sont des perspectives de son document, pas des fonctionnalités nécessaires annoncées comme terminées.
 
@@ -97,7 +97,7 @@ Un contrôle structural porte sur [3J8A, F-actine–tropomyosine](https://www.rc
 
 Pour 6VAO, le RMSD médian du voisin vaut environ 0,94 Å (C70 0_7797_10) et 1,08 Å (0_7797_12) par rapport à 5YU8, contre environ 7,01 Å et 7,11 Å face aux paires correspondantes de 3J8A. Ce contrôle représentatif appuie une géométrie distincte. Il ne valide pas tous les clusters, l'état de chaque assemblage, ni des conflits stériques avec les ABP. 3J8A contient de la tropomyosine : ce n'est pas un filament nu universel.
 
-Un bouton charge les sites observés dans 5YU8 (6685_1, 6685_2, 6685_17, 6685_23) dans la comparaison des empreintes, face à 6685_1–4. Les empreintes affichées restent l'union de toutes les observations appartenant aux sites sélectionnés ; elles ne représentent pas exclusivement cette structure. L'étiquette biologique finale « majoritaire/minoritaire » pour l'ensemble des interfaces reste à examiner avec Rémi à partir de ces résultats.
+Un bouton charge les sites observés dans 5YU8 (6685_1, 6685_2, 6685_17, 6685_23) dans la comparaison des empreintes, face à 6685_1–4. Les empreintes affichées restent l'union de toutes les observations appartenant aux sites sélectionnés ; elles ne représentent pas exclusivement cette structure.
 
 ## Figures et reproductibilité
 
@@ -151,7 +151,7 @@ python tools/update_folddisco_annotations.py --limit 200
 python tools/export_scientific_audit.py
 ```
 
-Les appels RCSB, GO et fetch_rsa_reference utilisent le réseau ; les autres calculs utilisent les sources locales. Le cache GO peut être complété par lots ou pour des identifiants choisis. Aucun nouveau résultat ProteoCast ou FoldDisco n'est inventé à partir d'un échec ou d'un fichier absent. La couverture exhaustive des prédictions, la qualification finale des interfaces majoritaires/minoritaires, la validation des ABD et les textes de documentation attendus de Rémi restent distincts des fonctionnalités désormais disponibles. Les pistes coévolution/chimères/deep learning du document sont des perspectives, pas des analyses validées par ce lot.
+Les appels RCSB, GO et fetch_rsa_reference utilisent le réseau ; les autres calculs utilisent les sources locales. Le cache GO peut être complété par lots ou pour des identifiants choisis. Aucun nouveau résultat ProteoCast ou FoldDisco n'est inventé à partir d'un échec ou d'un fichier absent. La couverture exhaustive des prédictions, la validation des ABD et les textes de documentation attendus de Rémi restent distincts des fonctionnalités désormais disponibles. Les pistes coévolution/chimères/deep learning du document sont des perspectives, pas des analyses validées par ce lot.
 
 
 ## Suite du document de Rémi — 2 octobre 2026
@@ -166,7 +166,7 @@ Les appels RCSB, GO et fetch_rsa_reference utilisent le réseau ; les autres cal
 
 ### Décisions scientifiques à revoir avec Rémi avant l'article
 
-- Confirmer la définition biologique de « majoritaire/minoritaire » et le choix des références : 3J8A contient de la tropomyosine et 5YU8 de la cofiline. Les effectifs PDB ne sont pas des fréquences physiologiques.
+- Examiner le choix des références selon la question biologique : 3J8A contient de la tropomyosine et 5YU8 de la cofiline. Les effectifs PDB ne sont pas des fréquences physiologiques.
 - Relire le critère de construction des clusters C70 dans la méthode PPI3D d'origine ; le guide ne les décrit plus comme des géométries identiques.
 - Définir un protocole de conflits stériques si cette conclusion est nécessaire : superposition structurale, traitement des conformations, seuils et contrôles. Le Jaccard seul ne suffit pas.
 - Confirmer les annotations et positions d'ABD servant de témoins biologiques aux candidats FoldDisco, et le traitement du motif de 44 résidus sans sélection arbitraire.
