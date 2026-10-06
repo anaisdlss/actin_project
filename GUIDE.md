@@ -86,6 +86,17 @@ Source summary:
 | **Footprint** | The set of actin residues a given ABP contacts. |
 | **Representative pair** | For a cluster, the single most frequent structure shown in the 3D viewer / sequences (so you look at one clear example, not an average). |
 
+In **Actin-actin interfaces → Compare footprints**, the default heatmap shows
+**mean buried ASA (%)** on a fixed 0–100% scale. Multiple ABPs can be selected,
+including without actin–actin reference sites. Selected contacts are combined
+by the maximum per resolved actin chain and position, averaged across chains
+within each PDB, then across PDBs with equal weight. Resolved positions without
+a selected contact contribute zero; unresolved positions and invalid contact
+measurements remain missing. Hover and CSV exports report contributing PDB and
+chain counts. The optional **Contact observed (blue/grey)** view and Jaccard
+tables use the union of contacts above the selected ASA threshold. That threshold
+does not filter the mean heatmap. These percentages do not measure binding strength.
+
 ---
 
 ## 4. Navigation and scientific pages
